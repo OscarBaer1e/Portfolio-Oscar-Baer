@@ -1,0 +1,130 @@
+/*
+ * ============================================
+ * FICHIER CSS ABOUT - SPÉCIFIQUE À LA PAGE À PROPOS
+ * ============================================
+ */
+
+
+/*
+ * --------------------------------------------
+ * 7. SECTION ABOUT (À PROPOS)
+ * --------------------------------------------
+ */
+#about {
+    background-color: var(--background-card);
+}
+
+.about-content {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 60px;
+    margin-top: 40px;
+}
+
+.profile-pic {
+    flex: 0 0 350px;
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.15);
+}
+
+/* Bordure décorative animée autour de l'image */
+.profile-pic::before {
+    content: '';
+    position: absolute;
+    top: -15px;
+    left: -15px;
+    right: -15px;
+    bottom: -15px;
+    border: 5px solid var(--primary-color);
+    border-radius: 18px;
+    opacity: 0.3;
+    transition: opacity 0.4s ease, border-color 0.4s ease;
+    pointer-events: none;
+}
+.profile-pic:hover::before {
+    opacity: 1;
+    border-color: var(--highlight-color);
+}
+
+.profile-pic img {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+}
+
+.bio {
+    flex: 1;
+    min-width: 300px;
+    padding-top: 20px;
+}
+
+.bio p {
+    margin-bottom: 1.5rem;
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+/* Section des compétences */
+.skills-section {
+    margin-top: 80px;
+    padding-top: 50px;
+    border-top: 3px solid var(--border-color);
+}
+
+.skills-section h3 {
+    color: var(--primary-color);
+    text-align: center;
+    margin-bottom: 3rem;
+    font-size: 2.2rem;
+}
+
+.skills-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 40px;
+}
+
+.skill-category {
+    background-color: var(--background-light);
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.skill-category:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 188, 212, 0.15);
+}
+
+.skill-category h4 {
+    color: var(--secondary-color);
+    margin-bottom: 15px;
+    border-bottom: 3px solid var(--highlight-color);
+    display: inline-block;
+    padding-bottom: 5px;
+}
+
+.skill-category li {
+    padding: 7px 0;
+    font-size: 1rem;
+    color: var(--text-dark);
+    position: relative;
+    padding-left: 25px;
+}
+
+/* L'icône Check-circle */
+.skill-category li::before {
+    content: '\f058';
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    color: var(--primary-color);
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 1.1rem;
+}

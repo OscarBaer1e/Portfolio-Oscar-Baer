@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galerie de Projets Visuels | Oscar Baer</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Anta&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="logo"><a href="../index.html">Oscar BAER</a></h1>
+            <nav>
+                <button class="menu-toggle" aria-label="Ouvrir le menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <ul class="nav-list">
+                    <li><a href="../index.html">Accueil</a></li>
+                    <li><a href="./portfolio.html" class="active">Portfolio</a></li>
+                    <li><a href="./about.html">À Propos</a></li>
+                    <li><a href="./contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="visual-gallery" class="section-padding">
+            <div class="container">
+                
+                <h2 class="section-title reveal">GALERIE DE CRÉATIONS VISUELLES & INFOGRAPHIES</h2>
+                
+                <p class="text-center project-tagline reveal mb-5">
+                    Aperçu de mes travaux en conception graphique, de la création de maquettes UI/UX aux illustrations et supports de communication.
+                </p>
+
+                <div class="image-gallery-grid">
+                    
+                        <figure class="gallery-item reveal">
+                            <img src="../ressources/images/web2.png" alt="Maquette et navigation webdocumentaire">
+                            <figcaption>
+                                <h4>Maquette UX/UI</h4>
+                                <p>Conception d'interfaces immersives pour le webdocumentaire et navigation animée.</p>
+                            </figcaption>
+                        </figure>
+                    
+                        <figure class="gallery-item reveal">
+                            <img src="../ressources/images/web3.png" alt="Identité visuelle et palette de couleurs">
+                            <figcaption>
+                                <h4>Identité Visuelle</h4>
+                                <p>Logo, palette et typographies cohérentes pour un projet événementiel.</p>
+                            </figcaption>
+                        </figure>
+
+                        <figure class="gallery-item reveal">
+                            <img src="../ressources/images/gaggagagaag.jpg" alt="Infographie colorée">
+                            <figcaption>
+                                <h4>Infographie & Storytelling</h4>
+                                <p>Mise en page illustrée pour vulgariser des données et guider la lecture.</p>
+                            </figcaption>
+                        </figure>
+
+                        <figure class="gallery-item reveal">
+                            <img src="../ressources/images/dossier.jpg" alt="Affiche rallye">
+                            <figcaption>
+                                <h4>Affiche & Print</h4>
+                                <p>Composition d'affiche pour un évènement automobile avec hiérarchie claire.</p>
+                            </figcaption>
+                        </figure>
+
+                        <figure class="gallery-item reveal">
+                            <img src="../ressources/images/web4.png" alt="Mockup mobile">
+                            <figcaption>
+                                <h4>Mockup Mobile</h4>
+                                <p>Déclinaison mobile de la charte graphique avec focus sur l'ergonomie.</p>
+                            </figcaption>
+                        </figure>
+
+                        <figure class="gallery-item reveal">
+                            <img src="../ressources/images/webdoc.png" alt="Vignette webdocumentaire">
+                            <figcaption>
+                                <h4>Vignette Projet</h4>
+                                <p>Présentation synthétique du webdocumentaire et accroche visuelle.</p>
+                            </figcaption>
+                        </figure>
+
+                </div>
+                
+                <div class="text-center mt-5 reveal">
+                    <a href="./portfolio.html" class="btn secondary-btn large-btn"><i class="fas fa-arrow-left"></i> Retour au Portfolio</a>
+                </div>
+
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; <span id="current-year-project"></span> Oscar Baer. Tous droits réservés.</p>
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/oscar-baer-a5bbb029b/" target="_blank" aria-label="LinkedIn" class="social-link-animated"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/OscarBaer" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="https://twitter.com/OscarBaer" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+    </footer>
+    <script>
+        document.getElementById('current-year-project').textContent = new Date().getFullYear();
+    </script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

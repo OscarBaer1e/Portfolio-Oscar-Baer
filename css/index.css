@@ -1,0 +1,122 @@
+/*
+ * ============================================
+ * FICHIER CSS INDEX - SPÉCIFIQUE À LA PAGE D'ACCUEIL
+ * ============================================
+ */
+
+
+/*
+ * --------------------------------------------
+ * 5. SECTION HERO (ACCUEIL)
+ * --------------------------------------------
+ */
+#hero {
+    /* Fond dégradé semi-transparent avec image (AJUSTER hero-image.jpg) */
+    background: linear-gradient(135deg, rgba(26, 26, 46, 0.9), rgba(26, 26, 46, 0.7)), url('../images/hero-image.jpg') no-repeat center center/cover;
+    color: var(--text-light);
+    text-align: center;
+    padding: 150px 0;
+    min-height: 90vh;
+}
+
+.hero-content {
+    max-width: 900px;
+    padding: 30px;
+    margin: 0 auto;
+}
+
+.hero-content .intro {
+    font-size: 1.4rem;
+    color: var(--highlight-color);
+    font-weight: 300;
+}
+
+.hero-content h2 {
+    font-size: 5rem;
+    color: var(--text-light);
+    font-weight: 900;
+    text-shadow: 0 4px 6px rgba(0,0,0,0.4);
+}
+
+.hero-content h3 {
+    font-size: 2.2rem;
+    color: var(--primary-color);
+    font-weight: 400;
+    min-height: 2.2rem; 
+}
+
+.hero-content .description {
+    font-size: 1.2rem;
+    color: rgba(255, 255, 255, 0.85);
+}
+
+/* Curseur clignotant pour l'effet de frappe */
+.typing-cursor {
+    display: inline-block;
+    width: 4px;
+    height: 2.2rem;
+    background-color: var(--primary-color);
+    margin-left: 5px;
+    animation: blink 0.7s step-end infinite;
+}
+@keyframes blink {
+    from, to { background-color: transparent }
+    50% { background-color: var(--primary-color); }
+}
+
+/*
+ * --------------------------------------------
+ * 6. SECTION PORTFOLIO (GRILLE DE PROJETS)
+ * --------------------------------------------
+ */
+#portfolio-section {
+    background-color: var(--background-light);
+}
+
+.portfolio-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 40px;
+}
+
+.portfolio-item {
+    background-color: var(--background-card);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+    transition: all 0.5s cubic-bezier(0.23, 1, 0.320, 1);
+    border: 1px solid var(--border-color);
+}
+
+.portfolio-item:hover {
+    transform: translateY(-12px);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+}
+
+.portfolio-item img {
+    height: 250px;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.portfolio-item:hover img {
+    transform: scale(1.05);
+}
+
+.portfolio-item h3 {
+    font-size: 1.6rem;
+    margin: 15px 15px 5px;
+}
+
+.portfolio-item .category {
+    font-size: 1rem;
+    color: var(--primary-color);
+    margin: 0 15px 15px;
+}
+
+/* Responsive Index */
+@media (max-width: 500px) {
+    .hero-content h2 {
+        font-size: 2.5rem;
+    }
+}

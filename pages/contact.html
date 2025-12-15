@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contactez Oscar Baer - Portfolio</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1 class="logo"><a href="../index.html">Oscar Baer</a></h1>
+            <nav>
+                <button class="menu-toggle" aria-label="Ouvrir le menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <ul class="nav-list">
+                    <li><a href="../index.html">Accueil</a></li>
+                    <li><a href="./portfolio.html">Portfolio</a></li>
+                    <li><a href="./about.html">À Propos</a></li>
+                    <li><a href="./contact.html" class="active">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="contact" class="section-padding">
+            <div class="container">
+                <h2 class="section-title">Me Contacter</h2>
+                <p class="text-center mb-5">
+                    N'hésitez pas à me contacter pour toute opportunité d'alternance à partir de septembre 2026, collaboration, ou simplement pour discuter de vos projets web et multimédia.
+                </p>
+
+                <div class="contact-grid">
+                    <div class="contact-info">
+                        <h3>Informations de Contact</h3>
+                        <p><i class="fas fa-envelope"></i> Email : <a href="mailto:contact@oscarbaer.com">contact@oscarbaer.com</a></p>
+                        <p><i class="fas fa-phone"></i> Téléphone : <a href="tel:+33760495591">(+33) 7 60 49 55 91</a></p>
+                        <p><i class="fas fa-map-marker-alt"></i> Localisation : Reims, France</p>
+                        
+                        <div class="social-links mt-4">
+                            <a href="https://www.linkedin.com/in/oscar-baer-a5bbb029b/" target="_blank" aria-label="LinkedIn"><i class="fab fa-linkedin fa-2x"></i></a>
+                            <a href="https://github.com/OscarBaer" target="_blank" aria-label="GitHub"><i class="fab fa-github fa-2x"></i></a>
+                            <a href="https://twitter.com/OscarBaer" target="_blank" aria-label="Twitter"><i class="fab fa-twitter fa-2x"></i></a>
+                            </div>
+                    </div>
+                    <div class="contact-form">
+                        <h3>Envoyez-moi un message</h3>
+                        <form action="https://formspree.io/f/xkgdaggb" method="POST"> <div class="form-group">
+                                <label for="name">Nom</label>
+                                <input type="text" id="name" name="name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" name="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="subject">Sujet</label>
+                                <input type="text" id="subject" name="subject">
+                            </div>
+                            <div class="form-group">
+                                <label for="message">Message</label>
+                                <textarea id="message" name="message" rows="6" required></textarea>
+                            </div>
+                            <button type="submit" class="btn primary-btn">Envoyer le message</button>
+                        </form>
+                        <p class="form-note">
+                            *Ce formulaire utilise <a href="https://formspree.io/" target="_blank">Formspree.io</a> pour envoyer des e-mails sans code back-end. L'ID de formulaire est déjà configuré.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; <span id="current-year-contact"></span> Oscar Baer. Tous droits réservés.</p>
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/oscar-baer-a5bbb029b/" target="_blank" aria-label="LinkedIn" class="social-link-animated"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/OscarBaer" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="https://twitter.com/OscarBaer" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>
