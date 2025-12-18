@@ -6,6 +6,22 @@
 document.addEventListener('DOMContentLoaded', function() {
 
     // ===============================================
+    // 0. Animation d'entrée (Loader)
+    // ===============================================
+    const pageLoader = document.querySelector('.page-loader');
+    
+    if (pageLoader) {
+        // Simule le chargement
+        setTimeout(() => {
+            pageLoader.classList.add('hidden');
+            // Retire le loader du DOM après l'animation
+            setTimeout(() => {
+                pageLoader.remove();
+            }, 500);
+        }, 2000);
+    }
+
+    // ===============================================
     // 1. Mise à jour de l'année dans le footer
     // ===============================================
     const currentYearElements = document.querySelectorAll('[id^="current-year"]');
@@ -93,8 +109,17 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Démarre l'effet uniquement si l'élément existe sur la page
+    // Attend que le loader soit terminé pour commencer
     if (typingElement) {
-        typeWriter();
+        if (pageLoader) {
+            // Attend la fin du loader + un petit délai
+            setTimeout(() => {
+                typeWriter();
+            }, 2500);
+        } else {
+            // Si pas de loader, démarre immédiatement
+            typeWriter();
+        }
     }
 
 
@@ -389,41 +414,411 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // ===============================================
-    // 15. Effet de particules animées (optionnel, léger)
+    // 15. Effet de particules animées amélioré
     // ===============================================
     function createParticle() {
         const particle = document.createElement('div');
+        const size = Math.random() * 4 + 2;
+        const colors = ['var(--primary-color)', 'var(--secondary-color)'];
+        const color = colors[Math.floor(Math.random() * colors.length)];
+        
         particle.style.position = 'fixed';
-        particle.style.width = '4px';
-        particle.style.height = '4px';
-        particle.style.background = `radial-gradient(circle, ${Math.random() > 0.5 ? 'var(--primary-color)' : 'var(--secondary-color)'}, transparent)`;
+        particle.style.width = size + 'px';
+        particle.style.height = size + 'px';
+        particle.style.background = `radial-gradient(circle, ${color}, transparent)`;
         particle.style.borderRadius = '50%';
         particle.style.pointerEvents = 'none';
         particle.style.left = Math.random() * 100 + '%';
         particle.style.top = '100%';
         particle.style.opacity = '0';
         particle.style.zIndex = '1';
+        particle.style.boxShadow = `0 0 ${size * 2}px ${color}`;
         
         document.body.appendChild(particle);
         
+        const endX = (Math.random() - 0.5) * 300;
+        const endY = -window.innerHeight - 100;
+        
         const animation = particle.animate([
-            { transform: 'translateY(0) translateX(0)', opacity: 0 },
-            { transform: `translateY(${-window.innerHeight}px) translateX(${(Math.random() - 0.5) * 200}px)`, opacity: 0.8 },
-            { transform: `translateY(${-window.innerHeight - 100}px) translateX(${(Math.random() - 0.5) * 400}px)`, opacity: 0 }
+            { 
+                transform: 'translateY(0) translateX(0) scale(0)', 
+                opacity: 0 
+            },
+            { 
+                transform: `translateY(${endY * 0.3}px) translateX(${endX * 0.3}px) scale(1)`, 
+                opacity: 0.8 
+            },
+            { 
+                transform: `translateY(${endY}px) translateX(${endX}px) scale(0)`, 
+                opacity: 0 
+            }
         ], {
-            duration: 3000 + Math.random() * 2000,
-            easing: 'linear'
+            duration: 4000 + Math.random() * 2000,
+            easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
         });
         
         animation.onfinish = () => particle.remove();
     }
     
-    // Crée des particules occasionnellement (pas trop pour les performances)
-    if (window.innerWidth > 768) {
-        setInterval(() => {
-            if (Math.random() > 0.7) {
+    // Crée des particules occasionnellement (optimisé pour les performances)
+    if (window.innerWidth > 768 && document.querySelector('.animated-background')) {
+        let particleInterval = setInterval(() => {
+            if (Math.random() > 0.6) {
                 createParticle();
             }
-        }, 2000);
+        }, 3000);
+        
+        // Arrête les particules si l'utilisateur quitte la page
+        window.addEventListener('blur', () => clearInterval(particleInterval));
+        window.addEventListener('focus', () => {
+            particleInterval = setInterval(() => {
+                if (Math.random() > 0.6) {
+                    createParticle();
+                }
+            }, 3000);
+        });
+    }
+
+    // ===============================================
+    // 16. Animation d'entrée pour les éléments de la page d'accueil
+    // ===============================================
+    if (document.querySelector('#hero')) {
+        const heroElements = document.querySelectorAll('.hero-left, .hero-right, .hero-intro > *');
+        heroElements.forEach((el, index) => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            
+            setTimeout(() => {
+                el.style.opacity = '1';
+                el.style.transform = 'translateY(0)';
+            }, 500 + (index * 100));
+        });
+    }
+
+    // ===============================================
+    // 17. Easter Egg - Mini-jeu de Bowling
+    // ===============================================
+    let clickCount = 0;
+    let clickTimeout;
+    const easterEggTrigger = document.getElementById('easter-egg-trigger');
+    const easterEggTriggerImg = document.getElementById('easter-egg-trigger-img');
+    
+    function triggerEasterEgg() {
+        // Affiche un message amusant
+        const message = document.createElement('div');
+        message.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--dark-bg-color);
+            padding: 30px 50px;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            z-index: 100000;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.8);
+            animation: easterEggPulse 0.5s ease;
+        `;
+        message.innerHTML = '🎳 Easter Egg Découvert ! 🎳<br><small style="font-size: 1rem; margin-top: 10px; display: block;">Redirection vers le mini-jeu...</small>';
+        document.body.appendChild(message);
+        
+        setTimeout(() => {
+            // Détermine le bon chemin selon la page actuelle
+            const currentPath = window.location.pathname;
+            const currentUrl = window.location.href;
+            // Vérifie si on est dans le dossier pages (Windows ou Unix)
+            const isInPagesFolder = currentPath.includes('/pages/') || currentPath.includes('\\pages\\') || currentUrl.includes('/pages/') || currentUrl.includes('\\pages\\');
+            const redirectPath = isInPagesFolder ? './bowling-game.html' : './pages/bowling-game.html';
+            console.log('Redirection vers:', redirectPath, 'Depuis:', currentPath);
+            window.location.href = redirectPath;
+        }, 1500);
+    }
+    
+    if (easterEggTrigger) {
+        easterEggTrigger.addEventListener('click', () => {
+            clickCount++;
+            clearTimeout(clickTimeout);
+            
+            if (clickCount >= 5) {
+                triggerEasterEgg();
+                clickCount = 0;
+            } else {
+                clickTimeout = setTimeout(() => {
+                    clickCount = 0;
+                }, 2000);
+            }
+        });
+    }
+    
+    if (easterEggTriggerImg) {
+        easterEggTriggerImg.addEventListener('click', () => {
+            clickCount++;
+            clearTimeout(clickTimeout);
+            
+            if (clickCount >= 5) {
+                triggerEasterEgg();
+                clickCount = 0;
+            } else {
+                clickTimeout = setTimeout(() => {
+                    clickCount = 0;
+                }, 2000);
+            }
+        });
+    }
+    
+    // Raccourci clavier : B + O + W + L + I + N + G
+    let keySequence = [];
+    const bowlingSequence = ['b', 'o', 'w', 'l', 'i', 'n', 'g'];
+    
+    document.addEventListener('keydown', (e) => {
+        keySequence.push(e.key.toLowerCase());
+        if (keySequence.length > bowlingSequence.length) {
+            keySequence.shift();
+        }
+        
+        if (keySequence.join('') === bowlingSequence.join('')) {
+            triggerEasterEgg();
+            keySequence = [];
+        }
+    });
+
+    // ===============================================
+    // 18. Easter Egg - Mini-jeu de Basketball (sur la page About)
+    // ===============================================
+    let basketballClickCount = 0;
+    let basketballClickTimeout;
+    const basketballEasterEgg = document.getElementById('basketball-easter-egg');
+    const basketballEasterEggTitle = document.getElementById('basketball-easter-egg-title');
+    let basketballKeySequence = [];
+    const basketballSequence = ['b', 'a', 's', 'k', 'e', 't', 'b', 'a', 'l', 'l'];
+    
+    function triggerBasketballEasterEgg() {
+        const message = document.createElement('div');
+        message.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: var(--dark-bg-color);
+            padding: 30px 50px;
+            border-radius: 15px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            z-index: 100000;
+            text-align: center;
+            box-shadow: 0 0 50px rgba(0, 255, 255, 0.8);
+            animation: easterEggPulse 0.5s ease;
+        `;
+        message.innerHTML = '🏀 Easter Egg Basket Découvert ! 🏀<br><small style="font-size: 1rem; margin-top: 10px; display: block;">Redirection vers le mini-jeu...</small>';
+        document.body.appendChild(message);
+        
+        setTimeout(() => {
+            // Détermine le bon chemin selon la page actuelle
+            const currentPath = window.location.pathname;
+            const currentUrl = window.location.href;
+            // Vérifie si on est dans le dossier pages (Windows ou Unix)
+            const isInPagesFolder = currentPath.includes('/pages/') || currentPath.includes('\\pages\\') || currentUrl.includes('/pages/') || currentUrl.includes('\\pages\\');
+            const redirectPath = isInPagesFolder ? './basketball-game.html' : './pages/basketball-game.html';
+            console.log('Redirection vers:', redirectPath, 'Depuis:', currentPath);
+            window.location.href = redirectPath;
+        }, 1500);
+    }
+    
+    if (basketballEasterEgg) {
+        basketballEasterEgg.addEventListener('click', () => {
+            basketballClickCount++;
+            clearTimeout(basketballClickTimeout);
+            
+            if (basketballClickCount >= 7) {
+                triggerBasketballEasterEgg();
+                basketballClickCount = 0;
+            } else {
+                basketballClickTimeout = setTimeout(() => {
+                    basketballClickCount = 0;
+                }, 2000);
+            }
+        });
+    }
+    
+    if (basketballEasterEggTitle) {
+        basketballEasterEggTitle.addEventListener('click', () => {
+            basketballClickCount++;
+            clearTimeout(basketballClickTimeout);
+            
+            if (basketballClickCount >= 7) {
+                triggerBasketballEasterEgg();
+                basketballClickCount = 0;
+            } else {
+                basketballClickTimeout = setTimeout(() => {
+                    basketballClickCount = 0;
+                }, 2000);
+            }
+        });
+    }
+    
+    // Raccourci clavier : B + A + S + K + E + T + B + A + L + L
+    document.addEventListener('keydown', (e) => {
+        if (window.location.pathname.includes('about.html')) {
+            basketballKeySequence.push(e.key.toLowerCase());
+            if (basketballKeySequence.length > basketballSequence.length) {
+                basketballKeySequence.shift();
+            }
+            
+            if (basketballKeySequence.join('') === basketballSequence.join('')) {
+                triggerBasketballEasterEgg();
+                basketballKeySequence = [];
+            }
+        }
+    });
+    
+    // ===============================================
+    // 19. Easter Egg - Mini-jeu Pacman (sur la page Portfolio)
+    // ===============================================
+    if (window.location.pathname.includes('portfolio.html')) {
+        let pacmanClickCount = 0;
+        let pacmanClickTimeout;
+        const pacmanEasterEgg = document.getElementById('pacman-easter-egg-trigger');
+        let pacmanKeySequence = [];
+        const pacmanSequence = ['p', 'a', 'c', 'm', 'a', 'n'];
+        
+        function triggerPacmanEasterEgg() {
+            const message = document.createElement('div');
+            message.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                color: var(--dark-bg-color);
+                padding: 30px 50px;
+                border-radius: 15px;
+                font-size: 1.5rem;
+                font-weight: bold;
+                z-index: 100000;
+                text-align: center;
+                box-shadow: 0 0 50px rgba(0, 255, 255, 0.8);
+                animation: easterEggPulse 0.5s ease;
+            `;
+            message.innerHTML = '👻 Easter Egg Pacman Découvert ! 👻<br><small style="font-size: 1rem; margin-top: 10px; display: block;">Redirection vers le mini-jeu...</small>';
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                const currentPath = window.location.pathname;
+                const currentUrl = window.location.href;
+                const isInPagesFolder = currentPath.includes('/pages/') || currentPath.includes('\\pages\\') || currentUrl.includes('/pages/') || currentUrl.includes('\\pages\\');
+                const redirectPath = isInPagesFolder ? './pacman-game.html' : './pages/pacman-game.html';
+                console.log('Redirection vers:', redirectPath, 'Depuis:', currentPath);
+                window.location.href = redirectPath;
+            }, 1500);
+        }
+        
+        if (pacmanEasterEgg) {
+            pacmanEasterEgg.addEventListener('click', () => {
+                pacmanClickCount++;
+                clearTimeout(pacmanClickTimeout);
+                
+                if (pacmanClickCount >= 5) {
+                    triggerPacmanEasterEgg();
+                    pacmanClickCount = 0;
+                } else {
+                    pacmanClickTimeout = setTimeout(() => {
+                        pacmanClickCount = 0;
+                    }, 2000);
+                }
+            });
+        }
+        
+        // Raccourci clavier : P + A + C + M + A + N
+        document.addEventListener('keydown', (e) => {
+            if (window.location.pathname.includes('portfolio.html')) {
+                pacmanKeySequence.push(e.key.toLowerCase());
+                if (pacmanKeySequence.length > pacmanSequence.length) {
+                    pacmanKeySequence.shift();
+                }
+                
+                if (pacmanKeySequence.join('') === pacmanSequence.join('')) {
+                    triggerPacmanEasterEgg();
+                    pacmanKeySequence = [];
+                }
+            }
+        });
+    }
+    
+    // ===============================================
+    // 20. Easter Egg - Page Secrète Omerta (sur la page Contact)
+    // ===============================================
+    if (window.location.pathname.includes('contact.html')) {
+        let omertaClickCount = 0;
+        let omertaClickTimeout;
+        const omertaEasterEgg = document.getElementById('omerta-easter-egg-trigger');
+        let omertaKeySequence = [];
+        const omertaSequence = ['o', 'm', 'e', 'r', 't', 'a'];
+        
+        function triggerOmertaEasterEgg() {
+            const message = document.createElement('div');
+            message.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+                color: var(--dark-bg-color);
+                padding: 30px 50px;
+                border-radius: 15px;
+                font-size: 1.5rem;
+                font-weight: bold;
+                z-index: 100000;
+                text-align: center;
+                box-shadow: 0 0 50px rgba(0, 255, 255, 0.8);
+                animation: easterEggPulse 0.5s ease;
+            `;
+            message.innerHTML = '🔒 Easter Egg Découvert ! 🔒<br><small style="font-size: 1rem; margin-top: 10px; display: block;">Redirection vers la page secrète...</small>';
+            document.body.appendChild(message);
+            
+            setTimeout(() => {
+                const currentPath = window.location.pathname;
+                const currentUrl = window.location.href;
+                const isInPagesFolder = currentPath.includes('/pages/') || currentPath.includes('\\pages\\') || currentUrl.includes('/pages/') || currentUrl.includes('\\pages\\');
+                const redirectPath = isInPagesFolder ? './omerta.html' : './pages/omerta.html';
+                console.log('Redirection vers:', redirectPath, 'Depuis:', currentPath);
+                window.location.href = redirectPath;
+            }, 1500);
+        }
+        
+        if (omertaEasterEgg) {
+            omertaEasterEgg.addEventListener('click', () => {
+                omertaClickCount++;
+                clearTimeout(omertaClickTimeout);
+                
+                if (omertaClickCount >= 5) {
+                    triggerOmertaEasterEgg();
+                    omertaClickCount = 0;
+                } else {
+                    omertaClickTimeout = setTimeout(() => {
+                        omertaClickCount = 0;
+                    }, 2000);
+                }
+            });
+        }
+        
+        // Raccourci clavier : O + M + E + R + T + A
+        document.addEventListener('keydown', (e) => {
+            if (window.location.pathname.includes('contact.html')) {
+                omertaKeySequence.push(e.key.toLowerCase());
+                if (omertaKeySequence.length > omertaSequence.length) {
+                    omertaKeySequence.shift();
+                }
+                
+                if (omertaKeySequence.join('') === omertaSequence.join('')) {
+                    triggerOmertaEasterEgg();
+                    omertaKeySequence = [];
+                }
+            }
+        });
     }
 });

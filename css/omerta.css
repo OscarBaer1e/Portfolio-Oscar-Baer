@@ -1,0 +1,329 @@
+/* ================================================
+   PAGE SECRÈTE - Omerta (Style Cyberpunk Rouge)
+   ================================================ */
+
+#omerta-section {
+    min-height: calc(100vh - var(--header-height));
+    padding: 60px 20px;
+    background: var(--dark-bg-color);
+    position: relative;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+
+/* Fond animé rouge cyberpunk */
+#omerta-section::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        linear-gradient(rgba(255, 0, 0, 0.15) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 0, 0, 0.15) 1px, transparent 1px),
+        linear-gradient(rgba(220, 20, 60, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(220, 20, 60, 0.1) 1px, transparent 1px);
+    background-size: 80px 80px, 80px 80px, 40px 40px, 40px 40px;
+    animation: redGridMove 20s linear infinite, redGridPulse 4s ease-in-out infinite;
+    opacity: 0.6;
+    z-index: 0;
+    pointer-events: none;
+}
+
+@keyframes redGridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(80px, 80px); }
+}
+
+@keyframes redGridPulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.7; }
+}
+
+/* Particules rouges flottantes */
+#omerta-section::after {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: radial-gradient(circle at 20% 30%, rgba(255, 0, 0, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 70%, rgba(220, 20, 60, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(178, 34, 34, 0.08) 0%, transparent 70%);
+    animation: redParticles 15s ease-in-out infinite;
+    z-index: 0;
+    pointer-events: none;
+}
+
+@keyframes redParticles {
+    0%, 100% {
+        transform: translate(0, 0) scale(1);
+        opacity: 0.6;
+    }
+    33% {
+        transform: translate(30px, -30px) scale(1.1);
+        opacity: 0.8;
+    }
+    66% {
+        transform: translate(-20px, 20px) scale(0.9);
+        opacity: 0.7;
+    }
+}
+
+.board-container {
+    position: relative;
+    min-height: calc(100vh - 200px);
+    z-index: 1;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.board-title {
+    text-align: center;
+    font-size: 2.5rem;
+    color: #ff3333;
+    text-shadow: 
+        0 0 10px rgba(255, 51, 51, 0.8),
+        0 0 20px rgba(255, 51, 51, 0.6),
+        0 0 30px rgba(255, 51, 51, 0.4),
+        2px 2px 4px rgba(0, 0, 0, 0.8);
+    margin-bottom: 60px;
+    position: relative;
+    z-index: 2;
+    animation: redTitleGlow 3s ease-in-out infinite;
+    font-family: 'Anta', sans-serif;
+}
+
+@keyframes redTitleGlow {
+    0%, 100% {
+        text-shadow: 
+            0 0 10px rgba(255, 51, 51, 0.8),
+            0 0 20px rgba(255, 51, 51, 0.6),
+            0 0 30px rgba(255, 51, 51, 0.4),
+            2px 2px 4px rgba(0, 0, 0, 0.8);
+    }
+    50% {
+        text-shadow: 
+            0 0 20px rgba(255, 51, 51, 1),
+            0 0 40px rgba(255, 51, 51, 0.8),
+            0 0 60px rgba(255, 51, 51, 0.6),
+            2px 2px 4px rgba(0, 0, 0, 0.8);
+    }
+}
+
+/* Grille pour éviter les superpositions */
+.sticky-notes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 40px;
+    padding: 20px 0;
+    position: relative;
+    z-index: 1;
+}
+
+/* Post-it avec animations */
+.sticky-note {
+    position: relative;
+    padding: 20px;
+    min-width: 280px;
+    max-width: 100%;
+    box-shadow: 
+        0 4px 15px rgba(255, 0, 0, 0.3),
+        0 0 0 1px rgba(255, 0, 0, 0.2),
+        inset 0 0 20px rgba(255, 0, 0, 0.1);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    z-index: 10;
+    border-radius: 8px;
+    animation: noteFloat 4s ease-in-out infinite;
+    animation-delay: calc(var(--note-index, 0) * 0.2s);
+}
+
+@keyframes noteFloat {
+    0%, 100% {
+        transform: translateY(0px) rotate(var(--note-rotation, 0deg));
+    }
+    50% {
+        transform: translateY(-5px) rotate(var(--note-rotation, 0deg));
+    }
+}
+
+.sticky-note:hover {
+    transform: translateY(-10px) scale(1.05) rotate(var(--note-rotation, 0deg)) !important;
+    z-index: 100;
+    box-shadow: 
+        0 8px 30px rgba(255, 0, 0, 0.5),
+        0 0 0 2px rgba(255, 0, 0, 0.4),
+        inset 0 0 30px rgba(255, 0, 0, 0.2);
+}
+
+/* Couleurs des post-it avec accents rouges */
+.video-note {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+    border: 2px solid rgba(255, 0, 0, 0.4);
+    border-left: 5px solid #ff3333;
+    --note-rotation: -2deg;
+}
+
+.video-note::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 51, 51, 0.1) 0%, transparent 100%);
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+.audio-note {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+    border: 2px solid rgba(255, 0, 0, 0.4);
+    border-left: 5px solid #ff6666;
+    --note-rotation: 2deg;
+}
+
+.audio-note::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 102, 102, 0.1) 0%, transparent 100%);
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+.image-note {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+    border: 2px solid rgba(255, 0, 0, 0.4);
+    border-left: 5px solid #dc143c;
+    --note-rotation: -1.5deg;
+}
+
+.image-note::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(220, 20, 60, 0.1) 0%, transparent 100%);
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+.return-note {
+    background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
+    border: 2px solid rgba(255, 0, 0, 0.4);
+    border-left: 5px solid #ff0000;
+    text-align: center;
+    padding: 25px;
+    --note-rotation: 0deg;
+    grid-column: 1 / -1;
+    max-width: 300px;
+    margin: 0 auto;
+}
+
+.return-note::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 0, 0, 0.1) 0%, transparent 100%);
+    border-radius: 8px;
+    pointer-events: none;
+}
+
+.note-header {
+    margin-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 0, 0, 0.3);
+    padding-bottom: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.note-header h3 {
+    margin: 0;
+    font-size: 1.2rem;
+    color: #ff3333;
+    font-weight: bold;
+    text-shadow: 
+        0 0 10px rgba(255, 51, 51, 0.6),
+        0 0 5px rgba(255, 51, 51, 0.4);
+    animation: headerPulse 2s ease-in-out infinite;
+}
+
+@keyframes headerPulse {
+    0%, 100% {
+        text-shadow: 
+            0 0 10px rgba(255, 51, 51, 0.6),
+            0 0 5px rgba(255, 51, 51, 0.4);
+    }
+    50% {
+        text-shadow: 
+            0 0 15px rgba(255, 51, 51, 0.8),
+            0 0 10px rgba(255, 51, 51, 0.6);
+    }
+}
+
+.media-video {
+    width: 100%;
+    height: auto;
+    border-radius: 5px;
+    background: #000;
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+    position: relative;
+    z-index: 1;
+}
+
+.media-audio {
+    width: 100%;
+    margin-top: 10px;
+    position: relative;
+    z-index: 1;
+}
+
+.media-image {
+    width: 100%;
+    height: auto;
+    max-height: 250px;
+    object-fit: cover;
+    border-radius: 5px;
+    border: 1px solid rgba(255, 0, 0, 0.3);
+    display: block;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
+    position: relative;
+    z-index: 1;
+}
+
+.return-note .btn {
+    position: relative;
+    z-index: 1;
+}
+
+@media (max-width: 768px) {
+    .sticky-notes-grid {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .sticky-note {
+        min-width: auto;
+        max-width: 100%;
+        --note-rotation: 0deg !important;
+    }
+    
+    .board-title {
+        font-size: 2rem;
+        margin-bottom: 40px;
+    }
+}
