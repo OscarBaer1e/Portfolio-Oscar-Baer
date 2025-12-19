@@ -317,13 +317,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Initialiser Firebase
                 const app = firebase.initializeApp(FIREBASE_CONFIG);
                 console.log('✅ Firebase initialisé');
-                console.log('✅ Project ID vérifié:', app.options.projectId);
                 
-                // Vérification critique
-                if (app.options.projectId !== 'oscar-baer') {
-                    console.error('❌ ERREUR CRITIQUE: Project ID incorrect:', app.options.projectId);
+                // Vérification critique du projectId
+                const actualProjectId = app.options.projectId;
+                console.log('✅ Project ID vérifié:', actualProjectId);
+                
+                if (actualProjectId !== 'oscar-baer') {
+                    console.error('❌ ERREUR CRITIQUE: Project ID incorrect:', actualProjectId);
+                    console.error('Attendu: oscar-baer');
+                    console.error('FIREBASE_CONFIG utilisé:', FIREBASE_CONFIG);
+                    // Désinitialiser et réessayer avec la config forcée
                     app.delete();
-                    return null;
+                    // Forcer la configuration correcte
+                    const forcedConfig = {
+                        apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
+                        authDomain: "oscar-baer.firebaseapp.com",
+                        projectId: "oscar-baer",
+                        storageBucket: "oscar-baer.firebasestorage.app",
+                        messagingSenderId: "419618942184",
+                        appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
+                    };
+                    const newApp = firebase.initializeApp(forcedConfig, 'default');
+                    console.log('✅ Firebase réinitialisé avec projectId:', newApp.options.projectId);
+                    db = newApp.firestore();
+                    firebaseInitialized = true;
+                    return db;
                 }
             } else {
                 // Firebase déjà initialisé - vérifier le projectId
