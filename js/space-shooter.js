@@ -2109,11 +2109,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 try {
                     await registerScore(name, gameState.score, gameState.level);
-                    if (scoreRegister) scoreRegister.classList.add('hidden');
+                    
+                    // Fermer la fenêtre d'enregistrement
+                    if (scoreRegister) {
+                        scoreRegister.classList.add('hidden');
+                    }
+                    
+                    // Masquer le bouton d'enregistrement après enregistrement réussi
+                    if (registerScoreBtn) {
+                        registerScoreBtn.classList.add('hidden');
+                    }
+                    
+                    // Réinitialiser les champs
                     playerNameInput.value = '';
                     registerScoreValue.textContent = '0';
                     registerLevelValue.textContent = '1';
                     registerPositionValue.textContent = '-';
+                    
                     showMessage(`Score enregistré ! Bien joué ${name} !`, 'powerup');
                     
                     // Mettre à jour le leaderboard si ouvert
