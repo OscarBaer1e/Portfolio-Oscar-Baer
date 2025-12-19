@@ -289,24 +289,48 @@
     <script>
         document.getElementById('current-year-space').textContent = new Date().getFullYear();
         
-        // Configuration Firebase - Valeurs par défaut garanties
-        window.FIREBASE_CONFIG = {
-            apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
-            authDomain: "oscar-baer.firebaseapp.com",
-            projectId: "oscar-baer",
-            storageBucket: "oscar-baer.firebasestorage.app",
-            messagingSenderId: "419618942184",
-            appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
-        };
-        
-        console.log('✅ Configuration Firebase définie par défaut:', {
-            projectId: window.FIREBASE_CONFIG.projectId,
-            apiKey: window.FIREBASE_CONFIG.apiKey.substring(0, 10) + '...'
-        });
-        
-        // NE PAS charger depuis l'API Vercel pour éviter d'écraser avec YOUR_PROJECT_ID
-        // Les valeurs par défaut sont garanties et correctes
-        console.log('ℹ️ Utilisation de la configuration directe (pas d\'API Vercel)');
+        // FORCER la configuration Firebase - Écraser TOUT ce qui pourrait exister
+        // Cette configuration est définie AVANT tout autre script pour garantir qu'elle est utilisée
+        (function() {
+            // Supprimer toute configuration existante qui pourrait être invalide
+            if (window.FIREBASE_CONFIG) {
+                console.warn('⚠️ Configuration Firebase existante détectée, remplacement...');
+                console.warn('Ancienne config:', window.FIREBASE_CONFIG);
+            }
+            
+            // Configuration Firebase FORCÉE - Valeurs garanties
+            window.FIREBASE_CONFIG = {
+                apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
+                authDomain: "oscar-baer.firebaseapp.com",
+                projectId: "oscar-baer",
+                storageBucket: "oscar-baer.firebasestorage.app",
+                messagingSenderId: "419618942184",
+                appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
+            };
+            
+            // Protection : rendre la config non-modifiable
+            Object.freeze(window.FIREBASE_CONFIG);
+            Object.defineProperty(window, 'FIREBASE_CONFIG', {
+                value: window.FIREBASE_CONFIG,
+                writable: false,
+                configurable: false
+            });
+            
+            console.log('✅ Configuration Firebase FORCÉE et verrouillée:', {
+                projectId: window.FIREBASE_CONFIG.projectId,
+                apiKey: window.FIREBASE_CONFIG.apiKey.substring(0, 10) + '...',
+                authDomain: window.FIREBASE_CONFIG.authDomain
+            });
+            
+            // Vérification immédiate
+            if (window.FIREBASE_CONFIG.projectId === 'YOUR_PROJECT_ID' || 
+                window.FIREBASE_CONFIG.projectId !== 'oscar-baer') {
+                console.error('❌ ERREUR: Configuration invalide détectée après définition!');
+                console.error('Config actuelle:', window.FIREBASE_CONFIG);
+            } else {
+                console.log('✅ Vérification: projectId correct =', window.FIREBASE_CONFIG.projectId);
+            }
+        })();
     </script>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>

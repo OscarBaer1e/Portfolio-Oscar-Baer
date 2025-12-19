@@ -283,7 +283,30 @@ document.addEventListener('DOMContentLoaded', function() {
         
         firebaseInitAttempted = true;
         
+        // DIAGNOSTIC COMPLET AVANT INITIALISATION
+        console.log('🔍 DIAGNOSTIC Firebase avant initialisation:');
+        console.log('  - window.FIREBASE_CONFIG:', window.FIREBASE_CONFIG);
+        console.log('  - FIREBASE_CONFIG local:', FIREBASE_CONFIG);
+        console.log('  - firebase.apps.length:', firebase.apps.length);
+        
         try {
+            // FORCER la configuration avant toute initialisation
+            if (!window.FIREBASE_CONFIG || 
+                window.FIREBASE_CONFIG.projectId === 'YOUR_PROJECT_ID' ||
+                window.FIREBASE_CONFIG.projectId !== 'oscar-baer') {
+                console.error('❌ Configuration invalide détectée, correction FORCÉE...');
+                window.FIREBASE_CONFIG = {
+                    apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
+                    authDomain: "oscar-baer.firebaseapp.com",
+                    projectId: "oscar-baer",
+                    storageBucket: "oscar-baer.firebasestorage.app",
+                    messagingSenderId: "419618942184",
+                    appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
+                };
+                FIREBASE_CONFIG = window.FIREBASE_CONFIG;
+                console.log('✅ Configuration corrigée:', window.FIREBASE_CONFIG);
+            }
+            
             // Vérifier si Firebase est déjà initialisé
             if (firebase.apps.length === 0) {
                 // Vérification finale stricte
