@@ -346,13 +346,27 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 // Firebase déjà initialisé - vérifier le projectId
                 const existingApp = firebase.app();
-                console.log('✅ Firebase déjà initialisé, Project ID:', existingApp.options.projectId);
+                const existingProjectId = existingApp.options.projectId;
+                console.log('✅ Firebase déjà initialisé, Project ID:', existingProjectId);
                 
-                if (existingApp.options.projectId === 'YOUR_PROJECT_ID') {
-                    console.error('❌ Firebase initialisé avec YOUR_PROJECT_ID - Réinitialisation...');
+                if (existingProjectId === 'YOUR_PROJECT_ID' || existingProjectId !== 'oscar-baer') {
+                    console.error('❌ Firebase initialisé avec projectId incorrect:', existingProjectId);
+                    console.error('Réinitialisation avec configuration forcée...');
                     existingApp.delete();
-                    const app = firebase.initializeApp(FIREBASE_CONFIG);
-                    console.log('✅ Réinitialisé avec projectId:', app.options.projectId);
+                    // Forcer la configuration correcte
+                    const forcedConfig = {
+                        apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
+                        authDomain: "oscar-baer.firebaseapp.com",
+                        projectId: "oscar-baer",
+                        storageBucket: "oscar-baer.firebasestorage.app",
+                        messagingSenderId: "419618942184",
+                        appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
+                    };
+                    const newApp = firebase.initializeApp(forcedConfig, 'default');
+                    console.log('✅ Réinitialisé avec projectId:', newApp.options.projectId);
+                    db = newApp.firestore();
+                    firebaseInitialized = true;
+                    return db;
                 }
             }
             
