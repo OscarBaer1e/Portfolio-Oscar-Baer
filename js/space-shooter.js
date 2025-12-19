@@ -420,11 +420,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
+        // Charger depuis localStorage (toujours disponible, même sans Firebase)
         const stored = localStorage.getItem('spaceShooterLeaderboard');
         if (stored) {
             try {
                 leaderboard = JSON.parse(stored);
                 leaderboard.sort((a, b) => b.score - a.score);
+                // Limiter à MAX_LEADERBOARD_ENTRIES
+                if (leaderboard.length > MAX_LEADERBOARD_ENTRIES) {
+                    leaderboard = leaderboard.slice(0, MAX_LEADERBOARD_ENTRIES);
+                }
             } catch (e) {
                 leaderboard = [];
             }
