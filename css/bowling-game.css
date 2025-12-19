@@ -82,6 +82,27 @@
         rgba(255, 255, 255, 0.05) 0%,
         transparent 50%,
         rgba(0, 255, 255, 0.1) 100%);
+    background-image: 
+        repeating-linear-gradient(
+            90deg,
+            transparent,
+            transparent 49%,
+            rgba(255, 255, 255, 0.1) 49%,
+            rgba(255, 255, 255, 0.1) 50%,
+            transparent 50%,
+            transparent 99%,
+            rgba(255, 255, 255, 0.1) 99%,
+            rgba(255, 255, 255, 0.1) 100%
+        ),
+        repeating-linear-gradient(
+            0deg,
+            transparent,
+            transparent 19px,
+            rgba(255, 255, 255, 0.05) 19px,
+            rgba(255, 255, 255, 0.05) 20px
+        );
+    background-size: 100% 100%, 100% 20px;
+    background-position: center, center;
 }
 
 .pins-container {
@@ -100,26 +121,17 @@
 .pin {
     width: 30px;
     height: 50px;
-    background: linear-gradient(135deg, #ffd700, #ffed4e);
-    border: 2px solid #ffaa00;
-    border-radius: 5px 5px 50% 50%;
+    background: transparent;
+    border: none;
     position: relative;
     transition: transform 0.3s ease;
-    box-shadow: 0 5px 15px rgba(255, 215, 0, 0.5);
     cursor: pointer;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
-.pin::before {
-    content: '';
-    position: absolute;
-    top: 5px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 15px;
-    height: 15px;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 50%;
-}
 
 .pin.fallen {
     transform: rotate(90deg) translateY(20px);
@@ -165,9 +177,14 @@
     object-fit: cover;
     border: 3px solid var(--primary-color);
     box-shadow: 0 0 20px var(--primary-color);
-    cursor: pointer;
+    cursor: grab;
     transition: transform 0.1s ease;
     position: relative;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    pointer-events: auto;
 }
 
 .bowling-ball.rolling {
@@ -347,6 +364,9 @@
 .ball-drag-area {
     cursor: grab;
     user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
 }
 
 .ball-drag-area:active {
