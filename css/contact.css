@@ -1,0 +1,120 @@
+/*
+ * ============================================
+ * FICHIER CSS CONTACT - SPÉCIFIQUE À LA PAGE CONTACT
+ * ============================================
+ */
+
+
+/*
+ * --------------------------------------------
+ * 8. SECTION CONTACT
+ * --------------------------------------------
+ */
+#contact {
+    background-color: var(--background-light);
+}
+
+.contact-grid {
+    display: flex;
+    gap: 60px;
+    align-items: stretch;
+    margin-top: 40px;
+}
+
+.contact-info, .contact-form {
+    flex: 1;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+}
+
+/* Partie information (fond sombre) */
+.contact-info {
+    background-color: var(--secondary-color);
+    color: var(--text-light);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.contact-info h3 {
+    color: var(--highlight-color);
+    margin-bottom: 30px;
+    font-size: 2.2rem;
+}
+
+.contact-info p {
+    margin-bottom: 15px;
+}
+
+.contact-info a {
+    color: var(--primary-color);
+    transition: color 0.3s ease;
+}
+
+.contact-info a:hover {
+    color: var(--highlight-color);
+}
+
+.contact-info i {
+    margin-right: 15px;
+    color: var(--primary-color);
+    font-size: 1.3rem;
+    width: 25px;
+    text-align: center;
+}
+
+/* Formulaire */
+.contact-form {
+    background-color: var(--background-card);
+    border: 1px solid var(--border-color);
+}
+
+.contact-form h3 {
+    color: var(--primary-color);
+    margin-bottom: 25px;
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 1.1rem;
+}
+
+.form-group input[type="text"],
+.form-group input[type="email"],
+.form-group textarea {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 8px rgba(0, 188, 212, 0.4);
+    outline: none;
+}
+
+.form-note {
+    font-size: 0.9rem;
+    color: #777;
+    margin-top: 20px;
+    border-top: 1px dashed var(--border-color);
+    padding-top: 10px;
+}
+
+/* Responsive Contact */
+@media (max-width: 900px) {
+    .contact-grid {
+        flex-direction: column;
+    }
+}

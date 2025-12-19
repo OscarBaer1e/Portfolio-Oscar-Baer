@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webdocumentaire - Détail du Projet</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Anta&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Animation de fond -->
+    <div class="animated-background">
+        <div class="grid-lines"></div>
+        <div class="floating-particles"></div>
+        <div class="animated-lines"></div>
+    </div>
+    
+    <header>
+        <div class="container">
+            <h1 class="logo"><a href="../index.html">Oscar BAER</a></h1>
+            <nav>
+                <button class="menu-toggle" aria-label="Ouvrir le menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <ul class="nav-list">
+                    <li><a href="../index.html">Accueil</a></li>
+                    <li><a href="./portfolio.html" class="active">Portfolio</a></li>
+                    <li><a href="./about.html">À Propos</a></li>
+                    <li><a href="./contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="project-detail" class="section-padding project-detail">
+            <div class="container">
+                
+                <h2 class="section-title">WEBDOCUMENTAIRE : UNE LONGUE HISTOIRE DE MOTEUR</h2>
+                
+                <div class="project-header">
+                    <img src="../ressources/images/webdocu.png" alt="Image de présentation du webdocumentaire" style="width:100%; height:auto; border-radius:15px; margin-bottom: 40px;">
+                    <p class="text-center" style="font-size: 1.3rem; color: var(--primary-color);">
+                        Voici ci-dessous des extraits du webdocumentaire sur lequel j'ai travaillé en équipe ( sur le 23ème Classic Tour de l'Aisne)
+
+                    </p>
+                </div>
+                
+                <div class="project-description">
+                    
+                    <h3>Objectif et Problématique</h3>
+                    <p>
+                        Le but principal de ce projet était de créer un webdocumentaire interactif et immersif sur un sujet au choix (en l'ocurence, notre travail était porté sur une course de rallye comprenant des véhicules historiques). L'objectif technique était de maîtriser l'intégration de différents formats médias (texte, vidéo, audio) via des technologies web modernes pour offrir une narration non linéaire.
+                    </p>
+                    <br>
+                    <h3>Compétences</h3>
+                    <div class="skills-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                        <div class="skill-category" style="padding: 15px;">HTML5</div>
+                        <div class="skill-category" style="padding: 15px;">CSS3</div>
+                        <div class="skill-category" style="padding: 15px;">JAVASCRIPT</div>
+                        <div class="skill-category" style="padding: 15px;">Adobe Premiere Pro (Montage)</div>
+                        <div class="skill-category" style="padding: 15px;">Figma (Maquettes UX/UI)</div>
+                        <div class="skill-category" style="padding: 15px;">Cadrage</div>
+                        <div class="skill-category" style="padding: 15px;">Prise de son</div>
+                        <div class="skill-category" style="padding: 15px;">Photographie</div>
+                    </div><br><br>
+
+                    <h3>Page d'accueil / Navigation</h3>
+                    <p>
+                        Le menu de navigation est composé d'une animation Javascript qui permet de cliquer sur les zones à droites et à gauche pour les faire passer au milieu et ensuite accéder aux page. Il y a également une animation de défilement tout en haut de la page et sur toutes les pages du site faite en CSS ainsi qu'une vidéo en fond avec des images filmées et montées par notre équipe.
+                    </p>
+                    <img src="../ressources/images/web2.png" alt="Image de présentation du webdocumentaire" style="width:100%; height:auto; border-radius:15px; margin-bottom: 40px;">
+<br><br>
+                    <h3>Articles / Galerie Photo</h3>
+                    <p>
+                        A part la page d'accueil et de navigation, on peut retrouver environs huit autres pages comme des pages d'articles décrivant chacun différents aspect de l'épreuve de rallye tel que le point de vue d'une copilote, l'organisation, quels sont les règles de l'épreuve, etc... mais il y a également une galerie photo, des images, sons et vidéos intégrées dans les articles...
+                    </p>
+                    
+                    <div class="gallery">
+                        <img src="../ressources/images/web3.png" alt="Capture d'écran 1 de l'interface" />
+                        <img src="../ressources/images/web4.png" alt="Capture d'écran 2 de la navigation" />
+                    </div>
+                    <br><br>
+                    <div class="text-center mt-5">
+                        <a href="https://une-longue-histoire-de-moteur.ct.ws/html/menu.html?i=1" target="_blank" class="btn primary-btn"><i class="fas fa-external-link-alt"></i> Voir le Projet en Ligne</a>
+                        <a href="./portfolio.html" class="btn secondary-btn"><i class="fas fa-arrow-left"></i> Retour au Portfolio</a>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; <span id="current-year-project"></span> Oscar Baer. Tous droits réservés.</p>
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/oscar-baer-a5bbb029b/" target="_blank" aria-label="LinkedIn" class="social-link-animated"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/OscarBaer" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="https://twitter.com/OscarBaer" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>

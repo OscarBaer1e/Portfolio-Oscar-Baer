@@ -1,0 +1,493 @@
+/* ================================================
+   MINI JEU DE BASKETBALL (Bouncy Basketball Style)
+   ================================================ */
+
+#basketball-game-section {
+    min-height: calc(100vh - var(--header-height));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+.basketball-game-container {
+    width: 100%;
+    max-width: 1200px;
+    background: var(--background-color-light);
+    border: 3px solid var(--primary-color);
+    border-radius: 15px;
+    padding: 30px;
+    box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+}
+
+.game-header {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.game-title {
+    font-size: 2.5rem;
+    color: var(--primary-color);
+    text-shadow: 0 0 20px var(--primary-color);
+    margin-bottom: 20px;
+    font-family: 'Anta', sans-serif;
+}
+
+.game-stats {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 5px;
+}
+
+.stat-label {
+    font-size: 0.9rem;
+    color: var(--dim-text-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.stat-value {
+    font-size: 2rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    text-shadow: 0 0 10px var(--primary-color);
+    font-family: 'Anta', sans-serif;
+}
+
+.game-controls-header {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+}
+
+/* Terrain de basket */
+.basketball-court {
+    position: relative;
+    width: 100%;
+    height: 500px;
+    background: linear-gradient(135deg, #d4a574 0%, #c8965a 50%, #b8864f 100%);
+    border: 4px solid #8b4513;
+    border-radius: 10px;
+    overflow: visible;
+    margin-bottom: 30px;
+    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.2), 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.court-floor {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background-image: 
+        /* Ligne médiane */
+        linear-gradient(to right, transparent 49.5%, rgba(255, 255, 255, 0.8) 49.5%, rgba(255, 255, 255, 0.8) 50.5%, transparent 50.5%),
+        /* Cercle central */
+        radial-gradient(circle at 50% 50%, transparent 60px, rgba(255, 255, 255, 0.8) 60px, rgba(255, 255, 255, 0.8) 65px, transparent 65px),
+        /* Zone de panier gauche (key) */
+        linear-gradient(to right, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.3) 200px, transparent 200px),
+        /* Zone de panier droite (key) */
+        linear-gradient(to left, rgba(255, 255, 255, 0.3) 0%, rgba(255, 255, 255, 0.3) 200px, transparent 200px),
+        /* Ligne à 3 points gauche */
+        radial-gradient(ellipse 300px 300px at 110px 100%, transparent 280px, rgba(255, 255, 255, 0.6) 280px, rgba(255, 255, 255, 0.6) 285px, transparent 285px),
+        /* Ligne à 3 points droite */
+        radial-gradient(ellipse 300px 300px at calc(100% - 110px) 100%, transparent 280px, rgba(255, 255, 255, 0.6) 280px, rgba(255, 255, 255, 0.6) 285px, transparent 285px);
+    background-size: 100% 100%;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.9;
+    pointer-events: none;
+}
+
+/* Paniers */
+.hoop {
+    position: absolute;
+    bottom: 100px;
+    width: 200px;
+    height: 150px;
+    z-index: 15;
+}
+
+.hoop-left {
+    left: 30px;
+}
+
+.hoop-right {
+    right: 30px;
+}
+
+/* Panneau de basket */
+.hoop::before {
+    content: '';
+    position: absolute;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 80px;
+    background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+    border: 4px solid #333;
+    border-radius: 5px;
+    box-shadow: 
+        0 5px 15px rgba(0, 0, 0, 0.5),
+        inset 0 0 10px rgba(0, 0, 0, 0.1);
+    z-index: 1;
+}
+
+/* Support du panier */
+.hoop::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 8px;
+    height: 100px;
+    background: linear-gradient(to top, #666, #333);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+    z-index: 0;
+}
+
+.rim {
+    position: absolute;
+    bottom: 35px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 70px;
+    height: 70px;
+    border: 6px solid #ffd700;
+    border-radius: 50%;
+    box-shadow: 
+        0 0 25px rgba(255, 215, 0, 1),
+        0 5px 15px rgba(0, 0, 0, 0.5),
+        inset 0 0 10px rgba(255, 215, 0, 0.5);
+    z-index: 2;
+    background: transparent;
+}
+
+.net {
+    position: absolute;
+    bottom: 41px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 55px;
+    height: 60px;
+    border-left: 3px solid rgba(255, 255, 255, 0.9);
+    border-right: 3px solid rgba(255, 255, 255, 0.9);
+    border-bottom: 3px solid rgba(255, 255, 255, 0.9);
+    border-radius: 0 0 25px 25px;
+    background: linear-gradient(to bottom, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.6));
+    z-index: 1;
+    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
+    animation: netSway 2s ease-in-out infinite;
+}
+
+@keyframes netSway {
+    0%, 100% { transform: translateX(-50%) rotate(0deg); }
+    25% { transform: translateX(-50%) rotate(-2deg); }
+    75% { transform: translateX(-50%) rotate(2deg); }
+}
+
+/* Indicateur de puissance de tir */
+.power-indicator {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 20;
+    background: rgba(0, 0, 0, 0.8);
+    padding: 15px 25px;
+    border-radius: 10px;
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    min-width: 200px;
+    text-align: center;
+}
+
+.power-indicator.hidden {
+    display: none;
+}
+
+.power-bar {
+    width: 200px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid var(--primary-color);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 8px;
+    position: relative;
+}
+
+.power-fill {
+    height: 100%;
+    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    width: 0%;
+    transition: width 0.1s linear;
+    box-shadow: 0 0 10px var(--primary-color);
+    border-radius: 8px;
+}
+
+.power-text {
+    color: var(--primary-color);
+    font-size: 0.9rem;
+    font-weight: bold;
+    text-shadow: 0 0 10px var(--primary-color);
+}
+
+/* Ballon */
+.basketball {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    background: #ff6b00;
+    border-radius: 50%;
+    border: 3px solid #000;
+    z-index: 10;
+    transition: transform 0.1s ease-out;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+    will-change: transform, left, top;
+}
+
+.basketball::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: #000;
+    transform: translateY(-50%);
+}
+
+.basketball::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 3px;
+    height: 100%;
+    background: #000;
+    transform: translateX(-50%);
+}
+
+.basketball.held {
+    box-shadow: 0 0 25px var(--secondary-color), 0 0 40px var(--primary-color);
+    transform: scale(1.15);
+    z-index: 10;
+    transition: all 0.2s ease;
+    opacity: 1;
+}
+
+.basketball.shooting {
+    z-index: 15;
+}
+
+/* Joueurs */
+.player {
+    position: absolute;
+    width: 50px;
+    height: 80px;
+    bottom: 0;
+    z-index: 8;
+    transition: transform 0.2s ease;
+}
+
+.player1 {
+    left: 20%;
+}
+
+.player2 {
+    right: 20%;
+}
+
+.player-head {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid var(--primary-color);
+    box-shadow: 0 0 15px var(--primary-color);
+    display: block;
+}
+
+.ai-head {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+    border: 3px solid var(--primary-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--dark-bg-color);
+    font-weight: bold;
+    font-size: 1.2rem;
+    box-shadow: 0 0 15px var(--primary-color);
+}
+
+.player {
+    transition: transform 0.1s ease-out;
+}
+
+.player.jumping {
+    animation: none; /* Animation gérée par JavaScript */
+}
+
+.player.high-jump {
+    z-index: 12;
+    filter: drop-shadow(0 -10px 20px rgba(0, 255, 255, 0.5));
+}
+
+.player.dunking {
+    animation: playerDunk 0.8s ease;
+    z-index: 20;
+}
+
+.player.caught-ball {
+    animation: caughtBall 0.3s ease;
+    box-shadow: 0 0 30px var(--secondary-color);
+}
+
+.player.running {
+    animation: playerRun 0.5s ease-in-out infinite;
+}
+
+@keyframes playerDunk {
+    0% { transform: translateY(0) scale(1); }
+    50% { transform: translateY(-120px) scale(1.2); }
+    100% { transform: translateY(0) scale(1); }
+}
+
+@keyframes caughtBall {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.15); }
+}
+
+@keyframes playerRun {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-5px); }
+}
+
+/* Instructions */
+.game-instructions {
+    background: var(--dark-bg-color);
+    padding: 20px;
+    border-radius: var(--radius-default);
+    border: 2px solid var(--border-color);
+    margin-bottom: 20px;
+}
+
+.game-instructions h3 {
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+}
+
+.instructions-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin-bottom: 15px;
+}
+
+.instruction {
+    color: var(--dim-text-color);
+}
+
+.instruction strong {
+    color: var(--primary-color);
+    display: block;
+    margin-bottom: 8px;
+}
+
+.instruction p {
+    margin: 5px 0;
+    font-size: 0.9rem;
+}
+
+.instruction kbd {
+    background: var(--background-color-light);
+    border: 1px solid var(--primary-color);
+    border-radius: 4px;
+    padding: 3px 8px;
+    font-family: monospace;
+    color: var(--primary-color);
+    box-shadow: 0 0 5px var(--primary-color);
+}
+
+.tip {
+    color: var(--secondary-color);
+    font-style: italic;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.game-message {
+    text-align: center;
+    min-height: 40px;
+    padding: 15px;
+    background: var(--dark-bg-color);
+    border-radius: var(--radius-default);
+    border: 2px solid var(--primary-color);
+    color: var(--primary-color);
+    font-size: 1.2rem;
+    font-weight: bold;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.game-message.show {
+    opacity: 1;
+}
+
+.game-message.score {
+    color: var(--secondary-color);
+    border-color: var(--secondary-color);
+    animation: messagePulse 0.5s ease;
+}
+
+@keyframes messagePulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .basketball-court {
+        height: 400px;
+    }
+    
+    .game-stats {
+        gap: 20px;
+    }
+    
+    .stat-value {
+        font-size: 1.5rem;
+    }
+    
+    .game-title {
+        font-size: 2rem;
+    }
+    
+    .hoop {
+        width: 80px;
+        height: 60px;
+    }
+    
+    .rim {
+        width: 60px;
+        height: 60px;
+    }
+}
+

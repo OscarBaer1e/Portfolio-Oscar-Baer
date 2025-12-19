@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portfolio Complet - Oscar Baer</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <!-- Animation de fond -->
+    <div class="animated-background">
+        <div class="grid-lines"></div>
+        <div class="floating-particles"></div>
+        <div class="animated-lines"></div>
+    </div>
+    
+    <header>
+        <div class="container">
+            <h1 class="logo"><a href="../index.html">Oscar Baer</a></h1>
+            <nav>
+                <button class="menu-toggle" aria-label="Ouvrir le menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <ul class="nav-list">
+                    <li><a href="../index.html">Accueil</a></li>
+                    <li><a href="./portfolio.html" class="active">Portfolio</a></li>
+                    <li><a href="./about.html">À Propos</a></li>
+                    <li><a href="./contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+    <main>
+        <section id="portfolio-list" class="section-padding">
+            <div class="container">
+                <h2 class="section-title" id="pacman-easter-egg-trigger">Mon Portfolio de Projets (BUT MMI & Personnels)</h2>
+                <p class="text-center mb-5">
+                    Découvrez mes réalisations en développement web, design, audiovisuel et mes projets personnels, fruit de mon parcours en BUT MMI.
+                </p>
+                <div class="portfolio-grid">
+                    <div class="portfolio-item reveal" data-animation-delay="0">
+                        <div class="portfolio-image-wrapper">
+                            <img src="../ressources/images/webdocu.png" alt="Vignette du Projet Webdocumentaire">
+                            <div class="portfolio-overlay">
+                                <div class="overlay-buttons">
+                                    <a href="./webdocumentaire.html" class="btn-overlay"><i class="fas fa-eye"></i> Voir</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="portfolio-item-content">
+                            <h3><a href="./webdocumentaire.html">Webdocumentaire</a></h3> 
+                            <p class="category">Web, Rédaction, Contenu Audiovisuel</p>
+                            <a href="./webdocumentaire.html" class="btn primary-btn btn-small animated-btn">Voir le Projet</a>
+                        </div>
+                    </div>
+                    
+                    <div class="portfolio-item reveal" data-animation-delay="100">
+                        <div class="portfolio-image-wrapper">
+                            <img src="../ressources/images/dossier.jpg" alt="Vignette documents PDF">
+                            <div class="portfolio-overlay">
+                                <div class="overlay-buttons">
+                                    <a href="./documents.html" class="btn-overlay"><i class="fas fa-file-pdf"></i> Voir</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="portfolio-item-content">
+                            <h3><a href="./documents.html">Rédactions & PDF</a></h3> 
+                            <p class="category">Articles, Notes, Dossiers</p>
+                            <a href="./documents.html" class="btn primary-btn btn-small animated-btn">Découvrir</a>
+                        </div>
+                    </div>
+                    
+                    <div class="portfolio-item reveal" data-animation-delay="200">
+                        <div class="portfolio-image-wrapper">
+                            <img src="../ressources/images/i1_files/unnamed.png" alt="Créations graphiques">
+                            <div class="portfolio-overlay">
+                                <div class="overlay-buttons">
+                                    <a href="./graphisme.html" class="btn-overlay"><i class="fas fa-palette"></i> Voir</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="portfolio-item-content">
+                            <h3><a href="./graphisme.html">Graphisme & Créations</a></h3> 
+                            <p class="category">Design, Illustrations, Identité</p>
+                            <a href="./graphisme.html" class="btn primary-btn btn-small animated-btn">Découvrir</a>
+                        </div>
+                    </div>
+                    
+                <br><br>
+                </div>
+                <div class="text-center reveal">
+                    <a href="../index.html" class="btn primary-btn mt-5 animated-btn"><i class="fas fa-home"></i> Retour à l'accueil</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; <span id="current-year-project"></span> Oscar Baer. Tous droits réservés.</p>
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/oscar-baer-a5bbb029b/" target="_blank" aria-label="LinkedIn" class="social-link-animated"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/OscarBaer" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="https://twitter.com/OscarBaer" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+            </div>
+        </div>
+</footer>
+
+<script src="../js/script.js"></script>
+</body>
+</html>

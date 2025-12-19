@@ -1,0 +1,406 @@
+/*
+ * ============================================
+ * FICHIER CSS GLOBAL - BASE ET STRUCTURE COMMUNE
+ * ============================================
+ */
+
+
+/*
+ * --------------------------------------------
+ * 1. VARIABLES GLOBALES (THÈME PREMIUM)
+ * --------------------------------------------
+ */
+:root {
+    /* Couleurs principales */
+    --primary-color: #00BCD4;       /* Cyan Électrique (Accentuation) */
+    --secondary-color: #1A1A2E;     /* Bleu Nuit Profond (Fonds sombres, titres) */
+    --highlight-color: #99c5ff;     /* Bleu Clair/Lavande (Survol, Impact) */
+    
+    /* Couleurs de texte et de fond */
+    --text-dark: #2c3e50;           /* Texte principal foncé */
+    --text-light: #f4f4f4;          /* Texte clair sur fond sombre */
+    --background-light: #F8F9FA;    /* Fond principal des sections claires */
+    --background-card: #ffffff;     /* Fond des cartes et du formulaire */
+    --border-color: #e0e0e0;        /* Bordures et séparateurs */
+
+    /* Glassmorphism */
+    --glass-background: rgba(26, 26, 46, 0.9); /* Opaque pour l'effet flottant */
+
+    /* Tailles et Mesures */
+    --header-height: 80px;
+    --max-width: 1300px;
+    --spacing-large: 100px;
+}
+
+
+/*
+ * --------------------------------------------
+ * 2. BASE & TYPOGRAPHIE
+ * --------------------------------------------
+ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Open Sans', sans-serif;
+    line-height: 1.7;
+    color: var(--text-dark);
+    /* Fond très clair pour le contraste, car le vert n'était pas harmonieux */
+    background-color: var(--background-light); 
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Montserrat', sans-serif;
+    margin-bottom: 1rem;
+    color: var(--secondary-color);
+    line-height: 1.2;
+}
+
+a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+a:hover {
+    color: var(--highlight-color);
+}
+
+ul {
+    list-style: none;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+}
+
+/* Conteneur de contenu centré */
+.container {
+    max-width: var(--max-width);
+    margin: 0 auto;
+    padding: 0 30px;
+}
+
+/* Espacement standard des sections */
+.section-padding {
+    padding: var(--spacing-large) 0;
+}
+
+/* Titres de section */
+.section-title {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 4rem;
+    position: relative;
+    padding-bottom: 15px;
+    font-weight: 800;
+}
+
+.section-title::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 5px;
+    background-color: var(--primary-color);
+    border-radius: 3px;
+}
+
+/* Classes utilitaires */
+.text-center { text-align: center; }
+.mb-5 { margin-bottom: 3rem; }
+.mt-4 { margin-top: 2rem; }
+.mt-5 { margin-top: 3rem; }
+
+
+/*
+ * --------------------------------------------
+ * 3. BOUTONS (CTA)
+ * --------------------------------------------
+ */
+.btn {
+    display: inline-block;
+    padding: 14px 30px;
+    border-radius: 8px;
+    font-weight: 700;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    margin: 8px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.primary-btn {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+}
+
+.primary-btn:hover {
+    background-color: var(--highlight-color);
+    color: var(--secondary-color);
+    box-shadow: 0 10px 20px rgba(0, 188, 212, 0.4);
+    transform: translateY(-4px);
+}
+
+.secondary-btn {
+    background-color: transparent;
+    color: var(--primary-color);
+    border: 2px solid var(--primary-color);
+}
+
+.secondary-btn:hover {
+    background-color: var(--primary-color);
+    color: var(--text-light);
+    box-shadow: 0 10px 20px rgba(0, 188, 212, 0.2);
+    transform: translateY(-4px);
+}
+
+
+/*
+ * --------------------------------------------
+ * 4. HEADER / NAVIGATION (Glassmorphism & Animée)
+ * --------------------------------------------
+ */
+header {
+    color: var(--text-light);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    
+    /* EFFET GLASSMORPHISM */
+    background-color: var(--glass-background);
+    backdrop-filter: blur(10px); 
+    -webkit-backdrop-filter: blur(10px); 
+
+    box-shadow: 0 4px 25px rgba(0,0,0,0.6);
+    height: var(--header-height);
+    display: flex;
+    align-items: center;
+}
+
+header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Logo avec Dégradé de Couleurs */
+.logo a {
+    color: var(--text-light);
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, var(--primary-color) 0%, var(--highlight-color) 100%);
+    -webkit-background-clip: text; 
+    -webkit-text-fill-color: transparent; 
+    transition: all 0.3s ease;
+}
+
+.logo a:hover {
+    -webkit-text-fill-color: var(--primary-color);
+    background: none;
+}
+
+/* Liste de navigation */
+nav .nav-list {
+    display: flex;
+}
+
+nav .nav-list li {
+    margin-left: 20px; 
+}
+
+/* Liens (Effet Bouton "Pill" Animé) */
+nav .nav-list a {
+    color: var(--text-light);
+    font-weight: 600; 
+    font-size: 1rem;
+    padding: 8px 15px; 
+    border-radius: 50px;
+    transition: all 0.4s ease-in-out;
+    position: relative;
+    overflow: hidden; 
+    z-index: 1;
+}
+
+/* Pseudo-élément pour l'animation de fond */
+nav .nav-list a::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--primary-color);
+    z-index: -1;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.4s ease-in-out;
+    border-radius: 50px;
+}
+
+/* Au survol, le fond glisse de droite à gauche */
+nav .nav-list a:hover::before {
+    transform: scaleX(1); 
+    transform-origin: left;
+}
+
+/* État Actif : utilise la highlight-color */
+nav .nav-list a.active::before {
+    transform: scaleX(1); 
+    transform-origin: left;
+    background: var(--highlight-color);
+}
+
+/* Le texte devient sombre sur le fond coloré */
+nav .nav-list a:hover,
+nav .nav-list a.active {
+    color: var(--secondary-color);
+    box-shadow: 0 0 15px rgba(0, 188, 212, 0.4);
+}
+
+
+/*
+ * --------------------------------------------
+ * 10. FOOTER
+ * --------------------------------------------
+ */
+footer {
+    background-color: var(--secondary-color);
+    color: var(--text-light);
+    padding: 40px 0;
+}
+
+footer .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+footer p {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.social-links a {
+    color: var(--text-light);
+    margin-left: 20px;
+    font-size: 1.4rem;
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.social-links a:hover {
+    color: var(--primary-color);
+    transform: scale(1.2);
+}
+
+
+/*
+ * --------------------------------------------
+ * 11. MEDIA QUERIES (RESPONSIVE)
+ * --------------------------------------------
+ */
+@media (max-width: 1100px) {
+    .container {
+        padding: 0 20px;
+    }
+}
+
+@media (max-width: 900px) {
+    /* Styles pour la tablette */
+}
+
+@media (max-width: 768px) {
+    /* Menu burger visible */
+    .menu-toggle {
+        display: block;
+        background: none;
+        border: none;
+        color: var(--text-light);
+        font-size: 1.8rem;
+        cursor: pointer;
+    }
+
+    /* Menu mobile qui glisse */
+    nav .nav-list {
+        display: none;
+        flex-direction: column;
+        position: absolute;
+        top: var(--header-height);
+        left: 0;
+        width: 100%;
+        background-color: var(--secondary-color);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        padding-bottom: 10px;
+        transition: all 0.3s ease-in-out;
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    nav .nav-list.active {
+        display: flex;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    nav .nav-list li {
+        margin: 0;
+        text-align: center;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Style des liens dans le menu mobile */
+    nav .nav-list a {
+        display: block;
+        padding: 15px 0;
+        border-radius: 0;
+        color: var(--text-light);
+    }
+
+    /* Désactive l'animation du background au survol/actif sur mobile pour plus de simplicité */
+    nav .nav-list a::before {
+        display: none;
+    }
+
+    nav .nav-list a:hover {
+        background-color: var(--primary-color);
+        color: var(--secondary-color);
+        box-shadow: none;
+    }
+    
+    nav .nav-list a.active {
+        background-color: var(--highlight-color);
+        color: var(--secondary-color);
+        font-weight: 700;
+    }
+
+    footer .container {
+        flex-direction: column;
+        gap: 15px;
+    }
+    .social-links a {
+        margin: 0 10px;
+    }
+}
+
+@media (max-width: 500px) {
+    .section-title {
+        font-size: 2rem;
+    }
+    .section-padding {
+        padding: 60px 0;
+    }
+}
