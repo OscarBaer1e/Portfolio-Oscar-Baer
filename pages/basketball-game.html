@@ -289,17 +289,24 @@
     <script>
         document.getElementById('current-year-space').textContent = new Date().getFullYear();
         
+        // Charger la configuration Firebase depuis l'API Vercel ou utiliser les valeurs par défaut
         (async function() {
             try {
                 const response = await fetch('/api/firebase-config');
                 if (response.ok) {
                     const config = await response.json();
-                    if (config.apiKey && config.projectId) {
+                    if (config.apiKey && config.projectId && config.apiKey !== '') {
                         window.FIREBASE_CONFIG = config;
+                        console.log('Configuration Firebase chargée depuis Vercel');
+                    } else {
+                        console.warn('Configuration Firebase vide depuis Vercel, utilisation des valeurs par défaut');
                     }
+                } else {
+                    console.warn('Impossible de charger la configuration depuis /api/firebase-config, utilisation des valeurs par défaut');
                 }
             } catch (error) {
-                // Utilisation des valeurs par défaut
+                console.warn('Erreur lors du chargement de la configuration Firebase:', error);
+                console.log('Utilisation des valeurs par défaut ou configuration directe dans le code');
             }
         })();
     </script>

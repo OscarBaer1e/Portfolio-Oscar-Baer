@@ -236,6 +236,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let leaderboard = [];
     const MAX_LEADERBOARD_ENTRIES = 10;
     
+    // Configuration Firebase - Utilise window.FIREBASE_CONFIG si disponible (depuis Vercel), sinon valeurs par défaut
     const FIREBASE_CONFIG = window.FIREBASE_CONFIG || {
         apiKey: window.FIREBASE_API_KEY || "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
         authDomain: window.FIREBASE_AUTH_DOMAIN || "oscar-baer.firebaseapp.com",
@@ -253,6 +254,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (firebaseInitialized && db) return db;
         
         if (typeof firebase === 'undefined' || !firebase.apps) {
+            console.warn('Firebase SDK non chargé');
             return null;
         }
         
@@ -263,17 +265,28 @@ document.addEventListener('DOMContentLoaded', function() {
         firebaseInitAttempted = true;
         
         try {
+            // Vérifier si Firebase est déjà initialisé
             if (firebase.apps.length === 0) {
-                if (!FIREBASE_CONFIG || !FIREBASE_CONFIG.apiKey) {
+                // Vérifier que la configuration est valide
+                if (!FIREBASE_CONFIG || !FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey === "VOTRE_API_KEY") {
+                    console.warn('Configuration Firebase invalide ou non configurée');
                     return null;
                 }
+                
+                // Initialiser Firebase
                 firebase.initializeApp(FIREBASE_CONFIG);
+                console.log('Firebase initialisé avec succès');
+            } else {
+                // Firebase déjà initialisé, utiliser l'instance existante
+                console.log('Firebase déjà initialisé');
             }
+            
             db = firebase.firestore();
             firebaseInitialized = true;
             return db;
         } catch (error) {
-            console.warn('Erreur initialisation Firebase:', error);
+            console.error('Erreur initialisation Firebase:', error);
+            firebaseInitialized = false;
             return null;
         }
     }
@@ -557,20 +570,27 @@ document.addEventListener('DOMContentLoaded', function() {
         if (firestoreDb) {
             try {
                 const timestamp = firebase.firestore.Timestamp.now();
-                await firestoreDb.collection('leaderboard').add({
+                const docRef = await firestoreDb.collection('leaderboard').add({
                     name: name.substring(0, 20),
                     score: score,
                     level: level,
                     date: timestamp
                 });
+                console.log('Score enregistré dans Firebase avec ID:', docRef.id);
+                
                 // Recharger depuis Firebase pour synchroniser avec les autres joueurs
-                loadLeaderboard().catch(() => {
-                    // Ignorer les erreurs, on a déjà le score en local
-                });
+                setTimeout(() => {
+                    loadLeaderboard().catch((err) => {
+                        console.warn('Erreur rechargement leaderboard:', err);
+                    });
+                }, 500);
             } catch (error) {
-                console.warn('Erreur enregistrement Firebase (non bloquant):', error);
+                console.error('Erreur enregistrement Firebase:', error);
+                console.error('Détails:', error.message, error.code);
                 // Ne pas bloquer si Firebase échoue, le score est déjà enregistré localement
             }
+        } else {
+            console.warn('Firebase non disponible, score enregistré uniquement en local');
         }
         
         updateLeaderboardDisplay();
