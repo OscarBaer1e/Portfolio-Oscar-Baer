@@ -305,6 +305,7 @@
         });
         
         // Essayer de charger depuis l'API Vercel (optionnel, en arrière-plan)
+        // MAIS ne jamais écraser avec des valeurs invalides
         (async function() {
             try {
                 const response = await fetch('/api/firebase-config');
@@ -312,11 +313,17 @@
                     const config = await response.json();
                     console.log('📥 Configuration reçue depuis API:', config);
                     
-                    if (config.apiKey && config.projectId && config.apiKey !== '' && 
-                        config.projectId !== 'YOUR_PROJECT_ID' && config.projectId !== 'oscar-baer') {
-                        // Utiliser la config Vercel seulement si elle est différente
+                    // Vérifier que la config de l'API est valide avant de l'utiliser
+                    if (config.apiKey && config.projectId && 
+                        config.apiKey !== '' && 
+                        config.projectId !== 'YOUR_PROJECT_ID' &&
+                        config.projectId !== 'votre-projet-id' &&
+                        config.projectId !== 'oscar-baer') {
+                        // Utiliser la config Vercel seulement si elle est valide ET différente
                         window.FIREBASE_CONFIG = config;
                         console.log('✅ Configuration Firebase mise à jour depuis Vercel');
+                    } else {
+                        console.warn('⚠️ Configuration API invalide, conservation des valeurs par défaut');
                     }
                 }
             } catch (error) {
