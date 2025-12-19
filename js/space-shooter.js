@@ -273,15 +273,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     return null;
                 }
                 
+                console.log('🔧 Initialisation de Firebase avec la configuration:', {
+                    projectId: FIREBASE_CONFIG.projectId,
+                    apiKey: FIREBASE_CONFIG.apiKey ? FIREBASE_CONFIG.apiKey.substring(0, 10) + '...' : 'manquant'
+                });
+                
                 // Initialiser Firebase
                 firebase.initializeApp(FIREBASE_CONFIG);
-                console.log('Firebase initialisé avec succès');
+                console.log('✅ Firebase initialisé avec succès');
             } else {
                 // Firebase déjà initialisé, utiliser l'instance existante
-                console.log('Firebase déjà initialisé');
+                console.log('✅ Firebase déjà initialisé');
             }
             
             db = firebase.firestore();
+            
+            // Vérifier que Firestore est accessible
+            console.log('✅ Firestore accessible');
+            
             firebaseInitialized = true;
             return db;
         } catch (error) {
