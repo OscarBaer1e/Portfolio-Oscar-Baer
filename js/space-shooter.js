@@ -508,8 +508,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function canRegisterScore(score) {
+        // Vérification locale basée sur le leaderboard actuel en mémoire
+        // Pas besoin de charger depuis Firebase pour cette validation
+        if (!leaderboard || leaderboard.length === 0) return true;
         if (leaderboard.length < MAX_LEADERBOARD_ENTRIES) return true;
-        return score > leaderboard[leaderboard.length - 1].score;
+        
+        // Vérifier si le score peut dépasser au moins une personne du classement
+        const lastScore = leaderboard[leaderboard.length - 1].score;
+        return score > lastScore;
     }
     
     async function registerScore(name, score, level) {
@@ -2008,13 +2014,17 @@ document.addEventListener('DOMContentLoaded', function() {
         startBtn.textContent = 'Commencer';
         
         // Vérifier si le score peut être enregistré dans le leaderboard
-        // Afficher le bouton d'enregistrement si le score est éligible
-        loadLeaderboard().then(() => {
-            if (canRegisterScore(gameState.score) && registerScoreBtn) {
-                registerScoreBtn.classList.remove('hidden');
-            } else if (registerScoreBtn) {
-                registerScoreBtn.classList.add('hidden');
-            }
+        // Utilisation du leaderboard local (pas besoin de recharger depuis Firebase)
+        // Le leaderboard est déjà chargé au démarrage et synchronisé en arrière-plan
+        if (canRegisterScore(gameState.score) && registerScoreBtn) {
+            registerScoreBtn.classList.remove('hidden');
+        } else if (registerScoreBtn) {
+            registerScoreBtn.classList.add('hidden');
+        }
+        
+        // Synchroniser le leaderboard en arrière-plan (sans bloquer)
+        loadLeaderboard().catch(() => {
+            // Ignorer les erreurs, on utilise le leaderboard local
         });
     }
     
@@ -2156,37 +2166,36 @@ document.addEventListener('DOMContentLoaded', function() {
     // Bouton pour ouvrir le formulaire d'enregistrement de score
     if (registerScoreBtn && scoreRegister && registerScoreValue && registerLevelValue && registerPositionValue) {
         registerScoreBtn.addEventListener('click', () => {
-            loadLeaderboard().then(() => {
-                if (canRegisterScore(gameState.score)) {
-                    const position = calculateScorePosition(gameState.score);
-                    registerScoreValue.textContent = gameState.score.toLocaleString();
-                    registerLevelValue.textContent = gameState.level;
-                    registerPositionValue.textContent = position ? `#${position}` : '-';
-                    
-                    // Style spécial pour les 3 premières positions
-                    if (position === 1) {
-                        registerPositionValue.style.color = '#ffd700';
-                        registerPositionValue.style.textShadow = '0 0 10px #ffd700';
-                    } else if (position === 2) {
-                        registerPositionValue.style.color = '#c0c0c0';
-                        registerPositionValue.style.textShadow = '0 0 10px #c0c0c0';
-                    } else if (position === 3) {
-                        registerPositionValue.style.color = '#cd7f32';
-                        registerPositionValue.style.textShadow = '0 0 10px #cd7f32';
-                    } else {
-                        registerPositionValue.style.color = 'var(--primary-color)';
-                        registerPositionValue.style.textShadow = 'none';
-                    }
-                    
-                    scoreRegister.classList.remove('hidden');
-                    // Focus automatique sur le champ de nom
-                    if (playerNameInput) {
-                        setTimeout(() => {
-                            playerNameInput.focus();
-                        }, 100);
-                    }
+            // Utilisation du leaderboard local (pas besoin de recharger depuis Firebase)
+            if (canRegisterScore(gameState.score)) {
+                const position = calculateScorePosition(gameState.score);
+                registerScoreValue.textContent = gameState.score.toLocaleString();
+                registerLevelValue.textContent = gameState.level;
+                registerPositionValue.textContent = position ? `#${position}` : '-';
+                
+                // Style spécial pour les 3 premières positions
+                if (position === 1) {
+                    registerPositionValue.style.color = '#ffd700';
+                    registerPositionValue.style.textShadow = '0 0 10px #ffd700';
+                } else if (position === 2) {
+                    registerPositionValue.style.color = '#c0c0c0';
+                    registerPositionValue.style.textShadow = '0 0 10px #c0c0c0';
+                } else if (position === 3) {
+                    registerPositionValue.style.color = '#cd7f32';
+                    registerPositionValue.style.textShadow = '0 0 10px #cd7f32';
+                } else {
+                    registerPositionValue.style.color = 'var(--primary-color)';
+                    registerPositionValue.style.textShadow = 'none';
                 }
-            });
+                
+                scoreRegister.classList.remove('hidden');
+                // Focus automatique sur le champ de nom
+                if (playerNameInput) {
+                    setTimeout(() => {
+                        playerNameInput.focus();
+                    }, 100);
+                }
+            }
         });
     }
     
