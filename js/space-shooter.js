@@ -406,6 +406,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (firestoreDb) {
             try {
+                console.log('Chargement du leaderboard depuis Firebase...');
                 const snapshot = await firestoreDb.collection('leaderboard')
                     .orderBy('score', 'desc')
                     .limit(MAX_LEADERBOARD_ENTRIES)
@@ -423,14 +424,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 });
                 
+                console.log(`Leaderboard chargé: ${leaderboard.length} scores`);
+                
                 if (leaderboard.length > 0) {
                     localStorage.setItem('spaceShooterLeaderboard', JSON.stringify(leaderboard));
                 }
                 return;
             } catch (error) {
-                console.warn('Erreur chargement leaderboard Firebase:', error);
+                console.error('Erreur chargement leaderboard Firebase:', error);
+                console.error('Code erreur:', error.code, 'Message:', error.message);
                 // Fallback sur localStorage
             }
+        } else {
+            console.warn('Firebase non disponible, chargement depuis localStorage');
         }
         
         // Charger depuis localStorage (toujours disponible, même sans Firebase)
