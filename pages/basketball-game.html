@@ -289,7 +289,22 @@
     <script>
         document.getElementById('current-year-space').textContent = new Date().getFullYear();
         
-        // Charger la configuration Firebase depuis l'API Vercel ou utiliser les valeurs par défaut
+        // Configuration Firebase - Valeurs par défaut garanties
+        window.FIREBASE_CONFIG = {
+            apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
+            authDomain: "oscar-baer.firebaseapp.com",
+            projectId: "oscar-baer",
+            storageBucket: "oscar-baer.firebasestorage.app",
+            messagingSenderId: "419618942184",
+            appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
+        };
+        
+        console.log('✅ Configuration Firebase définie par défaut:', {
+            projectId: window.FIREBASE_CONFIG.projectId,
+            apiKey: window.FIREBASE_CONFIG.apiKey.substring(0, 10) + '...'
+        });
+        
+        // Essayer de charger depuis l'API Vercel (optionnel, en arrière-plan)
         (async function() {
             try {
                 const response = await fetch('/api/firebase-config');
@@ -297,57 +312,23 @@
                     const config = await response.json();
                     console.log('📥 Configuration reçue depuis API:', config);
                     
-                    if (config.apiKey && config.projectId && config.apiKey !== '' && config.projectId !== 'YOUR_PROJECT_ID') {
+                    if (config.apiKey && config.projectId && config.apiKey !== '' && 
+                        config.projectId !== 'YOUR_PROJECT_ID' && config.projectId !== 'oscar-baer') {
+                        // Utiliser la config Vercel seulement si elle est différente
                         window.FIREBASE_CONFIG = config;
-                        console.log('✅ Configuration Firebase chargée depuis Vercel');
-                    } else {
-                        console.warn('⚠️ Configuration Firebase invalide depuis Vercel (valeurs vides ou placeholder)');
-                        console.warn('Utilisation des valeurs par défaut du code');
+                        console.log('✅ Configuration Firebase mise à jour depuis Vercel');
                     }
-                } else {
-                    console.warn('⚠️ Impossible de charger la configuration depuis /api/firebase-config');
-                    console.warn('Utilisation des valeurs par défaut du code');
                 }
             } catch (error) {
-                console.warn('⚠️ Erreur lors du chargement de la configuration Firebase:', error);
-                console.log('Utilisation des valeurs par défaut du code (définies dans space-shooter.js)');
+                // Ignorer les erreurs, on utilise les valeurs par défaut
+                console.log('ℹ️ API Vercel non disponible, utilisation des valeurs par défaut');
             }
         })();
     </script>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
-    <!-- Attendre que la configuration soit chargée avant de charger space-shooter.js -->
-    <script>
-        // S'assurer que la configuration est chargée avant d'exécuter space-shooter.js
-        (async function() {
-            // Attendre un peu pour que la configuration soit chargée
-            await new Promise(resolve => setTimeout(resolve, 100));
-            
-            // Si window.FIREBASE_CONFIG n'est pas défini, utiliser les valeurs par défaut
-            if (!window.FIREBASE_CONFIG || !window.FIREBASE_CONFIG.projectId || window.FIREBASE_CONFIG.projectId === 'YOUR_PROJECT_ID') {
-                console.log('📌 Utilisation des valeurs par défaut (configuration directe)');
-                window.FIREBASE_CONFIG = {
-                    apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
-                    authDomain: "oscar-baer.firebaseapp.com",
-                    projectId: "oscar-baer",
-                    storageBucket: "oscar-baer.firebasestorage.app",
-                    messagingSenderId: "419618942184",
-                    appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
-                };
-            }
-            
-            console.log('✅ Configuration Firebase prête:', {
-                projectId: window.FIREBASE_CONFIG.projectId,
-                apiKey: window.FIREBASE_CONFIG.apiKey ? window.FIREBASE_CONFIG.apiKey.substring(0, 10) + '...' : 'manquant'
-            });
-            
-            // Charger space-shooter.js maintenant que la configuration est prête
-            const script = document.createElement('script');
-            script.src = '../js/space-shooter.js';
-            document.body.appendChild(script);
-        })();
-    </script>
+    <script src="../js/space-shooter.js"></script>
     <script src="../js/script.js"></script>
 </body>
 </html>
