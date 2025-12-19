@@ -268,8 +268,14 @@ document.addEventListener('DOMContentLoaded', function() {
             // Vérifier si Firebase est déjà initialisé
             if (firebase.apps.length === 0) {
                 // Vérifier que la configuration est valide
-                if (!FIREBASE_CONFIG || !FIREBASE_CONFIG.apiKey || FIREBASE_CONFIG.apiKey === "VOTRE_API_KEY") {
-                    console.warn('Configuration Firebase invalide ou non configurée');
+                if (!FIREBASE_CONFIG || !FIREBASE_CONFIG.apiKey || 
+                    FIREBASE_CONFIG.apiKey === "VOTRE_API_KEY" || 
+                    FIREBASE_CONFIG.projectId === "YOUR_PROJECT_ID" ||
+                    FIREBASE_CONFIG.projectId === "votre-projet-id" ||
+                    !FIREBASE_CONFIG.projectId) {
+                    console.warn('⚠️ Configuration Firebase invalide ou non configurée');
+                    console.warn('FIREBASE_CONFIG:', FIREBASE_CONFIG);
+                    console.warn('window.FIREBASE_CONFIG:', window.FIREBASE_CONFIG);
                     return null;
                 }
                 
