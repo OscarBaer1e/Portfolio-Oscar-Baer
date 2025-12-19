@@ -609,28 +609,49 @@ document.addEventListener('DOMContentLoaded', function() {
         const firestoreDb = initFirebase();
         if (firestoreDb) {
             try {
+                console.log('Tentative d\'enregistrement dans Firebase...');
+                console.log('Données à enregistrer:', { name: name.substring(0, 20), score, level });
+                
+                // Utiliser Timestamp.now() de Firebase
                 const timestamp = firebase.firestore.Timestamp.now();
-                const docRef = await firestoreDb.collection('leaderboard').add({
+                console.log('Timestamp créé:', timestamp);
+                
+                const dataToSave = {
                     name: name.substring(0, 20),
-                    score: score,
-                    level: level,
+                    score: Number(score), // S'assurer que c'est un nombre
+                    level: Number(level), // S'assurer que c'est un nombre
                     date: timestamp
-                });
-                console.log('Score enregistré dans Firebase avec ID:', docRef.id);
+                };
+                
+                console.log('Données formatées:', dataToSave);
+                
+                const docRef = await firestoreDb.collection('leaderboard').add(dataToSave);
+                console.log('✅ Score enregistré dans Firebase avec ID:', docRef.id);
                 
                 // Recharger depuis Firebase pour synchroniser avec les autres joueurs
                 setTimeout(() => {
                     loadLeaderboard().catch((err) => {
                         console.warn('Erreur rechargement leaderboard:', err);
                     });
-                }, 500);
+                }, 1000);
             } catch (error) {
-                console.error('Erreur enregistrement Firebase:', error);
-                console.error('Détails:', error.message, error.code);
+                console.error('❌ Erreur enregistrement Firebase:', error);
+                console.error('Code erreur:', error.code);
+                console.error('Message:', error.message);
+                console.error('Stack:', error.stack);
+                
+                // Afficher un message à l'utilisateur
+                if (error.code === 'permission-denied') {
+                    console.error('🔒 Erreur de permissions - Vérifiez les règles Firestore');
+                } else if (error.code === 'unavailable') {
+                    console.error('🌐 Firebase indisponible - Vérifiez votre connexion');
+                }
+                
                 // Ne pas bloquer si Firebase échoue, le score est déjà enregistré localement
             }
         } else {
-            console.warn('Firebase non disponible, score enregistré uniquement en local');
+            console.warn('⚠️ Firebase non disponible, score enregistré uniquement en local');
+            console.warn('Vérifiez que Firebase est bien initialisé');
         }
         
         updateLeaderboardDisplay();

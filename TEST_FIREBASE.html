@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Firebase</title>
+</head>
+<body>
+    <h1>Test de connexion Firebase</h1>
+    <button id="test-btn">Tester Firebase</button>
+    <div id="results"></div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    
+    <script>
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
+            authDomain: "oscar-baer.firebaseapp.com",
+            projectId: "oscar-baer",
+            storageBucket: "oscar-baer.firebasestorage.app",
+            messagingSenderId: "419618942184",
+            appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
+        };
+
+        const resultsDiv = document.getElementById('results');
+        
+        function log(message, type = 'info') {
+            const p = document.createElement('p');
+            p.style.color = type === 'error' ? 'red' : type === 'success' ? 'green' : 'black';
+            p.textContent = message;
+            resultsDiv.appendChild(p);
+            console.log(message);
+        }
+
+        document.getElementById('test-btn').addEventListener('click', async () => {
+            resultsDiv.innerHTML = '';
+            log('🔍 Début du test Firebase...');
+            
+            try {
+                // 1. Vérifier que Firebase est chargé
+                if (typeof firebase === 'undefined') {
+                    log('❌ Firebase SDK non chargé', 'error');
+                    return;
+                }
+                log('✅ Firebase SDK chargé', 'success');
+                
+                // 2. Initialiser Firebase
+                let app;
+                try {
+                    if (firebase.apps.length === 0) {
+                        app = firebase.initializeApp(firebaseConfig);
+                        log('✅ Firebase initialisé', 'success');
+                    } else {
+                        app = firebase.app();
+                        log('✅ Firebase déjà initialisé', 'success');
+                    }
+                } catch (error) {
+                    log('❌ Erreur initialisation: ' + error.message, 'error');
+                    return;
+                }
+                
+                // 3. Obtenir Firestore
+                const db = firebase.firestore();
+                log('✅ Firestore obtenu', 'success');
+                
+                // 4. Tester la lecture
+                try {
+                    log('🔍 Test de lecture...');
+                    const snapshot = await db.collection('leaderboard').limit(5).get();
+                    log('✅ Lecture réussie: ' + snapshot.size + ' documents trouvés', 'success');
+                    
+                    snapshot.forEach(doc => {
+                        log('  - Document: ' + doc.id + ' - Score: ' + doc.data().score);
+                    });
+                } catch (error) {
+                    log('❌ Erreur lecture: ' + error.code + ' - ' + error.message, 'error');
+                }
+                
+                // 5. Tester l'écriture
+                try {
+                    log('🔍 Test d\'écriture...');
+                    const testData = {
+                        name: 'Test',
+                        score: 9999,
+                        level: 1,
+                        date: firebase.firestore.Timestamp.now()
+                    };
+                    
+                    const docRef = await db.collection('leaderboard').add(testData);
+                    log('✅ Écriture réussie! ID: ' + docRef.id, 'success');
+                    
+                    // Supprimer le document de test
+                    await docRef.delete();
+                    log('✅ Document de test supprimé', 'success');
+                } catch (error) {
+                    log('❌ Erreur écriture: ' + error.code + ' - ' + error.message, 'error');
+                    if (error.code === 'permission-denied') {
+                        log('🔒 Vérifiez les règles Firestore - elles doivent permettre "allow create: if true"', 'error');
+                    }
+                }
+                
+            } catch (error) {
+                log('❌ Erreur générale: ' + error.message, 'error');
+            }
+        });
+    </script>
+</body>
+</html>
+
