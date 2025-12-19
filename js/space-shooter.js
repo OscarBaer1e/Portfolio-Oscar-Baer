@@ -293,6 +293,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // FORCER la configuration avant toute initialisation
             if (!window.FIREBASE_CONFIG || 
                 window.FIREBASE_CONFIG.projectId === 'YOUR_PROJECT_ID' ||
+                window.FIREBASE_CONFIG.projectId === 'votre-projet-id' ||
                 window.FIREBASE_CONFIG.projectId !== 'oscar-baer') {
                 console.error('❌ Configuration invalide détectée, correction FORCÉE...');
                 window.FIREBASE_CONFIG = {
