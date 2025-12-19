@@ -30,11 +30,18 @@ service cloud.firestore {
   match /databases/{database}/documents {
     // Leaderboard - lecture publique, écriture limitée
     match /leaderboard/{document=**} {
-      allow read: if true; // Tout le monde peut lire
-      allow write: if request.resource.data.score is int 
+      // Tout le monde peut lire le leaderboard
+      allow read: if true;
+      
+      // Tout le monde peut créer un score (avec validation)
+      allow create: if request.resource.data.score is int 
                    && request.resource.data.name is string
                    && request.resource.data.name.size() <= 20
-                   && request.resource.data.level is int; // Écriture limitée avec validation
+                   && request.resource.data.level is int
+                   && request.resource.data.date is timestamp;
+      
+      // Pas de modification ou suppression (sécurité)
+      allow update, delete: if false;
     }
   }
 }

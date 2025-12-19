@@ -496,17 +496,19 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (firestoreDb) {
             try {
+                const timestamp = firebase.firestore.Timestamp.now();
                 await firestoreDb.collection('leaderboard').add({
                     name: name.substring(0, 20),
                     score: score,
                     level: level,
-                    date: firebase.firestore.Timestamp.now()
+                    date: timestamp
                 });
                 await loadLeaderboard();
                 updateLeaderboardDisplay();
                 return;
             } catch (error) {
-                // Fallback
+                console.error('Erreur Firebase:', error);
+                throw error;
             }
         }
         
@@ -2122,6 +2124,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         updateLeaderboardDisplay();
                     }
                 } catch (error) {
+                    console.error('Erreur lors de l\'enregistrement:', error);
                     showMessage('Erreur lors de l\'enregistrement. Réessayez plus tard.', 'hit');
                 } finally {
                     if (submitBtn) {
