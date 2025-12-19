@@ -242,14 +242,21 @@ document.addEventListener('DOMContentLoaded', function() {
     let leaderboard = [];
     const MAX_LEADERBOARD_ENTRIES = 10;
     
-    // Configuration Firebase (à remplacer par vos propres clés)
-    const FIREBASE_CONFIG = {
-        apiKey: "YOUR_API_KEY",
-        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-        projectId: "YOUR_PROJECT_ID",
-        storageBucket: "YOUR_PROJECT_ID.appspot.com",
-        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-        appId: "YOUR_APP_ID"
+    // Configuration Firebase
+    // Les valeurs peuvent être définies de plusieurs façons :
+    // 1. Via window.FIREBASE_CONFIG (injecté par un script avant ce fichier, depuis /api/firebase-config)
+    // 2. Via window.FIREBASE_* (variables individuelles)
+    // 3. Directement dans ce fichier (remplacez YOUR_* par vos valeurs)
+    // 
+    // Pour Vercel : Configurez les variables d'environnement dans Vercel Dashboard
+    // et l'API route /api/firebase-config.js les injectera automatiquement
+    const FIREBASE_CONFIG = window.FIREBASE_CONFIG || {
+        apiKey: window.FIREBASE_API_KEY || "YOUR_API_KEY",
+        authDomain: window.FIREBASE_AUTH_DOMAIN || "YOUR_PROJECT_ID.firebaseapp.com",
+        projectId: window.FIREBASE_PROJECT_ID || "YOUR_PROJECT_ID",
+        storageBucket: window.FIREBASE_STORAGE_BUCKET || "YOUR_PROJECT_ID.appspot.com",
+        messagingSenderId: window.FIREBASE_MESSAGING_SENDER_ID || "YOUR_MESSAGING_SENDER_ID",
+        appId: window.FIREBASE_APP_ID || "YOUR_APP_ID"
     };
     
     // Initialiser Firebase
