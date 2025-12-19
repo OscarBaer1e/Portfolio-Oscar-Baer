@@ -25,6 +25,14 @@
     margin-bottom: 30px;
 }
 
+.game-buttons {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+}
+
 .game-title {
     font-size: 2.5rem;
     color: var(--primary-color);
@@ -142,6 +150,7 @@
 .pin-row-1 {
     display: flex;
     justify-content: center;
+    gap: 30px;
 }
 
 .pin-row-2 {
