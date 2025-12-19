@@ -463,7 +463,7 @@ document.addEventListener('DOMContentLoaded', function() {
             canvas.height = height;
             
             // Réinitialiser la position du vaisseau
-            ship.x = canvas.width / 2;
+            if (canvas) ship.x = canvas.width / 2;
             ship.y = canvas.height - 80;
             
             // Redessiner
@@ -476,7 +476,7 @@ document.addEventListener('DOMContentLoaded', function() {
             canvas.height = 600;
             
             // Réinitialiser la position du vaisseau
-            ship.x = canvas.width / 2;
+            if (canvas) ship.x = canvas.width / 2;
             ship.y = canvas.height - 80;
             
             // Redessiner
@@ -931,6 +931,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Dessin
     function draw() {
+        if (!canvas || !ctx) return;
         // Fond noir avec dégradé
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         gradient.addColorStop(0, '#0a0a1a');
@@ -1564,7 +1565,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (gameState.lives < 5) { // Maximum 5 vies
                 gameState.lives++;
                 gameState.maxLives = Math.max(gameState.maxLives, gameState.lives);
-                livesElement.textContent = gameState.lives;
+                if (livesElement) livesElement.textContent = gameState.lives;
                 showMessage('❤️ Vie Bonus !', 'powerup');
             } else {
                 showMessage('Vies au maximum !', 'powerup');
@@ -1805,7 +1806,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 playSound('hit');
                 
                 gameState.lives--;
-                livesElement.textContent = gameState.lives;
+                if (livesElement) livesElement.textContent = gameState.lives;
                 updateHealthBars();
                 
                 if (gameState.lives <= 0) {
