@@ -242,6 +242,12 @@ document.addEventListener('DOMContentLoaded', function() {
     let leaderboard = [];
     const MAX_LEADERBOARD_ENTRIES = 10;
     
+    // Configuration pour le leaderboard partagé (JSONBin.io)
+    const LEADERBOARD_BIN_ID = '67f8a5e5e41b4d34e47b0a1a'; // À remplacer par votre propre bin ID
+    const LEADERBOARD_API_KEY = '$2a$10$YOUR_API_KEY'; // À remplacer par votre clé API JSONBin.io
+    const LEADERBOARD_API_URL = `https://api.jsonbin.io/v3/b/${LEADERBOARD_BIN_ID}`;
+    let leaderboardSyncInterval = null;
+    
     // Plein écran
     let isFullscreen = false;
     
@@ -348,21 +354,93 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Charger le leaderboard depuis localStorage
-    function loadLeaderboard() {
+    // Charger le leaderboard depuis le serveur (JSONBin.io)
+    async function loadLeaderboard() {
+        try {
+            const response = await fetch(LEADERBOARD_API_URL + '/latest', {
+                method: 'GET',
+                headers: {
+                    'X-Master-Key': LEADERBOARD_API_KEY,
+                    'X-Bin-Meta': 'false'
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                if (data && Array.isArray(data)) {
+                    leaderboard = data;
+                    // Trier par score décroissant
+                    leaderboard.sort((a, b) => b.score - a.score);
+                    // Garder seulement les 10 meilleurs
+                    if (leaderboard.length > MAX_LEADERBOARD_ENTRIES) {
+                        leaderboard = leaderboard.slice(0, MAX_LEADERBOARD_ENTRIES);
+                    }
+                    // Sauvegarder aussi en local comme backup
+                    localStorage.setItem('spaceShooterLeaderboard', JSON.stringify(leaderboard));
+                    return;
+                }
+            }
+        } catch (error) {
+            console.warn('Erreur lors du chargement du leaderboard en ligne, utilisation du cache local:', error);
+        }
+        
+        // Fallback: charger depuis localStorage si l'API échoue
         const stored = localStorage.getItem('spaceShooterLeaderboard');
         if (stored) {
-            leaderboard = JSON.parse(stored);
+            try {
+                leaderboard = JSON.parse(stored);
+                leaderboard.sort((a, b) => b.score - a.score);
+            } catch (e) {
+                leaderboard = [];
+            }
         } else {
             leaderboard = [];
         }
-        // Trier par score décroissant
-        leaderboard.sort((a, b) => b.score - a.score);
     }
     
-    // Sauvegarder le leaderboard dans localStorage
-    function saveLeaderboard() {
+    // Sauvegarder le leaderboard sur le serveur (JSONBin.io)
+    async function saveLeaderboard() {
+        // Sauvegarder d'abord en local comme backup
         localStorage.setItem('spaceShooterLeaderboard', JSON.stringify(leaderboard));
+        
+        try {
+            const response = await fetch(LEADERBOARD_API_URL, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': LEADERBOARD_API_KEY
+                },
+                body: JSON.stringify(leaderboard)
+            });
+            
+            if (!response.ok) {
+                console.warn('Erreur lors de la sauvegarde du leaderboard en ligne');
+            }
+        } catch (error) {
+            console.warn('Erreur lors de la sauvegarde du leaderboard en ligne:', error);
+        }
+    }
+    
+    // Synchroniser le leaderboard périodiquement (toutes les 5 secondes)
+    function startLeaderboardSync() {
+        if (leaderboardSyncInterval) {
+            clearInterval(leaderboardSyncInterval);
+        }
+        leaderboardSyncInterval = setInterval(() => {
+            loadLeaderboard().then(() => {
+                if (leaderboardModal && !leaderboardModal.classList.contains('hidden')) {
+                    updateLeaderboardDisplay();
+                }
+            });
+        }, 5000); // Synchroniser toutes les 5 secondes
+    }
+    
+    // Arrêter la synchronisation
+    function stopLeaderboardSync() {
+        if (leaderboardSyncInterval) {
+            clearInterval(leaderboardSyncInterval);
+            leaderboardSyncInterval = null;
+        }
     }
     
     // Vérifier si un score peut être enregistré
@@ -459,17 +537,19 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Afficher le leaderboard
-    function showLeaderboard() {
+    async function showLeaderboard() {
         if (!leaderboardModal) return;
-        loadLeaderboard();
+        await loadLeaderboard();
         updateLeaderboardDisplay();
         leaderboardModal.classList.remove('hidden');
+        startLeaderboardSync(); // Démarrer la synchronisation automatique
     }
     
     // Masquer le leaderboard
     function hideLeaderboard() {
         if (!leaderboardModal) return;
         leaderboardModal.classList.add('hidden');
+        stopLeaderboardSync(); // Arrêter la synchronisation pour économiser les ressources
     }
     
     // Initialisation
@@ -1253,7 +1333,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Crée un boss
     function spawnBoss() {
         const bossNumber = Math.min(10, Math.floor(gameState.level / 10));
-        const baseHealth = 50 + (bossNumber * 30);
+        const baseHealth = 30 + (bossNumber * 15); // Réduit : était 50 + (bossNumber * 30)
         const baseSize = 60 + (bossNumber * 10);
         
         // Initialiser les propriétés spécifiques au pattern du boss
@@ -1865,36 +1945,38 @@ document.addEventListener('DOMContentLoaded', function() {
         startBtn.textContent = 'Commencer';
         
         // Vérifier si le score peut être enregistré dans le leaderboard
-        loadLeaderboard();
-        if (canRegisterScore(gameState.score) && scoreRegister && registerScoreValue && registerLevelValue && registerPositionValue) {
-            const position = calculateScorePosition(gameState.score);
-            registerScoreValue.textContent = gameState.score.toLocaleString();
-            registerLevelValue.textContent = gameState.level;
-            registerPositionValue.textContent = position ? `#${position}` : '-';
-            
-            // Style spécial pour les 3 premières positions
-            if (position === 1) {
-                registerPositionValue.style.color = '#ffd700';
-                registerPositionValue.style.textShadow = '0 0 10px #ffd700';
-            } else if (position === 2) {
-                registerPositionValue.style.color = '#c0c0c0';
-                registerPositionValue.style.textShadow = '0 0 10px #c0c0c0';
-            } else if (position === 3) {
-                registerPositionValue.style.color = '#cd7f32';
-                registerPositionValue.style.textShadow = '0 0 10px #cd7f32';
-            } else {
-                registerPositionValue.style.color = 'var(--primary-color)';
-                registerPositionValue.style.textShadow = 'none';
+        // Charger le leaderboard avant de vérifier si on peut enregistrer
+        loadLeaderboard().then(() => {
+            if (canRegisterScore(gameState.score) && scoreRegister && registerScoreValue && registerLevelValue && registerPositionValue) {
+                const position = calculateScorePosition(gameState.score);
+                registerScoreValue.textContent = gameState.score.toLocaleString();
+                registerLevelValue.textContent = gameState.level;
+                registerPositionValue.textContent = position ? `#${position}` : '-';
+                
+                // Style spécial pour les 3 premières positions
+                if (position === 1) {
+                    registerPositionValue.style.color = '#ffd700';
+                    registerPositionValue.style.textShadow = '0 0 10px #ffd700';
+                } else if (position === 2) {
+                    registerPositionValue.style.color = '#c0c0c0';
+                    registerPositionValue.style.textShadow = '0 0 10px #c0c0c0';
+                } else if (position === 3) {
+                    registerPositionValue.style.color = '#cd7f32';
+                    registerPositionValue.style.textShadow = '0 0 10px #cd7f32';
+                } else {
+                    registerPositionValue.style.color = 'var(--primary-color)';
+                    registerPositionValue.style.textShadow = 'none';
+                }
+                
+                scoreRegister.classList.remove('hidden');
+                // Focus automatique sur le champ de nom
+                if (playerNameInput) {
+                    setTimeout(() => {
+                        playerNameInput.focus();
+                    }, 100);
+                }
             }
-            
-            scoreRegister.classList.remove('hidden');
-            // Focus automatique sur le champ de nom
-            if (playerNameInput) {
-                setTimeout(() => {
-                    playerNameInput.focus();
-                }, 100);
-            }
-        }
+        });
     }
     
     function resetGame() {
@@ -1974,21 +2056,39 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Formulaire d'enregistrement de score
     if (scoreRegisterForm && playerNameInput && registerScoreValue && registerLevelValue && registerPositionValue) {
-        scoreRegisterForm.addEventListener('submit', (e) => {
+        scoreRegisterForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const name = playerNameInput.value.trim();
             if (name && name.length > 0) {
-                registerScore(name, gameState.score, gameState.level);
-                if (scoreRegister) scoreRegister.classList.add('hidden');
-                playerNameInput.value = '';
-                registerScoreValue.textContent = '0';
-                registerLevelValue.textContent = '1';
-                registerPositionValue.textContent = '-';
-                showMessage(`Score enregistré ! Bien joué ${name} !`, 'powerup');
+                // Désactiver le bouton pendant l'enregistrement
+                const submitBtn = scoreRegisterForm.querySelector('button[type="submit"]');
+                if (submitBtn) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Enregistrement...';
+                }
                 
-                // Mettre à jour le leaderboard si ouvert
-                if (leaderboardModal && !leaderboardModal.classList.contains('hidden')) {
-                    updateLeaderboardDisplay();
+                try {
+                    await registerScore(name, gameState.score, gameState.level);
+                    if (scoreRegister) scoreRegister.classList.add('hidden');
+                    playerNameInput.value = '';
+                    registerScoreValue.textContent = '0';
+                    registerLevelValue.textContent = '1';
+                    registerPositionValue.textContent = '-';
+                    showMessage(`Score enregistré ! Bien joué ${name} !`, 'powerup');
+                    
+                    // Mettre à jour le leaderboard si ouvert
+                    if (leaderboardModal && !leaderboardModal.classList.contains('hidden')) {
+                        await loadLeaderboard();
+                        updateLeaderboardDisplay();
+                    }
+                } catch (error) {
+                    console.error('Erreur lors de l\'enregistrement du score:', error);
+                    showMessage('Erreur lors de l\'enregistrement. Réessayez plus tard.', 'hit');
+                } finally {
+                    if (submitBtn) {
+                        submitBtn.disabled = false;
+                        submitBtn.innerHTML = '<span class="btn-icon">💾</span> Enregistrer dans le Leaderboard';
+                    }
                 }
             }
         });

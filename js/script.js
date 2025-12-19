@@ -614,7 +614,7 @@ document.addEventListener('DOMContentLoaded', function() {
             box-shadow: 0 0 50px rgba(0, 255, 255, 0.8);
             animation: easterEggPulse 0.5s ease;
         `;
-        message.innerHTML = '🏀 Easter Egg Basket Découvert ! 🏀<br><small style="font-size: 1rem; margin-top: 10px; display: block;">Redirection vers le mini-jeu...</small>';
+        message.innerHTML = '🚀 Easter Egg Space Shooter Découvert ! 🚀<br><small style="font-size: 1rem; margin-top: 10px; display: block;">Redirection vers le mini-jeu...</small>';
         document.body.appendChild(message);
         
         setTimeout(() => {
