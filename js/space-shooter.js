@@ -237,14 +237,33 @@ document.addEventListener('DOMContentLoaded', function() {
     const MAX_LEADERBOARD_ENTRIES = 10;
     
     // Configuration Firebase - Utilise window.FIREBASE_CONFIG si disponible (depuis Vercel), sinon valeurs par défaut
-    const FIREBASE_CONFIG = window.FIREBASE_CONFIG || {
-        apiKey: window.FIREBASE_API_KEY || "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
-        authDomain: window.FIREBASE_AUTH_DOMAIN || "oscar-baer.firebaseapp.com",
-        projectId: window.FIREBASE_PROJECT_ID || "oscar-baer",
-        storageBucket: window.FIREBASE_STORAGE_BUCKET || "oscar-baer.firebasestorage.app",
-        messagingSenderId: window.FIREBASE_MESSAGING_SENDER_ID || "419618942184",
-        appId: window.FIREBASE_APP_ID || "1:419618942184:web:60e8e58c6c3348a3fbad5d"
-    };
+    // IMPORTANT: Les valeurs par défaut sont garanties pour éviter YOUR_PROJECT_ID
+    let FIREBASE_CONFIG = window.FIREBASE_CONFIG;
+    
+    // Si pas de config ou config invalide, utiliser les valeurs par défaut
+    if (!FIREBASE_CONFIG || 
+        !FIREBASE_CONFIG.projectId || 
+        FIREBASE_CONFIG.projectId === 'YOUR_PROJECT_ID' ||
+        FIREBASE_CONFIG.projectId === 'votre-projet-id' ||
+        FIREBASE_CONFIG.apiKey === 'VOTRE_API_KEY') {
+        console.log('📌 Utilisation des valeurs par défaut (config directe)');
+        FIREBASE_CONFIG = {
+            apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
+            authDomain: "oscar-baer.firebaseapp.com",
+            projectId: "oscar-baer",
+            storageBucket: "oscar-baer.firebasestorage.app",
+            messagingSenderId: "419618942184",
+            appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
+        };
+        // Mettre à jour window.FIREBASE_CONFIG pour les autres scripts
+        window.FIREBASE_CONFIG = FIREBASE_CONFIG;
+    }
+    
+    console.log('🔧 Configuration Firebase finale:', {
+        projectId: FIREBASE_CONFIG.projectId,
+        apiKey: FIREBASE_CONFIG.apiKey ? FIREBASE_CONFIG.apiKey.substring(0, 15) + '...' : 'manquant',
+        authDomain: FIREBASE_CONFIG.authDomain
+    });
     
     let db = null;
     let firebaseInitialized = false;
