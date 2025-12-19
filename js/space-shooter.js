@@ -27,6 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
         highScore: parseInt(localStorage.getItem('spaceShooterHighScore')) || 0,
         level: 1,
         lives: 3,
+<<<<<<< HEAD
         maxLives: 3,
         gameSpeed: 2,
         gameMode: 'normal', // 'normal' ou 'infinite'
@@ -160,6 +161,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+=======
+        gameSpeed: 2
+    };
+    
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
     // Vaisseau
     const ship = {
         x: canvas.width / 2,
@@ -179,6 +185,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Particules d'explosion
     let particles = [];
     
+<<<<<<< HEAD
     // Boosts
     let powerUps = [];
     
@@ -452,12 +459,18 @@ document.addEventListener('DOMContentLoaded', function() {
         leaderboardModal.classList.add('hidden');
     }
     
+=======
+    // Étoiles de fond
+    let stars = [];
+    
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
     // Initialisation
     function init() {
         ship.x = canvas.width / 2;
         bullets = [];
         asteroids = [];
         particles = [];
+<<<<<<< HEAD
         powerUps = [];
         stars = [];
         backgroundEvents = [];
@@ -478,6 +491,13 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         lastShotTime = 0;
         currentLevelDisplay.textContent = gameState.level;
+=======
+        stars = [];
+        gameState.score = 0;
+        gameState.level = 1;
+        gameState.lives = 3;
+        gameState.gameSpeed = 2;
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
         
         // Créer les étoiles
         for (let i = 0; i < 100; i++) {
@@ -489,6 +509,7 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
+<<<<<<< HEAD
         updateHealthBars();
         updateHighScore();
     }
@@ -514,6 +535,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+=======
+        updateHighScore();
+    }
+    
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
     function updateHighScore() {
         highScoreElement.textContent = gameState.highScore;
         finalHighScore.textContent = gameState.highScore;
@@ -557,6 +583,7 @@ document.addEventListener('DOMContentLoaded', function() {
             drawAsteroid(asteroid);
         });
         
+<<<<<<< HEAD
         // Boosts
         powerUps.forEach(powerUp => {
             drawPowerUp(powerUp);
@@ -567,16 +594,22 @@ document.addEventListener('DOMContentLoaded', function() {
             drawShield();
         }
         
+=======
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
         // Particules
         particles.forEach(particle => {
             ctx.fillStyle = particle.color;
             ctx.globalAlpha = particle.alpha;
+<<<<<<< HEAD
             ctx.shadowBlur = particle.size * 2;
             ctx.shadowColor = particle.color;
+=======
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
             ctx.beginPath();
             ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
             ctx.fill();
             ctx.globalAlpha = 1;
+<<<<<<< HEAD
             ctx.shadowBlur = 0;
         });
         
@@ -701,6 +734,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         ctx.restore();
+=======
+        });
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
     }
     
     function drawShip(x, y) {
@@ -758,6 +794,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.restore();
     }
     
+<<<<<<< HEAD
     function drawPowerUp(powerUp) {
         ctx.save();
         ctx.translate(powerUp.x, powerUp.y);
@@ -830,6 +867,8 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.restore();
     }
     
+=======
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
     // Mise à jour
     function update() {
         if (!gameState.isPlaying || gameState.isPaused) return;
@@ -843,6 +882,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
+<<<<<<< HEAD
         // Événements de fond rares (1% de chance par frame)
         if (Math.random() < 0.01) {
             const eventType = Math.random();
@@ -890,6 +930,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Mise à jour du boss
         updateBoss();
         
+=======
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
         // Mise à jour des projectiles
         bullets.forEach((bullet, index) => {
             bullet.y -= bullet.speed;
@@ -921,6 +963,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
+<<<<<<< HEAD
         // Mise à jour des boosts
         powerUps.forEach((powerUp, index) => {
             powerUp.y += powerUp.speed;
@@ -956,6 +999,8 @@ document.addEventListener('DOMContentLoaded', function() {
             showMessage('Bouclier terminé', 'powerup');
         }
         
+=======
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
         // Collision projectiles/astéroïdes
         bullets.forEach((bullet, bulletIndex) => {
             asteroids.forEach((asteroid, asteroidIndex) => {
@@ -964,14 +1009,20 @@ document.addEventListener('DOMContentLoaded', function() {
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 
                 if (distance < asteroid.size + 5) {
+<<<<<<< HEAD
                     // Explosion améliorée
                     createEnhancedExplosion(asteroid.x, asteroid.y, asteroid.color, asteroid.size);
                     playSound('explosion');
+=======
+                    // Explosion
+                    createExplosion(asteroid.x, asteroid.y, asteroid.color);
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
                     
                     // Score
                     gameState.score += Math.floor(asteroid.size / 5) * 10;
                     scoreElement.textContent = gameState.score;
                     
+<<<<<<< HEAD
                     // Supprimer le projectile
                     bullets.splice(bulletIndex, 1);
                     
@@ -1006,6 +1057,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     
                     // Supprimer l'astéroïde
+=======
+                    // Supprimer
+                    bullets.splice(bulletIndex, 1);
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
                     asteroids.splice(asteroidIndex, 1);
                     
                     // Vérifier le niveau
@@ -1021,6 +1076,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const distance = Math.sqrt(dx * dx + dy * dy);
             
             if (distance < asteroid.size + ship.width / 2) {
+<<<<<<< HEAD
                 // Si le bouclier est actif, l'astéroïde est détruit sans perdre de vie
                 if (activePowerUps.shield && Date.now() < activePowerUps.shieldEndTime) {
                     createEnhancedExplosion(asteroid.x, asteroid.y, asteroid.color, asteroid.size);
@@ -1050,10 +1106,32 @@ document.addEventListener('DOMContentLoaded', function() {
                             ship.invincible = false;
                         }, 2000);
                     }
+=======
+                // Explosion
+                createExplosion(ship.x, ship.y, ship.color);
+                
+                // Perdre une vie
+                gameState.lives--;
+                livesElement.textContent = gameState.lives;
+                
+                // Supprimer l'astéroïde
+                asteroids.splice(index, 1);
+                
+                // Vérifier game over
+                if (gameState.lives <= 0) {
+                    endGame();
+                } else {
+                    // Invincibilité temporaire
+                    ship.invincible = true;
+                    setTimeout(() => {
+                        ship.invincible = false;
+                    }, 2000);
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
                 }
             }
         });
         
+<<<<<<< HEAD
         // Collision vaisseau/boosts
         powerUps.forEach((powerUp, index) => {
             const dx = ship.x - powerUp.x;
@@ -1066,6 +1144,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
+=======
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
         // Spawn d'astéroïdes
         const spawnRate = 0.02 + (gameState.level * 0.005);
         if (Math.random() < spawnRate) {
@@ -1087,6 +1167,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+<<<<<<< HEAD
     // Explosion améliorée avec plus de particules et effets
     function createEnhancedExplosion(x, y, color, size) {
         const particleCount = Math.floor(size / 2) + 20; // Plus de particules pour les gros astéroïdes
@@ -1166,6 +1247,8 @@ document.addEventListener('DOMContentLoaded', function() {
         updateHealthBars();
     }
     
+=======
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
     function spawnAsteroid() {
         const size = Math.random() * 30 + 15;
         asteroids.push({
@@ -1179,6 +1262,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+<<<<<<< HEAD
     // Marque les astéroïdes comme "gros" (pour la séparation)
     function isLargeAsteroid(asteroid) {
         return asteroid.size > 25;
@@ -1205,11 +1289,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Mode normal : boss tous les 10 niveaux
+=======
+    function checkLevel() {
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
         const newLevel = Math.floor(gameState.score / 500) + 1;
         if (newLevel > gameState.level) {
             gameState.level = newLevel;
             gameState.gameSpeed += 0.5;
             levelElement.textContent = gameState.level;
+<<<<<<< HEAD
             currentLevelDisplay.textContent = gameState.level;
             
             // Effet visuel
@@ -1704,12 +1792,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 }
                 break;
+=======
+            
+            // Effet visuel
+            showMessage(`Niveau ${gameState.level} !`, 'level');
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
         }
     }
     
     function shoot() {
         if (!gameState.isPlaying || gameState.isPaused) return;
         
+<<<<<<< HEAD
         // Vérifie le cooldown de tir
         const now = Date.now();
         if (now - lastShotTime < currentFireRate) {
@@ -1718,19 +1812,27 @@ document.addEventListener('DOMContentLoaded', function() {
         
         lastShotTime = now;
         
+=======
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
         bullets.push({
             x: ship.x,
             y: ship.y - ship.height / 2,
             speed: 8
         });
+<<<<<<< HEAD
         
         playSound('shoot');
+=======
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
     }
     
     // Contrôles
     let keys = {};
+<<<<<<< HEAD
     let autoShootInterval = null;
     
+=======
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
     document.addEventListener('keydown', (e) => {
         keys[e.code] = true;
         
@@ -1738,6 +1840,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             if (gameState.isPlaying) {
                 shoot();
+<<<<<<< HEAD
                 // Démarrer le tir automatique
                 if (!autoShootInterval) {
                     const startAutoShoot = () => {
@@ -1749,6 +1852,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     };
                     startAutoShoot();
                 }
+=======
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
             } else if (!startScreen.classList.contains('hidden')) {
                 startGame();
             } else if (!gameOver.classList.contains('hidden')) {
@@ -1759,12 +1864,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     document.addEventListener('keyup', (e) => {
         keys[e.code] = false;
+<<<<<<< HEAD
         
         // Arrêter le tir automatique
         if (e.code === 'Space' && autoShootInterval) {
             clearInterval(autoShootInterval);
             autoShootInterval = null;
         }
+=======
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
     });
     
     // Mouvement du vaisseau
@@ -1784,6 +1892,7 @@ document.addEventListener('DOMContentLoaded', function() {
         handleMovement();
         update();
         draw();
+<<<<<<< HEAD
         updateHealthBars(); // Mise à jour des barres de vie
         
         // Mise à jour du tir automatique si actif et que le boost de tir rapide change
@@ -1793,15 +1902,20 @@ document.addEventListener('DOMContentLoaded', function() {
             // On ne recrée l'interval que si nécessaire (optimisation)
         }
         
+=======
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
         if (gameState.isPlaying) {
             requestAnimationFrame(gameLoop);
         }
     }
     
     function startGame() {
+<<<<<<< HEAD
         // Récupérer le mode de jeu sélectionné
         gameState.gameMode = gameModeSelect.value;
         
+=======
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
         init();
         gameState.isPlaying = true;
         gameState.isPaused = false;
@@ -1833,6 +1947,7 @@ document.addEventListener('DOMContentLoaded', function() {
         finalLevel.textContent = gameState.level;
         gameOver.classList.remove('hidden');
         startBtn.textContent = 'Commencer';
+<<<<<<< HEAD
         
         // Vérifier si le score peut être enregistré dans le leaderboard
         loadLeaderboard();
@@ -1863,6 +1978,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 playerNameInput.focus();
             }, 100);
         }
+=======
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
     }
     
     function resetGame() {
@@ -1884,6 +2001,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 2000);
     }
     
+<<<<<<< HEAD
     // Gestion des photos de boss
     document.querySelectorAll('.boss-photo-input').forEach(input => {
         input.addEventListener('change', (e) => {
@@ -1911,6 +2029,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
+=======
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
     // Boutons
     startBtn.addEventListener('click', () => {
         if (gameState.isPlaying) {
@@ -1923,6 +2043,7 @@ document.addEventListener('DOMContentLoaded', function() {
     resetBtn.addEventListener('click', resetGame);
     restartBtn.addEventListener('click', startGame);
     
+<<<<<<< HEAD
     // Leaderboard
     showLeaderboardBtn.addEventListener('click', showLeaderboard);
     closeLeaderboardBtn.addEventListener('click', hideLeaderboard);
@@ -1970,6 +2091,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialisation
     loadLeaderboard();
+=======
+    // Initialisation
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
     init();
     draw();
 });

@@ -40,91 +40,56 @@
                 <div class="bowling-game-container">
                     <div class="game-header">
                         <h2 class="game-title">🎳 Mini Bowling Secret 🎳</h2>
-                        <div class="mode-selector">
-                            <label for="game-mode">Mode de jeu:</label>
-                            <select id="game-mode" class="mode-select">
-                                <option value="solo">Solo</option>
-                                <option value="1v1">1V1</option>
-                            </select>
-                        </div>
-                        <div id="current-player" class="current-player-display">Frame 1 - Tir 1</div>
                         <div class="game-stats">
                             <div class="stat">
                                 <span class="stat-label">Score:</span>
                                 <span id="score" class="stat-value">0</span>
                             </div>
                             <div class="stat">
-                                <span class="stat-label">Frame:</span>
-                                <span id="throws" class="stat-value">1</span>
+                                <span class="stat-label">Lancers:</span>
+                                <span id="throws" class="stat-value">0</span>
                             </div>
                             <div class="stat">
                                 <span class="stat-label">Meilleur:</span>
                                 <span id="best-score" class="stat-value">0</span>
                             </div>
                         </div>
-                        <div class="header-buttons">
-                            <button id="reset-game" class="btn primary-btn btn-small">Nouvelle Partie</button>
-                            <a href="../index.html" class="btn secondary-btn btn-small"><i class="fas fa-home"></i> Retour</a>
-                        </div>
-                    </div>
-                    
-                    <div id="score-table-container" class="score-table-container" style="display: none;">
-                        <h3 class="score-table-title">Tableau des Scores</h3>
-                        <table id="score-table" class="score-table">
-                            <!-- Généré par JavaScript -->
-                        </table>
+                        <button id="reset-game" class="btn primary-btn btn-small">Nouvelle Partie</button>
+                        <a href="../index.html" class="btn secondary-btn btn-small"><i class="fas fa-home"></i> Retour</a>
                     </div>
                     
                     <div class="bowling-alley">
                         <div class="lane">
-                            <div class="lane-markings">
-                                <div class="lane-line center-line"></div>
-                                <div class="lane-line left-line"></div>
-                                <div class="lane-line right-line"></div>
-                                <div class="lane-arrows">
-                                    <div class="arrow arrow-1"></div>
-                                    <div class="arrow arrow-2"></div>
-                                    <div class="arrow arrow-3"></div>
-                                    <div class="arrow arrow-4"></div>
-                                    <div class="arrow arrow-5"></div>
-                                </div>
-                            </div>
                             <div id="pins-container" class="pins-container">
                                 <!-- Les quilles seront générées par JS -->
                             </div>
                             <div id="ball-container" class="ball-container">
-                                <div class="ball-drag-area">
-                                    <img id="bowling-ball" src="../ressources/images/1764412073317.png" alt="Boule de bowling" class="bowling-ball">
-                                </div>
+                                <img id="bowling-ball" src="../ressources/images/1764412073317.png" alt="Boule de bowling" class="bowling-ball">
                             </div>
                         </div>
                     </div>
                     
                     <div class="game-controls">
-                        <div class="throw-instructions">
-                            <p><i class="fas fa-mouse"></i> Cliquez et glissez depuis la boule pour viser et lancer</p>
+                        <div class="power-control">
+                            <label for="power-slider">Puissance:</label>
+                            <input type="range" id="power-slider" min="1" max="100" value="50">
+                            <span id="power-value">50%</span>
                         </div>
+                        <div class="angle-control">
+                            <label for="angle-slider">Angle:</label>
+                            <input type="range" id="angle-slider" min="-30" max="30" value="0">
+                            <span id="angle-value">0°</span>
+                        </div>
+                        <button id="throw-ball" class="btn primary-btn large-btn">
+                            <i class="fas fa-hand-rock"></i> Lancer la Boule
+                        </button>
                     </div>
                     
                     <div id="game-message" class="game-message"></div>
-                    
-                    <div id="player2-image-selector" class="player2-image-selector" style="display: none;">
-                        <label for="player2-image-input">Image du Joueur 2:</label>
-                        <input type="file" id="player2-image-input" accept="image/*" style="display: none;">
-                        <button id="select-player2-image" class="btn secondary-btn btn-small">
-                            <i class="fas fa-image"></i> Choisir une image
-                        </button>
-                        <button id="reset-player2-image" class="btn secondary-btn btn-small">
-                            <i class="fas fa-undo"></i> Image par défaut
-                        </button>
-                    </div>
                 </div>
             </div>
         </section>
     </main>
-    
-    <!-- Canvas pour les confettis -->
-    <canvas id="confetti-canvas"></canvas>
 
     <footer>
         <div class="container">
