@@ -513,19 +513,47 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function canRegisterScore(score) {
-        // Vérification locale basée sur le leaderboard actuel en mémoire
-        // Pas besoin de charger depuis Firebase pour cette validation
+        // Validation locale : vérifier si le score peut entrer dans le top 10
+        // Pas de validation Firebase nécessaire
         if (!leaderboard || leaderboard.length === 0) return true;
+        
+        // Si le leaderboard n'est pas plein, on peut toujours enregistrer
         if (leaderboard.length < MAX_LEADERBOARD_ENTRIES) return true;
         
-        // Vérifier si le score peut dépasser au moins une personne du classement
+        // Si le leaderboard est plein, vérifier si le score dépasse le dernier du top 10
         const lastScore = leaderboard[leaderboard.length - 1].score;
         return score > lastScore;
     }
     
     async function registerScore(name, score, level) {
-        const firestoreDb = initFirebase();
+        // Vérification locale : le score doit dépasser le dernier du top 10
+        // Pas de validation Firebase nécessaire - tout le monde peut créer un score
+        // si la condition est remplie
         
+        // Vérifier que le score peut entrer dans le top 10
+        if (!canRegisterScore(score)) {
+            throw new Error('Le score n\'est pas assez élevé pour entrer dans le top 10');
+        }
+        
+        // Ajouter le score au leaderboard local
+        leaderboard.push({ 
+            name: name.substring(0, 20), 
+            score: score, 
+            level: level, 
+            date: new Date().toISOString() 
+        });
+        leaderboard.sort((a, b) => b.score - a.score);
+        
+        // Garder seulement le top 10
+        if (leaderboard.length > MAX_LEADERBOARD_ENTRIES) {
+            leaderboard = leaderboard.slice(0, MAX_LEADERBOARD_ENTRIES);
+        }
+        
+        // Sauvegarder localement
+        saveLeaderboard();
+        
+        // Enregistrer dans Firebase en arrière-plan (sans bloquer)
+        const firestoreDb = initFirebase();
         if (firestoreDb) {
             try {
                 const timestamp = firebase.firestore.Timestamp.now();
@@ -535,22 +563,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     level: level,
                     date: timestamp
                 });
-                await loadLeaderboard();
-                updateLeaderboardDisplay();
-                return;
+                // Recharger depuis Firebase pour synchroniser avec les autres joueurs
+                loadLeaderboard().catch(() => {
+                    // Ignorer les erreurs, on a déjà le score en local
+                });
             } catch (error) {
-                console.error('Erreur Firebase:', error);
-                throw error;
+                console.warn('Erreur enregistrement Firebase (non bloquant):', error);
+                // Ne pas bloquer si Firebase échoue, le score est déjà enregistré localement
             }
         }
         
-        await loadLeaderboard();
-        leaderboard.push({ name, score, level, date: new Date().toISOString() });
-        leaderboard.sort((a, b) => b.score - a.score);
-        if (leaderboard.length > MAX_LEADERBOARD_ENTRIES) {
-            leaderboard = leaderboard.slice(0, MAX_LEADERBOARD_ENTRIES);
-        }
-        saveLeaderboard();
         updateLeaderboardDisplay();
     }
     
