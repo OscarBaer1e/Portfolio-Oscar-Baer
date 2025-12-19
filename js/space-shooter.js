@@ -246,16 +246,33 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let db = null;
     let firebaseInitialized = false;
+    let firebaseInitAttempted = false;
     
     function initFirebase() {
-        if (firebaseInitialized || typeof firebase === 'undefined') return db;
+        if (firebaseInitialized && db) return db;
+        
+        if (typeof firebase === 'undefined' || !firebase.apps) {
+            return null;
+        }
+        
+        if (firebaseInitAttempted && !firebaseInitialized) {
+            return null;
+        }
+        
+        firebaseInitAttempted = true;
         
         try {
-            firebase.initializeApp(FIREBASE_CONFIG);
+            if (firebase.apps.length === 0) {
+                if (!FIREBASE_CONFIG || !FIREBASE_CONFIG.apiKey) {
+                    return null;
+                }
+                firebase.initializeApp(FIREBASE_CONFIG);
+            }
             db = firebase.firestore();
             firebaseInitialized = true;
             return db;
         } catch (error) {
+            console.warn('Erreur initialisation Firebase:', error);
             return null;
         }
     }
@@ -1178,27 +1195,27 @@ document.addEventListener('DOMContentLoaded', function() {
                     asteroids.splice(index, 1);
                     showMessage('Bouclier actif !', 'powerup');
                 } else {
-                    // Explosion
+                // Explosion
                     createEnhancedExplosion(ship.x, ship.y, ship.color, 30);
                     playSound('hit');
-                    
-                    // Perdre une vie
-                    gameState.lives--;
+                
+                // Perdre une vie
+                gameState.lives--;
                     if (livesElement) livesElement.textContent = gameState.lives;
                     updateHealthBars();
-                    
-                    // Supprimer l'astéroïde
-                    asteroids.splice(index, 1);
-                    
-                    // Vérifier game over
-                    if (gameState.lives <= 0) {
-                        endGame();
-                    } else {
-                        // Invincibilité temporaire
-                        ship.invincible = true;
-                        setTimeout(() => {
-                            ship.invincible = false;
-                        }, 2000);
+                
+                // Supprimer l'astéroïde
+                asteroids.splice(index, 1);
+                
+                // Vérifier game over
+                if (gameState.lives <= 0) {
+                    endGame();
+                } else {
+                    // Invincibilité temporaire
+                    ship.invincible = true;
+                    setTimeout(() => {
+                        ship.invincible = false;
+                    }, 2000);
                     }
                 }
             }
@@ -2155,8 +2172,27 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Initialisation
-    loadLeaderboard();
-    init();
-    draw();
+    // Attendre que Firebase soit chargé avant d'initialiser
+    function waitForFirebase(callback, maxAttempts = 10) {
+        let attempts = 0;
+        const checkFirebase = () => {
+            if (typeof firebase !== 'undefined' && firebase.apps) {
+                callback();
+            } else if (attempts < maxAttempts) {
+                attempts++;
+                setTimeout(checkFirebase, 100);
+            } else {
+                // Firebase n'est pas disponible, continuer avec localStorage
+                callback();
+            }
+        };
+        checkFirebase();
+    }
+    
+    waitForFirebase(() => {
+        loadLeaderboard();
+        init();
+        draw();
+    });
 });
 
