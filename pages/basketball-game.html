@@ -304,33 +304,9 @@
             apiKey: window.FIREBASE_CONFIG.apiKey.substring(0, 10) + '...'
         });
         
-        // Essayer de charger depuis l'API Vercel (optionnel, en arrière-plan)
-        // MAIS ne jamais écraser avec des valeurs invalides
-        (async function() {
-            try {
-                const response = await fetch('/api/firebase-config');
-                if (response.ok) {
-                    const config = await response.json();
-                    console.log('📥 Configuration reçue depuis API:', config);
-                    
-                    // Vérifier que la config de l'API est valide avant de l'utiliser
-                    if (config.apiKey && config.projectId && 
-                        config.apiKey !== '' && 
-                        config.projectId !== 'YOUR_PROJECT_ID' &&
-                        config.projectId !== 'votre-projet-id' &&
-                        config.projectId !== 'oscar-baer') {
-                        // Utiliser la config Vercel seulement si elle est valide ET différente
-                        window.FIREBASE_CONFIG = config;
-                        console.log('✅ Configuration Firebase mise à jour depuis Vercel');
-                    } else {
-                        console.warn('⚠️ Configuration API invalide, conservation des valeurs par défaut');
-                    }
-                }
-            } catch (error) {
-                // Ignorer les erreurs, on utilise les valeurs par défaut
-                console.log('ℹ️ API Vercel non disponible, utilisation des valeurs par défaut');
-            }
-        })();
+        // NE PAS charger depuis l'API Vercel pour éviter d'écraser avec YOUR_PROJECT_ID
+        // Les valeurs par défaut sont garanties et correctes
+        console.log('ℹ️ Utilisation de la configuration directe (pas d\'API Vercel)');
     </script>
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
