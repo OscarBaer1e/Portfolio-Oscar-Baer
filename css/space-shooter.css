@@ -84,7 +84,6 @@
     box-shadow: 
         inset 0 0 30px rgba(0, 255, 255, 0.2),
         0 0 50px rgba(0, 255, 255, 0.3);
-<<<<<<< HEAD
     transition: all 0.3s ease;
 }
 
@@ -210,6 +209,19 @@
     font-size: 1.2rem;
     margin: 10px 0;
     color: var(--primary-color);
+}
+
+.game-over-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-top: 20px;
+    align-items: center;
+}
+
+.game-over-buttons .btn {
+    width: 100%;
+    max-width: 250px;
 }
 
 .start-screen p {
@@ -1115,7 +1127,6 @@
         min-width: 250px;
         padding: 30px 20px;
     }
-<<<<<<< HEAD
     
     .health-bars {
         min-width: 150px;

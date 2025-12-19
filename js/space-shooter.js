@@ -226,6 +226,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const registerLevelValue = document.getElementById('register-level-value');
     const registerPositionValue = document.getElementById('register-position-value');
     const cancelRegisterBtn = document.getElementById('cancel-register');
+    const registerScoreBtn = document.getElementById('register-score-btn');
     const fullscreenBtn = document.getElementById('fullscreen-btn');
     const gameWrapper = document.querySelector('.game-wrapper');
     const currentLevelDisplay = document.getElementById('current-level-display');
@@ -2007,36 +2008,12 @@ document.addEventListener('DOMContentLoaded', function() {
         startBtn.textContent = 'Commencer';
         
         // Vérifier si le score peut être enregistré dans le leaderboard
-        // Charger le leaderboard avant de vérifier si on peut enregistrer
+        // Afficher le bouton d'enregistrement si le score est éligible
         loadLeaderboard().then(() => {
-            if (canRegisterScore(gameState.score) && scoreRegister && registerScoreValue && registerLevelValue && registerPositionValue) {
-                const position = calculateScorePosition(gameState.score);
-                registerScoreValue.textContent = gameState.score.toLocaleString();
-                registerLevelValue.textContent = gameState.level;
-                registerPositionValue.textContent = position ? `#${position}` : '-';
-                
-                // Style spécial pour les 3 premières positions
-                if (position === 1) {
-                    registerPositionValue.style.color = '#ffd700';
-                    registerPositionValue.style.textShadow = '0 0 10px #ffd700';
-                } else if (position === 2) {
-                    registerPositionValue.style.color = '#c0c0c0';
-                    registerPositionValue.style.textShadow = '0 0 10px #c0c0c0';
-                } else if (position === 3) {
-                    registerPositionValue.style.color = '#cd7f32';
-                    registerPositionValue.style.textShadow = '0 0 10px #cd7f32';
-                } else {
-                    registerPositionValue.style.color = 'var(--primary-color)';
-                    registerPositionValue.style.textShadow = 'none';
-                }
-                
-                scoreRegister.classList.remove('hidden');
-                // Focus automatique sur le champ de nom
-                if (playerNameInput) {
-                    setTimeout(() => {
-                        playerNameInput.focus();
-                    }, 100);
-                }
+            if (canRegisterScore(gameState.score) && registerScoreBtn) {
+                registerScoreBtn.classList.remove('hidden');
+            } else if (registerScoreBtn) {
+                registerScoreBtn.classList.add('hidden');
             }
         });
     }
@@ -2048,6 +2025,7 @@ document.addEventListener('DOMContentLoaded', function() {
         gameOver.classList.add('hidden');
         startScreen.classList.remove('hidden');
         startBtn.textContent = 'Commencer';
+        if (registerScoreBtn) registerScoreBtn.classList.add('hidden');
         draw();
     }
     
@@ -2160,6 +2138,43 @@ document.addEventListener('DOMContentLoaded', function() {
         cancelRegisterBtn.addEventListener('click', () => {
             scoreRegister.classList.add('hidden');
             playerNameInput.value = '';
+        });
+    }
+    
+    // Bouton pour ouvrir le formulaire d'enregistrement de score
+    if (registerScoreBtn && scoreRegister && registerScoreValue && registerLevelValue && registerPositionValue) {
+        registerScoreBtn.addEventListener('click', () => {
+            loadLeaderboard().then(() => {
+                if (canRegisterScore(gameState.score)) {
+                    const position = calculateScorePosition(gameState.score);
+                    registerScoreValue.textContent = gameState.score.toLocaleString();
+                    registerLevelValue.textContent = gameState.level;
+                    registerPositionValue.textContent = position ? `#${position}` : '-';
+                    
+                    // Style spécial pour les 3 premières positions
+                    if (position === 1) {
+                        registerPositionValue.style.color = '#ffd700';
+                        registerPositionValue.style.textShadow = '0 0 10px #ffd700';
+                    } else if (position === 2) {
+                        registerPositionValue.style.color = '#c0c0c0';
+                        registerPositionValue.style.textShadow = '0 0 10px #c0c0c0';
+                    } else if (position === 3) {
+                        registerPositionValue.style.color = '#cd7f32';
+                        registerPositionValue.style.textShadow = '0 0 10px #cd7f32';
+                    } else {
+                        registerPositionValue.style.color = 'var(--primary-color)';
+                        registerPositionValue.style.textShadow = 'none';
+                    }
+                    
+                    scoreRegister.classList.remove('hidden');
+                    // Focus automatique sur le champ de nom
+                    if (playerNameInput) {
+                        setTimeout(() => {
+                            playerNameInput.focus();
+                        }, 100);
+                    }
+                }
+            });
         });
     }
     
