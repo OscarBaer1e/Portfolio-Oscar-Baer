@@ -407,10 +407,44 @@ document.addEventListener('DOMContentLoaded', function() {
         if (firestoreDb) {
             try {
                 console.log('Chargement du leaderboard depuis Firebase...');
-                const snapshot = await firestoreDb.collection('leaderboard')
-                    .orderBy('score', 'desc')
-                    .limit(MAX_LEADERBOARD_ENTRIES)
-                    .get();
+                
+                // Essayer avec orderBy, si ça échoue (index manquant), charger tout et trier
+                let snapshot;
+                try {
+                    snapshot = await firestoreDb.collection('leaderboard')
+                        .orderBy('score', 'desc')
+                        .limit(MAX_LEADERBOARD_ENTRIES)
+                        .get();
+                } catch (orderByError) {
+                    // Si l'index n'existe pas, charger tous les scores et trier côté client
+                    if (orderByError.code === 'failed-precondition' || orderByError.message.includes('index')) {
+                        console.warn('Index manquant, chargement de tous les scores et tri côté client...');
+                        const allSnapshot = await firestoreDb.collection('leaderboard').get();
+                        const allScores = [];
+                        allSnapshot.forEach(doc => {
+                            const data = doc.data();
+                            allScores.push({
+                                id: doc.id,
+                                name: data.name,
+                                score: data.score || 0,
+                                level: data.level || 1,
+                                date: data.date ? data.date.toDate().toISOString() : new Date().toISOString()
+                            });
+                        });
+                        // Trier par score décroissant
+                        allScores.sort((a, b) => b.score - a.score);
+                        // Prendre les top 10
+                        leaderboard = allScores.slice(0, MAX_LEADERBOARD_ENTRIES);
+                        
+                        if (leaderboard.length > 0) {
+                            localStorage.setItem('spaceShooterLeaderboard', JSON.stringify(leaderboard));
+                        }
+                        console.log(`Leaderboard chargé (sans index): ${leaderboard.length} scores`);
+                        return;
+                    } else {
+                        throw orderByError;
+                    }
+                }
                 
                 leaderboard = [];
                 snapshot.forEach(doc => {
