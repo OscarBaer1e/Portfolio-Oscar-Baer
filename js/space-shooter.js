@@ -286,40 +286,66 @@ document.addEventListener('DOMContentLoaded', function() {
         try {
             // Vérifier si Firebase est déjà initialisé
             if (firebase.apps.length === 0) {
-                // Vérifier que la configuration est valide
-                if (!FIREBASE_CONFIG || !FIREBASE_CONFIG.apiKey || 
-                    FIREBASE_CONFIG.apiKey === "VOTRE_API_KEY" || 
-                    FIREBASE_CONFIG.projectId === "YOUR_PROJECT_ID" ||
-                    FIREBASE_CONFIG.projectId === "votre-projet-id" ||
-                    !FIREBASE_CONFIG.projectId) {
-                    console.warn('⚠️ Configuration Firebase invalide ou non configurée');
-                    console.warn('FIREBASE_CONFIG:', FIREBASE_CONFIG);
-                    console.warn('window.FIREBASE_CONFIG:', window.FIREBASE_CONFIG);
+                // Vérification finale stricte
+                if (!FIREBASE_CONFIG || !FIREBASE_CONFIG.apiKey || !FIREBASE_CONFIG.projectId) {
+                    console.error('❌ Configuration Firebase manquante');
                     return null;
                 }
                 
-                console.log('🔧 Initialisation de Firebase avec la configuration:', {
+                // Détecter et corriger YOUR_PROJECT_ID
+                if (FIREBASE_CONFIG.projectId === "YOUR_PROJECT_ID" ||
+                    FIREBASE_CONFIG.projectId === "votre-projet-id" ||
+                    FIREBASE_CONFIG.apiKey === "VOTRE_API_KEY") {
+                    console.error('❌ Configuration contient des placeholders, correction automatique...');
+                    FIREBASE_CONFIG = {
+                        apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
+                        authDomain: "oscar-baer.firebaseapp.com",
+                        projectId: "oscar-baer",
+                        storageBucket: "oscar-baer.firebasestorage.app",
+                        messagingSenderId: "419618942184",
+                        appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
+                    };
+                    window.FIREBASE_CONFIG = FIREBASE_CONFIG;
+                    console.log('✅ Configuration corrigée');
+                }
+                
+                console.log('🔧 Initialisation Firebase avec:', {
                     projectId: FIREBASE_CONFIG.projectId,
-                    apiKey: FIREBASE_CONFIG.apiKey ? FIREBASE_CONFIG.apiKey.substring(0, 10) + '...' : 'manquant'
+                    authDomain: FIREBASE_CONFIG.authDomain
                 });
                 
                 // Initialiser Firebase
-                firebase.initializeApp(FIREBASE_CONFIG);
-                console.log('✅ Firebase initialisé avec succès');
+                const app = firebase.initializeApp(FIREBASE_CONFIG);
+                console.log('✅ Firebase initialisé');
+                console.log('✅ Project ID vérifié:', app.options.projectId);
+                
+                // Vérification critique
+                if (app.options.projectId !== 'oscar-baer') {
+                    console.error('❌ ERREUR CRITIQUE: Project ID incorrect:', app.options.projectId);
+                    app.delete();
+                    return null;
+                }
             } else {
-                // Firebase déjà initialisé, utiliser l'instance existante
-                console.log('✅ Firebase déjà initialisé');
+                // Firebase déjà initialisé - vérifier le projectId
+                const existingApp = firebase.app();
+                console.log('✅ Firebase déjà initialisé, Project ID:', existingApp.options.projectId);
+                
+                if (existingApp.options.projectId === 'YOUR_PROJECT_ID') {
+                    console.error('❌ Firebase initialisé avec YOUR_PROJECT_ID - Réinitialisation...');
+                    existingApp.delete();
+                    const app = firebase.initializeApp(FIREBASE_CONFIG);
+                    console.log('✅ Réinitialisé avec projectId:', app.options.projectId);
+                }
             }
             
             db = firebase.firestore();
-            
-            // Vérifier que Firestore est accessible
             console.log('✅ Firestore accessible');
             
             firebaseInitialized = true;
             return db;
         } catch (error) {
-            console.error('Erreur initialisation Firebase:', error);
+            console.error('❌ Erreur initialisation Firebase:', error);
+            console.error('Code:', error.code, 'Message:', error.message);
             firebaseInitialized = false;
             return null;
         }
