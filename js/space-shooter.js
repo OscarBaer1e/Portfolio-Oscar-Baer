@@ -409,9 +409,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 });
                 
-                localStorage.setItem('spaceShooterLeaderboard', JSON.stringify(leaderboard));
+                if (leaderboard.length > 0) {
+                    localStorage.setItem('spaceShooterLeaderboard', JSON.stringify(leaderboard));
+                }
                 return;
             } catch (error) {
+                console.warn('Erreur chargement leaderboard Firebase:', error);
                 // Fallback sur localStorage
             }
         }
