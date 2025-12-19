@@ -296,25 +296,24 @@ document.addEventListener('DOMContentLoaded', function() {
         pinData = [];
         
         const rows = [
-            [7, 8, 9, 10],  // Rangée 1 : 4 quilles (en haut)
-            [4, 5, 6],      // Rangée 2 : 3 quilles
-            [2, 3],         // Rangée 3 : 2 quilles
-            [1]             // Rangée 4 : 1 quille (en bas, vers la boule)
+            [1],           // Rangée 1 : 1 quille
+            [2, 3],        // Rangée 2 : 2 quilles
+            [4, 5, 6],     // Rangée 3 : 3 quilles
+            [7, 8, 9, 10]  // Rangée 4 : 4 quilles
         ];
         
         // Positions relatives des quilles (en pixels depuis le centre)
-        // Pyramide inversée : la pointe (1 quille) est en bas
         const pinPositions = [
-            { x: 0, y: 120 },         // 1 (en bas)
-            { x: -30, y: 80 },       // 2
-            { x: 30, y: 80 },        // 3
-            { x: -60, y: 40 },       // 4
-            { x: 0, y: 40 },         // 5
-            { x: 60, y: 40 },        // 6
-            { x: -90, y: 0 },        // 7 (en haut)
-            { x: -30, y: 0 },        // 8
-            { x: 30, y: 0 },         // 9
-            { x: 90, y: 0 }          // 10
+            { x: 0, y: 0 },           // 1
+            { x: -30, y: 40 },        // 2
+            { x: 30, y: 40 },         // 3
+            { x: -60, y: 80 },        // 4
+            { x: 0, y: 80 },          // 5
+            { x: 60, y: 80 },         // 6
+            { x: -90, y: 120 },       // 7
+            { x: -30, y: 120 },       // 8
+            { x: 30, y: 120 },        // 9
+            { x: 90, y: 120 }         // 10
         ];
         
         rows.forEach((rowPins, rowIndex) => {
@@ -326,14 +325,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 pin.className = 'pin';
                 pin.dataset.index = pinNum - 1;
                 pin.dataset.pinNumber = pinNum;
+                // Tours au lieu de quilles
                 pin.textContent = '🗼';
                 pin.style.fontSize = '40px';
                 pin.style.textAlign = 'center';
                 pin.style.lineHeight = '50px';
-                pin.style.userSelect = 'none';
-                pin.style.webkitUserSelect = 'none';
-                pin.style.mozUserSelect = 'none';
-                pin.style.msUserSelect = 'none';
                 
                 const pos = pinPositions[pinNum - 1];
                 const pinInfo = {
@@ -787,7 +783,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function checkCollisions(ballPath, power, finalBallX) {
         const hitRadius = 30 + (power / 20); // Rayon d'impact ajusté
-        const pinsContainerY = 50; // Position Y du conteneur des quilles depuis le haut (en haut de la piste)
+        const pinsContainerY = 50; // Position Y du conteneur des quilles depuis le haut
         
         // Liste des quilles touchées (directement ou sur le chemin)
         const hitPins = [];
