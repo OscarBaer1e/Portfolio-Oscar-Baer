@@ -1,0 +1,24 @@
+// Règles de sécurité Firestore à copier dans Firebase Console
+// Allez dans Firebase Console > Firestore Database > Rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Leaderboard - lecture publique, écriture limitée
+    match /leaderboard/{document=**} {
+      // Tout le monde peut lire le leaderboard
+      allow read: if true;
+      
+      // Tout le monde peut créer un score (avec validation)
+      allow create: if request.resource.data.score is int 
+                   && request.resource.data.name is string
+                   && request.resource.data.name.size() <= 20
+                   && request.resource.data.level is int
+                   && request.resource.data.date is timestamp;
+      
+      // Pas de modification ou suppression (sécurité)
+      allow update, delete: if false;
+    }
+  }
+}
+

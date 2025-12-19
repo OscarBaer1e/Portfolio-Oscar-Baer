@@ -4,10 +4,6 @@
  * (GSAP et tous ses plugins ont été retirés)
  */
 document.addEventListener('DOMContentLoaded', function() {
-
-    // ===============================================
-    // 0. Animation d'entrée (Loader)
-    // ===============================================
     const pageLoader = document.querySelector('.page-loader');
     
     if (pageLoader) {
@@ -21,17 +17,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 2000);
     }
 
-    // ===============================================
-    // 1. Mise à jour de l'année dans le footer
-    // ===============================================
     const currentYearElements = document.querySelectorAll('[id^="current-year"]');
     currentYearElements.forEach(el => {
         el.textContent = new Date().getFullYear();
     });
 
-    // ===============================================
-    // 2. Gestion du Menu Burger pour Mobile
-    // ===============================================
     const menuToggle = document.querySelector('.menu-toggle');
     const navList = document.querySelector('.nav-list');
 
@@ -121,11 +111,6 @@ document.addEventListener('DOMContentLoaded', function() {
             typeWriter();
         }
     }
-
-
-    // ===============================================
-    // 4. Active Navigation Highlighting (Scroll Spy via Intersection Observer)
-    // ===============================================
     // NOTE: Cela fonctionne correctement si les liens de la navbar pointent 
     // vers des IDs de section existants (ex: a[href="#portfolio-section"]).
     
@@ -206,10 +191,6 @@ document.addEventListener('DOMContentLoaded', function() {
         el.classList.add('reveal'); // Classe de base pour la transition CSS
         revealObserver.observe(el);
     });
-
-    // ===============================================
-    // 6. Animations améliorées pour les cartes avec délais
-    // ===============================================
     const cardsWithDelay = document.querySelectorAll('[data-animation-delay]');
     cardsWithDelay.forEach(card => {
         const delay = parseInt(card.dataset.animationDelay) || 0;
@@ -217,10 +198,6 @@ document.addEventListener('DOMContentLoaded', function() {
         card.classList.add('reveal');
         revealObserver.observe(card);
     });
-
-    // ===============================================
-    // 7. Effet de parallaxe au scroll
-    // ===============================================
     let lastScrollTop = 0;
     const parallaxElements = document.querySelectorAll('.parallax-section, .hero-content, .morph');
     
@@ -236,10 +213,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         lastScrollTop = scrollTop;
     }, { passive: true });
-
-    // ===============================================
-    // 8. Animation au survol des boutons avec effet ripple
-    // ===============================================
     const buttons = document.querySelectorAll('.btn, .btn-overlay');
     buttons.forEach(button => {
         button.addEventListener('click', function(e) {
@@ -261,10 +234,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 600);
         });
     });
-
-    // ===============================================
-    // 9. Animation de curseur personnalisé (optionnel)
-    // ===============================================
     const cursor = document.createElement('div');
     cursor.classList.add('custom-cursor');
     document.body.appendChild(cursor);
@@ -292,10 +261,6 @@ document.addEventListener('DOMContentLoaded', function() {
         el.addEventListener('mouseenter', () => cursor.classList.add('cursor-hover'));
         el.addEventListener('mouseleave', () => cursor.classList.remove('cursor-hover'));
     });
-
-    // ===============================================
-    // 10. Animation de compteur pour les statistiques (si présentes)
-    // ===============================================
     const counters = document.querySelectorAll('[data-count]');
     const countObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -323,10 +288,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }, { threshold: 0.5 });
     
     counters.forEach(counter => countObserver.observe(counter));
-
-    // ===============================================
-    // 11. Effet de tilt 3D sur les cartes
-    // ===============================================
     const tiltCards = document.querySelectorAll('.portfolio-item, .graphisme-card');
     tiltCards.forEach(card => {
         card.addEventListener('mousemove', (e) => {
@@ -347,10 +308,6 @@ document.addEventListener('DOMContentLoaded', function() {
             card.style.transform = '';
         });
     });
-
-    // ===============================================
-    // 12. Animation de texte défilant pour les titres
-    // ===============================================
     const animatedTitles = document.querySelectorAll('.section-title');
     animatedTitles.forEach(title => {
         if (!title.querySelector('.letter-animation')) {
@@ -365,10 +322,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
     });
-
-    // ===============================================
-    // 13. Lazy loading amélioré pour les images
-    // ===============================================
     const images = document.querySelectorAll('img[loading="lazy"], img:not([loading])');
     const imageObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -392,10 +345,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         imageObserver.observe(img);
     });
-
-    // ===============================================
-    // 14. Animation au scroll pour les éléments avec classe reveal
-    // ===============================================
     const allRevealElements = document.querySelectorAll('.reveal:not(.revealed)');
     const enhancedRevealObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -412,10 +361,6 @@ document.addEventListener('DOMContentLoaded', function() {
     allRevealElements.forEach(el => {
         enhancedRevealObserver.observe(el);
     });
-
-    // ===============================================
-    // 15. Effet de particules animées amélioré
-    // ===============================================
     function createParticle() {
         const particle = document.createElement('div');
         const size = Math.random() * 4 + 2;
@@ -478,10 +423,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 3000);
         });
     }
-
-    // ===============================================
-    // 16. Animation d'entrée pour les éléments de la page d'accueil
-    // ===============================================
     if (document.querySelector('#hero')) {
         const heroElements = document.querySelectorAll('.hero-left, .hero-right, .hero-intro > *');
         heroElements.forEach((el, index) => {
@@ -495,10 +436,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 500 + (index * 100));
         });
     }
-
-    // ===============================================
-    // 17. Easter Egg - Mini-jeu de Bowling
-    // ===============================================
     let clickCount = 0;
     let clickTimeout;
     const easterEggTrigger = document.getElementById('easter-egg-trigger');
@@ -533,7 +470,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Vérifie si on est dans le dossier pages (Windows ou Unix)
             const isInPagesFolder = currentPath.includes('/pages/') || currentPath.includes('\\pages\\') || currentUrl.includes('/pages/') || currentUrl.includes('\\pages\\');
             const redirectPath = isInPagesFolder ? './bowling-game.html' : './pages/bowling-game.html';
-            console.log('Redirection vers:', redirectPath, 'Depuis:', currentPath);
             window.location.href = redirectPath;
         }, 1500);
     }
@@ -585,10 +521,6 @@ document.addEventListener('DOMContentLoaded', function() {
             keySequence = [];
         }
     });
-
-    // ===============================================
-    // 18. Easter Egg - Mini-jeu de Basketball (sur la page About)
-    // ===============================================
     let basketballClickCount = 0;
     let basketballClickTimeout;
     const basketballEasterEgg = document.getElementById('basketball-easter-egg');
@@ -624,7 +556,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Vérifie si on est dans le dossier pages (Windows ou Unix)
             const isInPagesFolder = currentPath.includes('/pages/') || currentPath.includes('\\pages\\') || currentUrl.includes('/pages/') || currentUrl.includes('\\pages\\');
             const redirectPath = isInPagesFolder ? './basketball-game.html' : './pages/basketball-game.html';
-            console.log('Redirection vers:', redirectPath, 'Depuis:', currentPath);
             window.location.href = redirectPath;
         }, 1500);
     }
@@ -675,10 +606,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-    
-    // ===============================================
-    // 19. Easter Egg - Mini-jeu Pacman (sur la page Portfolio)
-    // ===============================================
     if (window.location.pathname.includes('portfolio.html')) {
         let pacmanClickCount = 0;
         let pacmanClickTimeout;
@@ -712,7 +639,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const currentUrl = window.location.href;
                 const isInPagesFolder = currentPath.includes('/pages/') || currentPath.includes('\\pages\\') || currentUrl.includes('/pages/') || currentUrl.includes('\\pages\\');
                 const redirectPath = isInPagesFolder ? './pacman-game.html' : './pages/pacman-game.html';
-                console.log('Redirection vers:', redirectPath, 'Depuis:', currentPath);
                 window.location.href = redirectPath;
             }, 1500);
         }
@@ -748,10 +674,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    
-    // ===============================================
-    // 20. Easter Egg - Page Secrète Omerta (sur la page Contact)
-    // ===============================================
     if (window.location.pathname.includes('contact.html')) {
         let omertaClickCount = 0;
         let omertaClickTimeout;
@@ -785,7 +707,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const currentUrl = window.location.href;
                 const isInPagesFolder = currentPath.includes('/pages/') || currentPath.includes('\\pages\\') || currentUrl.includes('/pages/') || currentUrl.includes('\\pages\\');
                 const redirectPath = isInPagesFolder ? './omerta.html' : './pages/omerta.html';
-                console.log('Redirection vers:', redirectPath, 'Depuis:', currentPath);
                 window.location.href = redirectPath;
             }, 1500);
         }

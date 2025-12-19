@@ -1,6 +1,6 @@
 /**
- * Space Shooter Cyberpunk - Mini-jeu original
- * Contrôlez un vaisseau spatial et détruisez les astéroïdes !
+ * Space Shooter - Mini-jeu
+ * Contrôlez un vaisseau spatial et détruisez les astéroïdes
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -43,7 +43,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 audioContext = new (window.AudioContext || window.webkitAudioContext)();
                 audioContextInitialized = true;
             } catch (e) {
-                console.warn('Audio context non disponible:', e);
+                // Audio context non disponible
             }
         }
         return audioContext;
@@ -156,7 +156,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     break;
             }
         } catch (e) {
-            console.warn('Erreur lors de la lecture du son:', e);
+            // Erreur lors de la lecture du son
         }
     }
     
@@ -207,10 +207,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let currentFireRate = baseFireRate;
     
     // Vérifications de sécurité pour tous les éléments
-    if (!canvas || !ctx) {
-        console.error('Canvas non trouvé !');
-        return;
-    }
+    if (!canvas || !ctx) return;
     
     // Éléments UI
     const healthBarFill = document.getElementById('health-bar-fill');
@@ -233,49 +230,32 @@ document.addEventListener('DOMContentLoaded', function() {
     const gameWrapper = document.querySelector('.game-wrapper');
     const currentLevelDisplay = document.getElementById('current-level-display');
     
-    // Vérifier que les éléments critiques existent
-    if (!healthBarFill || !shieldBarFill || !bossBarFill || !currentLevelDisplay) {
-        console.warn('Certains éléments UI sont manquants, mais le jeu peut continuer');
-    }
     
     // Leaderboard
     let leaderboard = [];
     const MAX_LEADERBOARD_ENTRIES = 10;
     
-    // Configuration Firebase
-    // Les valeurs peuvent être définies de plusieurs façons :
-    // 1. Via window.FIREBASE_CONFIG (injecté par un script avant ce fichier, depuis /api/firebase-config)
-    // 2. Via window.FIREBASE_* (variables individuelles)
-    // 3. Directement dans ce fichier (remplacez YOUR_* par vos valeurs)
-    // 
-    // Pour Vercel : Configurez les variables d'environnement dans Vercel Dashboard
-    // et l'API route /api/firebase-config.js les injectera automatiquement
     const FIREBASE_CONFIG = window.FIREBASE_CONFIG || {
-        apiKey: window.FIREBASE_API_KEY || "YOUR_API_KEY",
-        authDomain: window.FIREBASE_AUTH_DOMAIN || "YOUR_PROJECT_ID.firebaseapp.com",
-        projectId: window.FIREBASE_PROJECT_ID || "YOUR_PROJECT_ID",
-        storageBucket: window.FIREBASE_STORAGE_BUCKET || "YOUR_PROJECT_ID.appspot.com",
-        messagingSenderId: window.FIREBASE_MESSAGING_SENDER_ID || "YOUR_MESSAGING_SENDER_ID",
-        appId: window.FIREBASE_APP_ID || "YOUR_APP_ID"
+        apiKey: window.FIREBASE_API_KEY || "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
+        authDomain: window.FIREBASE_AUTH_DOMAIN || "oscar-baer.firebaseapp.com",
+        projectId: window.FIREBASE_PROJECT_ID || "oscar-baer",
+        storageBucket: window.FIREBASE_STORAGE_BUCKET || "oscar-baer.firebasestorage.app",
+        messagingSenderId: window.FIREBASE_MESSAGING_SENDER_ID || "419618942184",
+        appId: window.FIREBASE_APP_ID || "1:419618942184:web:60e8e58c6c3348a3fbad5d"
     };
     
-    // Initialiser Firebase
     let db = null;
     let firebaseInitialized = false;
     
     function initFirebase() {
-        if (firebaseInitialized || typeof firebase === 'undefined') {
-            return db;
-        }
+        if (firebaseInitialized || typeof firebase === 'undefined') return db;
         
         try {
             firebase.initializeApp(FIREBASE_CONFIG);
             db = firebase.firestore();
             firebaseInitialized = true;
-            console.log('Firebase initialisé avec succès');
             return db;
         } catch (error) {
-            console.warn('Erreur lors de l\'initialisation de Firebase:', error);
             return null;
         }
     }
@@ -412,15 +392,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 });
                 
-                // Sauvegarder aussi en local comme backup
                 localStorage.setItem('spaceShooterLeaderboard', JSON.stringify(leaderboard));
                 return;
             } catch (error) {
-                console.warn('Erreur lors du chargement du leaderboard depuis Firebase, utilisation du cache local:', error);
+                // Fallback sur localStorage
             }
         }
         
-        // Fallback: charger depuis localStorage si Firebase échoue
         const stored = localStorage.getItem('spaceShooterLeaderboard');
         if (stored) {
             try {
@@ -434,14 +412,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Sauvegarder le leaderboard dans Firebase Firestore
     async function saveLeaderboard() {
-        // Sauvegarder d'abord en local comme backup
         localStorage.setItem('spaceShooterLeaderboard', JSON.stringify(leaderboard));
-        
-        // Note: Avec Firestore, on n'a pas besoin de sauvegarder tout le leaderboard
-        // Les scores individuels sont ajoutés via registerScore()
-        // Cette fonction est gardée pour compatibilité mais ne fait rien avec Firestore
     }
     
     // Synchroniser le leaderboard en temps réel avec Firebase
@@ -484,16 +456,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
                 });
                 
-                // Sauvegarder en local comme backup
                 localStorage.setItem('spaceShooterLeaderboard', JSON.stringify(leaderboard));
                 
-                // Mettre à jour l'affichage si le modal est ouvert
                 if (leaderboardModal && !leaderboardModal.classList.contains('hidden')) {
                     updateLeaderboardDisplay();
                 }
             }, (error) => {
-                console.warn('Erreur lors de l\'écoute du leaderboard en temps réel:', error);
-                // Fallback sur synchronisation périodique
                 if (leaderboardSyncInterval) {
                     clearInterval(leaderboardSyncInterval);
                 }
@@ -507,7 +475,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
     }
     
-    // Arrêter la synchronisation
     function stopLeaderboardSync() {
         if (leaderboardUnsubscribe) {
             leaderboardUnsubscribe();
@@ -519,47 +486,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Vérifier si un score peut être enregistré
     function canRegisterScore(score) {
-        if (leaderboard.length < MAX_LEADERBOARD_ENTRIES) {
-            return true;
-        }
-        const lowestScore = leaderboard[leaderboard.length - 1].score;
-        return score > lowestScore;
+        if (leaderboard.length < MAX_LEADERBOARD_ENTRIES) return true;
+        return score > leaderboard[leaderboard.length - 1].score;
     }
     
-    // Enregistrer un score dans le leaderboard
     async function registerScore(name, score, level) {
         const firestoreDb = initFirebase();
         
         if (firestoreDb) {
             try {
-                // Ajouter le score directement dans Firestore
                 await firestoreDb.collection('leaderboard').add({
-                    name: name.substring(0, 20), // Limiter à 20 caractères
+                    name: name.substring(0, 20),
                     score: score,
                     level: level,
                     date: firebase.firestore.Timestamp.now()
                 });
-                
-                // Charger le leaderboard mis à jour
                 await loadLeaderboard();
                 updateLeaderboardDisplay();
                 return;
             } catch (error) {
-                console.error('Erreur lors de l\'enregistrement du score dans Firebase:', error);
-                // Fallback sur localStorage
+                // Fallback
             }
         }
         
-        // Fallback: sauvegarder en local si Firebase échoue
         await loadLeaderboard();
-        leaderboard.push({
-            name: name,
-            score: score,
-            level: level,
-            date: new Date().toISOString()
-        });
+        leaderboard.push({ name, score, level, date: new Date().toISOString() });
         leaderboard.sort((a, b) => b.score - a.score);
         if (leaderboard.length > MAX_LEADERBOARD_ENTRIES) {
             leaderboard = leaderboard.slice(0, MAX_LEADERBOARD_ENTRIES);
@@ -568,13 +520,11 @@ document.addEventListener('DOMContentLoaded', function() {
         updateLeaderboardDisplay();
     }
     
-    // Mettre à jour l'affichage du leaderboard
     function updateLeaderboardDisplay() {
         if (!leaderboardList) return;
         
         leaderboardList.innerHTML = '';
         
-        // S'assurer qu'on n'affiche que les 10 meilleurs
         const topScores = leaderboard.slice(0, MAX_LEADERBOARD_ENTRIES);
         
         if (topScores.length === 0) {
@@ -586,16 +536,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const entryDiv = document.createElement('div');
             entryDiv.className = 'leaderboard-entry';
             
-            // Classes spéciales pour les 3 premiers
-            if (index === 0) {
-                entryDiv.classList.add('first-place');
-            } else if (index === 1) {
-                entryDiv.classList.add('second-place');
-            } else if (index === 2) {
-                entryDiv.classList.add('third-place');
-            } else {
-                entryDiv.classList.add('regular-place');
-            }
+            const placeClasses = ['first-place', 'second-place', 'third-place', 'regular-place'];
+            entryDiv.classList.add(placeClasses[Math.min(index, 3)]);
             
             const rank = index + 1;
             const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
@@ -636,20 +578,18 @@ document.addEventListener('DOMContentLoaded', function() {
         return position;
     }
     
-    // Afficher le leaderboard
     async function showLeaderboard() {
         if (!leaderboardModal) return;
         await loadLeaderboard();
         updateLeaderboardDisplay();
         leaderboardModal.classList.remove('hidden');
-        startLeaderboardSync(); // Démarrer la synchronisation automatique
+        startLeaderboardSync();
     }
     
-    // Masquer le leaderboard
     function hideLeaderboard() {
         if (!leaderboardModal) return;
         leaderboardModal.classList.add('hidden');
-        stopLeaderboardSync(); // Arrêter la synchronisation pour économiser les ressources
+        stopLeaderboardSync();
     }
     
     // Initialisation
@@ -2182,7 +2122,6 @@ document.addEventListener('DOMContentLoaded', function() {
                         updateLeaderboardDisplay();
                     }
                 } catch (error) {
-                    console.error('Erreur lors de l\'enregistrement du score:', error);
                     showMessage('Erreur lors de l\'enregistrement. Réessayez plus tard.', 'hit');
                 } finally {
                     if (submitBtn) {
