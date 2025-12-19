@@ -5,7 +5,15 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     const canvas = document.getElementById('gameCanvas');
+    if (!canvas) {
+        console.error('Canvas non trouvé');
+        return;
+    }
     const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error('Contexte canvas non disponible');
+        return;
+    }
     const scoreElement = document.getElementById('score');
     const highScoreElement = document.getElementById('high-score');
     const levelElement = document.getElementById('level');
@@ -847,6 +855,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialisation
     function init() {
+        if (!canvas || !ctx) return;
         ship.x = canvas.width / 2;
         bullets = [];
         asteroids = [];
@@ -2300,16 +2309,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Boutons
-    startBtn.addEventListener('click', () => {
-        if (gameState.isPlaying) {
-            pauseGame();
-        } else {
-            startGame();
-        }
-    });
+    if (startBtn) {
+        startBtn.addEventListener('click', () => {
+            if (gameState.isPlaying) {
+                pauseGame();
+            } else {
+                startGame();
+            }
+        });
+    }
     
-    resetBtn.addEventListener('click', resetGame);
-    restartBtn.addEventListener('click', startGame);
+    if (resetBtn) {
+        resetBtn.addEventListener('click', resetGame);
+    }
+    if (restartBtn) {
+        restartBtn.addEventListener('click', startGame);
+    }
     
     // Leaderboard
     if (showLeaderboardBtn) {
