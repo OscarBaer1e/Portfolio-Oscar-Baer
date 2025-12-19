@@ -25,6 +25,14 @@
     margin-bottom: 30px;
 }
 
+.game-controls-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+}
+
 .game-buttons {
     display: flex;
     justify-content: center;
