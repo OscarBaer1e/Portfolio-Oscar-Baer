@@ -295,18 +295,22 @@
                 const response = await fetch('/api/firebase-config');
                 if (response.ok) {
                     const config = await response.json();
-                    if (config.apiKey && config.projectId && config.apiKey !== '') {
+                    console.log('📥 Configuration reçue depuis API:', config);
+                    
+                    if (config.apiKey && config.projectId && config.apiKey !== '' && config.projectId !== 'YOUR_PROJECT_ID') {
                         window.FIREBASE_CONFIG = config;
-                        console.log('Configuration Firebase chargée depuis Vercel');
+                        console.log('✅ Configuration Firebase chargée depuis Vercel');
                     } else {
-                        console.warn('Configuration Firebase vide depuis Vercel, utilisation des valeurs par défaut');
+                        console.warn('⚠️ Configuration Firebase invalide depuis Vercel (valeurs vides ou placeholder)');
+                        console.warn('Utilisation des valeurs par défaut du code');
                     }
                 } else {
-                    console.warn('Impossible de charger la configuration depuis /api/firebase-config, utilisation des valeurs par défaut');
+                    console.warn('⚠️ Impossible de charger la configuration depuis /api/firebase-config');
+                    console.warn('Utilisation des valeurs par défaut du code');
                 }
             } catch (error) {
-                console.warn('Erreur lors du chargement de la configuration Firebase:', error);
-                console.log('Utilisation des valeurs par défaut ou configuration directe dans le code');
+                console.warn('⚠️ Erreur lors du chargement de la configuration Firebase:', error);
+                console.log('Utilisation des valeurs par défaut du code (définies dans space-shooter.js)');
             }
         })();
     </script>
