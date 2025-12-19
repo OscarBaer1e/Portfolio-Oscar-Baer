@@ -242,11 +242,39 @@ document.addEventListener('DOMContentLoaded', function() {
     let leaderboard = [];
     const MAX_LEADERBOARD_ENTRIES = 10;
     
-    // Configuration pour le leaderboard partagé (JSONBin.io)
-    const LEADERBOARD_BIN_ID = '67f8a5e5e41b4d34e47b0a1a'; // À remplacer par votre propre bin ID
-    const LEADERBOARD_API_KEY = '$2a$10$YOUR_API_KEY'; // À remplacer par votre clé API JSONBin.io
-    const LEADERBOARD_API_URL = `https://api.jsonbin.io/v3/b/${LEADERBOARD_BIN_ID}`;
+    // Configuration Firebase (à remplacer par vos propres clés)
+    const FIREBASE_CONFIG = {
+        apiKey: "YOUR_API_KEY",
+        authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+        projectId: "YOUR_PROJECT_ID",
+        storageBucket: "YOUR_PROJECT_ID.appspot.com",
+        messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+        appId: "YOUR_APP_ID"
+    };
+    
+    // Initialiser Firebase
+    let db = null;
+    let firebaseInitialized = false;
+    
+    function initFirebase() {
+        if (firebaseInitialized || typeof firebase === 'undefined') {
+            return db;
+        }
+        
+        try {
+            firebase.initializeApp(FIREBASE_CONFIG);
+            db = firebase.firestore();
+            firebaseInitialized = true;
+            console.log('Firebase initialisé avec succès');
+            return db;
+        } catch (error) {
+            console.warn('Erreur lors de l\'initialisation de Firebase:', error);
+            return null;
+        }
+    }
+    
     let leaderboardSyncInterval = null;
+    let leaderboardUnsubscribe = null;
     
     // Plein écran
     let isFullscreen = false;
@@ -354,37 +382,38 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Charger le leaderboard depuis le serveur (JSONBin.io)
+    // Charger le leaderboard depuis Firebase Firestore
     async function loadLeaderboard() {
-        try {
-            const response = await fetch(LEADERBOARD_API_URL + '/latest', {
-                method: 'GET',
-                headers: {
-                    'X-Master-Key': LEADERBOARD_API_KEY,
-                    'X-Bin-Meta': 'false'
-                }
-            });
-            
-            if (response.ok) {
-                const data = await response.json();
-                if (data && Array.isArray(data)) {
-                    leaderboard = data;
-                    // Trier par score décroissant
-                    leaderboard.sort((a, b) => b.score - a.score);
-                    // Garder seulement les 10 meilleurs
-                    if (leaderboard.length > MAX_LEADERBOARD_ENTRIES) {
-                        leaderboard = leaderboard.slice(0, MAX_LEADERBOARD_ENTRIES);
-                    }
-                    // Sauvegarder aussi en local comme backup
-                    localStorage.setItem('spaceShooterLeaderboard', JSON.stringify(leaderboard));
-                    return;
-                }
+        const firestoreDb = initFirebase();
+        
+        if (firestoreDb) {
+            try {
+                const snapshot = await firestoreDb.collection('leaderboard')
+                    .orderBy('score', 'desc')
+                    .limit(MAX_LEADERBOARD_ENTRIES)
+                    .get();
+                
+                leaderboard = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    leaderboard.push({
+                        id: doc.id,
+                        name: data.name,
+                        score: data.score,
+                        level: data.level,
+                        date: data.date ? data.date.toDate().toISOString() : new Date().toISOString()
+                    });
+                });
+                
+                // Sauvegarder aussi en local comme backup
+                localStorage.setItem('spaceShooterLeaderboard', JSON.stringify(leaderboard));
+                return;
+            } catch (error) {
+                console.warn('Erreur lors du chargement du leaderboard depuis Firebase, utilisation du cache local:', error);
             }
-        } catch (error) {
-            console.warn('Erreur lors du chargement du leaderboard en ligne, utilisation du cache local:', error);
         }
         
-        // Fallback: charger depuis localStorage si l'API échoue
+        // Fallback: charger depuis localStorage si Firebase échoue
         const stored = localStorage.getItem('spaceShooterLeaderboard');
         if (stored) {
             try {
@@ -398,45 +427,85 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Sauvegarder le leaderboard sur le serveur (JSONBin.io)
+    // Sauvegarder le leaderboard dans Firebase Firestore
     async function saveLeaderboard() {
         // Sauvegarder d'abord en local comme backup
         localStorage.setItem('spaceShooterLeaderboard', JSON.stringify(leaderboard));
         
-        try {
-            const response = await fetch(LEADERBOARD_API_URL, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Master-Key': LEADERBOARD_API_KEY
-                },
-                body: JSON.stringify(leaderboard)
-            });
-            
-            if (!response.ok) {
-                console.warn('Erreur lors de la sauvegarde du leaderboard en ligne');
-            }
-        } catch (error) {
-            console.warn('Erreur lors de la sauvegarde du leaderboard en ligne:', error);
-        }
+        // Note: Avec Firestore, on n'a pas besoin de sauvegarder tout le leaderboard
+        // Les scores individuels sont ajoutés via registerScore()
+        // Cette fonction est gardée pour compatibilité mais ne fait rien avec Firestore
     }
     
-    // Synchroniser le leaderboard périodiquement (toutes les 5 secondes)
+    // Synchroniser le leaderboard en temps réel avec Firebase
     function startLeaderboardSync() {
-        if (leaderboardSyncInterval) {
-            clearInterval(leaderboardSyncInterval);
+        const firestoreDb = initFirebase();
+        
+        if (!firestoreDb) {
+            // Fallback: synchronisation périodique si Firebase n'est pas disponible
+            if (leaderboardSyncInterval) {
+                clearInterval(leaderboardSyncInterval);
+            }
+            leaderboardSyncInterval = setInterval(() => {
+                loadLeaderboard().then(() => {
+                    if (leaderboardModal && !leaderboardModal.classList.contains('hidden')) {
+                        updateLeaderboardDisplay();
+                    }
+                });
+            }, 5000);
+            return;
         }
-        leaderboardSyncInterval = setInterval(() => {
-            loadLeaderboard().then(() => {
+        
+        // Utiliser Firestore en temps réel
+        if (leaderboardUnsubscribe) {
+            leaderboardUnsubscribe(); // Désabonner l'ancien listener
+        }
+        
+        leaderboardUnsubscribe = firestoreDb.collection('leaderboard')
+            .orderBy('score', 'desc')
+            .limit(MAX_LEADERBOARD_ENTRIES)
+            .onSnapshot((snapshot) => {
+                leaderboard = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    leaderboard.push({
+                        id: doc.id,
+                        name: data.name,
+                        score: data.score,
+                        level: data.level,
+                        date: data.date ? data.date.toDate().toISOString() : new Date().toISOString()
+                    });
+                });
+                
+                // Sauvegarder en local comme backup
+                localStorage.setItem('spaceShooterLeaderboard', JSON.stringify(leaderboard));
+                
+                // Mettre à jour l'affichage si le modal est ouvert
                 if (leaderboardModal && !leaderboardModal.classList.contains('hidden')) {
                     updateLeaderboardDisplay();
                 }
+            }, (error) => {
+                console.warn('Erreur lors de l\'écoute du leaderboard en temps réel:', error);
+                // Fallback sur synchronisation périodique
+                if (leaderboardSyncInterval) {
+                    clearInterval(leaderboardSyncInterval);
+                }
+                leaderboardSyncInterval = setInterval(() => {
+                    loadLeaderboard().then(() => {
+                        if (leaderboardModal && !leaderboardModal.classList.contains('hidden')) {
+                            updateLeaderboardDisplay();
+                        }
+                    });
+                }, 5000);
             });
-        }, 5000); // Synchroniser toutes les 5 secondes
     }
     
     // Arrêter la synchronisation
     function stopLeaderboardSync() {
+        if (leaderboardUnsubscribe) {
+            leaderboardUnsubscribe();
+            leaderboardUnsubscribe = null;
+        }
         if (leaderboardSyncInterval) {
             clearInterval(leaderboardSyncInterval);
             leaderboardSyncInterval = null;
@@ -453,7 +522,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Enregistrer un score dans le leaderboard
-    function registerScore(name, score, level) {
+    async function registerScore(name, score, level) {
+        const firestoreDb = initFirebase();
+        
+        if (firestoreDb) {
+            try {
+                // Ajouter le score directement dans Firestore
+                await firestoreDb.collection('leaderboard').add({
+                    name: name.substring(0, 20), // Limiter à 20 caractères
+                    score: score,
+                    level: level,
+                    date: firebase.firestore.Timestamp.now()
+                });
+                
+                // Charger le leaderboard mis à jour
+                await loadLeaderboard();
+                updateLeaderboardDisplay();
+                return;
+            } catch (error) {
+                console.error('Erreur lors de l\'enregistrement du score dans Firebase:', error);
+                // Fallback sur localStorage
+            }
+        }
+        
+        // Fallback: sauvegarder en local si Firebase échoue
+        await loadLeaderboard();
         leaderboard.push({
             name: name,
             score: score,
