@@ -146,3 +146,5 @@ if (typeof firebase !== 'undefined') {
 
 Si tout fonctionne, vous devriez voir vos clés Firebase et le nombre de documents.
 
+
+

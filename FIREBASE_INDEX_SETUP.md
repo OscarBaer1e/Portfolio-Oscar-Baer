@@ -37,3 +37,5 @@ Une fois l'index créé, vous devriez voir dans Firebase Console > Indexes :
 
 Si vous ne voulez pas créer d'index, vous pouvez modifier le code pour charger tous les scores et les trier côté client, mais c'est moins performant.
 
+
+

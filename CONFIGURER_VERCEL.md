@@ -100,3 +100,5 @@ Après le redéploiement :
 3. Videz le cache de votre navigateur
 4. Consultez `TROUBLESHOOTING_FIREBASE.md` pour plus d'aide
 
+
+

@@ -100,3 +100,5 @@ Si après toutes ces étapes l'erreur persiste :
 
 Le code est maintenant configuré pour **NE JAMAIS** utiliser `YOUR_PROJECT_ID`. Il utilise toujours les valeurs par défaut garanties (`oscar-baer`). Si vous voyez encore cette erreur, c'est **100% un problème de cache**.
 
+
+
