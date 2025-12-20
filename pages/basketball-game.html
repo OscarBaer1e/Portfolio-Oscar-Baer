@@ -338,18 +338,43 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js";
         import { getFirestore, Timestamp } from "https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js";
 
-        // Your web app's Firebase configuration
+        // Your web app's Firebase configuration - FORCÉE avec projectId correct
         const firebaseConfig = {
             apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
             authDomain: "oscar-baer.firebaseapp.com",
-            projectId: "oscar-baer",
+            projectId: "oscar-baer", // FORCÉ : jamais YOUR_PROJECT_ID
             storageBucket: "oscar-baer.firebasestorage.app",
             messagingSenderId: "419618942184",
             appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
         };
 
+        // Vérification CRITIQUE avant initialisation
+        if (!firebaseConfig.projectId || 
+            firebaseConfig.projectId === 'YOUR_PROJECT_ID' || 
+            firebaseConfig.projectId === 'votre-projet-id' ||
+            firebaseConfig.projectId !== 'oscar-baer') {
+            console.error('❌ ERREUR CRITIQUE: projectId invalide dans firebaseConfig!');
+            console.error('projectId détecté:', firebaseConfig.projectId);
+            // Forcer la correction
+            firebaseConfig.projectId = 'oscar-baer';
+            console.log('✅ projectId corrigé à:', firebaseConfig.projectId);
+        }
+
         // Initialize Firebase
         const app = initializeApp(firebaseConfig);
+        
+        // Vérification IMMÉDIATE après initialisation
+        const actualProjectId = app.options.projectId;
+        console.log('🔍 Project ID après initialisation:', actualProjectId);
+        
+        if (actualProjectId !== 'oscar-baer') {
+            console.error('❌ ERREUR CRITIQUE: Project ID incorrect après initialisation!');
+            console.error('Attendu: oscar-baer');
+            console.error('Reçu:', actualProjectId);
+            // Ne pas continuer si le projectId est incorrect
+            throw new Error('Project ID incorrect: ' + actualProjectId);
+        }
+        
         const db = getFirestore(app);
         
         // Exposer Firebase pour les autres scripts
@@ -359,7 +384,8 @@
         window.firebaseInitialized = true;
         
         console.log('✅ Firebase initialisé avec succès (v12.7.0)');
-        console.log('✅ Project ID:', app.options.projectId);
+        console.log('✅ Project ID vérifié:', app.options.projectId);
+        console.log('✅ Firestore accessible');
     </script>
     <script src="../js/space-shooter.js"></script>
     <script src="../js/script.js"></script>
