@@ -26,6 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const finalScore = document.getElementById('final-score');
     const finalHighScore = document.getElementById('final-high-score');
     const finalLevel = document.getElementById('final-level');
+    const scoreMessage = document.getElementById('score-message');
     
     // État du jeu
     let gameState = {
@@ -2171,6 +2172,24 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (finalScore) finalScore.textContent = gameState.score;
         if (finalLevel) finalLevel.textContent = gameState.level;
+        
+        // Message humoristique si le score est inférieur à 500
+        if (scoreMessage) {
+            if (gameState.score < 500) {
+                scoreMessage.textContent = '😅 Tu es nul ! Moins de 500 points, vraiment ?';
+                scoreMessage.style.color = '#ff6b6b';
+                scoreMessage.style.fontWeight = 'bold';
+                scoreMessage.style.fontSize = '1.2em';
+                scoreMessage.style.marginTop = '15px';
+            } else {
+                scoreMessage.textContent = '';
+                scoreMessage.style.color = '';
+                scoreMessage.style.fontWeight = '';
+                scoreMessage.style.fontSize = '';
+                scoreMessage.style.marginTop = '';
+            }
+        }
+        
         gameOver.classList.remove('hidden');
         startBtn.textContent = 'Commencer';
         
