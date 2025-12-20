@@ -336,29 +336,35 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
     <script>
-        // Configuration Firebase FORCÉE - projectId garanti
-        const firebaseConfig = {
-            apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
-            authDomain: "oscar-baer.firebaseapp.com",
-            projectId: "oscar-baer", // FORCÉ : jamais YOUR_PROJECT_ID
-            storageBucket: "oscar-baer.firebasestorage.app",
-            messagingSenderId: "419618942184",
-            appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
-        };
+        // Fonction d'initialisation Firebase
+        function initFirebaseNow() {
+            // Configuration Firebase FORCÉE - projectId garanti
+            const firebaseConfig = {
+                apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
+                authDomain: "oscar-baer.firebaseapp.com",
+                projectId: "oscar-baer", // FORCÉ : jamais YOUR_PROJECT_ID
+                storageBucket: "oscar-baer.firebasestorage.app",
+                messagingSenderId: "419618942184",
+                appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
+            };
 
-        // Vérification CRITIQUE avant initialisation
-        if (!firebaseConfig.projectId || 
-            firebaseConfig.projectId === 'YOUR_PROJECT_ID' || 
-            firebaseConfig.projectId === 'votre-projet-id' ||
-            firebaseConfig.projectId !== 'oscar-baer') {
-            console.error('❌ ERREUR CRITIQUE: projectId invalide!');
-            console.error('projectId détecté:', firebaseConfig.projectId);
-            firebaseConfig.projectId = 'oscar-baer';
-            console.log('✅ projectId corrigé à:', firebaseConfig.projectId);
-        }
+            // Vérification CRITIQUE avant initialisation
+            if (!firebaseConfig.projectId || 
+                firebaseConfig.projectId === 'YOUR_PROJECT_ID' || 
+                firebaseConfig.projectId === 'votre-projet-id' ||
+                firebaseConfig.projectId !== 'oscar-baer') {
+                console.error('❌ ERREUR CRITIQUE: projectId invalide!');
+                console.error('projectId détecté:', firebaseConfig.projectId);
+                firebaseConfig.projectId = 'oscar-baer';
+                console.log('✅ projectId corrigé à:', firebaseConfig.projectId);
+            }
 
-        // Attendre que Firebase soit chargé
-        if (typeof firebase !== 'undefined') {
+            // Vérifier que Firebase est chargé
+            if (typeof firebase === 'undefined') {
+                console.error('❌ Firebase SDK non chargé - Vérifiez que les scripts se chargent');
+                return false;
+            }
+
             try {
                 // Initialize Firebase
                 const app = firebase.initializeApp(firebaseConfig);
@@ -384,23 +390,39 @@
                 console.log('✅ Firebase initialisé avec succès (v10.7.1 compat)');
                 console.log('✅ Project ID vérifié:', app.options.projectId);
                 console.log('✅ Firestore accessible');
+                console.log('✅ window.firebaseApp:', window.firebaseApp);
+                console.log('✅ window.firebaseDb:', window.firebaseDb);
+                
+                return true;
             } catch (error) {
                 console.error('❌ Erreur initialisation Firebase:', error);
+                console.error('Stack:', error.stack);
+                return false;
             }
+        }
+
+        // Essayer d'initialiser immédiatement
+        if (typeof firebase !== 'undefined') {
+            initFirebaseNow();
         } else {
-            console.error('❌ Firebase SDK non chargé');
-            // Réessayer après un court délai
-            setTimeout(function() {
+            // Attendre que les scripts se chargent
+            console.log('⏳ Attente du chargement des scripts Firebase...');
+            let attempts = 0;
+            const maxAttempts = 10;
+            const checkInterval = setInterval(function() {
+                attempts++;
                 if (typeof firebase !== 'undefined') {
-                    const app = firebase.initializeApp(firebaseConfig);
-                    const db = firebase.firestore();
-                    window.firebaseApp = app;
-                    window.firebaseDb = db;
-                    window.firebaseTimestamp = firebase.firestore.Timestamp;
-                    window.firebaseInitialized = true;
-                    console.log('✅ Firebase initialisé après attente');
+                    clearInterval(checkInterval);
+                    initFirebaseNow();
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(checkInterval);
+                    console.error('❌ Firebase SDK n\'a pas pu être chargé après', maxAttempts, 'tentatives');
+                    console.error('Vérifiez :');
+                    console.error('1. Que les scripts Firebase se chargent (onglet Network)');
+                    console.error('2. Qu\'il n\'y a pas de bloqueur de publicité');
+                    console.error('3. Que votre connexion internet fonctionne');
                 }
-            }, 1000);
+            }, 200);
         }
     </script>
     <script src="../js/space-shooter.js"></script>
