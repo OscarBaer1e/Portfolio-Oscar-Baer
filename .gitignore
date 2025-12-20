@@ -29,3 +29,10 @@ build/
 
 # Vercel
 .vercel
+
+# Firebase Admin SDK (NE JAMAIS COMMITER !)
+firebase-adminsdk*.json
+!firebase-adminsdk-structure.json
+firebase-service-account.json
+**/firebase-adminsdk*.json
+*-firebase-adminsdk-*.json
