@@ -489,8 +489,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 return;
             } catch (error) {
-                console.error('Erreur chargement leaderboard Firebase:', error);
+                console.error('❌ Erreur chargement leaderboard Firebase:', error);
                 console.error('Code erreur:', error.code, 'Message:', error.message);
+                
+                // Messages d'aide selon le type d'erreur
+                if (error.code === 'permission-denied') {
+                    console.error('🔒 PERMISSION DENIED - Les règles Firestore bloquent l\'accès');
+                    console.error('📋 Solution: Vérifiez les règles dans Firebase Console:');
+                    console.error('   1. Allez dans Firestore Database → Rules');
+                    console.error('   2. Assurez-vous d\'avoir: allow read: if true;');
+                    console.error('   3. Cliquez sur "Publier" et attendez 10-20 secondes');
+                    console.error('   4. Voir le guide: REPARER_PERMISSIONS_FIRESTORE.md');
+                } else if (error.code === 'unavailable') {
+                    console.error('🌐 Firebase indisponible - Vérifiez votre connexion internet');
+                } else if (error.code === 'not-found') {
+                    console.error('📦 Collection non trouvée - Normal si c\'est le premier score');
+                }
                 // Fallback sur localStorage
             }
         } else {
@@ -666,9 +680,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 // Afficher un message à l'utilisateur
                 if (error.code === 'permission-denied') {
-                    console.error('🔒 Erreur de permissions - Vérifiez les règles Firestore');
+                    console.error('🔒 PERMISSION DENIED - Les règles Firestore bloquent l\'écriture');
+                    console.error('📋 Solution: Vérifiez les règles dans Firebase Console:');
+                    console.error('   1. Allez dans Firestore Database → Rules');
+                    console.error('   2. Assurez-vous d\'avoir: allow create: if true;');
+                    console.error('   3. Cliquez sur "Publier" et attendez 10-20 secondes');
+                    console.error('   4. Voir le guide: REPARER_PERMISSIONS_FIRESTORE.md');
+                    
+                    // Afficher une alerte à l'utilisateur
+                    alert('❌ Erreur de permissions Firestore\n\n' +
+                          'Votre score a été enregistré localement mais n\'a pas pu être sauvegardé en ligne.\n\n' +
+                          'Vérifiez les règles Firestore dans Firebase Console.\n' +
+                          'Voir: REPARER_PERMISSIONS_FIRESTORE.md');
                 } else if (error.code === 'unavailable') {
                     console.error('🌐 Firebase indisponible - Vérifiez votre connexion');
+                } else if (error.code === 'not-found') {
+                    console.error('📦 Collection non trouvée - Normal si c\'est le premier score');
                 }
                 
                 // Ne pas bloquer si Firebase échoue, le score est déjà enregistré localement
