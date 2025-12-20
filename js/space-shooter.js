@@ -278,141 +278,38 @@ document.addEventListener('DOMContentLoaded', function() {
     let firebaseInitAttempted = false;
     
     function initFirebase() {
+        // Utiliser Firebase initialisé via module ES6 dans le HTML
+        if (window.firebaseDb && window.firebaseInitialized) {
+            db = window.firebaseDb;
+            firebaseInitialized = true;
+            console.log('✅ Firebase déjà initialisé via module ES6');
+            return db;
+        }
+        
         if (firebaseInitialized && db) return db;
         
-        if (typeof firebase === 'undefined' || !firebase.apps) {
-            console.warn('Firebase SDK non chargé');
+        // Attendre que Firebase soit initialisé par le module ES6
+        if (!window.firebaseInitialized) {
+            console.log('⏳ Attente de l\'initialisation Firebase via module ES6...');
+            // Réessayer après un court délai
+            setTimeout(() => {
+                if (window.firebaseDb) {
+                    db = window.firebaseDb;
+                    firebaseInitialized = true;
+                    console.log('✅ Firebase initialisé après attente');
+                }
+            }, 500);
             return null;
         }
         
-        if (firebaseInitAttempted && !firebaseInitialized) {
-            return null;
-        }
-        
-        firebaseInitAttempted = true;
-        
-        // DIAGNOSTIC COMPLET AVANT INITIALISATION
-        console.log('🔍 DIAGNOSTIC Firebase avant initialisation:');
-        console.log('  - window.FIREBASE_CONFIG:', window.FIREBASE_CONFIG);
-        console.log('  - FIREBASE_CONFIG local:', FIREBASE_CONFIG);
-        console.log('  - firebase.apps.length:', firebase.apps.length);
-        
-        try {
-            // FORCER la configuration avant toute initialisation
-            if (!window.FIREBASE_CONFIG || 
-                window.FIREBASE_CONFIG.projectId === 'YOUR_PROJECT_ID' ||
-                window.FIREBASE_CONFIG.projectId === 'votre-projet-id' ||
-                window.FIREBASE_CONFIG.projectId !== 'oscar-baer') {
-                console.error('❌ Configuration invalide détectée, correction FORCÉE...');
-                window.FIREBASE_CONFIG = {
-                    apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
-                    authDomain: "oscar-baer.firebaseapp.com",
-                    projectId: "oscar-baer",
-                    storageBucket: "oscar-baer.firebasestorage.app",
-                    messagingSenderId: "419618942184",
-                    appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
-                };
-                FIREBASE_CONFIG = window.FIREBASE_CONFIG;
-                console.log('✅ Configuration corrigée:', window.FIREBASE_CONFIG);
-            }
-            
-            // Vérifier si Firebase est déjà initialisé
-            if (firebase.apps.length === 0) {
-                // Vérification finale stricte
-                if (!FIREBASE_CONFIG || !FIREBASE_CONFIG.apiKey || !FIREBASE_CONFIG.projectId) {
-                    console.error('❌ Configuration Firebase manquante');
-                    return null;
-                }
-                
-                // Détecter et corriger YOUR_PROJECT_ID
-                if (FIREBASE_CONFIG.projectId === "YOUR_PROJECT_ID" ||
-                    FIREBASE_CONFIG.projectId === "votre-projet-id" ||
-                    FIREBASE_CONFIG.apiKey === "VOTRE_API_KEY") {
-                    console.error('❌ Configuration contient des placeholders, correction automatique...');
-                    FIREBASE_CONFIG = {
-                        apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
-                        authDomain: "oscar-baer.firebaseapp.com",
-                        projectId: "oscar-baer",
-                        storageBucket: "oscar-baer.firebasestorage.app",
-                        messagingSenderId: "419618942184",
-                        appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
-                    };
-                    window.FIREBASE_CONFIG = FIREBASE_CONFIG;
-                    console.log('✅ Configuration corrigée');
-                }
-                
-                console.log('🔧 Initialisation Firebase avec:', {
-                    projectId: FIREBASE_CONFIG.projectId,
-                    authDomain: FIREBASE_CONFIG.authDomain
-                });
-                
-                // Initialiser Firebase
-                const app = firebase.initializeApp(FIREBASE_CONFIG);
-                console.log('✅ Firebase initialisé');
-                
-                // Vérification critique du projectId
-                const actualProjectId = app.options.projectId;
-                console.log('✅ Project ID vérifié:', actualProjectId);
-                
-                if (actualProjectId !== 'oscar-baer') {
-                    console.error('❌ ERREUR CRITIQUE: Project ID incorrect:', actualProjectId);
-                    console.error('Attendu: oscar-baer');
-                    console.error('FIREBASE_CONFIG utilisé:', FIREBASE_CONFIG);
-                    // Désinitialiser et réessayer avec la config forcée
-                    app.delete();
-                    // Forcer la configuration correcte
-                    const forcedConfig = {
-                        apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
-                        authDomain: "oscar-baer.firebaseapp.com",
-                        projectId: "oscar-baer",
-                        storageBucket: "oscar-baer.firebasestorage.app",
-                        messagingSenderId: "419618942184",
-                        appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
-                    };
-                    const newApp = firebase.initializeApp(forcedConfig, 'default');
-                    console.log('✅ Firebase réinitialisé avec projectId:', newApp.options.projectId);
-                    db = newApp.firestore();
-                    firebaseInitialized = true;
-                    return db;
-                }
-            } else {
-                // Firebase déjà initialisé - vérifier le projectId
-                const existingApp = firebase.app();
-                const existingProjectId = existingApp.options.projectId;
-                console.log('✅ Firebase déjà initialisé, Project ID:', existingProjectId);
-                
-                if (existingProjectId === 'YOUR_PROJECT_ID' || existingProjectId !== 'oscar-baer') {
-                    console.error('❌ Firebase initialisé avec projectId incorrect:', existingProjectId);
-                    console.error('Réinitialisation avec configuration forcée...');
-                    existingApp.delete();
-                    // Forcer la configuration correcte
-                    const forcedConfig = {
-                        apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
-                        authDomain: "oscar-baer.firebaseapp.com",
-                        projectId: "oscar-baer",
-                        storageBucket: "oscar-baer.firebasestorage.app",
-                        messagingSenderId: "419618942184",
-                        appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
-                    };
-                    const newApp = firebase.initializeApp(forcedConfig, 'default');
-                    console.log('✅ Réinitialisé avec projectId:', newApp.options.projectId);
-                    db = newApp.firestore();
-                    firebaseInitialized = true;
-                    return db;
-                }
-            }
-            
-            db = firebase.firestore();
-            console.log('✅ Firestore accessible');
-            
+        if (window.firebaseDb) {
+            db = window.firebaseDb;
             firebaseInitialized = true;
+            console.log('✅ Firestore accessible via module ES6');
             return db;
-        } catch (error) {
-            console.error('❌ Erreur initialisation Firebase:', error);
-            console.error('Code:', error.code, 'Message:', error.message);
-            firebaseInitialized = false;
-            return null;
         }
+        
+        return null;
     }
     
     let leaderboardSyncInterval = null;
@@ -737,7 +634,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log('Données à enregistrer:', { name: name.substring(0, 20), score, level });
                 
                 // Utiliser Timestamp.now() de Firebase
-                const timestamp = firebase.firestore.Timestamp.now();
+                const timestamp = window.firebaseTimestamp ? window.firebaseTimestamp.now() : new Date();
                 console.log('Timestamp créé:', timestamp);
                 
                 const dataToSave = {
