@@ -332,118 +332,75 @@
             }
         })();
     </script>
-    <!-- Firebase SDK v12.7.0 - Modules ES6 avec fallback -->
-    <script type="module">
-        (async function() {
+    <!-- Firebase SDK - Version Compat (plus fiable que modules ES6) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script>
+        // Configuration Firebase FORCÉE - projectId garanti
+        const firebaseConfig = {
+            apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
+            authDomain: "oscar-baer.firebaseapp.com",
+            projectId: "oscar-baer", // FORCÉ : jamais YOUR_PROJECT_ID
+            storageBucket: "oscar-baer.firebasestorage.app",
+            messagingSenderId: "419618942184",
+            appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
+        };
+
+        // Vérification CRITIQUE avant initialisation
+        if (!firebaseConfig.projectId || 
+            firebaseConfig.projectId === 'YOUR_PROJECT_ID' || 
+            firebaseConfig.projectId === 'votre-projet-id' ||
+            firebaseConfig.projectId !== 'oscar-baer') {
+            console.error('❌ ERREUR CRITIQUE: projectId invalide!');
+            console.error('projectId détecté:', firebaseConfig.projectId);
+            firebaseConfig.projectId = 'oscar-baer';
+            console.log('✅ projectId corrigé à:', firebaseConfig.projectId);
+        }
+
+        // Attendre que Firebase soit chargé
+        if (typeof firebase !== 'undefined') {
             try {
-                // Import the functions you need from the SDKs you need
-                const { initializeApp } = await import("https://www.gstatic.com/firebasejs/12.7.0/firebase-app.js");
-                const { getFirestore, Timestamp } = await import("https://www.gstatic.com/firebasejs/12.7.0/firebase-firestore.js");
-
-                // Your web app's Firebase configuration - FORCÉE avec projectId correct
-                const firebaseConfig = {
-                    apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
-                    authDomain: "oscar-baer.firebaseapp.com",
-                    projectId: "oscar-baer", // FORCÉ : jamais YOUR_PROJECT_ID
-                    storageBucket: "oscar-baer.firebasestorage.app",
-                    messagingSenderId: "419618942184",
-                    appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
-                };
-
-                // Vérification CRITIQUE avant initialisation
-                if (!firebaseConfig.projectId || 
-                    firebaseConfig.projectId === 'YOUR_PROJECT_ID' || 
-                    firebaseConfig.projectId === 'votre-projet-id' ||
-                    firebaseConfig.projectId !== 'oscar-baer') {
-                    console.error('❌ ERREUR CRITIQUE: projectId invalide dans firebaseConfig!');
-                    console.error('projectId détecté:', firebaseConfig.projectId);
-                    // Forcer la correction
-                    firebaseConfig.projectId = 'oscar-baer';
-                    console.log('✅ projectId corrigé à:', firebaseConfig.projectId);
-                }
-
                 // Initialize Firebase
-                const app = initializeApp(firebaseConfig);
+                const app = firebase.initializeApp(firebaseConfig);
                 
                 // Vérification IMMÉDIATE après initialisation
                 const actualProjectId = app.options.projectId;
                 console.log('🔍 Project ID après initialisation:', actualProjectId);
                 
                 if (actualProjectId !== 'oscar-baer') {
-                    console.error('❌ ERREUR CRITIQUE: Project ID incorrect après initialisation!');
-                    console.error('Attendu: oscar-baer');
-                    console.error('Reçu:', actualProjectId);
-                    // Ne pas continuer si le projectId est incorrect
+                    console.error('❌ ERREUR CRITIQUE: Project ID incorrect!');
+                    console.error('Attendu: oscar-baer, Reçu:', actualProjectId);
                     throw new Error('Project ID incorrect: ' + actualProjectId);
                 }
                 
-                const db = getFirestore(app);
+                const db = firebase.firestore();
                 
                 // Exposer Firebase pour les autres scripts
                 window.firebaseApp = app;
                 window.firebaseDb = db;
-                window.firebaseTimestamp = Timestamp;
+                window.firebaseTimestamp = firebase.firestore.Timestamp;
                 window.firebaseInitialized = true;
                 
-                console.log('✅ Firebase initialisé avec succès (v12.7.0)');
+                console.log('✅ Firebase initialisé avec succès (v10.7.1 compat)');
                 console.log('✅ Project ID vérifié:', app.options.projectId);
                 console.log('✅ Firestore accessible');
             } catch (error) {
-                console.error('❌ Erreur lors du chargement Firebase:', error);
-                // Fallback : utiliser la version compat si le module ES6 échoue
-                console.log('⚠️ Tentative avec version compat...');
-                loadFirebaseCompat();
+                console.error('❌ Erreur initialisation Firebase:', error);
             }
-        })();
-    </script>
-    
-    <!-- Fallback Firebase Compat si module ES6 échoue -->
-    <script>
-        function loadFirebaseCompat() {
-            // Charger la version compat comme fallback
-            const script1 = document.createElement('script');
-            script1.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js';
-            script1.onload = function() {
-                const script2 = document.createElement('script');
-                script2.src = 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js';
-                script2.onload = function() {
-                    // Configuration Firebase FORCÉE
-                    const firebaseConfig = {
-                        apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
-                        authDomain: "oscar-baer.firebaseapp.com",
-                        projectId: "oscar-baer",
-                        storageBucket: "oscar-baer.firebasestorage.app",
-                        messagingSenderId: "419618942184",
-                        appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
-                    };
-                    
-                    // Vérification
-                    if (firebaseConfig.projectId !== 'oscar-baer') {
-                        firebaseConfig.projectId = 'oscar-baer';
-                    }
-                    
-                    // Initialize Firebase
+        } else {
+            console.error('❌ Firebase SDK non chargé');
+            // Réessayer après un court délai
+            setTimeout(function() {
+                if (typeof firebase !== 'undefined') {
                     const app = firebase.initializeApp(firebaseConfig);
                     const db = firebase.firestore();
-                    
-                    // Vérification
-                    if (app.options.projectId !== 'oscar-baer') {
-                        console.error('❌ Project ID incorrect même avec compat:', app.options.projectId);
-                        return;
-                    }
-                    
-                    // Exposer Firebase
                     window.firebaseApp = app;
                     window.firebaseDb = db;
                     window.firebaseTimestamp = firebase.firestore.Timestamp;
                     window.firebaseInitialized = true;
-                    
-                    console.log('✅ Firebase initialisé avec compat (v10.7.1)');
-                    console.log('✅ Project ID vérifié:', app.options.projectId);
-                };
-                document.head.appendChild(script2);
-            };
-            document.head.appendChild(script1);
+                    console.log('✅ Firebase initialisé après attente');
+                }
+            }, 1000);
         }
     </script>
     <script src="../js/space-shooter.js"></script>

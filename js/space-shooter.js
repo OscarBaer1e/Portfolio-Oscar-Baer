@@ -278,35 +278,38 @@ document.addEventListener('DOMContentLoaded', function() {
     let firebaseInitAttempted = false;
     
     function initFirebase() {
-        // Utiliser Firebase initialisé via module ES6 dans le HTML
+        // Utiliser Firebase initialisé dans le HTML (version compat)
         if (window.firebaseDb && window.firebaseInitialized) {
             db = window.firebaseDb;
             firebaseInitialized = true;
-            console.log('✅ Firebase déjà initialisé via module ES6');
+            console.log('✅ Firebase déjà initialisé');
             return db;
         }
         
         if (firebaseInitialized && db) return db;
         
-        // Attendre que Firebase soit initialisé par le module ES6
+        // Vérifier si Firebase est disponible via window
+        if (window.firebaseApp && window.firebaseDb) {
+            db = window.firebaseDb;
+            firebaseInitialized = true;
+            console.log('✅ Firebase accessible via window');
+            return db;
+        }
+        
+        // Attendre que Firebase soit initialisé
         if (!window.firebaseInitialized) {
-            console.log('⏳ Attente de l\'initialisation Firebase via module ES6...');
+            console.log('⏳ Attente de l\'initialisation Firebase...');
             // Réessayer après un court délai
             setTimeout(() => {
                 if (window.firebaseDb) {
                     db = window.firebaseDb;
                     firebaseInitialized = true;
                     console.log('✅ Firebase initialisé après attente');
+                } else {
+                    console.warn('⚠️ Firebase non initialisé après attente');
                 }
-            }, 500);
+            }, 1000);
             return null;
-        }
-        
-        if (window.firebaseDb) {
-            db = window.firebaseDb;
-            firebaseInitialized = true;
-            console.log('✅ Firestore accessible via module ES6');
-            return db;
         }
         
         return null;
