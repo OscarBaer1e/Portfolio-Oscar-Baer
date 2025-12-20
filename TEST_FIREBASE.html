@@ -76,6 +76,13 @@
                     });
                 } catch (error) {
                     log('❌ Erreur lecture: ' + error.code + ' - ' + error.message, 'error');
+                    if (error.code === 'permission-denied') {
+                        log('🔒 PERMISSION DENIED - Les règles Firestore bloquent la lecture', 'error');
+                        log('📋 SOLUTION: Voir COPIER_COLLER_REGLES.md', 'error');
+                        log('   1. Firebase Console → Firestore Database → Rules', 'error');
+                        log('   2. Collez les règles: allow read: if true;', 'error');
+                        log('   3. Cliquez sur "Publier" et attendez 10-20 secondes', 'error');
+                    }
                 }
                 
                 // 5. Tester l'écriture
@@ -97,7 +104,24 @@
                 } catch (error) {
                     log('❌ Erreur écriture: ' + error.code + ' - ' + error.message, 'error');
                     if (error.code === 'permission-denied') {
-                        log('🔒 Vérifiez les règles Firestore - elles doivent permettre "allow create: if true"', 'error');
+                        log('🔒 PERMISSION DENIED - Les règles Firestore bloquent l\'écriture', 'error');
+                        log('📋 SOLUTION URGENTE:', 'error');
+                        log('   1. Allez sur: https://console.firebase.google.com/', 'error');
+                        log('   2. Projet oscar-baer → Firestore Database → Rules', 'error');
+                        log('   3. SUPPRIMEZ TOUT et COLLEZ EXACTEMENT:', 'error');
+                        log('   rules_version = \'2\';', 'error');
+                        log('   service cloud.firestore {', 'error');
+                        log('     match /databases/{database}/documents {', 'error');
+                        log('       match /leaderboard/{document=**} {', 'error');
+                        log('         allow read: if true;', 'error');
+                        log('         allow create: if true;', 'error');
+                        log('         allow update, delete: if false;', 'error');
+                        log('       }', 'error');
+                        log('     }', 'error');
+                        log('   }', 'error');
+                        log('   4. Cliquez sur "Publier" et ATTENDEZ 10-20 secondes', 'error');
+                        log('   5. Rechargez cette page et testez à nouveau', 'error');
+                        log('   📖 Guide complet: COPIER_COLLER_REGLES.md', 'error');
                     }
                 }
                 
