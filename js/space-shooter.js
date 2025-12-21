@@ -1588,47 +1588,76 @@ document.addEventListener('DOMContentLoaded', function() {
     // Crée une explosion colorée stylée pour la mort du boss (ne bloque pas le jeu)
     function createBossDeathExplosion(x, y, color, size) {
         try {
-            // Explosion principale avec plusieurs couleurs (limité pour éviter les lags)
+            // Vérifier la limite de particules avant d'ajouter
+            const MAX_PARTICLES = 200;
+            const currentParticleCount = particles.length;
+            const availableSlots = MAX_PARTICLES - currentParticleCount;
+            
+            if (availableSlots <= 0) {
+                console.warn('Trop de particules, explosion boss annulée');
+                return;
+            }
+            
+            // Explosion réduite pour éviter les lags (max 20 particules principales)
             const colors = [color, '#ffff00', '#ff00ff', '#00ffff', '#ff8800'];
-            const particleCount = Math.min(Math.floor(size / 2) + 15, 35); // Limité à 35
+            const maxMainParticles = Math.min(20, availableSlots);
+            const particleCount = Math.min(Math.floor(size / 3) + 10, maxMainParticles);
             
-            for (let i = 0; i < particleCount; i++) {
-                const angle = (Math.PI * 2 / particleCount) * i;
-                const speed = Math.random() * 5 + 3;
-                const particleColor = colors[Math.floor(Math.random() * colors.length)];
-                const particleSize = Math.random() * 4 + 2;
+            // Créer les particules par petits lots pour ne pas bloquer
+            let created = 0;
+            const createBatch = () => {
+                const batchSize = Math.min(5, particleCount - created);
                 
-                particles.push({
-                    x: x,
-                    y: y,
-                    vx: Math.cos(angle) * speed,
-                    vy: Math.sin(angle) * speed,
-                    size: particleSize,
-                    color: particleColor,
-                    alpha: 1,
-                    life: 1,
-                    type: 'star'
-                });
-            }
+                for (let i = 0; i < batchSize && created < particleCount; i++) {
+                    const angle = (Math.PI * 2 / particleCount) * created;
+                    const speed = Math.random() * 4 + 2;
+                    const particleColor = colors[Math.floor(Math.random() * colors.length)];
+                    const particleSize = Math.random() * 3 + 1;
+                    
+                    particles.push({
+                        x: x,
+                        y: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        size: particleSize,
+                        color: particleColor,
+                        alpha: 1,
+                        life: 1,
+                        type: 'star'
+                    });
+                    created++;
+                }
+                
+                // Continuer par petits lots si nécessaire
+                if (created < particleCount && particles.length < MAX_PARTICLES) {
+                    setTimeout(createBatch, 0);
+                } else if (created < particleCount) {
+                    // Ajouter quelques particules secondaires si on a de la place
+                    const remainingSlots = MAX_PARTICLES - particles.length;
+                    const secondaryCount = Math.min(8, remainingSlots);
+                    
+                    for (let i = 0; i < secondaryCount; i++) {
+                        const angle = Math.random() * Math.PI * 2;
+                        const speed = Math.random() * 3 + 1;
+                        const particleColor = colors[Math.floor(Math.random() * colors.length)];
+                        
+                        particles.push({
+                            x: x + (Math.random() - 0.5) * size * 0.5,
+                            y: y + (Math.random() - 0.5) * size * 0.5,
+                            vx: Math.cos(angle) * speed,
+                            vy: Math.sin(angle) * speed,
+                            size: Math.random() * 2 + 1,
+                            color: particleColor,
+                            alpha: 0.8,
+                            life: 0.9,
+                            type: 'spark'
+                        });
+                    }
+                }
+            };
             
-            // Particules secondaires colorées (limitées)
-            for (let i = 0; i < 15; i++) { // Réduit de 20 à 15
-                const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 4 + 2;
-                const particleColor = colors[Math.floor(Math.random() * colors.length)];
-                
-                particles.push({
-                    x: x + (Math.random() - 0.5) * size,
-                    y: y + (Math.random() - 0.5) * size,
-                    vx: Math.cos(angle) * speed,
-                    vy: Math.sin(angle) * speed,
-                    size: Math.random() * 3 + 1,
-                    color: particleColor,
-                    alpha: 0.8,
-                    life: 0.9,
-                    type: 'spark'
-                });
-            }
+            // Démarrer la création par lots
+            createBatch();
         } catch (e) {
             console.warn('Erreur création explosion boss:', e);
         }
