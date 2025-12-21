@@ -498,25 +498,43 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             } catch (error) {
                 console.error('❌ Erreur chargement leaderboard Firebase:', error);
-                console.error('Code erreur:', error.code, 'Message:', error.message);
+                console.error('📊 Code erreur:', error.code);
+                console.error('📝 Message:', error.message);
                 
                 // Messages d'aide selon le type d'erreur
                 if (error.code === 'permission-denied') {
-                    console.error('🔒 PERMISSION DENIED - Les règles Firestore bloquent l\'accès');
-                    console.error('📋 Solution: Vérifiez les règles dans Firebase Console:');
-                    console.error('   1. Allez dans Firestore Database → Rules');
-                    console.error('   2. Assurez-vous d\'avoir: allow read: if true;');
-                    console.error('   3. Cliquez sur "Publier" et attendez 10-20 secondes');
-                    console.error('   4. Voir le guide: REPARER_PERMISSIONS_FIRESTORE.md');
+                    console.error('');
+                    console.error('🔒 ============================================');
+                    console.error('🔒 PERMISSION DENIED - Règles Firestore');
+                    console.error('🔒 ============================================');
+                    console.error('');
+                    console.error('📋 SOLUTION IMMÉDIATE:');
+                    console.error('   1. Allez sur: https://console.firebase.google.com/');
+                    console.error('   2. Projet oscar-baer → Firestore Database → Rules');
+                    console.error('   3. Vérifiez que vous avez EXACTEMENT:');
+                    console.error('      allow read: if true;');
+                    console.error('      allow create: if true;');
+                    console.error('   4. Cliquez sur "Publier"');
+                    console.error('   5. Attendez 20 secondes');
+                    console.error('');
+                    console.error('📖 Guides disponibles:');
+                    console.error('   - DIAGNOSTIC_LEADERBOARD.md');
+                    console.error('   - COPIER_COLLER_REGLES.md');
+                    console.error('   - REPARER_PERMISSIONS_FIRESTORE.md');
+                    console.error('');
                 } else if (error.code === 'unavailable') {
                     console.error('🌐 Firebase indisponible - Vérifiez votre connexion internet');
                 } else if (error.code === 'not-found') {
                     console.error('📦 Collection non trouvée - Normal si c\'est le premier score');
+                } else if (error.code === 'failed-precondition') {
+                    console.error('📊 Index manquant - Le leaderboard fonctionnera sans index (tri côté client)');
                 }
                 // Fallback sur localStorage
             }
         } else {
-            console.warn('Firebase non disponible, chargement depuis localStorage');
+            console.warn('⚠️ Firebase non disponible, chargement depuis localStorage');
+            console.warn('💡 Diagnostic: Vérifiez que window.firebaseDb existe');
+            console.warn('💡 Voir: DIAGNOSTIC_LEADERBOARD.md');
         }
         
         // Charger depuis localStorage (toujours disponible, même sans Firebase)
