@@ -384,10 +384,6 @@ document.addEventListener('DOMContentLoaded', function() {
             leaderboard = [];
         }
         
-        // Ancien code Firebase (désactivé mais conservé pour référence)
-        /*
-        const firestoreDb = initFirebase();
-        
         if (!firestoreDb) {
             console.warn('⚠️ Firebase non disponible, chargement depuis localStorage');
             console.warn('💡 Diagnostic: Vérifiez que window.firebaseDb existe');
@@ -518,12 +514,9 @@ document.addEventListener('DOMContentLoaded', function() {
         localStorage.setItem('spaceShooterLeaderboard', JSON.stringify(leaderboard));
     }
     
-    // Synchroniser le leaderboard en temps réel avec Firebase
+    // Synchroniser le leaderboard périodiquement avec Supabase
     function startLeaderboardSync() {
-        const firestoreDb = initFirebase();
-        
-        if (!firestoreDb) {
-            // Fallback: synchronisation périodique si Firebase n'est pas disponible
+        // Supabase : rechargement périodique (pas de temps réel nécessaire pour un leaderboard simple)
             if (leaderboardSyncInterval) {
                 clearInterval(leaderboardSyncInterval);
             }
