@@ -35,10 +35,13 @@
     box-sizing: border-box;
 }
 
-html { scroll-behavior: smooth; }
+html { 
+    scroll-behavior: smooth;
+    height: 100%;
+}
 
 body {
-    font-family: 'Open Sans', sans-serif; /* Remplacé par 'Open Sans' puisque 'Montserrat' n'était pas importé */
+    font-family: 'Open Sans', sans-serif;
     line-height: 1.6; 
     color: var(--light-text-color);
     background-color: var(--dark-bg-color); 
@@ -48,6 +51,9 @@ body {
     -moz-osx-font-smoothing: grayscale;
     padding-top: var(--header-height);
     position: relative;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* ================================================
@@ -424,7 +430,7 @@ p { margin-bottom: 1.5rem; color: var(--dim-text-color); }
 .primary-btn {
     background: var(--grad-neon); 
     color: var(--dark-bg-color); 
-    box-shadow: 0 0 15px var(--primary-color);
+    box-shadow: none;
 }
 
 .primary-btn:hover {
@@ -1706,7 +1712,7 @@ footer .container {
     overflow: hidden;
     background: linear-gradient(90deg, var(--primary-color), var(--secondary-color), var(--primary-color));
     background-size: 200% 100%;
-    animation: shimmer 3s infinite;
+    animation: none;
 }
 
 .animated-btn:hover {
