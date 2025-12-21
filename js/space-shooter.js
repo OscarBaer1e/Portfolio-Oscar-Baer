@@ -2093,6 +2093,9 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateBoss() {
         if (!boss || !gameState.bossActive) return;
         
+        // Ne pas mettre à jour si le jeu est en pause
+        if (gameState.isPaused) return;
+        
         // Vérifications de sécurité
         if (typeof boss.x !== 'number' || typeof boss.y !== 'number' || typeof boss.size !== 'number') {
             console.warn('Boss invalide, reset');
