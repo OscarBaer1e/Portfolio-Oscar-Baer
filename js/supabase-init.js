@@ -16,10 +16,9 @@
     'use strict';
 
     // Configuration Supabase
-    // ⚠️ REMPLACEZ ces valeurs par les vôtres après avoir créé votre projet Supabase
     const SUPABASE_CONFIG = {
-        url: 'VOTRE_URL_SUPABASE', // Exemple: 'https://xxxxx.supabase.co'
-        anonKey: 'VOTRE_ANON_KEY'  // Exemple: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'
+        url: 'https://xqpsvwtcvoggbkcjuelq.supabase.co',
+        anonKey: 'sb_publishable_zpaJPneM812wOeCBs3uO-A_yhx693Vp'  // Publishable API Key (safe pour le navigateur)
     };
 
     // Vérifier si Supabase est chargé
