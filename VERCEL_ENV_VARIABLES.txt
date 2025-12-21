@@ -1,0 +1,32 @@
+# ============================================
+# VARIABLES D'ENVIRONNEMENT POUR VERCEL
+# ============================================
+# 
+# Copiez ces valeurs dans Vercel Dashboard :
+# Settings → Environment Variables → Add New
+#
+# IMPORTANT : Utilisez le préfixe NEXT_PUBLIC_ pour que les variables
+# soient accessibles dans le navigateur
+#
+
+# Variable 1 :
+NEXT_PUBLIC_SUPABASE_URL=https://xqpsvwtcvoggbkcjuelq.supabase.co
+
+# Variable 2 :
+NEXT_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_zpaJPneM812wOeCBs3uO-A_yhx693Vp
+
+# ============================================
+# INSTRUCTIONS :
+# ============================================
+#
+# 1. Allez sur https://vercel.com/
+# 2. Sélectionnez votre projet
+# 3. Settings → Environment Variables
+# 4. Cliquez sur "Add New"
+# 5. Ajoutez les 2 variables ci-dessus
+# 6. Cochez : Production, Preview, Development
+# 7. Cliquez sur "Save"
+# 8. Redéployez votre projet
+#
+# ============================================
+
