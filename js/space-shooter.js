@@ -250,7 +250,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let leaderboardSyncInterval = null;
     
-    // Charger automatiquement les images de boss par défaut
+    // Charger automatiquement les images de boss par défaut (même système que les images utilisateur)
     function loadDefaultBossImages() {
         const bossImagePaths = {
             1: '../ressources/images/Locked_in_alien.jpg',
@@ -266,16 +266,37 @@ document.addEventListener('DOMContentLoaded', function() {
         };
         
         Object.keys(bossImagePaths).forEach(bossNum => {
-            const img = new Image();
-            img.onload = function() {
-                bossPhotos[parseInt(bossNum)] = img;
-                console.log(`✅ Image boss ${bossNum} chargée: ${bossImagePaths[bossNum]}`);
-            };
-            img.onerror = function() {
-                console.error(`❌ Image boss ${bossNum} NON chargée: ${bossImagePaths[bossNum]}`);
-                console.error('Vérifiez que le fichier existe et que le format est supporté');
-            };
-            img.src = bossImagePaths[bossNum];
+            // Utiliser le même système que les images utilisateur (FileReader + Image)
+            fetch(bossImagePaths[bossNum])
+                .then(response => {
+                    if (!response.ok) {
+                        console.warn(`Image boss ${bossNum} non trouvée: ${bossImagePaths[bossNum]}`);
+                        return null;
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    if (!blob) return;
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const img = new Image();
+                        img.onload = () => {
+                            bossPhotos[parseInt(bossNum)] = img;
+                            console.log(`✅ Image boss ${bossNum} chargée: ${bossImagePaths[bossNum]}`);
+                        };
+                        img.onerror = () => {
+                            console.warn(`Erreur chargement image boss ${bossNum}`);
+                        };
+                        img.src = event.target.result;
+                    };
+                    reader.onerror = () => {
+                        console.warn(`Erreur lecture image boss ${bossNum}`);
+                    };
+                    reader.readAsDataURL(blob);
+                })
+                .catch(error => {
+                    console.warn(`Erreur fetch image boss ${bossNum}:`, error);
+                });
         });
     }
     
@@ -1893,9 +1914,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         gameState.bossActive = true;
         
-        // Ne pas mettre le jeu en pause lors du spawn d'un boss
-        gameState.isPaused = false;
-        if (startBtn) startBtn.textContent = 'Pause';
+        // Ne JAMAIS mettre le jeu en pause automatiquement (seulement si le joueur appuie sur le bouton)
+        // Le jeu continue normalement même lors du spawn d'un boss
         
         try {
             playSound('bossSpawn');
@@ -2240,7 +2260,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     try {
                         const bossName = getBossName(defeatedBossNumber);
-                        showMessage(`${bossName} VAINCU ! +${defeatedBossNumber * 1000} points`, 'victory');
+                        // Message petit pour le score (comme les bonus)
+                        showMessage(`+${defeatedBossNumber * 1000} points`, 'powerup');
                     } catch (e) {
                         console.warn('Erreur message:', e);
                     }
