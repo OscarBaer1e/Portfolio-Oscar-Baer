@@ -99,21 +99,73 @@
         };
     }
     
+    // Bloquer require() si disponible (Node.js style)
+    if (typeof require !== 'undefined') {
+        const originalRequire = require;
+        window.require = function(module) {
+            if (typeof module === 'string' && module.includes('firebase')) {
+                console.warn('🚫 require() Firebase bloqué:', module);
+                throw new Error('Firebase bloqué');
+            }
+            return originalRequire(module);
+        };
+    }
+    
     // Intercepter les scripts qui se chargent
     const observer = new MutationObserver(function(mutations) {
         mutations.forEach(function(mutation) {
             mutation.addedNodes.forEach(function(node) {
-                if (node.tagName === 'SCRIPT' && node.src && node.src.includes('firebase')) {
-                    console.warn('🚫 Script Firebase détecté et supprimé:', node.src);
-                    node.remove();
-                    deleteFirebase();
+                if (node.tagName === 'SCRIPT') {
+                    // Vérifier src
+                    if (node.src && node.src.includes('firebase')) {
+                        console.warn('🚫 Script Firebase détecté et supprimé:', node.src);
+                        node.remove();
+                        deleteFirebase();
+                        return;
+                    }
+                    // Vérifier le contenu inline
+                    if (node.textContent && node.textContent.includes('firebase')) {
+                        console.warn('🚫 Script inline Firebase détecté et supprimé');
+                        node.remove();
+                        deleteFirebase();
+                        return;
+                    }
                 }
             });
         });
     });
     
-    observer.observe(document.head, { childList: true, subtree: true });
-    observer.observe(document.body, { childList: true, subtree: true });
+    // Observer dès que possible
+    if (document.head) {
+        observer.observe(document.head, { childList: true, subtree: true });
+    }
+    if (document.body) {
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+    
+    // Observer aussi le document lui-même
+    observer.observe(document.documentElement, { childList: true, subtree: true });
+    
+    // Intercepter aussi les appels à appendChild/insertBefore
+    const originalAppendChild = Node.prototype.appendChild;
+    Node.prototype.appendChild = function(child) {
+        if (child.tagName === 'SCRIPT' && child.src && child.src.includes('firebase')) {
+            console.warn('🚫 appendChild Firebase bloqué:', child.src);
+            deleteFirebase();
+            return child; // Retourner l'élément mais ne pas l'ajouter
+        }
+        return originalAppendChild.call(this, child);
+    };
+    
+    const originalInsertBefore = Node.prototype.insertBefore;
+    Node.prototype.insertBefore = function(newNode, referenceNode) {
+        if (newNode.tagName === 'SCRIPT' && newNode.src && newNode.src.includes('firebase')) {
+            console.warn('🚫 insertBefore Firebase bloqué:', newNode.src);
+            deleteFirebase();
+            return newNode; // Retourner l'élément mais ne pas l'ajouter
+        }
+        return originalInsertBefore.call(this, newNode, referenceNode);
+    };
     
     console.log('✅ Blocage Firebase terminé');
 })();

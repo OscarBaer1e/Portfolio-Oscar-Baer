@@ -297,8 +297,36 @@
             // Ignorer si l'élément n'existe pas encore
         }
     </script>
-    <!-- Blocage Firebase - DOIT être chargé EN PREMIER -->
-    <script src="../js/block-firebase.js"></script>
+    <!-- Script inline pour bloquer Firebase AVANT tout autre script -->
+    <script>
+        // Blocage ULTRA-AGGRESSIF Firebase - S'exécute IMMÉDIATEMENT
+        (function() {
+            'use strict';
+            console.log('🛡️ Blocage Firebase ULTRA-AGGRESSIF activé');
+            
+            // Supprimer Firebase immédiatement
+            function killFirebase() {
+                try {
+                    if (window.firebase) {
+                        console.warn('🚫 Firebase détecté, suppression...');
+                        if (window.firebase.apps) {
+                            window.firebase.apps.forEach(app => {
+                                try { app.delete(); } catch(e) {}
+                            });
+                        }
+                        delete window.firebase;
+                    }
+                    delete window.firebaseApp;
+                    delete window.firebaseDb;
+                    delete window.firebaseInitialized;
+                    delete window.FIREBASE_CONFIG;
+                } catch(e) {}
+            }
+            
+            killFirebase();
+            setInterval(killFirebase, 100);
+        })();
+    </script>
     <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Initialisation Supabase - DOIT être chargé après le SDK -->
