@@ -1732,6 +1732,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initialiser les propriétés spécifiques au pattern du boss
         let patternConfig = getBossPattern(bossNumber);
         
+        const bossName = getBossName(bossNumber);
+        
         boss = {
             x: canvas.width / 2,
             y: 100,
@@ -1743,6 +1745,7 @@ document.addEventListener('DOMContentLoaded', function() {
             direction: patternConfig.initialDirection,
             color: `hsl(${bossNumber * 36}, 70%, 50%)`,
             bossNumber: bossNumber,
+            bossName: bossName,
             lastShot: Date.now(),
             shootInterval: patternConfig.shootInterval,
             image: null,
@@ -1761,8 +1764,27 @@ document.addEventListener('DOMContentLoaded', function() {
         
         gameState.bossActive = true;
         playSound('bossSpawn');
-        showMessage(`BOSS ${bossNumber} !`, 'boss');
+        const bossName = getBossName(bossNumber);
+        showMessage(`${bossName} apparaît !`, 'boss');
         updateHealthBars();
+    }
+    
+    // Retourne le nom bizarre d'un boss selon son numéro
+    // Thème : "Gardiens Cosmiques Bizarres" - tous sont des entités spatiales étranges
+    function getBossName(bossNumber) {
+        const bossNames = {
+            1: 'Glorp le Gluant',
+            2: 'Zorg le Zarbi',
+            3: 'Blip le Bizarre',
+            4: 'Flub le Flou',
+            5: 'Snork le Snork',
+            6: 'Womp le Womp',
+            7: 'Klunk le Klunk',
+            8: 'Plop le Plop',
+            9: 'Squish le Squish',
+            10: 'Zzorp le Zzorp'
+        };
+        return bossNames[bossNumber] || `Boss ${bossNumber}`;
     }
     
     // Retourne la configuration du pattern pour un boss donné
@@ -1845,7 +1867,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (scoreElement) scoreElement.textContent = gameState.score;
                     
                     try {
-                        showMessage(`BOSS ${boss.bossNumber} VAINCU ! +${boss.bossNumber * 1000} points`, 'victory');
+                        const bossName = getBossName(boss.bossNumber);
+                        showMessage(`${bossName} VAINCU ! +${boss.bossNumber * 1000} points`, 'victory');
                     } catch (e) {
                         console.warn('Erreur message:', e);
                     }
