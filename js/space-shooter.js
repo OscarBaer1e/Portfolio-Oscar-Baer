@@ -2328,9 +2328,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     const defeatedBossColor = boss.color;
                     const defeatedBossSize = Math.min(boss.size || 50, 80);
                     
-                    // Boss vaincu - explosion limitée pour éviter crash
+                    // Boss vaincu - explosion colorée stylée
                     try {
-                        createEnhancedExplosion(defeatedBossX, defeatedBossY, defeatedBossColor, defeatedBossSize);
+                        createBossDeathExplosion(defeatedBossX, defeatedBossY, defeatedBossColor, defeatedBossSize);
                     } catch (e) {
                         console.warn('Erreur explosion boss:', e);
                     }
