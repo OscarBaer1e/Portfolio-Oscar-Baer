@@ -250,6 +250,36 @@ document.addEventListener('DOMContentLoaded', function() {
     
     let leaderboardSyncInterval = null;
     
+    // Charger automatiquement les images de boss par défaut
+    function loadDefaultBossImages() {
+        const bossImagePaths = {
+            1: '../ressources/images/Locked in alien.jpeg',
+            2: '../ressources/images/Goku SSJ3.webp',
+            3: '../ressources/images/Karism.jpg',
+            4: '../ressources/images/Herobrine.avif',
+            5: '../ressources/images/Goblinstein.jpg',
+            6: '../ressources/images/Michael Personne.avif',
+            7: '../ressources/images/M. BAER.jpg',
+            8: '../ressources/images/Sunshine.jpg',
+            9: '../ressources/images/What Sans.webp',
+            10: '../ressources/images/IUT GUSTAVE EIFFEL.png'
+        };
+        
+        Object.keys(bossImagePaths).forEach(bossNum => {
+            const img = new Image();
+            img.onload = function() {
+                bossPhotos[parseInt(bossNum)] = img;
+            };
+            img.onerror = function() {
+                console.warn(`Image boss ${bossNum} non trouvée: ${bossImagePaths[bossNum]}`);
+            };
+            img.src = bossImagePaths[bossNum];
+        });
+    }
+    
+    // Charger les images au démarrage
+    loadDefaultBossImages();
+    
     // Plein écran
     let isFullscreen = false;
     
@@ -868,10 +898,32 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.save();
         ctx.translate(boss.x, boss.y);
         
+        const effect = getBossImageEffect(boss.bossNumber);
+        const imageSize = boss.size * 2;
+        
         // Image du boss si disponible
         if (boss.image && boss.image.complete && boss.image.naturalWidth > 0) {
-            const size = boss.size * 2;
-            ctx.drawImage(boss.image, -size / 2, -size / 2, size, size);
+            // Dessiner l'effet autour de l'image AVANT l'image
+            drawBossImageEffect(effect, imageSize);
+            
+            // Créer un masque circulaire pour arrondir l'image
+            ctx.save();
+            ctx.beginPath();
+            ctx.arc(0, 0, imageSize / 2, 0, Math.PI * 2);
+            ctx.clip();
+            
+            // Dessiner l'image arrondie
+            ctx.drawImage(boss.image, -imageSize / 2, -imageSize / 2, imageSize, imageSize);
+            ctx.restore();
+            
+            // Contour de l'image arrondie
+            ctx.strokeStyle = effect.color;
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = effect.color;
+            ctx.beginPath();
+            ctx.arc(0, 0, imageSize / 2, 0, Math.PI * 2);
+            ctx.stroke();
         } else {
             // Forme par défaut : boule colorée avec effets
             const gradient = ctx.createRadialGradient(0, -boss.size * 0.3, 0, 0, 0, boss.size);
@@ -1768,22 +1820,223 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Retourne le nom d'un boss selon son numéro
-    // Thème : "Entités Spatiales Piégées" - références à des objets astronomiques réels et concepts SF
-    // Style "locked in" : entités enfermées/piégées dans l'espace
     function getBossName(bossNumber) {
         const bossNames = {
-            1: 'Locked In Nebula',      // Nébuleuse piégée (référence astronomique réelle)
-            2: 'Trapped Quasar',        // Quasar piégé (objet astronomique ultra-lumineux)
-            3: 'Caged Pulsar',          // Pulsar en cage (étoile à neutrons en rotation)
-            4: 'Bound Black Hole',      // Trou noir lié (objet astronomique réel)
-            5: 'Sealed Supernova',       // Supernova scellée (explosion stellaire)
-            6: 'Contained Comet',       // Comète contenue (objet céleste réel)
-            7: 'Imprisoned Asteroid',   // Astéroïde emprisonné (objet spatial réel)
-            8: 'Captured Galaxy',       // Galaxie capturée (structure astronomique)
-            9: 'Enclosed Void',         // Vide enfermé (concept spatial)
-            10: 'Sealed Singularity'    // Singularité scellée (point de trou noir)
+            1: 'Locked in alien',
+            2: 'Goku SSJ3',
+            3: 'Karism',
+            4: 'Herobrine',
+            5: 'Goblinstein',
+            6: 'Michael Personne',
+            7: 'M. BAER',
+            8: 'Sunshine',
+            9: 'WhatSans',
+            10: 'IUT GUSTAVE EIFFEL'
         };
         return bossNames[bossNumber] || `Boss ${bossNumber}`;
+    }
+    
+    // Retourne l'effet visuel autour de l'image du boss selon son numéro
+    function getBossImageEffect(bossNumber) {
+        const effects = {
+            1: { type: 'glow', color: '#00ff00', intensity: 20, pulse: true }, // Vert pulsant (Locked in alien)
+            2: { type: 'aura', color: '#ffff00', intensity: 25, rotation: true }, // Aura dorée rotative (Goku SSJ3)
+            3: { type: 'sparkles', color: '#ff00ff', intensity: 15, sparkle: true }, // Étincelles magenta (Karism)
+            4: { type: 'shadow', color: '#ffffff', intensity: 30, flicker: true }, // Ombre blanche clignotante (Herobrine)
+            5: { type: 'rings', color: '#ff8800', intensity: 20, rings: true }, // Anneaux orange (Goblinstein)
+            6: { type: 'waves', color: '#00ffff', intensity: 18, waves: true }, // Vagues cyan (Michael Personne)
+            7: { type: 'electric', color: '#ff0000', intensity: 22, electric: true }, // Électricité rouge (M. BAER)
+            8: { type: 'sunshine', color: '#ffff00', intensity: 28, rays: true }, // Rayons de soleil (Sunshine)
+            9: { type: 'void', color: '#ffffff', intensity: 25, void: true }, // Vide blanc avec particules (WhatSans)
+            10: { type: 'institutional', color: '#0066cc', intensity: 20, grid: true } // Grille bleue institutionnelle (IUT)
+        };
+        return effects[bossNumber] || effects[1];
+    }
+    
+    // Dessine l'effet visuel autour de l'image du boss
+    function drawBossImageEffect(effect, imageSize) {
+        const time = Date.now() * 0.001;
+        const radius = imageSize / 2;
+        
+        ctx.save();
+        
+        switch(effect.type) {
+            case 'glow':
+                // Glow pulsant
+                const pulseIntensity = effect.intensity * (1 + Math.sin(time * 3) * 0.3);
+                const gradient = ctx.createRadialGradient(0, 0, radius, 0, 0, radius + pulseIntensity);
+                gradient.addColorStop(0, effect.color + '00');
+                gradient.addColorStop(0.5, effect.color + '40');
+                gradient.addColorStop(1, effect.color + '00');
+                ctx.fillStyle = gradient;
+                ctx.beginPath();
+                ctx.arc(0, 0, radius + pulseIntensity, 0, Math.PI * 2);
+                ctx.fill();
+                break;
+                
+            case 'aura':
+                // Aura rotative
+                ctx.rotate(time * 2);
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i / 8) * Math.PI * 2;
+                    const x = Math.cos(angle) * (radius + 15);
+                    const y = Math.sin(angle) * (radius + 15);
+                    ctx.fillStyle = effect.color;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = effect.color;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 5, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                break;
+                
+            case 'sparkles':
+                // Étincelles
+                for (let i = 0; i < 12; i++) {
+                    const angle = (i / 12) * Math.PI * 2 + time;
+                    const distance = radius + 10 + Math.sin(time * 2 + i) * 5;
+                    const x = Math.cos(angle) * distance;
+                    const y = Math.sin(angle) * distance;
+                    ctx.fillStyle = effect.color;
+                    ctx.globalAlpha = 0.7 + Math.sin(time * 4 + i) * 0.3;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = effect.color;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1;
+                break;
+                
+            case 'shadow':
+                // Ombre clignotante
+                const flicker = Math.sin(time * 5) > 0 ? 1 : 0.3;
+                ctx.shadowBlur = effect.intensity * flicker;
+                ctx.shadowColor = effect.color;
+                ctx.strokeStyle = effect.color;
+                ctx.lineWidth = 4;
+                ctx.globalAlpha = flicker;
+                ctx.beginPath();
+                ctx.arc(0, 0, radius + 10, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.globalAlpha = 1;
+                break;
+                
+            case 'rings':
+                // Anneaux concentriques
+                for (let i = 0; i < 3; i++) {
+                    const ringRadius = radius + 15 + i * 10;
+                    const ringAlpha = 0.6 - i * 0.2;
+                    ctx.strokeStyle = effect.color;
+                    ctx.lineWidth = 2;
+                    ctx.globalAlpha = ringAlpha;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = effect.color;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, ringRadius + Math.sin(time * 2 + i) * 3, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+                ctx.globalAlpha = 1;
+                break;
+                
+            case 'waves':
+                // Vagues
+                for (let i = 0; i < 6; i++) {
+                    const waveRadius = radius + 8 + Math.sin(time * 2 + i) * 8;
+                    ctx.strokeStyle = effect.color;
+                    ctx.lineWidth = 2;
+                    ctx.globalAlpha = 0.5;
+                    ctx.shadowBlur = 8;
+                    ctx.shadowColor = effect.color;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, waveRadius, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+                ctx.globalAlpha = 1;
+                break;
+                
+            case 'electric':
+                // Électricité
+                for (let i = 0; i < 6; i++) {
+                    const angle = (i / 6) * Math.PI * 2;
+                    const startX = Math.cos(angle) * radius;
+                    const startY = Math.sin(angle) * radius;
+                    const endX = Math.cos(angle) * (radius + 20 + Math.random() * 10);
+                    const endY = Math.sin(angle) * (radius + 20 + Math.random() * 10);
+                    
+                    ctx.strokeStyle = effect.color;
+                    ctx.lineWidth = 2;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = effect.color;
+                    ctx.beginPath();
+                    ctx.moveTo(startX, startY);
+                    ctx.lineTo(endX, endY);
+                    ctx.stroke();
+                }
+                break;
+                
+            case 'sunshine':
+                // Rayons de soleil
+                ctx.rotate(time);
+                for (let i = 0; i < 12; i++) {
+                    const angle = (i / 12) * Math.PI * 2;
+                    const rayLength = radius + 25;
+                    ctx.strokeStyle = effect.color;
+                    ctx.lineWidth = 3;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = effect.color;
+                    ctx.beginPath();
+                    ctx.moveTo(Math.cos(angle) * radius, Math.sin(angle) * radius);
+                    ctx.lineTo(Math.cos(angle) * rayLength, Math.sin(angle) * rayLength);
+                    ctx.stroke();
+                }
+                break;
+                
+            case 'void':
+                // Vide avec particules
+                const voidGradient = ctx.createRadialGradient(0, 0, radius, 0, 0, radius + effect.intensity);
+                voidGradient.addColorStop(0, effect.color + '00');
+                voidGradient.addColorStop(0.7, effect.color + '60');
+                voidGradient.addColorStop(1, effect.color + '00');
+                ctx.fillStyle = voidGradient;
+                ctx.beginPath();
+                ctx.arc(0, 0, radius + effect.intensity, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Particules blanches
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i / 8) * Math.PI * 2 + time;
+                    const distance = radius + 12;
+                    ctx.fillStyle = '#ffffff';
+                    ctx.globalAlpha = 0.8;
+                    ctx.beginPath();
+                    ctx.arc(Math.cos(angle) * distance, Math.sin(angle) * distance, 2, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1;
+                break;
+                
+            case 'institutional':
+                // Grille institutionnelle
+                ctx.strokeStyle = effect.color;
+                ctx.lineWidth = 2;
+                ctx.globalAlpha = 0.6;
+                const gridSize = radius + 20;
+                for (let i = -2; i <= 2; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(-gridSize, i * 15);
+                    ctx.lineTo(gridSize, i * 15);
+                    ctx.stroke();
+                    ctx.beginPath();
+                    ctx.moveTo(i * 15, -gridSize);
+                    ctx.lineTo(i * 15, gridSize);
+                    ctx.stroke();
+                }
+                ctx.globalAlpha = 1;
+                break;
+        }
+        
+        ctx.restore();
     }
     
     // Retourne la configuration du pattern pour un boss donné
