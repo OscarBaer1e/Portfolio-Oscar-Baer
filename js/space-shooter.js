@@ -1130,11 +1130,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     }, currentFireRate);
                 }
             }
-            showMessage('Tir rapide terminé', 'powerup');
+            // Pas de message de fin
         }
         if (activePowerUps.shield && now > activePowerUps.shieldEndTime) {
             activePowerUps.shield = false;
-            showMessage('Bouclier terminé', 'powerup');
+            // Pas de message de fin
         }
         
         // Collision projectiles/astéroïdes
@@ -1326,24 +1326,24 @@ document.addEventListener('DOMContentLoaded', function() {
             activePowerUps.rapidFire = true;
             activePowerUps.rapidFireEndTime = now + 10000; // 10 secondes
             currentFireRate = baseFireRate / 3; // 3x plus rapide
-            showMessage('⚡ Tir Rapide Activé !', 'powerup');
+            showMessage('⚡ Tir Rapide', 'powerup');
         } else if (powerUp.type === 'shield') {
             activePowerUps.shield = true;
             activePowerUps.shieldEndTime = now + 8000; // 8 secondes
-            showMessage('🛡️ Bouclier Activé !', 'powerup');
+            showMessage('🛡️ Bouclier', 'powerup');
         } else if (powerUp.type === 'life') {
             if (gameState.lives < 5) { // Maximum 5 vies
                 gameState.lives++;
                 gameState.maxLives = Math.max(gameState.maxLives, gameState.lives);
                 if (livesElement) livesElement.textContent = gameState.lives;
-                showMessage('❤️ Vie Bonus !', 'powerup');
+                showMessage('❤️ +1 Vie', 'powerup');
             } else {
                 showMessage('Vies au maximum !', 'powerup');
             }
         }
         
-        // Effet visuel de collecte
-        createExplosion(powerUp.x, powerUp.y, powerUp.color);
+        // Effet visuel de collecte (discret)
+        createSmallExplosion(powerUp.x, powerUp.y, powerUp.color);
         updateHealthBars();
     }
     
@@ -2063,11 +2063,17 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function showMessage(text, type) {
         const message = document.getElementById('game-message');
+        if (!message) return;
+        
         message.textContent = text;
         message.className = 'game-message show ' + type;
+        
+        // Durée plus courte pour les powerups (plus discret)
+        const duration = type === 'powerup' ? 1200 : 2000;
+        
         setTimeout(() => {
             message.classList.remove('show');
-        }, 2000);
+        }, duration);
     }
     
     // Gestion des photos de boss
