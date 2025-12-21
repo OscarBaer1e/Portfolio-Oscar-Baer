@@ -1777,8 +1777,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Dessine les animations visuelles des bonus avec lumière et texte stylé
     function drawPowerUpVisualAnimations() {
         powerUpVisualAnimations.forEach((anim, index) => {
-            if (!anim || anim.life <= 0) {
-                powerUpVisualAnimations.splice(index, 1);
+            if (!anim || anim.life <= 0 || anim.type === 'score') {
+                if (anim && anim.type === 'score') {
+                    powerUpVisualAnimations.splice(index, 1);
+                }
                 return;
             }
             
