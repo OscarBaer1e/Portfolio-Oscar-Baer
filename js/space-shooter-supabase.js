@@ -39,7 +39,17 @@ async function loadLeaderboardFromSupabase() {
             .order('score', { ascending: false })
             .limit(MAX_LEADERBOARD_ENTRIES);
         
-        console.log('📊 Réponse Supabase:', { data, error });
+        console.log('📊 Réponse Supabase complète:', { data, error });
+        console.log('📊 Nombre de données:', data ? data.length : 0);
+        
+        // Vérifier spécifiquement les erreurs RLS
+        if (error) {
+            if (error.code === 'PGRST116') {
+                console.error('❌ ERREUR RLS: Permission denied');
+                console.error('💡 SOLUTION: Allez sur Supabase Dashboard → Table Editor → leaderboard → Policies');
+                console.error('💡 Créez une policy SELECT avec "true" pour permettre la lecture');
+            }
+        }
         
         if (error) {
             console.error('❌ Erreur Supabase:', error);
