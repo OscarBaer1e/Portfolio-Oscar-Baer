@@ -24,11 +24,13 @@ async function loadLeaderboardFromSupabase() {
     
     if (!supabase) {
         console.warn('⚠️ Supabase non disponible, chargement depuis localStorage');
+        console.warn('💡 Vérifiez que Supabase est initialisé: window.diagnosticSupabase()');
         return loadLeaderboardFromLocalStorage();
     }
     
     try {
         console.log('📥 Chargement du leaderboard depuis Supabase...');
+        console.log('🔗 URL:', window.supabaseClient?.supabaseUrl || 'Non disponible');
         
         const { data, error } = await supabase
             .from('leaderboard')
@@ -95,6 +97,7 @@ async function saveScoreToSupabase(name, score, level) {
     
     try {
         console.log('💾 Sauvegarde du score dans Supabase...');
+        console.log('🔗 URL:', window.supabaseClient?.supabaseUrl || 'Non disponible');
         console.log('Données:', { name: name.substring(0, 20), score, level });
         
         const { data, error } = await supabase
