@@ -1,12 +1,9 @@
 {
   "name": "portfolio-oscar-baer",
   "version": "1.0.0",
-  "description": "Portfolio d'Oscar Baer",
+  "description": "Portfolio d'Oscar Baer - Site statique",
   "scripts": {
     "build": "echo 'Site statique - Aucun build nécessaire'",
     "dev": "echo 'Site statique - Ouvrez index.html dans votre navigateur'"
-  },
-  "dependencies": {
-    "gsap": "^3.14.2"
   }
 }

@@ -2,7 +2,7 @@
   "version": 2,
   "buildCommand": "echo 'Site statique - Aucun build nécessaire'",
   "outputDirectory": ".",
-  "installCommand": "npm install --legacy-peer-deps || echo 'Installation ignorée'",
+  "installCommand": "npm install || true",
   "routes": [
     {
       "src": "/(.*)",
