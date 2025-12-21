@@ -331,6 +331,25 @@
             } else {
                 console.log('✅ Vérification: projectId correct =', window.FIREBASE_CONFIG.projectId);
             }
+            
+            // FORCER la suppression de toute instance Firebase existante avec YOUR_PROJECT_ID
+            // Ceci s'exécute AVANT le chargement de Firebase SDK
+            if (typeof firebase !== 'undefined' && firebase.apps) {
+                console.log('🔄 Nettoyage des instances Firebase existantes...');
+                while (firebase.apps.length > 0) {
+                    try {
+                        const app = firebase.app();
+                        if (app.options && app.options.projectId === 'YOUR_PROJECT_ID') {
+                            console.warn('⚠️ Instance avec YOUR_PROJECT_ID détectée, suppression...');
+                            app.delete();
+                        } else {
+                            break;
+                        }
+                    } catch (e) {
+                        break;
+                    }
+                }
+            }
         })();
     </script>
     <!-- Firebase SDK - Version CDN (plus fiable) -->
@@ -463,15 +482,52 @@
                 // Supprimer toutes les instances existantes
                 while (firebase.apps.length > 0) {
                     try {
-                        firebase.app().delete();
+                        const app = firebase.app();
+                        console.log('🗑️ Suppression instance:', app.name, 'projectId:', app.options?.projectId);
+                        app.delete();
                     } catch (e) {
+                        console.warn('⚠️ Erreur lors de la suppression:', e);
                         break;
                     }
                 }
-                return tryInitFirebase();
+                // Attendre un peu pour que la suppression soit effective
+                setTimeout(() => {
+                    return tryInitFirebase();
+                }, 100);
+            } else {
+                console.error('❌ Firebase SDK non chargé');
+                return false;
             }
-            return false;
         };
+        
+        // Exposer une fonction de diagnostic
+        window.diagnosticFirebase = function() {
+            console.log('🔍 === DIAGNOSTIC FIREBASE ===');
+            console.log('1. firebase SDK chargé:', typeof firebase !== 'undefined');
+            if (typeof firebase !== 'undefined') {
+                console.log('2. Nombre d\'instances:', firebase.apps.length);
+                firebase.apps.forEach((app, index) => {
+                    console.log(`   Instance ${index}:`, {
+                        name: app.name,
+                        projectId: app.options?.projectId,
+                        apiKey: app.options?.apiKey?.substring(0, 10) + '...'
+                    });
+                });
+            }
+            console.log('3. window.firebaseApp:', window.firebaseApp);
+            console.log('4. window.firebaseDb:', window.firebaseDb);
+            console.log('5. window.firebaseInitialized:', window.firebaseInitialized);
+            console.log('6. window.FIREBASE_CONFIG:', window.FIREBASE_CONFIG);
+            console.log('========================');
+        };
+        
+        // Exécuter le diagnostic après un délai pour voir l'état final
+        setTimeout(() => {
+            if (!window.firebaseDb) {
+                console.warn('⚠️ Firebase non initialisé après 3 secondes');
+                window.diagnosticFirebase();
+            }
+        }, 3000);
     </script>
     <script src="../js/space-shooter.js"></script>
     <script src="../js/script.js"></script>
