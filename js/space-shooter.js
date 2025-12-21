@@ -510,7 +510,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.error('');
                     console.error('📋 SOLUTION IMMÉDIATE:');
                     console.error('   1. Allez sur: https://console.firebase.google.com/');
-                    console.error('   2. Projet oscar-baer → Firestore Database → Rules');
+                    console.error('   2. Projet leaderboard → Firestore Database → Rules');
                     console.error('   3. Vérifiez que vous avez EXACTEMENT:');
                     console.error('      allow read: if true;');
                     console.error('      allow create: if true;');
