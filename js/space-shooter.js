@@ -365,18 +365,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 const data = await window.supabaseLeaderboard.load();
                 console.log('📊 Données reçues de Supabase:', data);
                 
-                if (data && data.length > 0) {
+                if (data && Array.isArray(data) && data.length > 0) {
+                    console.log('✅ Données valides reçues de Supabase');
                     leaderboard = data;
                     console.log(`✅ Leaderboard chargé depuis Supabase: ${leaderboard.length} scores`);
-                    console.log('📋 Contenu leaderboard:', leaderboard);
+                    console.log('📋 Contenu leaderboard complet:', JSON.stringify(leaderboard, null, 2));
                     
                     // Mettre à jour l'affichage si le modal est ouvert
                     if (leaderboardModal && !leaderboardModal.classList.contains('hidden')) {
+                        console.log('🔄 Modal ouvert, mise à jour de l\'affichage...');
                         updateLeaderboardDisplay();
                     }
                     return;
                 } else {
-                    console.log('📭 Aucune donnée dans Supabase, fallback localStorage');
+                    console.log('📭 Aucune donnée valide dans Supabase');
+                    console.log('📊 Type de data:', typeof data);
+                    console.log('📊 Est un array?', Array.isArray(data));
+                    console.log('📊 Longueur:', data ? data.length : 'data est null/undefined');
                 }
             } catch (error) {
                 console.error('❌ Erreur chargement Supabase:', error);

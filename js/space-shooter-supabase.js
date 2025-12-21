@@ -40,26 +40,44 @@ async function loadLeaderboardFromSupabase() {
             .limit(MAX_LEADERBOARD_ENTRIES);
         
         console.log('📊 Réponse Supabase complète:', { data, error });
+        console.log('📊 Type de data:', typeof data);
+        console.log('📊 Est un array?', Array.isArray(data));
         console.log('📊 Nombre de données:', data ? data.length : 0);
         
         // Vérifier spécifiquement les erreurs RLS
         if (error) {
+            console.error('❌ ERREUR Supabase détectée:', error);
+            console.error('❌ Code erreur:', error.code);
+            console.error('❌ Message:', error.message);
+            console.error('❌ Détails:', error.details);
+            console.error('❌ Hint:', error.hint);
+            
             if (error.code === 'PGRST116') {
                 console.error('❌ ERREUR RLS: Permission denied');
                 console.error('💡 SOLUTION: Allez sur Supabase Dashboard → Table Editor → leaderboard → Policies');
                 console.error('💡 Créez une policy SELECT avec "true" pour permettre la lecture');
             }
-        }
-        
-        if (error) {
-            console.error('❌ Erreur Supabase:', error);
             throw error;
         }
         
-        if (!data || data.length === 0) {
-            console.log('📭 Aucun score dans Supabase, chargement depuis localStorage');
+        if (!data) {
+            console.warn('⚠️ data est null ou undefined');
+            console.log('📭 Fallback vers localStorage');
             return loadLeaderboardFromLocalStorage();
         }
+        
+        if (!Array.isArray(data)) {
+            console.error('❌ data n\'est pas un array:', typeof data, data);
+            console.log('📭 Fallback vers localStorage');
+            return loadLeaderboardFromLocalStorage();
+        }
+        
+        if (data.length === 0) {
+            console.log('📭 Aucun score dans Supabase (table vide), chargement depuis localStorage');
+            return loadLeaderboardFromLocalStorage();
+        }
+        
+        console.log('✅ Données reçues de Supabase:', data.length, 'scores');
         
         console.log('📋 Données brutes Supabase:', data);
         
