@@ -1800,9 +1800,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Vérifier que le bossNumber est valide
         if (bossNumber < 1 || bossNumber > 10) {
-            console.error('Boss number invalide:', bossNumber);
+            console.error('Boss number invalide:', bossNumber, 'level:', gameState.level);
             return;
         }
+        
+        console.log('Spawning boss', bossNumber, 'at level', gameState.level);
         
         const baseHealth = 30 + (bossNumber * 15); // Réduit : était 50 + (bossNumber * 30)
         const baseSize = 60 + (bossNumber * 10);
@@ -1845,10 +1847,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         gameState.bossActive = true;
-        playSound('bossSpawn');
-        const bossName = getBossName(bossNumber);
-        showMessage(`${bossName} apparaît !`, 'boss');
-        updateHealthBars();
+        
+        // Ne pas mettre le jeu en pause lors du spawn d'un boss
+        gameState.isPaused = false;
+        if (startBtn) startBtn.textContent = 'Pause';
+        
+        try {
+            playSound('bossSpawn');
+        } catch (e) {
+            console.warn('Erreur son bossSpawn:', e);
+        }
+        
+        try {
+            const bossName = getBossName(bossNumber);
+            showMessage(`${bossName} apparaît !`, 'boss');
+        } catch (e) {
+            console.warn('Erreur message boss:', e);
+        }
+        
+        try {
+            updateHealthBars();
+        } catch (e) {
+            console.warn('Erreur updateHealthBars:', e);
+        }
+        
+        console.log('Boss spawné:', bossNumber, boss);
     }
     
     // Retourne le nom d'un boss selon son numéro
