@@ -27,10 +27,20 @@ Ouvrez la console (F12) et copiez-collez **EXACTEMENT** ceci :
     }
     
     try {
-        // Supprimer l'instance existante si elle existe
+        // Supprimer TOUTES les instances existantes
         if (firebase.apps.length > 0) {
-            console.log('⚠️ Suppression de l\'instance Firebase existante...');
-            firebase.app().delete();
+            console.log('⚠️ Suppression des instances Firebase existantes...');
+            // Supprimer toutes les instances
+            firebase.apps.forEach(app => {
+                try {
+                    app.delete();
+                    console.log('  ✓ Instance supprimée:', app.name);
+                } catch (e) {
+                    console.warn('  ⚠ Impossible de supprimer:', app.name, e);
+                }
+            });
+            // Attendre un peu pour que la suppression soit effective
+            await new Promise(resolve => setTimeout(resolve, 100));
         }
         
         // Initialiser Firebase
