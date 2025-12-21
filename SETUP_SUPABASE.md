@@ -67,22 +67,26 @@ Dans la table `leaderboard`, ajoutez ces colonnes :
 1. Allez dans **"Table Editor"** → Table `leaderboard`
 2. Cliquez sur l'onglet **"Policies"**
 3. Cliquez sur **"New policy"**
-4. Choisissez **"For full customization"**
-5. Nom : `Allow public read`
-6. Allowed operation : **SELECT**
-7. Policy definition : 
-   ```sql
-   true
-   ```
-8. Cliquez sur **"Save"**
-9. Créez une autre policy :
+4. **IMPORTANT** : Choisissez **"For full customization"** (pas les options pré-définies)
+5. Pour la lecture (SELECT) :
+   - Nom : `Allow public read`
+   - Allowed operation : **SELECT**
+   - Policy definition : 
+     ```sql
+     true
+     ```
+   - Cliquez sur **"Save"**
+6. Pour l'insertion (INSERT) :
+   - Cliquez sur **"New policy"** à nouveau
    - Nom : `Allow public insert`
    - Allowed operation : **INSERT**
    - Policy definition : 
      ```sql
      true
      ```
-10. Cliquez sur **"Save"**
+   - Cliquez sur **"Save"**
+
+**⚠️ Ne choisissez PAS** les options pré-définies comme "Enable insert for authenticated users only" car elles nécessitent une authentification. Pour un leaderboard public, utilisez "For full customization" avec `true`.
 
 ### 7. Configurer le code (30 secondes)
 
