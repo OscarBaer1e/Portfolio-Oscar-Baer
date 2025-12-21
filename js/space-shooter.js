@@ -2646,21 +2646,22 @@ document.addEventListener('DOMContentLoaded', function() {
             const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
             if (distance < boss.size + shipSize) {
                 if (!ship.invincible) {
-                createEnhancedExplosion(ship.x, ship.y, ship.color, 30);
-                playSound('hit');
-                
-                gameState.lives--;
-                if (livesElement) livesElement.textContent = gameState.lives;
-                updateHealthBars();
-                
-                if (gameState.lives <= 0) {
-                    endGame();
-                } else {
-                    // Invincibilité temporaire avec clignotement (1-2 secondes)
-                    ship.invincible = true;
-                    setTimeout(() => {
-                        ship.invincible = false;
-                    }, 2000); // 2 secondes exactement
+                    createEnhancedExplosion(ship.x, ship.y, ship.color, 30);
+                    playSound('hit');
+                    
+                    gameState.lives--;
+                    if (livesElement) livesElement.textContent = gameState.lives;
+                    updateHealthBars();
+                    
+                    if (gameState.lives <= 0) {
+                        endGame();
+                    } else {
+                        // Invincibilité temporaire avec clignotement (1-2 secondes)
+                        ship.invincible = true;
+                        setTimeout(() => {
+                            ship.invincible = false;
+                        }, 2000); // 2 secondes exactement
+                    }
                 }
             }
         }
