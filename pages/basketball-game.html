@@ -367,8 +367,15 @@
             }
 
             try {
-                // Initialize Firebase
-                const app = firebase.initializeApp(firebaseConfig);
+                // Vérifier si Firebase est déjà initialisé
+                let app;
+                if (firebase.apps.length > 0) {
+                    console.log('⚠️ Firebase déjà initialisé, utilisation de l\'instance existante');
+                    app = firebase.app();
+                } else {
+                    // Initialize Firebase
+                    app = firebase.initializeApp(firebaseConfig);
+                }
                 
                 // Vérification IMMÉDIATE après initialisation
                 const actualProjectId = app.options.projectId;
@@ -393,6 +400,12 @@
                 console.log('✅ Firestore accessible');
                 console.log('✅ window.firebaseApp:', window.firebaseApp);
                 console.log('✅ window.firebaseDb:', window.firebaseDb);
+                console.log('✅ window.firebaseInitialized:', window.firebaseInitialized);
+                
+                // Vérification finale
+                if (!window.firebaseApp || !window.firebaseDb) {
+                    throw new Error('Firebase exposé mais variables window non définies');
+                }
                 
                 return true;
             } catch (error) {
@@ -403,18 +416,32 @@
         }
 
         // Essayer d'initialiser immédiatement
-        if (typeof firebase !== 'undefined') {
-            initFirebaseNow();
-        } else {
+        function tryInitFirebase() {
+            if (typeof firebase !== 'undefined') {
+                const result = initFirebaseNow();
+                if (result) {
+                    console.log('✅ Firebase initialisé avec succès');
+                } else {
+                    console.error('❌ Échec de l\'initialisation Firebase');
+                }
+                return result;
+            }
+            return false;
+        }
+        
+        // Essayer immédiatement
+        if (!tryInitFirebase()) {
             // Attendre que les scripts se chargent
             console.log('⏳ Attente du chargement des scripts Firebase...');
             let attempts = 0;
-            const maxAttempts = 10;
+            const maxAttempts = 20; // Augmenté à 20 tentatives
             const checkInterval = setInterval(function() {
                 attempts++;
                 if (typeof firebase !== 'undefined') {
                     clearInterval(checkInterval);
-                    initFirebaseNow();
+                    if (tryInitFirebase()) {
+                        console.log('✅ Firebase initialisé après', attempts, 'tentatives');
+                    }
                 } else if (attempts >= maxAttempts) {
                     clearInterval(checkInterval);
                     console.error('❌ Firebase SDK n\'a pas pu être chargé après', maxAttempts, 'tentatives');
@@ -425,6 +452,23 @@
                 }
             }, 200);
         }
+        
+        // Exposer une fonction globale pour réinitialiser si nécessaire
+        window.reinitFirebase = function() {
+            console.log('🔄 Réinitialisation Firebase...');
+            if (typeof firebase !== 'undefined') {
+                // Supprimer l'instance existante si elle existe
+                try {
+                    if (firebase.apps.length > 0) {
+                        firebase.app().delete();
+                    }
+                } catch (e) {
+                    // Ignorer les erreurs
+                }
+                return tryInitFirebase();
+            }
+            return false;
+        };
     </script>
     <script src="../js/space-shooter.js"></script>
     <script src="../js/script.js"></script>
