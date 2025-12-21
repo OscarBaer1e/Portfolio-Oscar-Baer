@@ -2645,7 +2645,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
             if (distance < boss.size + shipSize) {
-            if (!ship.invincible) {
+                if (!ship.invincible) {
                 createEnhancedExplosion(ship.x, ship.y, ship.color, 30);
                 playSound('hit');
                 
