@@ -552,8 +552,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 <div class="leaderboard-rank">${medal}</div>
                 <div class="leaderboard-name">${name}</div>
                 <div class="leaderboard-score">${score.toLocaleString()}</div>
-                <div class="leaderboard-level">Niveau ${level}</div>
-                <div class="leaderboard-date">${dateStr}</div>
+                <div class="leaderboard-level">Niv. ${level}</div>
             `;
             leaderboardList.appendChild(entryDiv);
         });
