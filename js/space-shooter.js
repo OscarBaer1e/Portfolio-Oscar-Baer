@@ -1732,8 +1732,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Initialiser les propriétés spécifiques au pattern du boss
         let patternConfig = getBossPattern(bossNumber);
         
-        const bossName = getBossName(bossNumber);
-        
         boss = {
             x: canvas.width / 2,
             y: 100,
