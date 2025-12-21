@@ -93,23 +93,24 @@
     left: 10px;
     z-index: 100;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    flex-wrap: wrap;
     gap: 8px;
 }
 
 .buff-icon {
     display: flex;
     align-items: center;
-    gap: 8px;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
     background: rgba(0, 0, 0, 0.8);
     border: 2px solid var(--primary-color);
-    border-radius: 8px;
-    padding: 6px 12px;
-    font-size: 0.9rem;
+    border-radius: 50%;
+    font-size: 1.5rem;
     color: var(--primary-color);
     box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
     transition: all 0.3s ease;
-    font-family: 'Anta', sans-serif;
 }
 
 .buff-icon.warning {
@@ -127,17 +128,6 @@
         opacity: 0.5;
         transform: scale(0.95);
     }
-}
-
-.buff-emoji {
-    font-size: 1.2rem;
-    filter: drop-shadow(0 0 5px currentColor);
-}
-
-.buff-label {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
 }
 
 /* Mode plein écran - Tout est plus gros proportionnellement */

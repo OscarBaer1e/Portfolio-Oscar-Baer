@@ -28,11 +28,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const finalLevel = document.getElementById('final-level');
     const scoreMessage = document.getElementById('score-message');
     
-    // Éléments des icônes de buff
-    const buffRapidFire = document.getElementById('buff-rapidFire');
-    const buffShrink = document.getElementById('buff-shrink');
-    const buffBigBullets = document.getElementById('buff-bigBullets');
-    const buffTripleShot = document.getElementById('buff-tripleShot');
+    // Conteneur des icônes de buff
+    const activeBuffsContainer = document.getElementById('active-buffs');
+    
+    // Mapping des buffs avec leurs emojis
+    const buffEmojis = {
+        rapidFire: '⚡',
+        shrink: '🔽',
+        bigBullets: '💥',
+        tripleShot: '🎯'
+    };
     
     // État du jeu
     let gameState = {
@@ -748,66 +753,52 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Met à jour les icônes de buff actifs
     function updateBuffIcons() {
-        if (!buffRapidFire || !buffShrink || !buffBigBullets || !buffTripleShot) return;
+        if (!activeBuffsContainer) return;
         
         const now = Date.now();
         const WARNING_TIME = 2000; // Clignotement 2 secondes avant la fin
         
-        // Rapid Fire
-        if (activePowerUps.rapidFire && now < activePowerUps.rapidFireEndTime) {
-            const timeLeft = activePowerUps.rapidFireEndTime - now;
-            buffRapidFire.style.display = 'flex';
-            if (timeLeft < WARNING_TIME) {
-                buffRapidFire.classList.add('warning');
-            } else {
-                buffRapidFire.classList.remove('warning');
-            }
-        } else {
-            buffRapidFire.style.display = 'none';
-            buffRapidFire.classList.remove('warning');
-        }
+        // Liste des buffs actifs avec leurs temps restants
+        const activeBuffs = [];
         
-        // Shrink
-        if (activePowerUps.shrink && now < activePowerUps.shrinkEndTime) {
-            const timeLeft = activePowerUps.shrinkEndTime - now;
-            buffShrink.style.display = 'flex';
-            if (timeLeft < WARNING_TIME) {
-                buffShrink.classList.add('warning');
-            } else {
-                buffShrink.classList.remove('warning');
+        // Vérifier chaque type de buff
+        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot'];
+        buffTypes.forEach(buffType => {
+            const isActive = activePowerUps[buffType] && now < activePowerUps[`${buffType}EndTime`];
+            if (isActive) {
+                const endTime = activePowerUps[`${buffType}EndTime`];
+                const timeLeft = endTime - now;
+                activeBuffs.push({
+                    type: buffType,
+                    emoji: buffEmojis[buffType],
+                    timeLeft: timeLeft,
+                    isWarning: timeLeft < WARNING_TIME
+                });
             }
-        } else {
-            buffShrink.style.display = 'none';
-            buffShrink.classList.remove('warning');
-        }
+        });
         
-        // Big Bullets
-        if (activePowerUps.bigBullets && now < activePowerUps.bigBulletsEndTime) {
-            const timeLeft = activePowerUps.bigBulletsEndTime - now;
-            buffBigBullets.style.display = 'flex';
-            if (timeLeft < WARNING_TIME) {
-                buffBigBullets.classList.add('warning');
-            } else {
-                buffBigBullets.classList.remove('warning');
-            }
-        } else {
-            buffBigBullets.style.display = 'none';
-            buffBigBullets.classList.remove('warning');
-        }
+        // Vider le conteneur
+        activeBuffsContainer.innerHTML = '';
         
-        // Triple Shot
-        if (activePowerUps.tripleShot && now < activePowerUps.tripleShotEndTime) {
-            const timeLeft = activePowerUps.tripleShotEndTime - now;
-            buffTripleShot.style.display = 'flex';
-            if (timeLeft < WARNING_TIME) {
-                buffTripleShot.classList.add('warning');
-            } else {
-                buffTripleShot.classList.remove('warning');
+        // Créer une icône pour chaque buff actif (sans doublons)
+        const displayedTypes = new Set();
+        activeBuffs.forEach(buff => {
+            // Éviter les doublons
+            if (!displayedTypes.has(buff.type)) {
+                displayedTypes.add(buff.type);
+                
+                const buffIcon = document.createElement('div');
+                buffIcon.className = 'buff-icon';
+                buffIcon.id = `buff-${buff.type}`;
+                buffIcon.textContent = buff.emoji;
+                
+                if (buff.isWarning) {
+                    buffIcon.classList.add('warning');
+                }
+                
+                activeBuffsContainer.appendChild(buffIcon);
             }
-        } else {
-            buffTripleShot.style.display = 'none';
-            buffTripleShot.classList.remove('warning');
-        }
+        });
     }
     
     // Met à jour les barres de vie et shield
