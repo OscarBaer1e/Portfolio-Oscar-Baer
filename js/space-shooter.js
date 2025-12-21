@@ -1530,6 +1530,76 @@ document.addEventListener('DOMContentLoaded', function() {
         return color;
     }
     
+    // Crée une animation visuelle pour le score (comme les bonus)
+    function createScoreAnimation(x, y, scoreText) {
+        // Position aléatoire pour le texte (à côté de la position du boss mort)
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 50 + Math.random() * 30; // Entre 50 et 80 pixels
+        const textX = x + Math.cos(angle) * distance;
+        const textY = y + Math.sin(angle) * distance;
+        
+        const animation = {
+            type: 'score',
+            textX: textX,
+            textY: textY,
+            text: scoreText,
+            glowColor: '#ffff00', // Jaune pour les points
+            life: 1.0,
+            alpha: 1.0,
+            glowIntensity: 1.0,
+            textOffsetX: (Math.random() - 0.5) * 15,
+            textOffsetY: (Math.random() - 0.5) * 15,
+            vy: -1.5 // Montée légère
+        };
+        
+        powerUpVisualAnimations.push(animation);
+    }
+    
+    // Crée une explosion colorée stylée pour la mort du boss
+    function createBossDeathExplosion(x, y, color, size) {
+        // Explosion principale avec plusieurs couleurs
+        const colors = [color, '#ffff00', '#ff00ff', '#00ffff', '#ff8800'];
+        const particleCount = Math.min(Math.floor(size / 2) + 15, 40);
+        
+        for (let i = 0; i < particleCount; i++) {
+            const angle = (Math.PI * 2 / particleCount) * i;
+            const speed = Math.random() * 5 + 3;
+            const particleColor = colors[Math.floor(Math.random() * colors.length)];
+            const particleSize = Math.random() * 4 + 2;
+            
+            particles.push({
+                x: x,
+                y: y,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                size: particleSize,
+                color: particleColor,
+                alpha: 1,
+                life: 1,
+                type: 'star'
+            });
+        }
+        
+        // Particules secondaires colorées
+        for (let i = 0; i < 20; i++) {
+            const angle = Math.random() * Math.PI * 2;
+            const speed = Math.random() * 4 + 2;
+            const particleColor = colors[Math.floor(Math.random() * colors.length)];
+            
+            particles.push({
+                x: x + (Math.random() - 0.5) * size,
+                y: y + (Math.random() - 0.5) * size,
+                vx: Math.cos(angle) * speed,
+                vy: Math.sin(angle) * speed,
+                size: Math.random() * 3 + 1,
+                color: particleColor,
+                alpha: 0.8,
+                life: 0.9,
+                type: 'spark'
+            });
+        }
+    }
+    
     // Crée une animation visuelle pour un bonus avec lumière et texte stylé
     function createPowerUpVisualAnimation(type, x, y) {
         // Définir les textes et couleurs selon le type
@@ -1651,28 +1721,44 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            // Mettre à jour la position du vaisseau (suivre le vaisseau)
-            anim.shipX = ship.x;
-            anim.shipY = ship.y;
-            
-            // Mettre à jour la position du texte (suivre avec petit mouvement)
-            const angle = Math.atan2(anim.textY - anim.shipY, anim.textX - anim.shipX);
-            const distance = 60 + Math.random() * 40;
-            anim.textX = anim.shipX + Math.cos(angle) * distance;
-            anim.textY = anim.shipY + Math.sin(angle) * distance;
-            
-            // Petit mouvement aléatoire pour le texte
-            anim.textOffsetX += (Math.random() - 0.5) * 0.5;
-            anim.textOffsetY += (Math.random() - 0.5) * 0.5;
-            
-            // Limiter le mouvement
-            anim.textOffsetX = Math.max(-15, Math.min(15, anim.textOffsetX));
-            anim.textOffsetY = Math.max(-15, Math.min(15, anim.textOffsetY));
-            
-            // Fade out progressif
-            anim.life -= 0.015; // Plus lent pour laisser le temps de voir
-            anim.alpha = Math.max(0, anim.life);
-            anim.glowIntensity = Math.max(0, anim.life);
+            if (anim.type === 'score') {
+                // Animation de score : monte légèrement puis disparaît
+                anim.textY += anim.vy || -1.5;
+                anim.textOffsetX += (Math.random() - 0.5) * 0.3;
+                anim.textOffsetY += (Math.random() - 0.5) * 0.3;
+                
+                // Limiter le mouvement
+                anim.textOffsetX = Math.max(-10, Math.min(10, anim.textOffsetX));
+                anim.textOffsetY = Math.max(-10, Math.min(10, anim.textOffsetY));
+                
+                // Fade out progressif
+                anim.life -= 0.02;
+                anim.alpha = Math.max(0, anim.life);
+            } else {
+                // Animation de bonus : suit le vaisseau
+                // Mettre à jour la position du vaisseau (suivre le vaisseau)
+                anim.shipX = ship.x;
+                anim.shipY = ship.y;
+                
+                // Mettre à jour la position du texte (suivre avec petit mouvement)
+                const angle = Math.atan2(anim.textY - anim.shipY, anim.textX - anim.shipX);
+                const distance = 60 + Math.random() * 40;
+                anim.textX = anim.shipX + Math.cos(angle) * distance;
+                anim.textY = anim.shipY + Math.sin(angle) * distance;
+                
+                // Petit mouvement aléatoire pour le texte
+                anim.textOffsetX += (Math.random() - 0.5) * 0.5;
+                anim.textOffsetY += (Math.random() - 0.5) * 0.5;
+                
+                // Limiter le mouvement
+                anim.textOffsetX = Math.max(-15, Math.min(15, anim.textOffsetX));
+                anim.textOffsetY = Math.max(-15, Math.min(15, anim.textOffsetY));
+                
+                // Fade out progressif
+                anim.life -= 0.015; // Plus lent pour laisser le temps de voir
+                anim.alpha = Math.max(0, anim.life);
+                anim.glowIntensity = Math.max(0, anim.life);
+            }
             
             if (anim.life <= 0) {
                 powerUpVisualAnimations.splice(index, 1);
@@ -2258,12 +2344,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     gameState.score += defeatedBossNumber * 1000;
                     if (scoreElement) scoreElement.textContent = gameState.score;
                     
+                    // Animation visuelle du score à côté du boss mort (comme les bonus)
                     try {
-                        const bossName = getBossName(defeatedBossNumber);
-                        // Message petit pour le score (comme les bonus)
-                        showMessage(`+${defeatedBossNumber * 1000} points`, 'powerup');
+                        createScoreAnimation(defeatedBossX, defeatedBossY, `+${defeatedBossNumber * 1000} points`);
                     } catch (e) {
-                        console.warn('Erreur message:', e);
+                        console.warn('Erreur animation score:', e);
                     }
                     
                     // Nettoyer le boss de manière sécurisée AVANT checkLevel
