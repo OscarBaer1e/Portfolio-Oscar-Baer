@@ -1423,71 +1423,51 @@ document.addEventListener('DOMContentLoaded', function() {
         return color;
     }
     
-    // Crée une animation visuelle pour un bonus (remplace les messages texte)
+    // Crée une animation visuelle pour un bonus avec lumière et texte stylé
     function createPowerUpVisualAnimation(type, x, y) {
+        // Définir les textes et couleurs selon le type
+        let text = '';
+        let glowColor = '#ffffff';
+        
+        if (type === 'rapidFire') {
+            text = '⚡ Tir Rapide';
+            glowColor = '#ffff00';
+        } else if (type === 'shield') {
+            text = '🛡️ Bouclier';
+            glowColor = '#00ffff';
+        } else if (type === 'life') {
+            text = '❤️ +1 Vie';
+            glowColor = '#ff00ff';
+        } else if (type === 'lifeMax') {
+            text = 'Vies Max';
+            glowColor = '#ff0000';
+        }
+        
+        // Position aléatoire pour le texte (à côté du vaisseau)
+        const angle = Math.random() * Math.PI * 2;
+        const distance = 60 + Math.random() * 40; // Entre 60 et 100 pixels
+        const textX = x + Math.cos(angle) * distance;
+        const textY = y + Math.sin(angle) * distance;
+        
         const animation = {
             type: type,
-            x: x,
-            y: y,
+            shipX: x,
+            shipY: y,
+            textX: textX,
+            textY: textY,
+            text: text,
+            glowColor: glowColor,
             life: 1.0,
             alpha: 1.0,
-            scale: 0.5,
-            rotation: 0,
-            particles: []
+            glowIntensity: 1.0,
+            textOffsetX: (Math.random() - 0.5) * 20, // Petit mouvement aléatoire
+            textOffsetY: (Math.random() - 0.5) * 20
         };
-        
-        // Créer des particules spécifiques selon le type
-        if (type === 'rapidFire') {
-            // Éclairs jaunes qui tournent
-            for (let i = 0; i < 12; i++) {
-                const angle = (Math.PI * 2 / 12) * i;
-                animation.particles.push({
-                    angle: angle,
-                    distance: 30,
-                    size: 4,
-                    color: '#ffff00',
-                    speed: 0.1
-                });
-            }
-        } else if (type === 'shield') {
-            // Cercles concentriques bleus
-            for (let i = 0; i < 3; i++) {
-                animation.particles.push({
-                    radius: 20 + i * 15,
-                    size: 3 - i,
-                    color: '#00ffff',
-                    speed: 0.05
-                });
-            }
-        } else if (type === 'life') {
-            // Cœurs qui montent
-            for (let i = 0; i < 5; i++) {
-                animation.particles.push({
-                    x: x + (Math.random() - 0.5) * 40,
-                    y: y,
-                    vy: -2 - Math.random() * 2,
-                    size: 8 + Math.random() * 4,
-                    color: '#ff00ff',
-                    life: 1.0
-                });
-            }
-        } else if (type === 'lifeMax') {
-            // Particules statiques pour "vies max"
-            for (let i = 0; i < 8; i++) {
-                animation.particles.push({
-                    angle: (Math.PI * 2 / 8) * i,
-                    distance: 25,
-                    size: 3,
-                    color: '#ff0000',
-                    speed: 0.08
-                });
-            }
-        }
         
         powerUpVisualAnimations.push(animation);
     }
     
-    // Dessine les animations visuelles des bonus
+    // Dessine les animations visuelles des bonus avec lumière et texte stylé
     function drawPowerUpVisualAnimations() {
         powerUpVisualAnimations.forEach((anim, index) => {
             if (!anim || anim.life <= 0) {
@@ -1497,68 +1477,60 @@ document.addEventListener('DOMContentLoaded', function() {
             
             ctx.save();
             ctx.globalAlpha = anim.alpha;
-            ctx.translate(anim.x, anim.y);
-            ctx.scale(anim.scale, anim.scale);
             
-            if (anim.type === 'rapidFire') {
-                // Dessiner des éclairs jaunes qui tournent
-                anim.rotation += 0.15;
-                anim.particles.forEach(particle => {
-                    const px = Math.cos(particle.angle + anim.rotation) * particle.distance;
-                    const py = Math.sin(particle.angle + anim.rotation) * particle.distance;
-                    
-                    ctx.fillStyle = particle.color;
-                    ctx.shadowBlur = particle.size * 3;
-                    ctx.shadowColor = particle.color;
-                    ctx.beginPath();
-                    // Dessiner un éclair
-                    ctx.moveTo(px, py - particle.size);
-                    ctx.lineTo(px + particle.size * 0.5, py);
-                    ctx.lineTo(px, py + particle.size);
-                    ctx.lineTo(px - particle.size * 0.5, py);
-                    ctx.closePath();
-                    ctx.fill();
-                });
-            } else if (anim.type === 'shield') {
-                // Dessiner des cercles concentriques bleus
-                anim.particles.forEach(particle => {
-                    const currentRadius = particle.radius * (1 + Math.sin(Date.now() * particle.speed) * 0.2);
-                    ctx.strokeStyle = particle.color;
-                    ctx.lineWidth = particle.size;
-                    ctx.shadowBlur = 10;
-                    ctx.shadowColor = particle.color;
-                    ctx.beginPath();
-                    ctx.arc(0, 0, currentRadius, 0, Math.PI * 2);
-                    ctx.stroke();
-                });
-            } else if (anim.type === 'life') {
-                // Dessiner des cœurs qui montent
-                anim.particles.forEach(particle => {
-                    if (particle.life <= 0) return;
-                    
-                    ctx.fillStyle = particle.color;
-                    ctx.shadowBlur = particle.size * 2;
-                    ctx.shadowColor = particle.color;
-                    ctx.beginPath();
-                    // Forme de cœur simplifiée
-                    ctx.arc(particle.x - anim.x, particle.y - anim.y, particle.size / 2, 0, Math.PI * 2);
-                    ctx.fill();
-                });
-            } else if (anim.type === 'lifeMax') {
-                // Dessiner des particules statiques pour "vies max"
-                anim.rotation += 0.1;
-                anim.particles.forEach(particle => {
-                    const px = Math.cos(particle.angle + anim.rotation) * particle.distance;
-                    const py = Math.sin(particle.angle + anim.rotation) * particle.distance;
-                    
-                    ctx.fillStyle = particle.color;
-                    ctx.shadowBlur = particle.size * 2;
-                    ctx.shadowColor = particle.color;
-                    ctx.beginPath();
-                    ctx.arc(px, py, particle.size, 0, Math.PI * 2);
-                    ctx.fill();
-                });
-            }
+            // 1. Dessiner la lumière autour du vaisseau (glow)
+            const glowRadius = 30 + Math.sin(Date.now() * 0.005) * 5; // Pulsation légère
+            const gradient = ctx.createRadialGradient(
+                anim.shipX, anim.shipY, 0,
+                anim.shipX, anim.shipY, glowRadius
+            );
+            gradient.addColorStop(0, anim.glowColor + '80'); // 50% opacity
+            gradient.addColorStop(0.5, anim.glowColor + '40'); // 25% opacity
+            gradient.addColorStop(1, anim.glowColor + '00'); // Transparent
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(anim.shipX, anim.shipY, glowRadius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // 2. Dessiner le trait qui relie le texte au vaisseau
+            const currentTextX = anim.textX + anim.textOffsetX;
+            const currentTextY = anim.textY + anim.textOffsetY;
+            
+            ctx.strokeStyle = anim.glowColor;
+            ctx.lineWidth = 1.5;
+            ctx.globalAlpha = anim.alpha * 0.6;
+            ctx.shadowBlur = 5;
+            ctx.shadowColor = anim.glowColor;
+            ctx.setLineDash([3, 3]); // Ligne pointillée
+            ctx.beginPath();
+            ctx.moveTo(anim.shipX, anim.shipY);
+            ctx.lineTo(currentTextX, currentTextY);
+            ctx.stroke();
+            ctx.setLineDash([]); // Réinitialiser
+            
+            // 3. Dessiner le texte stylé
+            ctx.globalAlpha = anim.alpha;
+            ctx.font = 'bold 14px "Anta", sans-serif';
+            ctx.fillStyle = anim.glowColor;
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = anim.glowColor;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            
+            // Contour noir pour la lisibilité
+            ctx.strokeText(anim.text, currentTextX, currentTextY);
+            // Texte coloré
+            ctx.fillText(anim.text, currentTextX, currentTextY);
+            
+            // Petit point lumineux à la position du texte
+            ctx.fillStyle = anim.glowColor;
+            ctx.shadowBlur = 8;
+            ctx.beginPath();
+            ctx.arc(currentTextX, currentTextY, 3, 0, Math.PI * 2);
+            ctx.fill();
             
             ctx.restore();
         });
@@ -1572,18 +1544,28 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            anim.life -= 0.02;
-            anim.alpha = Math.max(0, anim.life);
-            anim.scale = 0.5 + (1 - anim.life) * 0.5;
+            // Mettre à jour la position du vaisseau (suivre le vaisseau)
+            anim.shipX = ship.x;
+            anim.shipY = ship.y;
             
-            // Mettre à jour les particules selon le type
-            if (anim.type === 'life') {
-                anim.particles.forEach(particle => {
-                    particle.y += particle.vy;
-                    particle.life -= 0.03;
-                    particle.alpha = Math.max(0, particle.life);
-                });
-            }
+            // Mettre à jour la position du texte (suivre avec petit mouvement)
+            const angle = Math.atan2(anim.textY - anim.shipY, anim.textX - anim.shipX);
+            const distance = 60 + Math.random() * 40;
+            anim.textX = anim.shipX + Math.cos(angle) * distance;
+            anim.textY = anim.shipY + Math.sin(angle) * distance;
+            
+            // Petit mouvement aléatoire pour le texte
+            anim.textOffsetX += (Math.random() - 0.5) * 0.5;
+            anim.textOffsetY += (Math.random() - 0.5) * 0.5;
+            
+            // Limiter le mouvement
+            anim.textOffsetX = Math.max(-15, Math.min(15, anim.textOffsetX));
+            anim.textOffsetY = Math.max(-15, Math.min(15, anim.textOffsetY));
+            
+            // Fade out progressif
+            anim.life -= 0.015; // Plus lent pour laisser le temps de voir
+            anim.alpha = Math.max(0, anim.life);
+            anim.glowIntensity = Math.max(0, anim.life);
             
             if (anim.life <= 0) {
                 powerUpVisualAnimations.splice(index, 1);
