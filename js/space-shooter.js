@@ -246,7 +246,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const MAX_LEADERBOARD_ENTRIES = 10;
     
     let leaderboardSyncInterval = null;
-    let leaderboardUnsubscribe = null;
     
     // Plein écran
     let isFullscreen = false;
