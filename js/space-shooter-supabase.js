@@ -31,6 +31,7 @@ async function loadLeaderboardFromSupabase() {
     try {
         console.log('📥 Chargement du leaderboard depuis Supabase...');
         console.log('🔗 URL:', window.supabaseClient?.supabaseUrl || 'Non disponible');
+        console.log('🔑 Client Supabase:', window.supabaseClient);
         
         const { data, error } = await supabase
             .from('leaderboard')
@@ -38,7 +39,10 @@ async function loadLeaderboardFromSupabase() {
             .order('score', { ascending: false })
             .limit(MAX_LEADERBOARD_ENTRIES);
         
+        console.log('📊 Réponse Supabase:', { data, error });
+        
         if (error) {
+            console.error('❌ Erreur Supabase:', error);
             throw error;
         }
         
@@ -47,14 +51,22 @@ async function loadLeaderboardFromSupabase() {
             return loadLeaderboardFromLocalStorage();
         }
         
+        console.log('📋 Données brutes Supabase:', data);
+        
         // Convertir les données Supabase au format attendu
-        const leaderboardData = data.map(entry => ({
-            id: entry.id,
-            name: entry.name,
-            score: entry.score,
-            level: entry.level,
-            date: entry.created_at || new Date().toISOString()
-        }));
+        const leaderboardData = data.map(entry => {
+            const formatted = {
+                id: entry.id,
+                name: entry.name || 'Anonyme',
+                score: Number(entry.score) || 0,
+                level: Number(entry.level) || 1,
+                date: entry.created_at || entry.date || new Date().toISOString()
+            };
+            console.log('📝 Entrée formatée:', formatted);
+            return formatted;
+        });
+        
+        console.log('✅ Données formatées:', leaderboardData);
         
         // Sauvegarder dans localStorage comme backup
         localStorage.setItem('spaceShooterLeaderboard', JSON.stringify(leaderboardData));

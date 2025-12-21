@@ -355,18 +355,36 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Charger le leaderboard depuis Supabase (ou localStorage en fallback)
     async function loadLeaderboard() {
+        console.log('📥 loadLeaderboard() appelé');
+        console.log('🔍 window.supabaseLeaderboard:', window.supabaseLeaderboard);
+        
         // Utiliser Supabase si disponible, sinon localStorage
         if (window.supabaseLeaderboard && window.supabaseLeaderboard.load) {
             try {
+                console.log('🔄 Tentative de chargement depuis Supabase...');
                 const data = await window.supabaseLeaderboard.load();
+                console.log('📊 Données reçues de Supabase:', data);
+                
                 if (data && data.length > 0) {
                     leaderboard = data;
-                    console.log(`✅ Leaderboard chargé: ${leaderboard.length} scores`);
+                    console.log(`✅ Leaderboard chargé depuis Supabase: ${leaderboard.length} scores`);
+                    console.log('📋 Contenu leaderboard:', leaderboard);
+                    
+                    // Mettre à jour l'affichage si le modal est ouvert
+                    if (leaderboardModal && !leaderboardModal.classList.contains('hidden')) {
+                        updateLeaderboardDisplay();
+                    }
                     return;
+                } else {
+                    console.log('📭 Aucune donnée dans Supabase, fallback localStorage');
                 }
             } catch (error) {
-                console.warn('⚠️ Erreur chargement Supabase, fallback localStorage:', error);
+                console.error('❌ Erreur chargement Supabase:', error);
+                console.warn('⚠️ Fallback vers localStorage');
             }
+        } else {
+            console.warn('⚠️ window.supabaseLeaderboard non disponible');
+            console.warn('💡 Vérifiez que js/space-shooter-supabase.js est chargé');
         }
         
         // Fallback: Charger depuis localStorage
@@ -375,12 +393,18 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 leaderboard = JSON.parse(stored);
                 console.log(`📦 Leaderboard chargé depuis localStorage: ${leaderboard.length} scores`);
+                
+                // Mettre à jour l'affichage si le modal est ouvert
+                if (leaderboardModal && !leaderboardModal.classList.contains('hidden')) {
+                    updateLeaderboardDisplay();
+                }
             } catch (e) {
                 console.error('Erreur parsing localStorage:', e);
                 leaderboard = [];
             }
         } else {
             leaderboard = [];
+            console.log('📭 Aucun leaderboard trouvé (ni Supabase ni localStorage)');
         }
     
     async function saveLeaderboard() {
@@ -526,11 +550,23 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     async function showLeaderboard() {
-        if (!leaderboardModal) return;
+        console.log('📊 showLeaderboard() appelé');
+        if (!leaderboardModal) {
+            console.error('❌ leaderboardModal non trouvé');
+            return;
+        }
+        
+        console.log('🔄 Chargement du leaderboard...');
         await loadLeaderboard();
+        
+        console.log('📋 Leaderboard après chargement:', leaderboard);
+        console.log('🔄 Mise à jour de l\'affichage...');
         updateLeaderboardDisplay();
+        
         leaderboardModal.classList.remove('hidden');
         startLeaderboardSync();
+        
+        console.log('✅ Leaderboard affiché');
     }
     
     function hideLeaderboard() {
