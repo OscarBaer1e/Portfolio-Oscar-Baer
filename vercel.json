@@ -12,10 +12,6 @@
   ],
   "routes": [
     {
-      "src": "/api/firebase-config",
-      "dest": "/api/firebase-config.js"
-    },
-    {
       "src": "/(.*)",
       "dest": "/$1"
     }
