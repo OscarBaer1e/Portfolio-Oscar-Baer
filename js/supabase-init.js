@@ -15,17 +15,25 @@
 (function() {
     'use strict';
 
-    // Configuration Supabase
-    // ⚠️ Ces valeurs sont déjà configurées avec vos vraies clés
+    // Configuration Supabase - CONFIGURÉE AVEC VOS VRAIES CLÉS
     const SUPABASE_CONFIG = {
         url: 'https://xqpsvwtcvoggbkcjuelq.supabase.co',
         anonKey: 'sb_publishable_zpaJPneM812wOeCBs3uO-A_yhx693Vp'  // Publishable API Key (safe pour le navigateur)
     };
     
-    console.log('✅ Configuration Supabase chargée:', {
+    // Vérification immédiate de la configuration
+    console.log('🔧 Configuration Supabase chargée:', {
         url: SUPABASE_CONFIG.url,
-        anonKey: SUPABASE_CONFIG.anonKey.substring(0, 20) + '...'
+        anonKey: SUPABASE_CONFIG.anonKey.substring(0, 20) + '...',
+        configValide: SUPABASE_CONFIG.url.includes('supabase.co') && SUPABASE_CONFIG.anonKey.startsWith('sb_')
     });
+    
+    if (!SUPABASE_CONFIG.url.includes('supabase.co')) {
+        console.error('❌ ERREUR: URL Supabase invalide');
+    }
+    if (!SUPABASE_CONFIG.anonKey.startsWith('sb_')) {
+        console.error('❌ ERREUR: Clé API Supabase invalide');
+    }
 
     // Vérifier si Supabase est chargé
     function initSupabase() {
