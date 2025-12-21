@@ -157,14 +157,49 @@ async function saveScoreToSupabase(name, score, level) {
         
         // Méthode 1 : Utiliser la fonction SQL (recommandé)
         // Appeler la fonction PostgreSQL insert_leaderboard_score
-        const { data: functionData, error: functionError } = await supabase.rpc('insert_leaderboard_score', {
-            p_name: scoreData.name,
-            p_score: scoreData.score,
-            p_level: scoreData.level
-        });
-        
-        if (functionError) {
-            console.warn('⚠️ Fonction SQL non disponible, tentative insertion directe...', functionError);
+        try {
+            const { data: functionData, error: functionError } = await supabase.rpc('insert_leaderboard_score', {
+                p_name: scoreData.name,
+                p_score: scoreData.score,
+                p_level: scoreData.level
+            });
+            
+            console.log('📊 Réponse fonction SQL complète:', { functionData, functionError });
+            
+            if (functionError) {
+                console.warn('⚠️ Erreur appel fonction SQL, tentative insertion directe...', functionError);
+                throw functionError; // Passer à la méthode 2
+            }
+            
+            // Vérifier le résultat de la fonction
+            if (functionData) {
+                // La fonction peut retourner un JSON string ou un objet
+                let result = functionData;
+                if (typeof functionData === 'string') {
+                    try {
+                        result = JSON.parse(functionData);
+                    } catch (e) {
+                        console.warn('⚠️ Impossible de parser le résultat JSON');
+                    }
+                }
+                
+                console.log('📊 Résultat parsé:', result);
+                
+                if (result && result.success === true) {
+                    console.log('✅ Score enregistré via fonction SQL avec ID:', result.id);
+                    return true;
+                } else {
+                    console.error('❌ Fonction SQL a retourné success: false');
+                    console.error('📝 Détails:', result);
+                    // Passer à la méthode 2 (insertion directe)
+                    throw new Error(result?.message || result?.error || 'Fonction SQL a échoué');
+                }
+            } else {
+                console.warn('⚠️ Fonction SQL n\'a retourné aucune donnée, tentative insertion directe...');
+                throw new Error('Aucune donnée retournée par la fonction');
+            }
+        } catch (functionErr) {
+            console.log('🔄 Fallback vers insertion directe...');
             
             // Méthode 2 : Fallback vers insertion directe
             const { data, error } = await supabase
@@ -175,24 +210,17 @@ async function saveScoreToSupabase(name, score, level) {
             console.log('📊 Réponse Supabase (insert direct):', { data, error });
             
             if (error) {
-                console.error('❌ Erreur lors de l\'insertion:', error);
+                console.error('❌ Erreur lors de l\'insertion directe:', error);
                 throw error;
             }
             
-            console.log('✅ Score enregistré via insertion directe avec ID:', data[0]?.id);
-            console.log('✅ Données enregistrées:', data[0]);
-            return true;
-        }
-        
-        // Vérifier le résultat de la fonction
-        console.log('📊 Réponse fonction SQL:', functionData);
-        
-        if (functionData && functionData.success) {
-            console.log('✅ Score enregistré via fonction SQL avec ID:', functionData.id);
-            return true;
-        } else {
-            console.error('❌ Fonction SQL a retourné une erreur:', functionData);
-            throw new Error(functionData?.message || 'Erreur inconnue');
+            if (data && data.length > 0) {
+                console.log('✅ Score enregistré via insertion directe avec ID:', data[0]?.id);
+                console.log('✅ Données enregistrées:', data[0]);
+                return true;
+            } else {
+                throw new Error('Aucune donnée retournée par l\'insertion');
+            }
         }
         
         console.log('✅ Score enregistré dans Supabase avec ID:', data[0]?.id);
