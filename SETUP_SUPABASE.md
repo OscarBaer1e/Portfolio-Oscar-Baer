@@ -177,7 +177,7 @@ window.supabaseClient
 ## 🐛 Problèmes courants
 
 ### "Supabase SDK non chargé"
-- Vérifiez que le script Supabase est chargé dans `basketball-game.html`
+- Vérifiez que le script Supabase est chargé dans `space-shooter.html`
 
 ### "Configuration Supabase non définie"
 - Vérifiez que vous avez bien rempli `SUPABASE_CONFIG` dans `js/supabase-init.js`

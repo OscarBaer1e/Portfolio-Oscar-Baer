@@ -555,7 +555,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const currentUrl = window.location.href;
             // Vérifie si on est dans le dossier pages (Windows ou Unix)
             const isInPagesFolder = currentPath.includes('/pages/') || currentPath.includes('\\pages\\') || currentUrl.includes('/pages/') || currentUrl.includes('\\pages\\');
-            const redirectPath = isInPagesFolder ? './basketball-game.html' : './pages/basketball-game.html';
+            const redirectPath = isInPagesFolder ? './space-shooter.html' : './pages/space-shooter.html';
             window.location.href = redirectPath;
         }, 1500);
     }
