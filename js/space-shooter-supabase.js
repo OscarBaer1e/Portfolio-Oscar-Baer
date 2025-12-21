@@ -190,6 +190,12 @@ window.supabaseLeaderboard = {
     init: initSupabase
 };
 
+// Log pour vérifier que le module est bien chargé
+console.log('✅ Module space-shooter-supabase.js chargé');
+console.log('📦 window.supabaseLeaderboard:', window.supabaseLeaderboard);
+console.log('🔍 load function:', typeof window.supabaseLeaderboard.load);
+console.log('🔍 save function:', typeof window.supabaseLeaderboard.save);
+
 console.log('✅ Module Supabase leaderboard chargé');
 console.log('💡 Fonctions disponibles:');
 console.log('   - window.supabaseLeaderboard.load() : Charger le leaderboard');
