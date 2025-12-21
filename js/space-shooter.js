@@ -737,6 +737,69 @@ document.addEventListener('DOMContentLoaded', function() {
         
         updateHealthBars();
         updateHighScore();
+        updateBuffIcons();
+    }
+    
+    // Met à jour les icônes de buff actifs
+    function updateBuffIcons() {
+        const now = Date.now();
+        const WARNING_TIME = 2000; // Clignotement 2 secondes avant la fin
+        
+        // Rapid Fire
+        if (activePowerUps.rapidFire && now < activePowerUps.rapidFireEndTime) {
+            const timeLeft = activePowerUps.rapidFireEndTime - now;
+            buffRapidFire.style.display = 'flex';
+            if (timeLeft < WARNING_TIME) {
+                buffRapidFire.classList.add('warning');
+            } else {
+                buffRapidFire.classList.remove('warning');
+            }
+        } else {
+            buffRapidFire.style.display = 'none';
+            buffRapidFire.classList.remove('warning');
+        }
+        
+        // Shrink
+        if (activePowerUps.shrink && now < activePowerUps.shrinkEndTime) {
+            const timeLeft = activePowerUps.shrinkEndTime - now;
+            buffShrink.style.display = 'flex';
+            if (timeLeft < WARNING_TIME) {
+                buffShrink.classList.add('warning');
+            } else {
+                buffShrink.classList.remove('warning');
+            }
+        } else {
+            buffShrink.style.display = 'none';
+            buffShrink.classList.remove('warning');
+        }
+        
+        // Big Bullets
+        if (activePowerUps.bigBullets && now < activePowerUps.bigBulletsEndTime) {
+            const timeLeft = activePowerUps.bigBulletsEndTime - now;
+            buffBigBullets.style.display = 'flex';
+            if (timeLeft < WARNING_TIME) {
+                buffBigBullets.classList.add('warning');
+            } else {
+                buffBigBullets.classList.remove('warning');
+            }
+        } else {
+            buffBigBullets.style.display = 'none';
+            buffBigBullets.classList.remove('warning');
+        }
+        
+        // Triple Shot
+        if (activePowerUps.tripleShot && now < activePowerUps.tripleShotEndTime) {
+            const timeLeft = activePowerUps.tripleShotEndTime - now;
+            buffTripleShot.style.display = 'flex';
+            if (timeLeft < WARNING_TIME) {
+                buffTripleShot.classList.add('warning');
+            } else {
+                buffTripleShot.classList.remove('warning');
+            }
+        } else {
+            buffTripleShot.style.display = 'none';
+            buffTripleShot.classList.remove('warning');
+        }
     }
     
     // Met à jour les barres de vie et shield

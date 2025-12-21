@@ -87,6 +87,59 @@
     transition: all 0.3s ease;
 }
 
+.active-buffs {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.buff-icon {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.8);
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    padding: 6px 12px;
+    font-size: 0.9rem;
+    color: var(--primary-color);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+    transition: all 0.3s ease;
+    font-family: 'Anta', sans-serif;
+}
+
+.buff-icon.warning {
+    animation: buffWarning 0.5s ease-in-out infinite;
+    border-color: var(--secondary-color);
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.8);
+}
+
+@keyframes buffWarning {
+    0%, 100% {
+        opacity: 1;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 0.5;
+        transform: scale(0.95);
+    }
+}
+
+.buff-emoji {
+    font-size: 1.2rem;
+    filter: drop-shadow(0 0 5px currentColor);
+}
+
+.buff-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
 /* Mode plein écran - Tout est plus gros proportionnellement */
 .game-wrapper:fullscreen,
 .game-wrapper:-webkit-full-screen,
