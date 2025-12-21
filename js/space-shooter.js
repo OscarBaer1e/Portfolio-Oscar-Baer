@@ -3043,9 +3043,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     };
                     startAutoShoot();
                 }
-            } else if (!startScreen.classList.contains('hidden')) {
+            } else if (startScreen && !startScreen.classList.contains('hidden')) {
                 startGame();
-            } else if (!gameOver.classList.contains('hidden')) {
+            } else if (gameOver && !gameOver.classList.contains('hidden')) {
                 startGame();
             }
         }
@@ -3102,15 +3102,15 @@ document.addEventListener('DOMContentLoaded', function() {
         init();
         gameState.isPlaying = true;
         gameState.isPaused = false;
-        gameOver.classList.add('hidden');
-        startScreen.classList.add('hidden');
-        startBtn.textContent = 'Pause';
+        if (gameOver) gameOver.classList.add('hidden');
+        if (startScreen) startScreen.classList.add('hidden');
+        if (startBtn) startBtn.textContent = 'Pause';
         gameLoop();
     }
     
     function pauseGame() {
         gameState.isPaused = !gameState.isPaused;
-        startBtn.textContent = gameState.isPaused ? 'Reprendre' : 'Pause';
+        if (startBtn) startBtn.textContent = gameState.isPaused ? 'Reprendre' : 'Pause';
         if (!gameState.isPaused) {
             gameLoop();
         }
@@ -3146,7 +3146,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        gameOver.classList.remove('hidden');
+        if (gameOver) gameOver.classList.remove('hidden');
         startBtn.textContent = 'Commencer';
         
         // Vérifier si le score peut être enregistré dans le leaderboard
@@ -3168,9 +3168,9 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.isPlaying = false;
         gameState.isPaused = false;
         init();
-        gameOver.classList.add('hidden');
-        startScreen.classList.remove('hidden');
-        startBtn.textContent = 'Commencer';
+        if (gameOver) gameOver.classList.add('hidden');
+        if (startScreen) startScreen.classList.remove('hidden');
+        if (startBtn) startBtn.textContent = 'Commencer';
         if (registerScoreBtn) registerScoreBtn.classList.add('hidden');
         draw();
     }
