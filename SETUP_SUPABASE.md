@@ -103,22 +103,32 @@ Dans la table `leaderboard`, ajoutez ces colonnes :
 
 ### 7. Configurer le code (30 secondes)
 
-1. Ouvrez `js/supabase-init.js`
-2. Remplacez :
+**Où faire cette étape ?** Dans votre projet local, dans le fichier `js/supabase-init.js`
+
+#### Étapes :
+
+1. **Ouvrez le fichier** `js/supabase-init.js` dans votre éditeur de code (VS Code, etc.)
+   - Chemin : `/Users/oscar/Desktop/Portfolio/Portfolio-Oscar-Baer-main/js/supabase-init.js`
+   
+2. **Trouvez ces lignes** (vers la ligne 15-18) :
    ```javascript
    const SUPABASE_CONFIG = {
        url: 'VOTRE_URL_SUPABASE',
        anonKey: 'VOTRE_ANON_KEY'
    };
    ```
-   
-   Par :
+
+3. **Remplacez par vos vraies valeurs** (récupérées à l'étape 5) :
    ```javascript
    const SUPABASE_CONFIG = {
-       url: 'https://xxxxx.supabase.co', // Votre Project URL
-       anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' // Votre anon public key
+       url: 'https://xxxxx.supabase.co', // Votre Project URL (copié depuis Supabase)
+       anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...' // Votre anon public key (copié depuis Supabase)
    };
    ```
+
+4. **Sauvegardez le fichier** (Cmd+S sur Mac)
+
+**💡 Astuce** : Les valeurs à copier se trouvent dans Supabase Console → Settings → API (étape 5)
 
 ---
 
