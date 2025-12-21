@@ -425,8 +425,38 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Charger le leaderboard depuis Firebase Firestore
+    // Charger le leaderboard depuis Supabase (ou localStorage en fallback)
     async function loadLeaderboard() {
+        // Utiliser Supabase si disponible, sinon localStorage
+        if (window.supabaseLeaderboard && window.supabaseLeaderboard.load) {
+            try {
+                const data = await window.supabaseLeaderboard.load();
+                if (data && data.length > 0) {
+                    leaderboard = data;
+                    console.log(`✅ Leaderboard chargé: ${leaderboard.length} scores`);
+                    return;
+                }
+            } catch (error) {
+                console.warn('⚠️ Erreur chargement Supabase, fallback localStorage:', error);
+            }
+        }
+        
+        // Fallback: Charger depuis localStorage
+        const stored = localStorage.getItem('spaceShooterLeaderboard');
+        if (stored) {
+            try {
+                leaderboard = JSON.parse(stored);
+                console.log(`📦 Leaderboard chargé depuis localStorage: ${leaderboard.length} scores`);
+            } catch (e) {
+                console.error('Erreur parsing localStorage:', e);
+                leaderboard = [];
+            }
+        } else {
+            leaderboard = [];
+        }
+        
+        // Ancien code Firebase (désactivé mais conservé pour référence)
+        /*
         const firestoreDb = initFirebase();
         
         if (!firestoreDb) {
