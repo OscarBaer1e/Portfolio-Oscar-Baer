@@ -333,8 +333,146 @@
             }
         })();
     </script>
-    <!-- Firebase SDK - Version npm (modules ES6) -->
-    <script type="module" src="../js/firebase-init.js"></script>
+    <!-- Firebase SDK - Version CDN (plus fiable) -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script>
+        // Fonction d'initialisation Firebase - Version CDN
+        function initFirebaseNow() {
+            // Configuration Firebase FORCÉE - projectId garanti
+            const firebaseConfig = {
+                apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
+                authDomain: "oscar-baer.firebaseapp.com",
+                projectId: "oscar-baer", // FORCÉ : jamais YOUR_PROJECT_ID
+                storageBucket: "oscar-baer.firebasestorage.app",
+                messagingSenderId: "419618942184",
+                appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
+            };
+
+            // Vérification CRITIQUE avant initialisation
+            if (!firebaseConfig.projectId || 
+                firebaseConfig.projectId === 'YOUR_PROJECT_ID' || 
+                firebaseConfig.projectId === 'votre-projet-id' ||
+                firebaseConfig.projectId !== 'oscar-baer') {
+                console.error('❌ ERREUR CRITIQUE: projectId invalide!');
+                console.error('projectId détecté:', firebaseConfig.projectId);
+                firebaseConfig.projectId = 'oscar-baer';
+                console.log('✅ projectId corrigé à:', firebaseConfig.projectId);
+            }
+
+            // Vérifier que Firebase est chargé
+            if (typeof firebase === 'undefined') {
+                console.error('❌ Firebase SDK non chargé - Vérifiez que les scripts se chargent');
+                return false;
+            }
+
+            try {
+                // Supprimer toutes les instances existantes pour éviter les conflits
+                while (firebase.apps.length > 0) {
+                    try {
+                        firebase.app().delete();
+                    } catch (e) {
+                        // Ignorer les erreurs
+                        break;
+                    }
+                }
+                
+                // Initialize Firebase
+                const app = firebase.initializeApp(firebaseConfig);
+                
+                // Vérification IMMÉDIATE après initialisation
+                const actualProjectId = app.options.projectId;
+                console.log('🔍 Project ID après initialisation:', actualProjectId);
+                
+                if (actualProjectId !== 'oscar-baer') {
+                    console.error('❌ ERREUR CRITIQUE: Project ID incorrect!');
+                    console.error('Attendu: oscar-baer, Reçu:', actualProjectId);
+                    throw new Error('Project ID incorrect: ' + actualProjectId);
+                }
+                
+                const db = firebase.firestore();
+                
+                // Exposer Firebase pour les autres scripts
+                window.firebaseApp = app;
+                window.firebaseDb = db;
+                window.firebaseTimestamp = firebase.firestore.Timestamp;
+                window.firebaseInitialized = true;
+                
+                console.log('✅ Firebase initialisé avec succès (CDN v10.7.1)');
+                console.log('✅ Project ID vérifié:', app.options.projectId);
+                console.log('✅ Firestore accessible');
+                console.log('✅ window.firebaseApp:', window.firebaseApp);
+                console.log('✅ window.firebaseDb:', window.firebaseDb);
+                console.log('✅ window.firebaseInitialized:', window.firebaseInitialized);
+                
+                // Vérification finale
+                if (!window.firebaseApp || !window.firebaseDb) {
+                    throw new Error('Firebase exposé mais variables window non définies');
+                }
+                
+                return true;
+            } catch (error) {
+                console.error('❌ Erreur initialisation Firebase:', error);
+                console.error('Stack:', error.stack);
+                return false;
+            }
+        }
+
+        // Essayer d'initialiser immédiatement
+        function tryInitFirebase() {
+            if (typeof firebase !== 'undefined') {
+                const result = initFirebaseNow();
+                if (result) {
+                    console.log('✅ Firebase initialisé avec succès');
+                } else {
+                    console.error('❌ Échec de l\'initialisation Firebase');
+                }
+                return result;
+            }
+            return false;
+        }
+        
+        // Essayer immédiatement
+        if (!tryInitFirebase()) {
+            // Attendre que les scripts se chargent
+            console.log('⏳ Attente du chargement des scripts Firebase...');
+            let attempts = 0;
+            const maxAttempts = 20;
+            const checkInterval = setInterval(function() {
+                attempts++;
+                if (typeof firebase !== 'undefined') {
+                    clearInterval(checkInterval);
+                    if (tryInitFirebase()) {
+                        console.log('✅ Firebase initialisé après', attempts, 'tentatives');
+                    }
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(checkInterval);
+                    console.error('❌ Firebase SDK n\'a pas pu être chargé après', maxAttempts, 'tentatives');
+                    console.error('Vérifiez :');
+                    console.error('1. Que les scripts Firebase se chargent (onglet Network)');
+                    console.error('2. Qu\'il n\'y a pas de bloqueur de publicité');
+                    console.error('3. Que votre connexion internet fonctionne');
+                }
+            }, 200);
+        }
+        
+        // Exposer une fonction globale pour réinitialiser si nécessaire
+        window.reinitFirebase = function() {
+            console.log('🔄 Réinitialisation Firebase...');
+            if (typeof firebase !== 'undefined') {
+                // Supprimer toutes les instances existantes
+                while (firebase.apps.length > 0) {
+                    try {
+                        firebase.app().delete();
+                    } catch (e) {
+                        break;
+                    }
+                }
+                return tryInitFirebase();
+            }
+            return false;
+        };
+    </script>
     <script src="../js/space-shooter.js"></script>
     <script src="../js/script.js"></script>
 </body>
