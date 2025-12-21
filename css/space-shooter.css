@@ -863,7 +863,7 @@
 
 .leaderboard-entry.first-place .leaderboard-name {
     position: relative;
-    padding-right: 40px;
+    padding-right: 30px;
     display: inline-block;
     overflow: visible;
     z-index: 1;
@@ -872,9 +872,9 @@
 .leaderboard-entry.first-place .leaderboard-name::after {
     content: '👑';
     position: absolute;
-    top: -12px;
-    right: -8px;
-    font-size: 1.6rem;
+    top: -6px;
+    right: -5px;
+    font-size: 1.5rem;
     line-height: 1;
     filter: drop-shadow(0 0 10px rgba(255, 215, 0, 1));
     animation: crownFloat 2s ease-in-out infinite;
