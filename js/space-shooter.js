@@ -2602,38 +2602,40 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Collision vaisseau / projectiles du boss
-        bossBullets.forEach((bullet, index) => {
-            const dx = ship.x - bullet.x;
-            const dy = ship.y - bullet.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            
-            const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
-            if (distance < bullet.size + shipSize) {
-                if (activePowerUps.shield && Date.now() < activePowerUps.shieldEndTime) {
-                    playSound('hit');
-                    bossBullets.splice(index, 1);
-                    // Animation visuelle remplace le message texte
-                } else {
-                    createEnhancedExplosion(ship.x, ship.y, ship.color, 30);
-                    playSound('hit');
-                    bossBullets.splice(index, 1);
-                    
-                    gameState.lives--;
-                    if (livesElement) livesElement.textContent = gameState.lives;
-                    updateHealthBars();
-                    
-                    if (gameState.lives <= 0) {
-                        endGame();
-                } else {
-                    // Invincibilité temporaire avec clignotement (1-2 secondes)
-                    ship.invincible = true;
-                    setTimeout(() => {
-                        ship.invincible = false;
-                    }, 2000); // 2 secondes exactement
+        if (bossBullets && bossBullets.length > 0) {
+            bossBullets.forEach((bullet, index) => {
+                const dx = ship.x - bullet.x;
+                const dy = ship.y - bullet.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
+                if (distance < bullet.size + shipSize) {
+                    if (activePowerUps.shield && Date.now() < activePowerUps.shieldEndTime) {
+                        playSound('hit');
+                        bossBullets.splice(index, 1);
+                        // Animation visuelle remplace le message texte
+                    } else {
+                        createEnhancedExplosion(ship.x, ship.y, ship.color, 30);
+                        playSound('hit');
+                        bossBullets.splice(index, 1);
+                        
+                        gameState.lives--;
+                        if (livesElement) livesElement.textContent = gameState.lives;
+                        updateHealthBars();
+                        
+                        if (gameState.lives <= 0) {
+                            endGame();
+                        } else {
+                            // Invincibilité temporaire avec clignotement (1-2 secondes)
+                            ship.invincible = true;
+                            setTimeout(() => {
+                                ship.invincible = false;
+                            }, 2000); // 2 secondes exactement
+                        }
+                    }
                 }
-                }
-            }
-        });
+            });
+        }
         
         // Collision vaisseau / boss
         if (boss && gameState.bossActive) {
@@ -2666,6 +2668,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Met à jour le mouvement du boss selon son pattern
     function updateBossMovement() {
+        if (!boss || !gameState.bossActive) return;
+        
         const pattern = getBossPattern(boss.pattern);
         const time = boss.patternTime * 0.001; // Convertir en secondes
         
