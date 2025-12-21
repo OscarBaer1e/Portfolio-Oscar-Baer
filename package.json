@@ -2,5 +2,14 @@
   "dependencies": {
     "firebase": "^12.7.0",
     "gsap": "^3.14.2"
+  },
+  "devDependencies": {
+    "firebase-tools": "^13.35.1"
+  },
+  "scripts": {
+    "firebase:login": "npx firebase login",
+    "firebase:init": "npx firebase init hosting",
+    "firebase:deploy": "npx firebase deploy --only hosting",
+    "firebase:serve": "npx firebase serve"
   }
 }
