@@ -753,6 +753,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Met à jour les icônes de buff actifs
     function updateBuffIcons() {
+        if (!buffRapidFire || !buffShrink || !buffBigBullets || !buffTripleShot) return;
+        
         const now = Date.now();
         const WARNING_TIME = 2000; // Clignotement 2 secondes avant la fin
         
