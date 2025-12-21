@@ -8,11 +8,9 @@
     <link rel="stylesheet" href="../css/space-shooter.css">
     <link href="https://fonts.googleapis.com/css2?family=Anta&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <!-- BLOCAGE FIREBASE - DOIT être chargé EN PREMIER, AVANT TOUT -->
     <script src="../js/block-firebase.js"></script>
 </head>
 <body>
-    <!-- Animation de fond -->
     <div class="animated-background">
         <div class="grid-lines"></div>
         <div class="floating-particles"></div>
@@ -126,7 +124,6 @@
                     
                     <div id="game-message" class="game-message"></div>
                     
-                    <!-- Leaderboard Modal -->
                     <div id="leaderboard-modal" class="leaderboard-modal hidden">
                         <div class="leaderboard-content">
                             <div class="leaderboard-header">
@@ -134,12 +131,10 @@
                                 <button id="close-leaderboard" class="close-btn">&times;</button>
                             </div>
                             <div id="leaderboard-list" class="leaderboard-list">
-                                <!-- Les scores seront ajoutés dynamiquement -->
                             </div>
                         </div>
                     </div>
                     
-                    <!-- Formulaire d'enregistrement de score -->
                     <div id="score-register" class="score-register hidden">
                         <div class="score-register-content">
                             <div class="score-register-header">
@@ -297,7 +292,6 @@
             // Ignorer si l'élément n'existe pas encore
         }
     </script>
-    <!-- Script inline pour bloquer Firebase AVANT tout autre script -->
     <script>
         // Blocage ULTRA-AGGRESSIF Firebase - S'exécute IMMÉDIATEMENT
         (function() {
@@ -327,11 +321,8 @@
             setInterval(killFirebase, 100);
         })();
     </script>
-    <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Initialisation Supabase - DOIT être chargé après le SDK -->
     <script src="../js/supabase-init.js"></script>
-    <!-- Vérification que Supabase est bien chargé -->
     <script>
         // Vérifier que Supabase est bien initialisé après chargement
         window.addEventListener('load', function() {
@@ -345,7 +336,6 @@
             }, 500);
         });
     </script>
-    <!-- Fonctions leaderboard Supabase -->
     <script src="../js/space-shooter-supabase.js"></script>
     <script src="../js/space-shooter.js"></script>
     <script src="../js/script.js"></script>
