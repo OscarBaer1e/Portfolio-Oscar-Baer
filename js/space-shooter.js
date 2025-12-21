@@ -2467,7 +2467,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Monter automatiquement au niveau juste au-dessus (ex: boss niveau 10 → niveau 11)
                     // Ne pas utiliser checkLevel() qui calcule selon le score (peut sauter plusieurs niveaux)
                     gameState.level += 1;
-                    gameState.gameSpeed += 0.5;
+                    // Augmentation progressive de la vitesse
+                    const speedIncrease = getSpeedIncrease(gameState.level);
+                    gameState.gameSpeed += speedIncrease;
                     if (levelElement) levelElement.textContent = gameState.level;
                     if (currentLevelDisplay) currentLevelDisplay.textContent = gameState.level;
                     
