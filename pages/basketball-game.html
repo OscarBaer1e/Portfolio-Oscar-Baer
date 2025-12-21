@@ -295,17 +295,6 @@
             // Ignorer si l'élément n'existe pas encore
         }
     </script>
-    <!-- Injection des variables d'environnement Vercel -->
-    <script>
-        // Injecter les variables d'environnement Vercel
-        // Ces variables sont définies par Vercel au build time
-        window.SUPABASE_URL = '{{NEXT_PUBLIC_SUPABASE_URL}}' !== '{{NEXT_PUBLIC_SUPABASE_URL}}' 
-            ? '{{NEXT_PUBLIC_SUPABASE_URL}}' 
-            : 'https://xqpsvwtcvoggbkcjuelq.supabase.co';
-        window.SUPABASE_ANON_KEY = '{{NEXT_PUBLIC_SUPABASE_ANON_KEY}}' !== '{{NEXT_PUBLIC_SUPABASE_ANON_KEY}}' 
-            ? '{{NEXT_PUBLIC_SUPABASE_ANON_KEY}}' 
-            : 'sb_publishable_zpaJPneM812wOeCBs3uO-A_yhx693Vp';
-    </script>
     <!-- Blocage Firebase - Empêche tout chargement Firebase -->
     <script src="../js/block-firebase.js"></script>
     <!-- Supabase SDK -->
