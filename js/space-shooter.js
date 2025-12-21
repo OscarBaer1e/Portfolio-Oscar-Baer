@@ -940,55 +940,64 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Forme par défaut si pas d'image, image non chargée, ou erreur
+        // Forme par défaut si pas d'image, image non chargée, ou erreur (TOUJOURS affichée)
         if (!boss.image || !boss.image.complete || boss.image.naturalWidth === 0) {
-            // Forme par défaut : boule colorée avec effets
-            const gradient = ctx.createRadialGradient(0, -boss.size * 0.3, 0, 0, 0, boss.size);
-            gradient.addColorStop(0, boss.color);
-            gradient.addColorStop(0.5, boss.color);
-            gradient.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
-            
-            // Ombre portée
-            ctx.shadowBlur = 30;
-            ctx.shadowColor = boss.color;
-            ctx.shadowOffsetX = 0;
-            ctx.shadowOffsetY = 0;
-            
-            // Cercle principal
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.arc(0, 0, boss.size, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Reflet lumineux
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-            ctx.beginPath();
-            ctx.arc(-boss.size * 0.3, -boss.size * 0.3, boss.size * 0.4, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Contour
-            ctx.strokeStyle = boss.color;
-            ctx.lineWidth = 3;
-            ctx.shadowBlur = 15;
-            ctx.beginPath();
-            ctx.arc(0, 0, boss.size, 0, Math.PI * 2);
-            ctx.stroke();
-            
-            // Particules autour du boss
-            const time = Date.now() * 0.001;
-            for (let i = 0; i < 8; i++) {
-                const angle = (i / 8) * Math.PI * 2 + time;
-                const distance = boss.size + 10;
-                const x = Math.cos(angle) * distance;
-                const y = Math.sin(angle) * distance;
+            try {
+                // Forme par défaut : boule colorée avec effets
+                const gradient = ctx.createRadialGradient(0, -boss.size * 0.3, 0, 0, 0, boss.size);
+                gradient.addColorStop(0, boss.color);
+                gradient.addColorStop(0.5, boss.color);
+                gradient.addColorStop(1, 'rgba(0, 0, 0, 0.8)');
                 
-                ctx.fillStyle = boss.color;
-                ctx.globalAlpha = 0.6;
+                // Ombre portée
+                ctx.shadowBlur = 30;
+                ctx.shadowColor = boss.color;
+                ctx.shadowOffsetX = 0;
+                ctx.shadowOffsetY = 0;
+                
+                // Cercle principal
+                ctx.fillStyle = gradient;
                 ctx.beginPath();
-                ctx.arc(x, y, 3, 0, Math.PI * 2);
+                ctx.arc(0, 0, boss.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Reflet lumineux
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                ctx.beginPath();
+                ctx.arc(-boss.size * 0.3, -boss.size * 0.3, boss.size * 0.4, 0, Math.PI * 2);
+                ctx.fill();
+                
+                // Contour
+                ctx.strokeStyle = boss.color;
+                ctx.lineWidth = 3;
+                ctx.shadowBlur = 15;
+                ctx.beginPath();
+                ctx.arc(0, 0, boss.size, 0, Math.PI * 2);
+                ctx.stroke();
+                
+                // Particules autour du boss
+                const time = Date.now() * 0.001;
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i / 8) * Math.PI * 2 + time;
+                    const distance = boss.size + 10;
+                    const x = Math.cos(angle) * distance;
+                    const y = Math.sin(angle) * distance;
+                    
+                    ctx.fillStyle = boss.color;
+                    ctx.globalAlpha = 0.6;
+                    ctx.beginPath();
+                    ctx.arc(x, y, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+                ctx.globalAlpha = 1;
+            } catch (e) {
+                // Dernière solution : cercle simple si tout échoue
+                console.error('Erreur dessin forme par défaut boss, fallback cercle simple:', e);
+                ctx.fillStyle = boss.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, boss.size, 0, Math.PI * 2);
                 ctx.fill();
             }
-            ctx.globalAlpha = 1;
         }
         
         ctx.restore();
