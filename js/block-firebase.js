@@ -87,6 +87,34 @@
         configurable: true
     });
     
+    // Bloquer les imports dynamiques de Firebase
+    const originalImport = window.import;
+    if (window.import) {
+        window.import = function(url) {
+            if (typeof url === 'string' && url.includes('firebase')) {
+                console.warn('🚫 Import Firebase bloqué:', url);
+                return Promise.reject(new Error('Firebase bloqué'));
+            }
+            return originalImport(url);
+        };
+    }
+    
+    // Intercepter les scripts qui se chargent
+    const observer = new MutationObserver(function(mutations) {
+        mutations.forEach(function(mutation) {
+            mutation.addedNodes.forEach(function(node) {
+                if (node.tagName === 'SCRIPT' && node.src && node.src.includes('firebase')) {
+                    console.warn('🚫 Script Firebase détecté et supprimé:', node.src);
+                    node.remove();
+                    deleteFirebase();
+                }
+            });
+        });
+    });
+    
+    observer.observe(document.head, { childList: true, subtree: true });
+    observer.observe(document.body, { childList: true, subtree: true });
+    
     console.log('✅ Blocage Firebase terminé');
 })();
 
