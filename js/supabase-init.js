@@ -18,12 +18,8 @@
     // Configuration Supabase
     // Utilise les variables d'environnement si disponibles (Vercel), sinon valeurs par défaut
     const SUPABASE_CONFIG = {
-        url: window.SUPABASE_URL || 
-             (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_URL) ||
-             'https://xqpsvwtcvoggbkcjuelq.supabase.co',
-        anonKey: window.SUPABASE_ANON_KEY || 
-                 (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_SUPABASE_ANON_KEY) ||
-                 'sb_publishable_zpaJPneM812wOeCBs3uO-A_yhx693Vp'  // Publishable API Key (safe pour le navigateur)
+        url: window.SUPABASE_URL || 'https://xqpsvwtcvoggbkcjuelq.supabase.co',
+        anonKey: window.SUPABASE_ANON_KEY || 'sb_publishable_zpaJPneM812wOeCBs3uO-A_yhx693Vp'
     };
     
     // Vérification immédiate de la configuration
@@ -124,5 +120,7 @@
     console.log('💡 Fonctions disponibles:');
     console.log('   - window.diagnosticSupabase() : Diagnostic complet');
     console.log('   - window.reinitSupabase() : Réinitialiser Supabase');
+
+    
 })();
 
