@@ -7,6 +7,9 @@
  * Beaucoup plus simple !
  */
 
+// Constante pour le nombre maximum d'entrées dans le leaderboard
+const MAX_LEADERBOARD_ENTRIES = 10;
+
 // Fonction pour initialiser Supabase
 function initSupabase() {
     if (window.supabaseClient && window.supabaseInitialized) {
