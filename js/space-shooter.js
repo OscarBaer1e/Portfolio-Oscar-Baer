@@ -517,9 +517,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Synchroniser le leaderboard périodiquement avec Supabase
     function startLeaderboardSync() {
         // Supabase : rechargement périodique (pas de temps réel nécessaire pour un leaderboard simple)
-            if (leaderboardSyncInterval) {
-                clearInterval(leaderboardSyncInterval);
-            }
+        if (leaderboardSyncInterval) {
+            clearInterval(leaderboardSyncInterval);
+        }
             leaderboardSyncInterval = setInterval(() => {
                 loadLeaderboard().then(() => {
                     if (leaderboardModal && !leaderboardModal.classList.contains('hidden')) {
