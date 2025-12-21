@@ -295,12 +295,26 @@
             // Ignorer si l'élément n'existe pas encore
         }
     </script>
-    <!-- Blocage Firebase - Empêche tout chargement Firebase -->
+    <!-- Blocage Firebase - DOIT être chargé EN PREMIER -->
     <script src="../js/block-firebase.js"></script>
     <!-- Supabase SDK -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Initialisation Supabase -->
+    <!-- Initialisation Supabase - DOIT être chargé après le SDK -->
     <script src="../js/supabase-init.js"></script>
+    <!-- Vérification que Supabase est bien chargé -->
+    <script>
+        // Vérifier que Supabase est bien initialisé après chargement
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                if (typeof window.diagnosticSupabase === 'function') {
+                    console.log('✅ Supabase correctement chargé');
+                } else {
+                    console.error('❌ ERREUR: window.diagnosticSupabase n\'existe pas');
+                    console.error('💡 Vérifiez que js/supabase-init.js est bien chargé');
+                }
+            }, 500);
+        });
+    </script>
     <!-- Fonctions leaderboard Supabase -->
     <script src="../js/space-shooter-supabase.js"></script>
     <script src="../js/space-shooter.js"></script>
