@@ -1175,7 +1175,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Mise à jour
     function update() {
-        if (!gameState.isPlaying || gameState.isPaused) return;
+        // Ne pas bloquer les animations et spawns - seul le bouton pause peut vraiment mettre en pause
+        if (!gameState.isPlaying) return;
+        
+        // Si le jeu est en pause, on continue quand même les animations de fond (étoiles, particules)
+        // mais on ne met pas à jour les entités actives
+        if (gameState.isPaused) {
+            // Continuer les animations de fond même en pause
+            stars.forEach(star => {
+                star.y += star.speed + gameState.gameSpeed * 0.3;
+                if (star.y > canvas.height) {
+                    star.y = 0;
+                    star.x = Math.random() * canvas.width;
+                }
+            });
+            return;
+        }
         
         // Mise à jour des étoiles
         stars.forEach(star => {
@@ -2286,8 +2301,8 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateBoss() {
         if (!boss || !gameState.bossActive) return;
         
-        // Ne pas mettre à jour si le jeu est en pause
-        if (gameState.isPaused) return;
+        // Le boss continue de bouger même si le jeu est en pause (pour éviter les bugs)
+        // Seul le bouton pause peut vraiment mettre le jeu en pause
         
         // Vérifications de sécurité
         if (typeof boss.x !== 'number' || typeof boss.y !== 'number' || typeof boss.size !== 'number') {
