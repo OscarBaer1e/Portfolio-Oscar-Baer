@@ -253,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Charger automatiquement les images de boss par défaut
     function loadDefaultBossImages() {
         const bossImagePaths = {
-            1: '../ressources/images/Locked in alien.jpeg',
+            1: '../ressources/images/Locked in alien.heic',
             2: '../ressources/images/Goku SSJ3.webp',
             3: '../ressources/images/Karism.jpg',
             4: '../ressources/images/Herobrine.avif',
