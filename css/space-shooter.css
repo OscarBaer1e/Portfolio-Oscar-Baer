@@ -681,12 +681,33 @@
     border: 3px solid var(--primary-color);
     border-radius: 15px;
     padding: 30px;
-    max-width: 600px;
+    max-width: 700px;
     width: 90%;
-    max-height: 80vh;
+    max-height: 85vh;
     overflow-y: auto;
+    overflow-x: hidden;
     box-shadow: 0 0 50px rgba(0, 255, 255, 0.5);
     position: relative;
+    scrollbar-width: thin;
+    scrollbar-color: var(--primary-color) rgba(0, 0, 0, 0.3);
+}
+
+.leaderboard-content::-webkit-scrollbar {
+    width: 8px;
+}
+
+.leaderboard-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.leaderboard-content::-webkit-scrollbar-thumb {
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+.leaderboard-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 255, 0.8);
 }
 
 .leaderboard-header {
@@ -731,6 +752,15 @@
     display: flex;
     flex-direction: column;
     gap: 10px;
+    min-height: 100px;
+}
+
+.leaderboard-list:empty::before {
+    content: 'Chargement...';
+    text-align: center;
+    color: var(--dim-text-color);
+    padding: 20px;
+    font-style: italic;
 }
 
 .no-scores {
@@ -750,6 +780,9 @@
     border-radius: 8px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: all 0.3s ease;
+    min-height: 60px;
+    word-wrap: break-word;
+    overflow: hidden;
 }
 
 .leaderboard-entry:hover {
@@ -771,10 +804,12 @@
 .leaderboard-entry.first-place::before {
     content: '👑';
     position: absolute;
-    top: -10px;
-    right: -10px;
-    font-size: 2rem;
+    top: -8px;
+    right: -8px;
+    font-size: 1.8rem;
     filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.8));
+    z-index: 1;
+    pointer-events: none;
 }
 
 .leaderboard-entry.first-place .leaderboard-rank {
@@ -863,6 +898,10 @@
     color: var(--primary-color);
     font-weight: bold;
     font-size: 1.1rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
 }
 
 .leaderboard-score {
@@ -1127,8 +1166,7 @@
     50% { transform: translate(-50%, -50%) scale(1.2); }
 }
 
-=======
->>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
+/* Responsive Design */
 @media (max-width: 768px) {
     #gameCanvas {
         width: 100%;
@@ -1177,11 +1215,32 @@
         gap: 10px;
     }
     
-    .leaderboard-entry {
-        grid-template-columns: 40px 1fr 80px 60px;
-        gap: 10px;
+    .leaderboard-modal {
         padding: 10px;
-        font-size: 0.9rem;
+    }
+    
+    .leaderboard-content {
+        width: 95%;
+        max-width: 100%;
+        padding: 20px;
+        max-height: 90vh;
+    }
+    
+    .leaderboard-header h2 {
+        font-size: 1.5rem;
+    }
+    
+    .close-btn {
+        width: 35px;
+        height: 35px;
+        font-size: 1.5rem;
+    }
+    
+    .leaderboard-entry {
+        grid-template-columns: 45px 1fr 100px 70px;
+        gap: 8px;
+        padding: 12px;
+        font-size: 0.85rem;
     }
     
     .leaderboard-date {
@@ -1189,15 +1248,44 @@
     }
     
     .leaderboard-rank {
-        font-size: 1.2rem;
+        font-size: 1.3rem;
     }
     
     .leaderboard-name {
-        font-size: 1rem;
+        font-size: 0.95rem;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
     
     .leaderboard-score {
         font-size: 1rem;
+        text-align: right;
+    }
+    
+    .leaderboard-level {
+        font-size: 0.8rem;
+        text-align: center;
+    }
+    
+    .leaderboard-entry.first-place .leaderboard-rank {
+        font-size: 1.5rem;
+    }
+    
+    .leaderboard-entry.first-place .leaderboard-name {
+        font-size: 1.05rem;
+    }
+    
+    .leaderboard-entry.first-place .leaderboard-score {
+        font-size: 1.2rem;
+    }
+    
+    .leaderboard-entry.second-place .leaderboard-rank {
+        font-size: 1.4rem;
+    }
+    
+    .leaderboard-entry.third-place .leaderboard-rank {
+        font-size: 1.3rem;
     }
     
     .score-register-content {
