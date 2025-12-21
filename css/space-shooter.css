@@ -327,16 +327,13 @@
     color: #000;
 }
 
-<<<<<<< HEAD
 .game-message.powerup {
-    background: linear-gradient(135deg, #ffff00, #ffaa00);
-    color: #000;
-    animation: powerupPulse 0.5s ease;
-}
-
-@keyframes powerupPulse {
-    0%, 100% { transform: translate(-50%, -50%) scale(1); }
-    50% { transform: translate(-50%, -50%) scale(1.1); }
+    background: rgba(0, 255, 0, 0.3);
+    color: #00ff00;
+    border: 1px solid rgba(0, 255, 0, 0.5);
+    font-size: 0.9rem;
+    padding: 8px 15px;
+    /* Pas d'animation pour être plus discret */
 }
 
 /* Barres de vie et shield */
