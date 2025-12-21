@@ -87,7 +87,7 @@
     transition: all 0.3s ease;
 }
 
-/* Mode plein écran */
+/* Mode plein écran - Tout est plus gros proportionnellement */
 .game-wrapper:fullscreen,
 .game-wrapper:-webkit-full-screen,
 .game-wrapper:-moz-full-screen,
@@ -116,20 +116,23 @@
     border-radius: 0;
 }
 
+/* Barres de vie - Plus grandes en plein écran */
 .game-wrapper:fullscreen .health-bars,
 .game-wrapper:-webkit-full-screen .health-bars,
 .game-wrapper:-moz-full-screen .health-bars,
 .game-wrapper:-ms-fullscreen .health-bars {
-    bottom: 20px;
-    right: 20px;
-    min-width: 250px;
+    bottom: 30px;
+    right: 30px;
+    min-width: 350px;
+    gap: 15px;
 }
 
 .game-wrapper:fullscreen .health-bar-container,
 .game-wrapper:-webkit-full-screen .health-bar-container,
 .game-wrapper:-moz-full-screen .health-bar-container,
 .game-wrapper:-ms-fullscreen .health-bar-container {
-    padding: 10px 15px;
+    padding: 15px 20px;
+    gap: 15px;
 }
 
 .game-wrapper:fullscreen .health-bar-label,
@@ -144,8 +147,8 @@
 .game-wrapper:-webkit-full-screen .boss-bar-label,
 .game-wrapper:-moz-full-screen .boss-bar-label,
 .game-wrapper:-ms-fullscreen .boss-bar-label {
-    font-size: 0.9rem;
-    min-width: 60px;
+    font-size: 1.3rem;
+    min-width: 90px;
 }
 
 .game-wrapper:fullscreen .health-bar,
@@ -160,9 +163,96 @@
 .game-wrapper:-webkit-full-screen .boss-bar,
 .game-wrapper:-moz-full-screen .boss-bar,
 .game-wrapper:-ms-fullscreen .boss-bar {
-    height: 22px;
-=======
->>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
+    height: 32px;
+}
+
+/* Affichage du niveau - Plus grand en plein écran */
+.game-wrapper:fullscreen .level-display,
+.game-wrapper:-webkit-full-screen .level-display,
+.game-wrapper:-moz-full-screen .level-display,
+.game-wrapper:-ms-fullscreen .level-display {
+    bottom: 30px;
+    left: 30px;
+    padding: 18px 28px;
+    min-width: 150px;
+    gap: 8px;
+}
+
+.game-wrapper:fullscreen .level-label,
+.game-wrapper:-webkit-full-screen .level-label,
+.game-wrapper:-moz-full-screen .level-label,
+.game-wrapper:-ms-fullscreen .level-label {
+    font-size: 1.1rem;
+}
+
+.game-wrapper:fullscreen .level-value,
+.game-wrapper:-webkit-full-screen .level-value,
+.game-wrapper:-moz-full-screen .level-value,
+.game-wrapper:-ms-fullscreen .level-value {
+    font-size: 3rem;
+}
+
+/* Messages de jeu - Plus grands en plein écran */
+.game-wrapper:fullscreen .game-message,
+.game-wrapper:-webkit-full-screen .game-message,
+.game-wrapper:-moz-full-screen .game-message,
+.game-wrapper:-ms-fullscreen .game-message {
+    font-size: 2.5rem;
+    padding: 30px 60px;
+}
+
+.game-wrapper:fullscreen .game-message.powerup,
+.game-wrapper:-webkit-full-screen .game-message.powerup,
+.game-wrapper:-moz-full-screen .game-message.powerup,
+.game-wrapper:-ms-fullscreen .game-message.powerup {
+    font-size: 1.4rem;
+    padding: 12px 25px;
+}
+
+/* Écrans de début/fin - Plus grands en plein écran */
+.game-wrapper:fullscreen .game-over,
+.game-wrapper:-webkit-full-screen .game-over,
+.game-wrapper:-moz-full-screen .game-over,
+.game-wrapper:-ms-fullscreen .game-over,
+.game-wrapper:fullscreen .start-screen,
+.game-wrapper:-webkit-full-screen .start-screen,
+.game-wrapper:-moz-full-screen .start-screen,
+.game-wrapper:-ms-fullscreen .start-screen {
+    padding: 60px;
+    min-width: 500px;
+}
+
+.game-wrapper:fullscreen .game-over h3,
+.game-wrapper:-webkit-full-screen .game-over h3,
+.game-wrapper:-moz-full-screen .game-over h3,
+.game-wrapper:-ms-fullscreen .game-over h3,
+.game-wrapper:fullscreen .start-screen h3,
+.game-wrapper:-webkit-full-screen .start-screen h3,
+.game-wrapper:-moz-full-screen .start-screen h3,
+.game-wrapper:-ms-fullscreen .start-screen h3 {
+    font-size: 3rem;
+    margin-bottom: 30px;
+}
+
+.game-wrapper:fullscreen .game-over p,
+.game-wrapper:-webkit-full-screen .game-over p,
+.game-wrapper:-moz-full-screen .game-over p,
+.game-wrapper:-ms-fullscreen .game-over p,
+.game-wrapper:fullscreen .start-screen p,
+.game-wrapper:-webkit-full-screen .start-screen p,
+.game-wrapper:-moz-full-screen .start-screen p,
+.game-wrapper:-ms-fullscreen .start-screen p {
+    font-size: 1.8rem;
+    margin: 15px 0;
+}
+
+.game-wrapper:fullscreen .game-over-buttons .btn,
+.game-wrapper:-webkit-full-screen .game-over-buttons .btn,
+.game-wrapper:-moz-full-screen .game-over-buttons .btn,
+.game-wrapper:-ms-fullscreen .game-over-buttons .btn {
+    font-size: 1.3rem;
+    padding: 18px 35px;
+    max-width: 350px;
 }
 
 #gameCanvas {
