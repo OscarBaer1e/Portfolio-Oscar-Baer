@@ -590,7 +590,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function canRegisterScore(score) {
         // Validation locale : vérifier si le score peut entrer dans le top 10
-        // Pas de validation Firebase nécessaire
         if (!leaderboard || leaderboard.length === 0) return true;
         
         // Si le leaderboard n'est pas plein, on peut toujours enregistrer
@@ -603,8 +602,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     async function registerScore(name, score, level) {
         // Vérification locale : le score doit dépasser le dernier du top 10
-        // Pas de validation Firebase nécessaire - tout le monde peut créer un score
-        // si la condition est remplie
         
         // Vérifier que le score peut entrer dans le top 10
         if (!canRegisterScore(score)) {
@@ -2134,7 +2131,7 @@ document.addEventListener('DOMContentLoaded', function() {
         startBtn.textContent = 'Commencer';
         
         // Vérifier si le score peut être enregistré dans le leaderboard
-        // Utilisation du leaderboard local (pas besoin de recharger depuis Firebase)
+        // Utilisation du leaderboard local
         // Le leaderboard est déjà chargé au démarrage et synchronisé en arrière-plan
         if (canRegisterScore(gameState.score) && registerScoreBtn) {
             registerScoreBtn.classList.remove('hidden');
@@ -2292,7 +2289,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Bouton pour ouvrir le formulaire d'enregistrement de score
     if (registerScoreBtn && scoreRegister && registerScoreValue && registerLevelValue && registerPositionValue) {
         registerScoreBtn.addEventListener('click', () => {
-            // Utilisation du leaderboard local (pas besoin de recharger depuis Firebase)
+            // Utilisation du leaderboard local
             if (canRegisterScore(gameState.score)) {
                 const position = calculateScorePosition(gameState.score);
                 registerScoreValue.textContent = gameState.score.toLocaleString();
@@ -2337,8 +2334,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Initialisation
-    // Attendre que Firebase soit chargé avant d'initialiser
-    // Initialiser le jeu (utilise Supabase maintenant, pas Firebase)
+    // Initialiser le jeu (utilise Supabase)
     loadLeaderboard().then(() => {
         init();
         draw();
