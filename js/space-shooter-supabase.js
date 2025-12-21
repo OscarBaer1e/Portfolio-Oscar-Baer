@@ -155,16 +155,44 @@ async function saveScoreToSupabase(name, score, level) {
         
         console.log('📦 Données formatées:', scoreData);
         
-        const { data, error } = await supabase
-            .from('leaderboard')
-            .insert([scoreData])
-            .select();
+        // Méthode 1 : Utiliser la fonction SQL (recommandé)
+        // Appeler la fonction PostgreSQL insert_leaderboard_score
+        const { data: functionData, error: functionError } = await supabase.rpc('insert_leaderboard_score', {
+            p_name: scoreData.name,
+            p_score: scoreData.score,
+            p_level: scoreData.level
+        });
         
-        console.log('📊 Réponse Supabase (insert):', { data, error });
+        if (functionError) {
+            console.warn('⚠️ Fonction SQL non disponible, tentative insertion directe...', functionError);
+            
+            // Méthode 2 : Fallback vers insertion directe
+            const { data, error } = await supabase
+                .from('leaderboard')
+                .insert([scoreData])
+                .select();
+            
+            console.log('📊 Réponse Supabase (insert direct):', { data, error });
+            
+            if (error) {
+                console.error('❌ Erreur lors de l\'insertion:', error);
+                throw error;
+            }
+            
+            console.log('✅ Score enregistré via insertion directe avec ID:', data[0]?.id);
+            console.log('✅ Données enregistrées:', data[0]);
+            return true;
+        }
         
-        if (error) {
-            console.error('❌ Erreur lors de l\'insertion:', error);
-            throw error;
+        // Vérifier le résultat de la fonction
+        console.log('📊 Réponse fonction SQL:', functionData);
+        
+        if (functionData && functionData.success) {
+            console.log('✅ Score enregistré via fonction SQL avec ID:', functionData.id);
+            return true;
+        } else {
+            console.error('❌ Fonction SQL a retourné une erreur:', functionData);
+            throw new Error(functionData?.message || 'Erreur inconnue');
         }
         
         console.log('✅ Score enregistré dans Supabase avec ID:', data[0]?.id);
