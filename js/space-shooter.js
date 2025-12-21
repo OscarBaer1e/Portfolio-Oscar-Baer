@@ -253,16 +253,16 @@ document.addEventListener('DOMContentLoaded', function() {
     // Charger automatiquement les images de boss par défaut
     function loadDefaultBossImages() {
         const bossImagePaths = {
-            1: '../ressources/images/Locked in alien.jpg',
-            2: '../ressources/images/Goku SSJ3.webp',
+            1: '../ressources/images/Locked_in_alien.jpg',
+            2: '../ressources/images/Goku_SSJ3.webp',
             3: '../ressources/images/Karism.jpg',
             4: '../ressources/images/Herobrine.avif',
             5: '../ressources/images/Goblinstein.jpg',
-            6: '../ressources/images/Michael Personne.avif',
-            7: '../ressources/images/M. BAER.jpg',
+            6: '../ressources/images/Michael_Personne.avif',
+            7: '../ressources/images/M_BAER.jpg',
             8: '../ressources/images/Sunshine.jpg',
-            9: '../ressources/images/What Sans.webp',
-            10: '../ressources/images/IUT GUSTAVE EIFFEL.png'
+            9: '../ressources/images/What_Sans.webp',
+            10: '../ressources/images/IUT_GUSTAVE_EIFFEL.png'
         };
         
         Object.keys(bossImagePaths).forEach(bossNum => {
