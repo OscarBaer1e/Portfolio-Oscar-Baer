@@ -117,3 +117,4 @@ window.firebaseDb.collection('leaderboard').limit(1).get()
     .catch(e => console.error('❌ Erreur:', e.code));
 ```
 
+

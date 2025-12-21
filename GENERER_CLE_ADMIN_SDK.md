@@ -105,3 +105,4 @@ const firebaseConfig = {
 
 C'est suffisant pour lire/écrire dans Firestore depuis le navigateur.
 
+

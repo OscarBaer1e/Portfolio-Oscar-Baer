@@ -168,3 +168,4 @@ Pour vérifier que Firebase est bien chargé, ouvrez la console du navigateur (F
 ✅ Project ID: oscar-baer
 ```
 
+

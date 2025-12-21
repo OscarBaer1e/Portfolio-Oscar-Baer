@@ -67,3 +67,4 @@ Causes possibles :
 
 **Solution** : Vérifiez les règles Firestore dans Firebase Console (voir `CE_QUE_VOUS_DEVEZ_MODIFIER.md`)
 
+

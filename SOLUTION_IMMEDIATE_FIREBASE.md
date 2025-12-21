@@ -92,3 +92,4 @@ console.log('firebaseInitialized:', window.firebaseInitialized);
 
 Tous devraient maintenant avoir des valeurs (pas `undefined`).
 
+

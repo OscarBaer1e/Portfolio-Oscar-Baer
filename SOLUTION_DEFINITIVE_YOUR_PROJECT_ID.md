@@ -179,3 +179,4 @@ Le code est maintenant **ultra-protégé** contre YOUR_PROJECT_ID. Si l'erreur p
 - Des règles Firestore non publiées
 - Une variable d'environnement Vercel incorrecte
 
+

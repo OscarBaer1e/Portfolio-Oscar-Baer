@@ -2423,16 +2423,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialisation
     // Attendre que Firebase soit chargé avant d'initialiser
-    function waitForFirebase(callback, maxAttempts = 10) {
+    function waitForFirebase(callback, maxAttempts = 30) {
         let attempts = 0;
         const checkFirebase = () => {
-            if (typeof firebase !== 'undefined' && firebase.apps) {
+            // Vérifier si Firebase est initialisé via window (npm ou CDN)
+            if (window.firebaseInitialized && window.firebaseDb) {
                 callback();
             } else if (attempts < maxAttempts) {
                 attempts++;
                 setTimeout(checkFirebase, 100);
             } else {
                 // Firebase n'est pas disponible, continuer avec localStorage
+                console.warn('⚠️ Firebase non initialisé après', maxAttempts, 'tentatives, utilisation de localStorage');
                 callback();
             }
         };
