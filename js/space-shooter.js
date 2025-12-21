@@ -258,9 +258,9 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('📌 Utilisation des valeurs par défaut (config directe)');
         FIREBASE_CONFIG = {
             apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
-            authDomain: "oscar-baer.firebaseapp.com",
-            projectId: "oscar-baer",
-            storageBucket: "oscar-baer.firebasestorage.app",
+            authDomain: "leaderboard.firebaseapp.com",
+            projectId: "leaderboard",
+            storageBucket: "leaderboard.firebasestorage.app",
             messagingSenderId: "419618942184",
             appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
         };
