@@ -1452,19 +1452,25 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                     
-                    // Chance de faire apparaître un boost
+                    // Chance de faire apparaître un boost (équilibré selon l'impact)
                     const boostChance = Math.random();
                     if (boostChance < 0.05) {
+                        // 5% - Tir rapide (fort impact)
                         spawnPowerUp(asteroid.x, asteroid.y, 'rapidFire');
                     } else if (boostChance < 0.08) {
+                        // 3% - Bouclier (fort impact)
                         spawnPowerUp(asteroid.x, asteroid.y, 'shield');
                     } else if (boostChance < 0.09) {
+                        // 1% - Vie (très fort impact, très rare)
                         spawnPowerUp(asteroid.x, asteroid.y, 'life');
                     } else if (boostChance < 0.11) {
+                        // 2% - Rétrécissement (impact moyen)
                         spawnPowerUp(asteroid.x, asteroid.y, 'shrink');
                     } else if (boostChance < 0.13) {
+                        // 2% - Munitions XL (impact moyen)
                         spawnPowerUp(asteroid.x, asteroid.y, 'bigBullets');
-                    } else if (boostChance < 0.15) {
+                    } else if (boostChance < 0.145) {
+                        // 1.5% - Tir triple (fort impact, rare)
                         spawnPowerUp(asteroid.x, asteroid.y, 'tripleShot');
                     }
                     
@@ -2902,6 +2908,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 y: ship.y - ship.height / 2,
                 speed: 8,
                 vx: -0.5,
+                vy: -8,
                 size: bulletSize
             });
             bullets.push({
@@ -2909,6 +2916,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 y: ship.y - ship.height / 2,
                 speed: 8,
                 vx: 0,
+                vy: -8,
                 size: bulletSize
             });
             bullets.push({
@@ -2916,6 +2924,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 y: ship.y - ship.height / 2,
                 speed: 8,
                 vx: 0.5,
+                vy: -8,
                 size: bulletSize
             });
         } else {
