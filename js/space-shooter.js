@@ -1421,12 +1421,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (gameState.lives <= 0) {
                     endGame();
                 } else {
-                    // Invincibilité temporaire avec clignotement (1-2 secondes)
+                    // Invincibilité temporaire avec clignotement (2 secondes exactement)
                     ship.invincible = true;
-                    const invincibleDuration = 1500 + Math.random() * 500; // Entre 1.5 et 2 secondes
                     setTimeout(() => {
                         ship.invincible = false;
-                    }, invincibleDuration);
+                    }, 2000);
                     }
                 }
             }
@@ -2437,14 +2436,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         console.warn('Erreur updateHealthBars:', e);
                     }
                     
-                    // Vérifier le niveau maintenant que le boss est vaincu (avec délai pour éviter les conflits)
+                    // Monter automatiquement au niveau juste au-dessus (ex: boss niveau 10 → niveau 11)
+                    // Ne pas utiliser checkLevel() qui calcule selon le score (peut sauter plusieurs niveaux)
+                    gameState.level += 1;
+                    gameState.gameSpeed += 0.5;
+                    if (levelElement) levelElement.textContent = gameState.level;
+                    if (currentLevelDisplay) currentLevelDisplay.textContent = gameState.level;
+                    
+                    // Rendre le joueur invincible pendant 2 secondes exactement
+                    ship.invincible = true;
                     setTimeout(() => {
-                        try {
-                            checkLevel();
-                        } catch (e) {
-                            console.warn('Erreur checkLevel:', e);
-                        }
-                    }, 100);
+                        ship.invincible = false;
+                    }, 2000);
                     
                     // Si on atteint le niveau 100, victoire finale
                     if (gameState.level >= 100) {
