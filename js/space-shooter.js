@@ -1721,30 +1721,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Crée une animation visuelle pour le score (comme les bonus)
-    function createScoreAnimation(x, y, scoreText) {
-        // Position aléatoire pour le texte (à côté de la position du boss mort)
-        const angle = Math.random() * Math.PI * 2;
-        const distance = 50 + Math.random() * 30; // Entre 50 et 80 pixels
-        const textX = x + Math.cos(angle) * distance;
-        const textY = y + Math.sin(angle) * distance;
-        
-        const animation = {
-            type: 'score',
-            textX: textX,
-            textY: textY,
-            text: scoreText,
-            glowColor: '#ffff00', // Jaune pour les points
-            life: 1.0,
-            alpha: 1.0,
-            glowIntensity: 1.0,
-            textOffsetX: (Math.random() - 0.5) * 15,
-            textOffsetY: (Math.random() - 0.5) * 15,
-            vy: -1.5 // Montée légère
-        };
-        
-        powerUpVisualAnimations.push(animation);
-    }
-    
     // Crée une animation visuelle pour un bonus avec lumière et texte stylé
     function createPowerUpVisualAnimation(type, x, y) {
         // Définir les textes et couleurs selon le type
@@ -1875,20 +1851,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 return;
             }
             
-            if (anim.type === 'score') {
-                // Animation de score : monte légèrement puis disparaît
-                anim.textY += anim.vy || -1.5;
-                anim.textOffsetX += (Math.random() - 0.5) * 0.3;
-                anim.textOffsetY += (Math.random() - 0.5) * 0.3;
-                
-                // Limiter le mouvement
-                anim.textOffsetX = Math.max(-10, Math.min(10, anim.textOffsetX));
-                anim.textOffsetY = Math.max(-10, Math.min(10, anim.textOffsetY));
-                
-                // Fade out progressif
-                anim.life -= 0.02;
-                anim.alpha = Math.max(0, anim.life);
-            } else {
+            if (anim.type !== 'score') {
                 // Animation de bonus : suit le vaisseau
                 // Mettre à jour la position du vaisseau (suivre le vaisseau)
                 anim.shipX = ship.x;
@@ -2531,14 +2494,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     boss.size = boss.maxSize * (0.5 + healthPercent * 0.5); // Entre 50% et 100% de la taille
                     
                     if (boss.health <= 0) {
-                        // Sauvegarder les infos du boss avant de le supprimer
+                        // Sauvegarder le numéro du boss pour le score
                         const defeatedBossNumber = boss.bossNumber;
-                        const defeatedBossX = boss.x;
-                        const defeatedBossY = boss.y;
-                        const defeatedBossColor = boss.color;
-                        const defeatedBossSize = Math.min(boss.size || 50, 80);
                         
-                        // Mise à jour du score immédiatement (ne bloque pas)
+                        // Mise à jour du score immédiatement
                         gameState.score += defeatedBossNumber * 1000;
                         if (scoreElement) scoreElement.textContent = gameState.score;
                         
@@ -2553,13 +2512,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             }, 0);
                         } catch (e) {
                             console.warn('Erreur son victory:', e);
-                        }
-                        
-                        // Animation visuelle du score à côté du boss mort (comme les bonus)
-                        try {
-                            createScoreAnimation(defeatedBossX, defeatedBossY, `+${defeatedBossNumber * 1000} points`);
-                        } catch (e) {
-                            console.warn('Erreur animation score:', e);
                         }
                         
                         try {
