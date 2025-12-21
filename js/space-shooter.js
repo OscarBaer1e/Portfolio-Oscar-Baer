@@ -27,11 +27,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const finalHighScore = document.getElementById('final-high-score');
     const finalLevel = document.getElementById('final-level');
     const scoreMessage = document.getElementById('score-message');
-    const registerScoreBtn = document.getElementById('register-score-btn');
-    const cancelRegisterBtn = document.getElementById('cancel-register');
-    const fullscreenBtn = document.getElementById('fullscreen-btn');
-    const gameWrapper = document.querySelector('.game-wrapper');
-    const currentLevelDisplay = document.getElementById('current-level-display');
     
     // Éléments des icônes de buff
     const buffRapidFire = document.getElementById('buff-rapidFire');
