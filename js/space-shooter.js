@@ -909,13 +909,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const effect = getBossImageEffect(boss.bossNumber);
         const imageSize = boss.size * 2;
         
-        // Image du boss si disponible
-        if (boss.image) {
-            // Vérifier si l'image est chargée
-            if (boss.image.complete && boss.image.naturalWidth > 0) {
-                // Dessiner l'effet autour de l'image AVANT l'image
-                drawBossImageEffect(effect, imageSize);
-                
+        // Dessiner l'effet autour du boss (toujours, même sans image)
+        drawBossImageEffect(effect, imageSize);
+        
+        // Image du boss si disponible et chargée
+        if (boss.image && boss.image.complete && boss.image.naturalWidth > 0) {
+            try {
                 // Créer un masque circulaire pour arrondir l'image
                 ctx.save();
                 ctx.beginPath();
@@ -934,14 +933,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 ctx.beginPath();
                 ctx.arc(0, 0, imageSize / 2, 0, Math.PI * 2);
                 ctx.stroke();
-            } else {
-                // Image pas encore chargée, afficher la forme par défaut temporairement
-                console.warn('Image boss pas encore chargée, affichage forme par défaut');
-                // Continuer vers le else pour afficher la forme par défaut
+            } catch (e) {
+                // Erreur lors du dessin de l'image - utiliser la forme par défaut
+                console.warn('Erreur dessin image boss, utilisation forme par défaut:', e);
+                // Continuer vers la forme par défaut
             }
         }
         
-        // Forme par défaut si pas d'image ou image non chargée
+        // Forme par défaut si pas d'image, image non chargée, ou erreur
         if (!boss.image || !boss.image.complete || boss.image.naturalWidth === 0) {
             // Forme par défaut : boule colorée avec effets
             const gradient = ctx.createRadialGradient(0, -boss.size * 0.3, 0, 0, 0, boss.size);
@@ -1853,13 +1852,14 @@ document.addEventListener('DOMContentLoaded', function() {
             targetY: 100
         };
         
-        // Charger l'image du boss si disponible
-        if (bossPhotos[bossNumber]) {
+        // Charger l'image du boss si disponible (mais ne pas bloquer si elle n'est pas là)
+        if (bossPhotos[bossNumber] && bossPhotos[bossNumber].complete && bossPhotos[bossNumber].naturalWidth > 0) {
             boss.image = bossPhotos[bossNumber];
-            console.log(`Image boss ${bossNumber} assignée:`, boss.image.complete, boss.image.naturalWidth);
+            console.log(`✅ Image boss ${bossNumber} assignée et chargée`);
         } else {
-            console.warn(`⚠️ Image boss ${bossNumber} non disponible dans bossPhotos`);
-            console.log('bossPhotos disponibles:', Object.keys(bossPhotos));
+            // Pas d'image ou image non chargée - le boss s'affichera avec la forme par défaut
+            boss.image = null;
+            console.log(`ℹ️ Boss ${bossNumber} sans image - forme par défaut utilisée`);
         }
         
         gameState.bossActive = true;
