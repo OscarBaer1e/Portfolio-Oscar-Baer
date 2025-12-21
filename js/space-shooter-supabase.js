@@ -134,10 +134,37 @@ async function saveScoreToSupabase(name, score, level) {
     } catch (error) {
         console.error('❌ Erreur sauvegarde Supabase:', error);
         console.error('📝 Message:', error.message);
+        console.error('📝 Code:', error.code);
+        console.error('📝 Détails:', error);
         
-        if (error.code === 'PGRST116') {
-            console.error('🔒 PERMISSION DENIED - Vérifiez les policies RLS dans Supabase');
-            console.error('📋 Solution: Voir SETUP_SUPABASE.md étape 6');
+        if (error.code === 'PGRST116' || error.code === '42501') {
+            console.error('');
+            console.error('🔒 ============================================');
+            console.error('🔒 PERMISSION DENIED - RLS Policies');
+            console.error('🔒 ============================================');
+            console.error('');
+            console.error('📋 SOLUTION:');
+            console.error('   1. Allez sur https://supabase.com/dashboard');
+            console.error('   2. Votre projet → Table Editor → leaderboard');
+            console.error('   3. Onglet "Policies"');
+            console.error('   4. Créez 2 policies:');
+            console.error('      - SELECT: Allow public read (true)');
+            console.error('      - INSERT: Allow public insert (true)');
+            console.error('   5. Voir SETUP_SUPABASE.md étape 6');
+            console.error('');
+        } else if (error.code === '42P01') {
+            console.error('');
+            console.error('📦 ============================================');
+            console.error('📦 TABLE NON TROUVÉE');
+            console.error('📦 ============================================');
+            console.error('');
+            console.error('📋 SOLUTION:');
+            console.error('   1. Allez sur https://supabase.com/dashboard');
+            console.error('   2. Votre projet → Table Editor');
+            console.error('   3. Créez la table "leaderboard"');
+            console.error('   4. Colonnes: id, name, score, level, created_at');
+            console.error('   5. Voir SETUP_SUPABASE.md étape 3-4');
+            console.error('');
         }
         
         return false;
