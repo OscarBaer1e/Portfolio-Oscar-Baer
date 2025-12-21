@@ -748,17 +748,52 @@ document.addEventListener('DOMContentLoaded', function() {
             drawShield();
         }
         
-        // Particules
+        // Particules avec effets stylés selon le type
         particles.forEach(particle => {
-            ctx.fillStyle = particle.color;
-            ctx.globalAlpha = particle.alpha;
-            ctx.shadowBlur = particle.size * 2;
-            ctx.shadowColor = particle.color;
-            ctx.beginPath();
-            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.globalAlpha = 1;
-            ctx.shadowBlur = 0;
+            if (!particle) return;
+            
+            ctx.save();
+            ctx.globalAlpha = particle.alpha || 1;
+            
+            if (particle.type === 'star') {
+                // Étoile stylée avec 4 branches
+                ctx.fillStyle = particle.color;
+                ctx.shadowBlur = particle.size * 3;
+                ctx.shadowColor = particle.color;
+                ctx.translate(particle.x, particle.y);
+                ctx.rotate(Math.atan2(particle.vy || 0, particle.vx || 0));
+                ctx.beginPath();
+                for (let i = 0; i < 4; i++) {
+                    const angle = (Math.PI / 2) * i;
+                    ctx.moveTo(0, 0);
+                    ctx.lineTo(Math.cos(angle) * particle.size * 1.5, Math.sin(angle) * particle.size * 1.5);
+                }
+                ctx.closePath();
+                ctx.fill();
+            } else if (particle.type === 'sparkle') {
+                // Étincelle brillante avec effet de lueur
+                ctx.fillStyle = particle.color;
+                ctx.shadowBlur = particle.size * 4;
+                ctx.shadowColor = particle.color;
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                ctx.fill();
+                // Cœur brillant supplémentaire
+                ctx.globalAlpha = particle.alpha * 0.5;
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.size * 2, 0, Math.PI * 2);
+                ctx.fill();
+            } else {
+                // Particule normale avec effet de lueur amélioré
+                ctx.fillStyle = particle.color;
+                ctx.shadowBlur = particle.size * 2.5;
+                ctx.shadowColor = particle.color;
+                ctx.beginPath();
+                ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            
+            ctx.restore();
         });
         
         // Animations de fond rares
@@ -1284,26 +1319,99 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Explosion discrète pour les bonus (évite les crashes)
+    // Explosion stylée pour les bonus avec effets visuels améliorés
     function createSmallExplosion(x, y, color) {
         try {
-            // Limiter le nombre de particules pour éviter les crashes
-            const maxParticles = 5;
-            for (let i = 0; i < maxParticles; i++) {
+            // Particules principales en étoile (8 directions)
+            const starParticles = 8;
+            for (let i = 0; i < starParticles; i++) {
+                const angle = (Math.PI * 2 / starParticles) * i;
+                const speed = Math.random() * 3 + 2;
                 particles.push({
                     x: x,
                     y: y,
-                    vx: (Math.random() - 0.5) * 2,
-                    vy: (Math.random() - 0.5) * 2,
-                    size: Math.random() * 2 + 1,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    size: Math.random() * 3 + 2,
                     color: color,
-                    alpha: 0.6,
-                    life: 0.8
+                    alpha: 1,
+                    life: 1,
+                    type: 'star'
+                });
+            }
+            
+            // Particules secondaires aléatoires avec couleurs variées
+            const randomParticles = 6;
+            const colorVariations = [
+                color,
+                lightenColor(color, 0.3),
+                darkenColor(color, 0.2),
+                '#ffffff',
+                '#ffff00'
+            ];
+            
+            for (let i = 0; i < randomParticles; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 2.5 + 1;
+                const particleColor = colorVariations[Math.floor(Math.random() * colorVariations.length)];
+                
+                particles.push({
+                    x: x + (Math.random() - 0.5) * 10,
+                    y: y + (Math.random() - 0.5) * 10,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    size: Math.random() * 2 + 1,
+                    color: particleColor,
+                    alpha: 0.8,
+                    life: 0.9,
+                    type: 'spark'
+                });
+            }
+            
+            // Particules de brillance (petites et rapides)
+            const sparkleParticles = 4;
+            for (let i = 0; i < sparkleParticles; i++) {
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 4 + 3;
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    size: Math.random() * 1.5 + 0.5,
+                    color: '#ffffff',
+                    alpha: 1,
+                    life: 0.6,
+                    type: 'sparkle'
                 });
             }
         } catch (e) {
             console.warn('Erreur createSmallExplosion:', e);
         }
+    }
+    
+    // Fonction utilitaire pour éclaircir une couleur
+    function lightenColor(color, amount) {
+        if (color.startsWith('#')) {
+            const num = parseInt(color.replace('#', ''), 16);
+            const r = Math.min(255, ((num >> 16) & 0xFF) + Math.floor(255 * amount));
+            const g = Math.min(255, ((num >> 8) & 0xFF) + Math.floor(255 * amount));
+            const b = Math.min(255, (num & 0xFF) + Math.floor(255 * amount));
+            return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+        }
+        return color;
+    }
+    
+    // Fonction utilitaire pour assombrir une couleur
+    function darkenColor(color, amount) {
+        if (color.startsWith('#')) {
+            const num = parseInt(color.replace('#', ''), 16);
+            const r = Math.max(0, ((num >> 16) & 0xFF) - Math.floor(255 * amount));
+            const g = Math.max(0, ((num >> 8) & 0xFF) - Math.floor(255 * amount));
+            const b = Math.max(0, (num & 0xFF) - Math.floor(255 * amount));
+            return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, '0')}`;
+        }
+        return color;
     }
     
     // Explosion améliorée avec plus de particules et effets
@@ -1433,7 +1541,7 @@ document.addEventListener('DOMContentLoaded', function() {
             gameState.gameSpeed += 0.3;
             if (levelElement) levelElement.textContent = gameState.level;
             if (currentLevelDisplay) currentLevelDisplay.textContent = gameState.level;
-                showMessage(`Niveau ${gameState.level} !`, 'level');
+                // Animation de niveau supprimée
             }
             // Pas de boss en mode infini
             return;
@@ -1447,8 +1555,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (levelElement) levelElement.textContent = gameState.level;
             if (currentLevelDisplay) currentLevelDisplay.textContent = gameState.level;
             
-            // Effet visuel
-            showMessage(`Niveau ${gameState.level} !`, 'level');
+            // Animation de niveau supprimée
             
             // Vérifier si un boss doit apparaître (tous les 10 niveaux)
             if (gameState.level % 10 === 0 && !gameState.bossActive && !boss) {
