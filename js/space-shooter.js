@@ -1489,6 +1489,9 @@ document.addEventListener('DOMContentLoaded', function() {
             activePowerUps.tripleShot = false;
         }
         
+        // Mettre à jour les icônes de buff
+        updateBuffIcons();
+        
         // Collision projectiles/astéroïdes
         bullets.forEach((bullet, bulletIndex) => {
             asteroids.forEach((asteroid, asteroidIndex) => {
