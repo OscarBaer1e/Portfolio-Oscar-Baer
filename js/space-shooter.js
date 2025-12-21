@@ -195,8 +195,14 @@ document.addEventListener('DOMContentLoaded', function() {
     let activePowerUps = {
         rapidFire: false,
         shield: false,
+        shrink: false,
+        bigBullets: false,
+        tripleShot: false,
         rapidFireEndTime: 0,
-        shieldEndTime: 0
+        shieldEndTime: 0,
+        shrinkEndTime: 0,
+        bigBulletsEndTime: 0,
+        tripleShotEndTime: 0
     };
     
     // Étoiles de fond
@@ -705,8 +711,14 @@ document.addEventListener('DOMContentLoaded', function() {
         activePowerUps = {
             rapidFire: false,
             shield: false,
+            shrink: false,
+            bigBullets: false,
+            tripleShot: false,
             rapidFireEndTime: 0,
-            shieldEndTime: 0
+            shieldEndTime: 0,
+            shrinkEndTime: 0,
+            bigBulletsEndTime: 0,
+            tripleShotEndTime: 0
         };
         lastShotTime = 0;
         if (currentLevelDisplay) {
@@ -787,8 +799,9 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.fillStyle = '#00ffff';
             ctx.shadowBlur = 10;
             ctx.shadowColor = '#00ffff';
+            const bulletSize = bullet.size || 4;
             ctx.beginPath();
-            ctx.arc(bullet.x, bullet.y, 4, 0, Math.PI * 2);
+            ctx.arc(bullet.x, bullet.y, bulletSize, 0, Math.PI * 2);
             ctx.fill();
             ctx.shadowBlur = 0;
         });
@@ -1050,6 +1063,10 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.save();
         ctx.translate(x, y);
         
+        // Rétrécissement si bonus actif
+        const shrinkScale = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? 0.6 : 1.0;
+        ctx.scale(shrinkScale, shrinkScale);
+        
         // Corps du vaisseau
         ctx.fillStyle = ship.color;
         ctx.shadowBlur = 15;
@@ -1148,6 +1165,55 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.bezierCurveTo(8, 0, 0, 0, 0, 5);
             ctx.closePath();
             ctx.fill();
+            ctx.stroke();
+        } else if (powerUp.type === 'shrink') {
+            // Rétrécissement - flèche vers le bas
+            ctx.fillStyle = '#00ff00';
+            ctx.strokeStyle = '#00aa00';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, -8);
+            ctx.lineTo(-6, 0);
+            ctx.lineTo(-3, 0);
+            ctx.lineTo(-3, 8);
+            ctx.lineTo(3, 8);
+            ctx.lineTo(3, 0);
+            ctx.lineTo(6, 0);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        } else if (powerUp.type === 'bigBullets') {
+            // Munitions plus grandes - cercle avec étoile
+            ctx.fillStyle = '#ff8800';
+            ctx.strokeStyle = '#ff6600';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = '#ffff00';
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                const angle = (Math.PI * 2 / 5) * i - Math.PI / 2;
+                const x = Math.cos(angle) * 5;
+                const y = Math.sin(angle) * 5;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            ctx.fill();
+        } else if (powerUp.type === 'tripleShot') {
+            // Tir triple - trois lignes
+            ctx.fillStyle = '#ff00ff';
+            ctx.strokeStyle = '#ff0088';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(-8, -8);
+            ctx.lineTo(0, 8);
+            ctx.moveTo(0, -8);
+            ctx.lineTo(0, 8);
+            ctx.moveTo(8, -8);
+            ctx.lineTo(0, 8);
             ctx.stroke();
         }
         
@@ -1253,7 +1319,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Mise à jour des projectiles
         bullets.forEach((bullet, index) => {
-            bullet.y -= bullet.speed;
+            if (bullet.vx !== undefined) {
+                bullet.y += bullet.vy || bullet.speed;
+                bullet.x += bullet.vx;
+            } else {
+                bullet.y -= bullet.speed;
+            }
             if (bullet.y < 0) {
                 bullets.splice(index, 1);
             }
@@ -1330,7 +1401,15 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (activePowerUps.shield && now > activePowerUps.shieldEndTime) {
             activePowerUps.shield = false;
-            // Pas de message de fin
+        }
+        if (activePowerUps.shrink && now > activePowerUps.shrinkEndTime) {
+            activePowerUps.shrink = false;
+        }
+        if (activePowerUps.bigBullets && now > activePowerUps.bigBulletsEndTime) {
+            activePowerUps.bigBullets = false;
+        }
+        if (activePowerUps.tripleShot && now > activePowerUps.tripleShotEndTime) {
+            activePowerUps.tripleShot = false;
         }
         
         // Collision projectiles/astéroïdes
@@ -1340,7 +1419,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const dy = bullet.y - asteroid.y;
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 
-                if (distance < asteroid.size + 5) {
+                const bulletSize = bullet.size || 4;
+                if (distance < asteroid.size + bulletSize) {
                     // Explosion améliorée
                     createEnhancedExplosion(asteroid.x, asteroid.y, asteroid.color, asteroid.size);
                     playSound('explosion');
@@ -1372,7 +1452,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                     
-                    // Chance de faire apparaître un boost (5% pour vitesse de tir, 3% pour bouclier, 1% pour vie)
+                    // Chance de faire apparaître un boost
                     const boostChance = Math.random();
                     if (boostChance < 0.05) {
                         spawnPowerUp(asteroid.x, asteroid.y, 'rapidFire');
@@ -1380,6 +1460,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         spawnPowerUp(asteroid.x, asteroid.y, 'shield');
                     } else if (boostChance < 0.09) {
                         spawnPowerUp(asteroid.x, asteroid.y, 'life');
+                    } else if (boostChance < 0.11) {
+                        spawnPowerUp(asteroid.x, asteroid.y, 'shrink');
+                    } else if (boostChance < 0.13) {
+                        spawnPowerUp(asteroid.x, asteroid.y, 'bigBullets');
+                    } else if (boostChance < 0.15) {
+                        spawnPowerUp(asteroid.x, asteroid.y, 'tripleShot');
                     }
                     
                     // Supprimer l'astéroïde
@@ -1397,7 +1483,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const dy = ship.y - asteroid.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
             
-            if (distance < asteroid.size + ship.width / 2) {
+            const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
+            if (distance < asteroid.size + shipSize) {
                 // Si le bouclier est actif, l'astéroïde est détruit sans perdre de vie
                 if (activePowerUps.shield && Date.now() < activePowerUps.shieldEndTime) {
                     createEnhancedExplosion(asteroid.x, asteroid.y, asteroid.color, asteroid.size);
@@ -1584,86 +1671,6 @@ document.addEventListener('DOMContentLoaded', function() {
         powerUpVisualAnimations.push(animation);
     }
     
-    // Crée une explosion SPECTACULAIRE pour la mort du boss (feux d'artifice améliorés)
-    function createBossDeathExplosion(x, y, color, size) {
-        try {
-            // Vérifier la limite de particules avant d'ajouter
-            const MAX_PARTICLES = 200;
-            const currentParticleCount = particles.length;
-            const availableSlots = MAX_PARTICLES - currentParticleCount;
-            
-            if (availableSlots <= 30) {
-                // Nettoyer quelques vieilles particules pour faire de la place
-                particles = particles.slice(-150);
-            }
-            
-            // Explosion ÉLEVÉE avec beaucoup plus de particules et d'effets
-            const colors = [color, '#ffff00', '#ff00ff', '#00ffff', '#ff8800', '#ff0088', '#88ff00', '#0088ff'];
-            const mainParticleCount = Math.min(50, availableSlots - 20); // 50 particules principales
-            
-            // Créer les particules principales en étoile (explosion radiale)
-            for (let i = 0; i < mainParticleCount; i++) {
-                const angle = (Math.PI * 2 / mainParticleCount) * i;
-                const speed = Math.random() * 8 + 4; // Vitesse plus élevée
-                const particleColor = colors[Math.floor(Math.random() * colors.length)];
-                const particleSize = Math.random() * 5 + 2; // Taille plus grande
-                
-                particles.push({
-                    x: x,
-                    y: y,
-                    vx: Math.cos(angle) * speed,
-                    vy: Math.sin(angle) * speed,
-                    size: particleSize,
-                    color: particleColor,
-                    alpha: 1,
-                    life: 1.2, // Durée de vie plus longue
-                    type: 'star'
-                });
-            }
-            
-            // Particules secondaires (étincelles) - beaucoup plus nombreuses
-            const secondaryCount = Math.min(30, MAX_PARTICLES - particles.length);
-            for (let i = 0; i < secondaryCount; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 6 + 2;
-                const particleColor = colors[Math.floor(Math.random() * colors.length)];
-                
-                particles.push({
-                    x: x + (Math.random() - 0.5) * size,
-                    y: y + (Math.random() - 0.5) * size,
-                    vx: Math.cos(angle) * speed,
-                    vy: Math.sin(angle) * speed,
-                    size: Math.random() * 4 + 1,
-                    color: particleColor,
-                    alpha: 0.9,
-                    life: 1.1,
-                    type: 'spark'
-                });
-            }
-            
-            // Particules de brillance (sparkles) pour effet supplémentaire
-            const sparkleCount = Math.min(20, MAX_PARTICLES - particles.length);
-            for (let i = 0; i < sparkleCount; i++) {
-                const angle = Math.random() * Math.PI * 2;
-                const speed = Math.random() * 4 + 1;
-                
-                particles.push({
-                    x: x + (Math.random() - 0.5) * size * 0.8,
-                    y: y + (Math.random() - 0.5) * size * 0.8,
-                    vx: Math.cos(angle) * speed,
-                    vy: Math.sin(angle) * speed,
-                    size: Math.random() * 2 + 0.5,
-                    color: '#ffffff',
-                    alpha: 1,
-                    life: 0.8,
-                    type: 'sparkle'
-                });
-            }
-        } catch (e) {
-            console.warn('Erreur création explosion boss:', e);
-        }
-    }
-    
     // Crée une animation visuelle pour un bonus avec lumière et texte stylé
     function createPowerUpVisualAnimation(type, x, y) {
         // Définir les textes et couleurs selon le type
@@ -1682,6 +1689,15 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (type === 'lifeMax') {
             text = 'Vies Max';
             glowColor = '#ff0000';
+        } else if (type === 'shrink') {
+            text = '🔽 Rétrécissement';
+            glowColor = '#00ff00';
+        } else if (type === 'bigBullets') {
+            text = '💥 Munitions XL';
+            glowColor = '#ff8800';
+        } else if (type === 'tripleShot') {
+            text = '⚡ Tir Triple';
+            glowColor = '#ff00ff';
         }
         
         // Position aléatoire pour le texte (à côté du vaisseau)
@@ -1875,13 +1891,20 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Fait apparaître un boost
     function spawnPowerUp(x, y, type) {
+        let color = '#ff00ff';
+        if (type === 'rapidFire') color = '#ffff00';
+        else if (type === 'shield') color = '#00ffff';
+        else if (type === 'shrink') color = '#00ff00';
+        else if (type === 'bigBullets') color = '#ff8800';
+        else if (type === 'tripleShot') color = '#ff00ff';
+        
         powerUps.push({
             x: x,
             y: y,
             type: type,
             speed: 2,
             rotation: 0,
-            color: type === 'rapidFire' ? '#ffff00' : type === 'shield' ? '#00ffff' : '#ff00ff'
+            color: color
         });
     }
     
@@ -1909,6 +1932,18 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 createPowerUpVisualAnimation('lifeMax', ship.x, ship.y);
             }
+        } else if (powerUp.type === 'shrink') {
+            activePowerUps.shrink = true;
+            activePowerUps.shrinkEndTime = now + 12000; // 12 secondes
+            createPowerUpVisualAnimation('shrink', ship.x, ship.y);
+        } else if (powerUp.type === 'bigBullets') {
+            activePowerUps.bigBullets = true;
+            activePowerUps.bigBulletsEndTime = now + 15000; // 15 secondes
+            createPowerUpVisualAnimation('bigBullets', ship.x, ship.y);
+        } else if (powerUp.type === 'tripleShot') {
+            activePowerUps.tripleShot = true;
+            activePowerUps.tripleShotEndTime = now + 10000; // 10 secondes
+            createPowerUpVisualAnimation('tripleShot', ship.x, ship.y);
         }
         
         // Effet visuel de collecte (discret)
@@ -2429,15 +2464,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     gameState.score += defeatedBossNumber * 1000;
                     if (scoreElement) scoreElement.textContent = gameState.score;
                     
-                    // Animations et sons en arrière-plan pour ne pas bloquer le jeu
-                    try {
-                        setTimeout(() => {
-                            createBossDeathExplosion(defeatedBossX, defeatedBossY, defeatedBossColor, defeatedBossSize);
-                        }, 0);
-                    } catch (e) {
-                        console.warn('Erreur explosion boss:', e);
-                    }
-                    
                     try {
                         setTimeout(() => {
                             playSound('victory');
@@ -2503,7 +2529,8 @@ document.addEventListener('DOMContentLoaded', function() {
             const dy = ship.y - bullet.y;
             const distance = Math.sqrt(dx * dx + dy * dy);
             
-            if (distance < bullet.size + ship.width / 2) {
+            const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
+            if (distance < bullet.size + shipSize) {
                 if (activePowerUps.shield && Date.now() < activePowerUps.shieldEndTime) {
                     playSound('hit');
                     bossBullets.splice(index, 1);
@@ -2535,7 +2562,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const dy = ship.y - boss.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         
-        if (distance < boss.size + ship.width / 2) {
+        const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
+        if (distance < boss.size + shipSize) {
             if (!ship.invincible) {
                 createEnhancedExplosion(ship.x, ship.y, ship.color, 30);
                 playSound('hit');
@@ -2865,11 +2893,39 @@ document.addEventListener('DOMContentLoaded', function() {
         
         lastShotTime = now;
         
-        bullets.push({
-            x: ship.x,
-            y: ship.y - ship.height / 2,
-            speed: 8
-        });
+        const bulletSize = activePowerUps.bigBullets ? 8 : 4;
+        
+        if (activePowerUps.tripleShot) {
+            // Tir triple : 3 projectiles en éventail
+            bullets.push({
+                x: ship.x,
+                y: ship.y - ship.height / 2,
+                speed: 8,
+                vx: -0.5,
+                size: bulletSize
+            });
+            bullets.push({
+                x: ship.x,
+                y: ship.y - ship.height / 2,
+                speed: 8,
+                vx: 0,
+                size: bulletSize
+            });
+            bullets.push({
+                x: ship.x,
+                y: ship.y - ship.height / 2,
+                speed: 8,
+                vx: 0.5,
+                size: bulletSize
+            });
+        } else {
+            bullets.push({
+                x: ship.x,
+                y: ship.y - ship.height / 2,
+                speed: 8,
+                size: bulletSize
+            });
+        }
         
         playSound('shoot');
     }
@@ -2918,11 +2974,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function handleMovement() {
         if (!gameState.isPlaying || gameState.isPaused) return;
         
+        const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
         if (keys['ArrowLeft'] || keys['KeyA']) {
-            ship.x = Math.max(ship.width / 2, ship.x - ship.speed);
+            ship.x = Math.max(shipSize, ship.x - ship.speed);
         }
         if (keys['ArrowRight'] || keys['KeyD']) {
-            ship.x = Math.min(canvas.width - ship.width / 2, ship.x + ship.speed);
+            ship.x = Math.min(canvas.width - shipSize, ship.x + ship.speed);
         }
     }
     
