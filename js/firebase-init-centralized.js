@@ -289,30 +289,44 @@
     };
 
     // Initialiser Firebase automatiquement
-    // Essayer immédiatement
-    if (!tryInitFirebase()) {
-        // Attendre que les scripts se chargent
-        console.log('⏳ Attente du chargement des scripts Firebase...');
-        let attempts = 0;
-        const maxAttempts = 20;
-        const checkInterval = setInterval(function() {
-            attempts++;
-            if (typeof firebase !== 'undefined') {
-                clearInterval(checkInterval);
-                if (tryInitFirebase()) {
-                    console.log('✅ Firebase initialisé après', attempts, 'tentatives');
+    // IMPORTANT: S'assurer que Firebase SDK est chargé AVANT d'initialiser
+    function waitForFirebaseSDK() {
+        if (typeof firebase !== 'undefined' && typeof firebase.initializeApp !== 'undefined') {
+            // Firebase SDK est chargé, initialiser
+            console.log('✅ Firebase SDK détecté, initialisation...');
+            
+            // Supprimer TOUTES les instances existantes AVANT d'initialiser
+            if (firebase.apps && firebase.apps.length > 0) {
+                console.log('🗑️ Suppression de toutes les instances existantes avant initialisation...');
+                while (firebase.apps.length > 0) {
+                    try {
+                        const app = firebase.apps[0];
+                        const projectId = app.options?.projectId;
+                        console.log('   Suppression instance:', app.name, 'projectId:', projectId);
+                        app.delete();
+                    } catch (e) {
+                        break;
+                    }
                 }
-            } else if (attempts >= maxAttempts) {
-                clearInterval(checkInterval);
-                console.error('❌ Firebase SDK n\'a pas pu être chargé après', maxAttempts, 'tentatives');
-                console.error('Vérifiez :');
-                console.error('1. Que les scripts Firebase se chargent (onglet Network)');
-                console.error('2. Qu\'il n\'y a pas de bloqueur de publicité');
-                console.error('3. Que votre connexion internet fonctionne');
-                console.error('4. Utilisez window.diagnosticFirebase() pour plus d\'informations');
             }
-        }, 200);
+            
+            // Attendre un peu puis initialiser
+            setTimeout(() => {
+                if (tryInitFirebase()) {
+                    console.log('✅ Firebase initialisé avec succès');
+                } else {
+                    console.error('❌ Échec de l\'initialisation Firebase');
+                }
+            }, 100);
+        } else {
+            // Firebase SDK pas encore chargé, réessayer
+            console.log('⏳ Attente du chargement de Firebase SDK...');
+            setTimeout(waitForFirebaseSDK, 100);
+        }
     }
+    
+    // Démarrer l'attente
+    waitForFirebaseSDK();
 
     // Exécuter un diagnostic automatique après 3 secondes si Firebase n'est pas initialisé
     setTimeout(() => {
