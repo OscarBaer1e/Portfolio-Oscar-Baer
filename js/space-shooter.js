@@ -394,61 +394,16 @@ document.addEventListener('DOMContentLoaded', function() {
         if (leaderboardSyncInterval) {
             clearInterval(leaderboardSyncInterval);
         }
-            leaderboardSyncInterval = setInterval(() => {
-                loadLeaderboard().then(() => {
-                    if (leaderboardModal && !leaderboardModal.classList.contains('hidden')) {
-                        updateLeaderboardDisplay();
-                    }
-                });
-            }, 5000);
-            return;
-        }
-        
-        // Utiliser Firestore en temps réel
-        if (leaderboardUnsubscribe) {
-            leaderboardUnsubscribe(); // Désabonner l'ancien listener
-        }
-        
-        leaderboardUnsubscribe = firestoreDb.collection('leaderboard')
-            .orderBy('score', 'desc')
-            .limit(MAX_LEADERBOARD_ENTRIES)
-            .onSnapshot((snapshot) => {
-                leaderboard = [];
-                snapshot.forEach(doc => {
-                    const data = doc.data();
-                    leaderboard.push({
-                        id: doc.id,
-                        name: data.name,
-                        score: data.score,
-                        level: data.level,
-                        date: data.date ? data.date.toDate().toISOString() : new Date().toISOString()
-                    });
-                });
-                
-                localStorage.setItem('spaceShooterLeaderboard', JSON.stringify(leaderboard));
-                
+        leaderboardSyncInterval = setInterval(() => {
+            loadLeaderboard().then(() => {
                 if (leaderboardModal && !leaderboardModal.classList.contains('hidden')) {
                     updateLeaderboardDisplay();
                 }
-            }, (error) => {
-                if (leaderboardSyncInterval) {
-                    clearInterval(leaderboardSyncInterval);
-                }
-                leaderboardSyncInterval = setInterval(() => {
-                    loadLeaderboard().then(() => {
-                        if (leaderboardModal && !leaderboardModal.classList.contains('hidden')) {
-                            updateLeaderboardDisplay();
-                        }
-                    });
-                }, 5000);
             });
+        }, 5000);
     }
     
     function stopLeaderboardSync() {
-        if (leaderboardUnsubscribe) {
-            leaderboardUnsubscribe();
-            leaderboardUnsubscribe = null;
-        }
         if (leaderboardSyncInterval) {
             clearInterval(leaderboardSyncInterval);
             leaderboardSyncInterval = null;
