@@ -1767,20 +1767,21 @@ document.addEventListener('DOMContentLoaded', function() {
         updateHealthBars();
     }
     
-    // Retourne le nom bizarre d'un boss selon son numéro
-    // Thème : "Gardiens Cosmiques Bizarres" - tous sont des entités spatiales étranges
+    // Retourne le nom d'un boss selon son numéro
+    // Thème : "Entités Spatiales Piégées" - références à des objets astronomiques réels et concepts SF
+    // Style "locked in" : entités enfermées/piégées dans l'espace
     function getBossName(bossNumber) {
         const bossNames = {
-            1: 'Glorp le Gluant',
-            2: 'Zorg le Zarbi',
-            3: 'Blip le Bizarre',
-            4: 'Flub le Flou',
-            5: 'Snork le Snork',
-            6: 'Womp le Womp',
-            7: 'Klunk le Klunk',
-            8: 'Plop le Plop',
-            9: 'Squish le Squish',
-            10: 'Zzorp le Zzorp'
+            1: 'Locked In Nebula',      // Nébuleuse piégée (référence astronomique réelle)
+            2: 'Trapped Quasar',        // Quasar piégé (objet astronomique ultra-lumineux)
+            3: 'Caged Pulsar',          // Pulsar en cage (étoile à neutrons en rotation)
+            4: 'Bound Black Hole',      // Trou noir lié (objet astronomique réel)
+            5: 'Sealed Supernova',       // Supernova scellée (explosion stellaire)
+            6: 'Contained Comet',       // Comète contenue (objet céleste réel)
+            7: 'Imprisoned Asteroid',   // Astéroïde emprisonné (objet spatial réel)
+            8: 'Captured Galaxy',       // Galaxie capturée (structure astronomique)
+            9: 'Enclosed Void',         // Vide enfermé (concept spatial)
+            10: 'Sealed Singularity'    // Singularité scellée (point de trou noir)
         };
         return bossNames[bossNumber] || `Boss ${bossNumber}`;
     }
