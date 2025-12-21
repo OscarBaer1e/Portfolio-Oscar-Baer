@@ -51,20 +51,62 @@
         }
 
         try {
-            // Supprimer toutes les instances existantes pour éviter les conflits
-            console.log('🔄 Nettoyage des instances Firebase existantes...');
+            // Supprimer TOUTES les instances existantes pour éviter les conflits
+            console.log('🔄 Nettoyage FORCÉ de toutes les instances Firebase existantes...');
+            let deletedCount = 0;
             while (firebase.apps.length > 0) {
                 try {
-                    const app = firebase.app();
+                    const app = firebase.apps[0]; // Toujours prendre la première
                     const projectId = app.options?.projectId;
-                    if (projectId === 'YOUR_PROJECT_ID' || projectId !== 'oscar-baer') {
-                        console.warn('⚠️ Instance avec projectId invalide détectée:', projectId);
-                    }
+                    const appName = app.name;
+                    console.log(`   Suppression instance: ${appName}, projectId: ${projectId}`);
+                    
+                    // Supprimer l'instance
                     app.delete();
+                    deletedCount++;
+                    
+                    // Attendre un peu pour que la suppression soit effective
+                    // (on ne peut pas utiliser await ici)
                 } catch (e) {
                     console.warn('⚠️ Erreur lors de la suppression d\'une instance:', e);
+                    // Forcer la suppression en vidant le tableau (si possible)
+                    try {
+                        if (firebase.apps.length > 0) {
+                            // Essayer de supprimer toutes les instances d'un coup
+                            const appsToDelete = Array.from(firebase.apps);
+                            appsToDelete.forEach(app => {
+                                try {
+                                    app.delete();
+                                } catch (err) {
+                                    // Ignorer
+                                }
+                            });
+                        }
+                    } catch (err2) {
+                        // Ignorer
+                    }
                     break;
                 }
+            }
+            console.log(`✅ ${deletedCount} instance(s) supprimée(s)`);
+            
+            // Attendre un peu pour que la suppression soit effective
+            // (on utilise setTimeout car on ne peut pas utiliser await)
+            if (deletedCount > 0) {
+                console.log('⏳ Attente de la suppression effective...');
+                // On va réessayer après un délai
+                setTimeout(() => {
+                    if (firebase.apps.length > 0) {
+                        console.warn('⚠️ Des instances persistent encore, nouvelle tentative...');
+                        while (firebase.apps.length > 0) {
+                            try {
+                                firebase.apps[0].delete();
+                            } catch (e) {
+                                break;
+                            }
+                        }
+                    }
+                }, 100);
             }
             
             // Attendre un peu pour que la suppression soit effective
