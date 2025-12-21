@@ -1,17 +1,8 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "**/*.html",
-      "use": "@vercel/static"
-    }
-  ],
-  "rewrites": [
-    {
-      "source": "/(.*)",
-      "destination": "/$1"
-    }
-  ],
+  "buildCommand": "echo 'Site statique - Aucun build nécessaire'",
+  "outputDirectory": ".",
+  "installCommand": "npm install --legacy-peer-deps || echo 'Installation ignorée'",
   "routes": [
     {
       "src": "/(.*)",
