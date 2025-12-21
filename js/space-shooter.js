@@ -1090,14 +1090,30 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Mise à jour des particules
+        // Limiter le nombre de particules pour éviter les crashes
+        if (particles.length > 200) {
+            // Supprimer les particules les plus anciennes
+            particles = particles.slice(-150);
+        }
+        
         particles.forEach((particle, index) => {
-            particle.x += particle.vx;
-            particle.y += particle.vy;
-            particle.vy += 0.1; // Gravité
-            particle.alpha -= 0.02;
-            particle.size -= 0.1;
+            if (!particle) {
+                particles.splice(index, 1);
+                return;
+            }
             
-            if (particle.alpha <= 0 || particle.size <= 0) {
+            try {
+                particle.x += particle.vx || 0;
+                particle.y += particle.vy || 0;
+                particle.vy = (particle.vy || 0) + 0.1; // Gravité
+                particle.alpha = (particle.alpha || 1) - 0.02;
+                particle.size = (particle.size || 1) - 0.1;
+                
+                if (particle.alpha <= 0 || particle.size <= 0 || isNaN(particle.x) || isNaN(particle.y)) {
+                    particles.splice(index, 1);
+                }
+            } catch (e) {
+                console.warn('Erreur particule:', e);
                 particles.splice(index, 1);
             }
         });
@@ -1268,39 +1284,68 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Explosion discrète pour les bonus (évite les crashes)
+    function createSmallExplosion(x, y, color) {
+        try {
+            // Limiter le nombre de particules pour éviter les crashes
+            const maxParticles = 5;
+            for (let i = 0; i < maxParticles; i++) {
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: (Math.random() - 0.5) * 2,
+                    size: Math.random() * 2 + 1,
+                    color: color,
+                    alpha: 0.6,
+                    life: 0.8
+                });
+            }
+        } catch (e) {
+            console.warn('Erreur createSmallExplosion:', e);
+        }
+    }
+    
     // Explosion améliorée avec plus de particules et effets
     function createEnhancedExplosion(x, y, color, size) {
-        const particleCount = Math.floor(size / 2) + 20; // Plus de particules pour les gros astéroïdes
-        
-        for (let i = 0; i < particleCount; i++) {
-            const angle = (Math.PI * 2 / particleCount) * i;
-            const speed = Math.random() * 6 + 2;
-            const particleSize = Math.random() * (size / 5) + 2;
+        try {
+            // Limiter le nombre de particules pour éviter les crashes
+            const maxParticleCount = Math.min(Math.floor(size / 2) + 20, 50); // Max 50 particules
+            const particleCount = Math.min(maxParticleCount, 50);
             
-            particles.push({
-                x: x,
-                y: y,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                size: particleSize,
-                color: color,
-                alpha: 1,
-                life: 1
-            });
-        }
-        
-        // Ajoute des particules plus petites pour l'effet de fumée
-        for (let i = 0; i < particleCount / 2; i++) {
-            particles.push({
-                x: x + (Math.random() - 0.5) * size,
-                y: y + (Math.random() - 0.5) * size,
-                vx: (Math.random() - 0.5) * 2,
-                vy: (Math.random() - 0.5) * 2,
-                size: Math.random() * 3 + 1,
-                color: `rgba(${Math.random() * 100 + 50}, ${Math.random() * 100 + 50}, ${Math.random() * 100 + 50}, 0.8)`,
-                alpha: 0.8,
-                life: 1
-            });
+            for (let i = 0; i < particleCount; i++) {
+                const angle = (Math.PI * 2 / particleCount) * i;
+                const speed = Math.random() * 6 + 2;
+                const particleSize = Math.random() * (size / 5) + 2;
+                
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    size: particleSize,
+                    color: color,
+                    alpha: 1,
+                    life: 1
+                });
+            }
+            
+            // Ajoute des particules plus petites pour l'effet de fumée (limitées)
+            const smokeCount = Math.min(Math.floor(particleCount / 2), 25); // Max 25 particules de fumée
+            for (let i = 0; i < smokeCount; i++) {
+                particles.push({
+                    x: x + (Math.random() - 0.5) * size,
+                    y: y + (Math.random() - 0.5) * size,
+                    vx: (Math.random() - 0.5) * 2,
+                    vy: (Math.random() - 0.5) * 2,
+                    size: Math.random() * 3 + 1,
+                    color: `rgba(${Math.random() * 100 + 50}, ${Math.random() * 100 + 50}, ${Math.random() * 100 + 50}, 0.8)`,
+                    alpha: 0.8,
+                    life: 1
+                });
+            }
+        } catch (e) {
+            console.warn('Erreur createEnhancedExplosion:', e);
         }
     }
     
@@ -1343,8 +1388,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Effet visuel de collecte (discret)
-        createSmallExplosion(powerUp.x, powerUp.y, powerUp.color);
-        updateHealthBars();
+        try {
+            createSmallExplosion(powerUp.x, powerUp.y, powerUp.color);
+        } catch (e) {
+            console.warn('Erreur animation bonus:', e);
+        }
+        
+        try {
+            updateHealthBars();
+        } catch (e) {
+            console.warn('Erreur updateHealthBars:', e);
+        }
     }
     
     function spawnAsteroid() {
@@ -1507,26 +1561,56 @@ document.addEventListener('DOMContentLoaded', function() {
                 boss.size = boss.maxSize * (0.5 + healthPercent * 0.5); // Entre 50% et 100% de la taille
                 
                 if (boss.health <= 0) {
-                    // Boss vaincu
-                    createEnhancedExplosion(boss.x, boss.y, boss.color, boss.size);
-                    playSound('victory');
+                    // Boss vaincu - explosion limitée pour éviter crash
+                    try {
+                        const explosionSize = Math.min(boss.size || 50, 80); // Limiter la taille
+                        createEnhancedExplosion(boss.x, boss.y, boss.color, explosionSize);
+                    } catch (e) {
+                        console.warn('Erreur explosion boss:', e);
+                    }
+                    
+                    try {
+                        playSound('victory');
+                    } catch (e) {
+                        console.warn('Erreur son victory:', e);
+                    }
+                    
                     gameState.score += boss.bossNumber * 1000;
                     if (scoreElement) scoreElement.textContent = gameState.score;
-                    showMessage(`BOSS ${boss.bossNumber} VAINCU ! +${boss.bossNumber * 1000} points`, 'victory');
                     
+                    try {
+                        showMessage(`BOSS ${boss.bossNumber} VAINCU ! +${boss.bossNumber * 1000} points`, 'victory');
+                    } catch (e) {
+                        console.warn('Erreur message:', e);
+                    }
+                    
+                    // Nettoyer le boss de manière sécurisée
                     boss = null;
                     gameState.bossActive = false;
                     bossBullets = [];
-                    updateHealthBars();
+                    
+                    try {
+                        updateHealthBars();
+                    } catch (e) {
+                        console.warn('Erreur updateHealthBars:', e);
+                    }
                     
                     // Vérifier le niveau maintenant que le boss est vaincu
-                    checkLevel();
+                    try {
+                        checkLevel();
+                    } catch (e) {
+                        console.warn('Erreur checkLevel:', e);
+                    }
                     
                     // Si on atteint le niveau 100, victoire finale
                     if (gameState.level >= 100) {
                         setTimeout(() => {
-                            showMessage('VICTOIRE FINALE ! Vous avez vaincu tous les boss !', 'victory');
-                            playSound('victory');
+                            try {
+                                showMessage('VICTOIRE FINALE ! Vous avez vaincu tous les boss !', 'victory');
+                                playSound('victory');
+                            } catch (e) {
+                                console.warn('Erreur victoire finale:', e);
+                            }
                         }, 2000);
                     }
                 }
