@@ -893,7 +893,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Dessine le boss
     function drawBoss() {
-        if (!boss || !gameState.bossActive) return;
+        if (!boss || !gameState.bossActive || !boss.bossNumber) return;
+        
+        // Vérifications de sécurité supplémentaires
+        if (typeof boss.x !== 'number' || typeof boss.y !== 'number' || typeof boss.size !== 'number') {
+            console.warn('Boss invalide, skip draw');
+            return;
+        }
         
         ctx.save();
         ctx.translate(boss.x, boss.y);
@@ -1769,20 +1775,46 @@ document.addEventListener('DOMContentLoaded', function() {
             // Animation de niveau supprimée
             
             // Vérifier si un boss doit apparaître (tous les 10 niveaux)
-            if (gameState.level % 10 === 0 && !gameState.bossActive && !boss) {
-                spawnBoss();
+            // Ne pas spawn si on dépasse le niveau 100 (tous les boss sont vaincus)
+            if (gameState.level % 10 === 0 && !gameState.bossActive && !boss && gameState.level <= 100) {
+                try {
+                    spawnBoss();
+                } catch (e) {
+                    console.error('Erreur spawnBoss:', e);
+                    gameState.bossActive = false;
+                    boss = null;
+                }
             }
         }
     }
     
     // Crée un boss
     function spawnBoss() {
+        // Vérifications de sécurité
+        if (gameState.bossActive || boss) {
+            console.warn('Tentative de spawn boss alors qu\'un boss est déjà actif');
+            return;
+        }
+        
         const bossNumber = Math.min(10, Math.floor(gameState.level / 10));
+        
+        // Vérifier que le bossNumber est valide
+        if (bossNumber < 1 || bossNumber > 10) {
+            console.error('Boss number invalide:', bossNumber);
+            return;
+        }
+        
         const baseHealth = 30 + (bossNumber * 15); // Réduit : était 50 + (bossNumber * 30)
         const baseSize = 60 + (bossNumber * 10);
         
         // Initialiser les propriétés spécifiques au pattern du boss
         let patternConfig = getBossPattern(bossNumber);
+        
+        // Vérifier que patternConfig est valide
+        if (!patternConfig) {
+            console.error('Pattern config invalide pour boss', bossNumber);
+            patternConfig = getBossPattern(1); // Fallback sur boss 1
+        }
         
         boss = {
             x: canvas.width / 2,
@@ -2061,7 +2093,18 @@ document.addEventListener('DOMContentLoaded', function() {
     function updateBoss() {
         if (!boss || !gameState.bossActive) return;
         
+        // Vérifications de sécurité
+        if (typeof boss.x !== 'number' || typeof boss.y !== 'number' || typeof boss.size !== 'number') {
+            console.warn('Boss invalide, reset');
+            boss = null;
+            gameState.bossActive = false;
+            return;
+        }
+        
         const now = Date.now();
+        if (typeof boss.patternTime !== 'number') {
+            boss.patternTime = 0;
+        }
         boss.patternTime += 16; // ~60fps
         
         // Appliquer le pattern de mouvement selon le numéro du boss
@@ -2101,10 +2144,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 boss.size = boss.maxSize * (0.5 + healthPercent * 0.5); // Entre 50% et 100% de la taille
                 
                 if (boss.health <= 0) {
+                    // Sauvegarder les infos du boss avant de le supprimer
+                    const defeatedBossNumber = boss.bossNumber;
+                    const defeatedBossX = boss.x;
+                    const defeatedBossY = boss.y;
+                    const defeatedBossColor = boss.color;
+                    const defeatedBossSize = Math.min(boss.size || 50, 80);
+                    
                     // Boss vaincu - explosion limitée pour éviter crash
                     try {
-                        const explosionSize = Math.min(boss.size || 50, 80); // Limiter la taille
-                        createEnhancedExplosion(boss.x, boss.y, boss.color, explosionSize);
+                        createEnhancedExplosion(defeatedBossX, defeatedBossY, defeatedBossColor, defeatedBossSize);
                     } catch (e) {
                         console.warn('Erreur explosion boss:', e);
                     }
@@ -2115,17 +2164,17 @@ document.addEventListener('DOMContentLoaded', function() {
                         console.warn('Erreur son victory:', e);
                     }
                     
-                    gameState.score += boss.bossNumber * 1000;
+                    gameState.score += defeatedBossNumber * 1000;
                     if (scoreElement) scoreElement.textContent = gameState.score;
                     
                     try {
-                        const bossName = getBossName(boss.bossNumber);
-                        showMessage(`${bossName} VAINCU ! +${boss.bossNumber * 1000} points`, 'victory');
+                        const bossName = getBossName(defeatedBossNumber);
+                        showMessage(`${bossName} VAINCU ! +${defeatedBossNumber * 1000} points`, 'victory');
                     } catch (e) {
                         console.warn('Erreur message:', e);
                     }
                     
-                    // Nettoyer le boss de manière sécurisée
+                    // Nettoyer le boss de manière sécurisée AVANT checkLevel
                     boss = null;
                     gameState.bossActive = false;
                     bossBullets = [];
@@ -2136,12 +2185,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         console.warn('Erreur updateHealthBars:', e);
                     }
                     
-                    // Vérifier le niveau maintenant que le boss est vaincu
-                    try {
-                        checkLevel();
-                    } catch (e) {
-                        console.warn('Erreur checkLevel:', e);
-                    }
+                    // Vérifier le niveau maintenant que le boss est vaincu (avec délai pour éviter les conflits)
+                    setTimeout(() => {
+                        try {
+                            checkLevel();
+                        } catch (e) {
+                            console.warn('Erreur checkLevel:', e);
+                        }
+                    }, 100);
                     
                     // Si on atteint le niveau 100, victoire finale
                     if (gameState.level >= 100) {
@@ -2154,6 +2205,9 @@ document.addEventListener('DOMContentLoaded', function() {
                             }
                         }, 2000);
                     }
+                    
+                    // Sortir de la boucle pour éviter de traiter d'autres collisions
+                    return;
                 }
             }
         });
