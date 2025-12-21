@@ -2492,10 +2492,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     // Invincibilité temporaire avec clignotement (1-2 secondes)
                     ship.invincible = true;
-                    const invincibleDuration = 1500 + Math.random() * 500; // Entre 1.5 et 2 secondes
                     setTimeout(() => {
                         ship.invincible = false;
-                    }, invincibleDuration);
+                    }, 2000); // 2 secondes exactement
                 }
                 }
             }
@@ -2520,10 +2519,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 } else {
                     // Invincibilité temporaire avec clignotement (1-2 secondes)
                     ship.invincible = true;
-                    const invincibleDuration = 1500 + Math.random() * 500; // Entre 1.5 et 2 secondes
                     setTimeout(() => {
                         ship.invincible = false;
-                    }, invincibleDuration);
+                    }, 2000); // 2 secondes exactement
                 }
             }
         }
