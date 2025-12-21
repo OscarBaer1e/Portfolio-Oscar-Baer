@@ -16,10 +16,16 @@
     'use strict';
 
     // Configuration Supabase
+    // ⚠️ Ces valeurs sont déjà configurées avec vos vraies clés
     const SUPABASE_CONFIG = {
         url: 'https://xqpsvwtcvoggbkcjuelq.supabase.co',
         anonKey: 'sb_publishable_zpaJPneM812wOeCBs3uO-A_yhx693Vp'  // Publishable API Key (safe pour le navigateur)
     };
+    
+    console.log('✅ Configuration Supabase chargée:', {
+        url: SUPABASE_CONFIG.url,
+        anonKey: SUPABASE_CONFIG.anonKey.substring(0, 20) + '...'
+    });
 
     // Vérifier si Supabase est chargé
     function initSupabase() {
