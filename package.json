@@ -2,6 +2,7 @@
   "name": "portfolio-oscar-baer",
   "version": "1.0.0",
   "description": "Portfolio d'Oscar Baer - Site statique",
+  "private": true,
   "scripts": {
     "build": "echo 'Site statique - Aucun build nécessaire'",
     "dev": "echo 'Site statique - Ouvrez index.html dans votre navigateur'"

@@ -2,7 +2,7 @@
   "version": 2,
   "buildCommand": "echo 'Site statique - Aucun build nécessaire'",
   "outputDirectory": ".",
-  "installCommand": "npm install || true",
+  "installCommand": "echo 'Site statique - Pas d\'installation nécessaire'",
   "routes": [
     {
       "src": "/(.*)",
