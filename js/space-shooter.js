@@ -2511,91 +2511,95 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Collision projectiles du joueur / boss
-        bullets.forEach((bullet, bulletIndex) => {
-            const dx = bullet.x - boss.x;
-            const dy = bullet.y - boss.y;
-            const distance = Math.sqrt(dx * dx + dy * dy);
-            
-            if (distance < boss.size + 5) {
-                boss.health--;
-                playSound('bossHit');
-                bullets.splice(bulletIndex, 1);
-                updateHealthBars();
+        if (boss && gameState.bossActive) {
+            bullets.forEach((bullet, bulletIndex) => {
+                // Vérifier que le boss existe toujours (peut être null si détruit par un autre projectile)
+                if (!boss || !gameState.bossActive) return;
                 
-                // Le boss rétrécit quand il prend des dégâts
-                const healthPercent = boss.health / boss.maxHealth;
-                boss.size = boss.maxSize * (0.5 + healthPercent * 0.5); // Entre 50% et 100% de la taille
+                const dx = bullet.x - boss.x;
+                const dy = bullet.y - boss.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
                 
-                if (boss.health <= 0) {
-                    // Sauvegarder les infos du boss avant de le supprimer
-                    const defeatedBossNumber = boss.bossNumber;
-                    const defeatedBossX = boss.x;
-                    const defeatedBossY = boss.y;
-                    const defeatedBossColor = boss.color;
-                    const defeatedBossSize = Math.min(boss.size || 50, 80);
+                if (distance < boss.size + 5) {
+                    boss.health--;
+                    playSound('bossHit');
+                    bullets.splice(bulletIndex, 1);
+                    updateHealthBars();
                     
-                    // Mise à jour du score immédiatement (ne bloque pas)
-                    gameState.score += defeatedBossNumber * 1000;
-                    if (scoreElement) scoreElement.textContent = gameState.score;
+                    // Le boss rétrécit quand il prend des dégâts
+                    const healthPercent = boss.health / boss.maxHealth;
+                    boss.size = boss.maxSize * (0.5 + healthPercent * 0.5); // Entre 50% et 100% de la taille
                     
-                    try {
-                        setTimeout(() => {
-                            playSound('victory');
-                        }, 0);
-                    } catch (e) {
-                        console.warn('Erreur son victory:', e);
-                    }
-                    
-                    // Animation visuelle du score à côté du boss mort (comme les bonus)
-                    try {
-                        createScoreAnimation(defeatedBossX, defeatedBossY, `+${defeatedBossNumber * 1000} points`);
-                    } catch (e) {
-                        console.warn('Erreur animation score:', e);
-                    }
-                    
-                    // Nettoyer le boss de manière sécurisée AVANT checkLevel
-                    boss = null;
-                    gameState.bossActive = false;
-                    bossBullets = [];
-                    
-                    try {
-                        updateHealthBars();
-                    } catch (e) {
-                        console.warn('Erreur updateHealthBars:', e);
-                    }
-                    
-                    // Monter automatiquement au niveau juste au-dessus (ex: boss niveau 10 → niveau 11)
-                    // Ne pas utiliser checkLevel() qui calcule selon le score (peut sauter plusieurs niveaux)
-                    gameState.level += 1;
-                    // Augmentation progressive de la vitesse
-                    const speedIncrease = getSpeedIncrease(gameState.level);
-                    gameState.gameSpeed += speedIncrease;
-                    if (levelElement) levelElement.textContent = gameState.level;
-                    if (currentLevelDisplay) currentLevelDisplay.textContent = gameState.level;
-                    
-                    // Rendre le joueur invincible pendant 2 secondes exactement
-                    ship.invincible = true;
-                    setTimeout(() => {
-                        ship.invincible = false;
-                    }, 2000);
-                    
-                    // Si on atteint le niveau 100, victoire finale
-                    if (gameState.level >= 100) {
-                        setTimeout(() => {
-                            try {
-                                showMessage('VICTOIRE FINALE ! Vous avez vaincu tous les boss !', 'victory');
+                    if (boss.health <= 0) {
+                        // Sauvegarder les infos du boss avant de le supprimer
+                        const defeatedBossNumber = boss.bossNumber;
+                        const defeatedBossX = boss.x;
+                        const defeatedBossY = boss.y;
+                        const defeatedBossColor = boss.color;
+                        const defeatedBossSize = Math.min(boss.size || 50, 80);
+                        
+                        // Mise à jour du score immédiatement (ne bloque pas)
+                        gameState.score += defeatedBossNumber * 1000;
+                        if (scoreElement) scoreElement.textContent = gameState.score;
+                        
+                        // Nettoyer le boss IMMÉDIATEMENT pour éviter les accès après
+                        boss = null;
+                        gameState.bossActive = false;
+                        bossBullets = [];
+                        
+                        try {
+                            setTimeout(() => {
                                 playSound('victory');
-                            } catch (e) {
-                                console.warn('Erreur victoire finale:', e);
-                            }
+                            }, 0);
+                        } catch (e) {
+                            console.warn('Erreur son victory:', e);
+                        }
+                        
+                        // Animation visuelle du score à côté du boss mort (comme les bonus)
+                        try {
+                            createScoreAnimation(defeatedBossX, defeatedBossY, `+${defeatedBossNumber * 1000} points`);
+                        } catch (e) {
+                            console.warn('Erreur animation score:', e);
+                        }
+                        
+                        try {
+                            updateHealthBars();
+                        } catch (e) {
+                            console.warn('Erreur updateHealthBars:', e);
+                        }
+                        
+                        // Monter automatiquement au niveau juste au-dessus (ex: boss niveau 10 → niveau 11)
+                        gameState.level += 1;
+                        // Augmentation progressive de la vitesse
+                        const speedIncrease = getSpeedIncrease(gameState.level);
+                        gameState.gameSpeed += speedIncrease;
+                        if (levelElement) levelElement.textContent = gameState.level;
+                        if (currentLevelDisplay) currentLevelDisplay.textContent = gameState.level;
+                        
+                        // Rendre le joueur invincible pendant 2 secondes exactement
+                        ship.invincible = true;
+                        setTimeout(() => {
+                            ship.invincible = false;
                         }, 2000);
+                        
+                        // Si on atteint le niveau 100, victoire finale
+                        if (gameState.level >= 100) {
+                            setTimeout(() => {
+                                try {
+                                    showMessage('VICTOIRE FINALE ! Vous avez vaincu tous les boss !', 'victory');
+                                    playSound('victory');
+                                } catch (e) {
+                                    console.warn('Erreur victoire finale:', e);
+                                }
+                            }, 2000);
+                        }
+                        
+                        // Sortir de la boucle pour éviter de traiter d'autres collisions
+                        return;
                     }
-                    
-                    // Sortir de la boucle pour éviter de traiter d'autres collisions
-                    return;
                 }
-            }
-        });
+            });
+        }
         
         // Collision vaisseau / projectiles du boss
         bossBullets.forEach((bullet, index) => {
@@ -2632,12 +2636,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Collision vaisseau / boss
-        const dx = ship.x - boss.x;
-        const dy = ship.y - boss.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        
-        const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
-        if (distance < boss.size + shipSize) {
+        if (boss && gameState.bossActive) {
+            const dx = ship.x - boss.x;
+            const dy = ship.y - boss.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
+            if (distance < boss.size + shipSize) {
             if (!ship.invincible) {
                 createEnhancedExplosion(ship.x, ship.y, ship.color, 30);
                 playSound('hit');
