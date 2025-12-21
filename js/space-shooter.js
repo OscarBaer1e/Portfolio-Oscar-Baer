@@ -841,7 +841,15 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Boss
         if (boss && gameState.bossActive) {
-            drawBoss();
+            try {
+                drawBoss();
+            } catch (e) {
+                console.error('❌ Erreur drawBoss:', e);
+            }
+        } else if (gameState.bossActive && !boss) {
+            // État incohérent détecté
+            console.warn('⚠️ gameState.bossActive=true mais boss=null - reset');
+            gameState.bossActive = false;
         }
         
         // Projectiles du boss
