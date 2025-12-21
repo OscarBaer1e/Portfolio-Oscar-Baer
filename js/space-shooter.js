@@ -335,17 +335,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Fonction pour ajuster le canvas en plein écran
+    // Fonction pour ajuster le canvas en plein écran (agrandissement proportionnel)
     function adjustCanvasForFullscreen() {
         if (!canvas) return;
         
         if (isFullscreen) {
-            // En plein écran, utiliser toute la taille disponible
-            const width = window.innerWidth;
-            const height = window.innerHeight;
+            // En plein écran, agrandir proportionnellement (pas étendre)
+            const baseWidth = 800;
+            const baseHeight = 600;
+            const scaleFactor = Math.min(
+                window.innerWidth / baseWidth,
+                window.innerHeight / baseHeight
+            ) * 0.95; // 95% pour garder des marges
             
-            canvas.width = width;
-            canvas.height = height;
+            canvas.width = baseWidth * scaleFactor;
+            canvas.height = baseHeight * scaleFactor;
             
             // Réinitialiser la position du vaisseau
             if (canvas) ship.x = canvas.width / 2;
@@ -1033,6 +1037,16 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function drawShip(x, y) {
+        // Clignotement si invincible (1-2 secondes)
+        if (ship.invincible) {
+            const blinkSpeed = 150; // ms par clignotement
+            const blinkTime = Date.now() % (blinkSpeed * 2);
+            if (blinkTime < blinkSpeed) {
+                // Ne pas dessiner pendant la moitié du temps (clignotement)
+                return;
+            }
+        }
+        
         ctx.save();
         ctx.translate(x, y);
         
@@ -1392,11 +1406,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (gameState.lives <= 0) {
                     endGame();
                 } else {
-                    // Invincibilité temporaire
+                    // Invincibilité temporaire avec clignotement (1-2 secondes)
                     ship.invincible = true;
+                    const invincibleDuration = 1500 + Math.random() * 500; // Entre 1.5 et 2 secondes
                     setTimeout(() => {
                         ship.invincible = false;
-                    }, 2000);
+                    }, invincibleDuration);
                     }
                 }
             }
@@ -1555,48 +1570,52 @@ document.addEventListener('DOMContentLoaded', function() {
         powerUpVisualAnimations.push(animation);
     }
     
-    // Crée une explosion colorée stylée pour la mort du boss
+    // Crée une explosion colorée stylée pour la mort du boss (ne bloque pas le jeu)
     function createBossDeathExplosion(x, y, color, size) {
-        // Explosion principale avec plusieurs couleurs
-        const colors = [color, '#ffff00', '#ff00ff', '#00ffff', '#ff8800'];
-        const particleCount = Math.min(Math.floor(size / 2) + 15, 40);
-        
-        for (let i = 0; i < particleCount; i++) {
-            const angle = (Math.PI * 2 / particleCount) * i;
-            const speed = Math.random() * 5 + 3;
-            const particleColor = colors[Math.floor(Math.random() * colors.length)];
-            const particleSize = Math.random() * 4 + 2;
+        try {
+            // Explosion principale avec plusieurs couleurs (limité pour éviter les lags)
+            const colors = [color, '#ffff00', '#ff00ff', '#00ffff', '#ff8800'];
+            const particleCount = Math.min(Math.floor(size / 2) + 15, 35); // Limité à 35
             
-            particles.push({
-                x: x,
-                y: y,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                size: particleSize,
-                color: particleColor,
-                alpha: 1,
-                life: 1,
-                type: 'star'
-            });
-        }
-        
-        // Particules secondaires colorées
-        for (let i = 0; i < 20; i++) {
-            const angle = Math.random() * Math.PI * 2;
-            const speed = Math.random() * 4 + 2;
-            const particleColor = colors[Math.floor(Math.random() * colors.length)];
+            for (let i = 0; i < particleCount; i++) {
+                const angle = (Math.PI * 2 / particleCount) * i;
+                const speed = Math.random() * 5 + 3;
+                const particleColor = colors[Math.floor(Math.random() * colors.length)];
+                const particleSize = Math.random() * 4 + 2;
+                
+                particles.push({
+                    x: x,
+                    y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    size: particleSize,
+                    color: particleColor,
+                    alpha: 1,
+                    life: 1,
+                    type: 'star'
+                });
+            }
             
-            particles.push({
-                x: x + (Math.random() - 0.5) * size,
-                y: y + (Math.random() - 0.5) * size,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                size: Math.random() * 3 + 1,
-                color: particleColor,
-                alpha: 0.8,
-                life: 0.9,
-                type: 'spark'
-            });
+            // Particules secondaires colorées (limitées)
+            for (let i = 0; i < 15; i++) { // Réduit de 20 à 15
+                const angle = Math.random() * Math.PI * 2;
+                const speed = Math.random() * 4 + 2;
+                const particleColor = colors[Math.floor(Math.random() * colors.length)];
+                
+                particles.push({
+                    x: x + (Math.random() - 0.5) * size,
+                    y: y + (Math.random() - 0.5) * size,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    size: Math.random() * 3 + 1,
+                    color: particleColor,
+                    alpha: 0.8,
+                    life: 0.9,
+                    type: 'spark'
+                });
+            }
+        } catch (e) {
+            console.warn('Erreur création explosion boss:', e);
         }
     }
     
@@ -2411,12 +2430,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     if (gameState.lives <= 0) {
                         endGame();
-                    } else {
-                        ship.invincible = true;
-                        setTimeout(() => {
-                            ship.invincible = false;
-                        }, 2000);
-                    }
+                } else {
+                    // Invincibilité temporaire avec clignotement (1-2 secondes)
+                    ship.invincible = true;
+                    const invincibleDuration = 1500 + Math.random() * 500; // Entre 1.5 et 2 secondes
+                    setTimeout(() => {
+                        ship.invincible = false;
+                    }, invincibleDuration);
+                }
                 }
             }
         });
@@ -2438,10 +2459,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (gameState.lives <= 0) {
                     endGame();
                 } else {
+                    // Invincibilité temporaire avec clignotement (1-2 secondes)
                     ship.invincible = true;
+                    const invincibleDuration = 1500 + Math.random() * 500; // Entre 1.5 et 2 secondes
                     setTimeout(() => {
                         ship.invincible = false;
-                    }, 2000);
+                    }, invincibleDuration);
                 }
             }
         }

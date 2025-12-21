@@ -108,12 +108,14 @@
 .game-wrapper:-webkit-full-screen #gameCanvas,
 .game-wrapper:-moz-full-screen #gameCanvas,
 .game-wrapper:-ms-fullscreen #gameCanvas {
-    width: 100vw;
-    height: 100vh;
-    max-width: 100%;
-    max-height: 100%;
+    /* Agrandissement proportionnel, pas d'extension */
+    width: auto;
+    height: auto;
+    max-width: 95vw;
+    max-height: 95vh;
     border: none;
     border-radius: 0;
+    object-fit: contain;
 }
 
 /* Barres de vie - Plus grandes en plein écran */
