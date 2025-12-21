@@ -479,14 +479,22 @@ document.addEventListener('DOMContentLoaded', function() {
         // Enregistrer dans Supabase en arrière-plan (sans bloquer)
         if (window.supabaseLeaderboard && window.supabaseLeaderboard.save) {
             try {
+                console.log('🔄 Tentative d\'enregistrement dans Supabase...');
                 const success = await window.supabaseLeaderboard.save(name, score, level);
                 if (success) {
-                    console.log('✅ Score enregistré dans Supabase');
+                    console.log('✅ Score enregistré dans Supabase avec succès');
+                    // Recharger le leaderboard après enregistrement
+                    setTimeout(async () => {
+                        console.log('🔄 Rechargement du leaderboard après enregistrement...');
+                        await loadLeaderboard();
+                        updateLeaderboardDisplay();
+                    }, 500);
                 } else {
-                    console.warn('⚠️ Score enregistré localement uniquement');
+                    console.warn('⚠️ Score enregistré localement uniquement (Supabase a retourné false)');
                 }
             } catch (error) {
                 console.error('❌ Erreur enregistrement Supabase:', error);
+                console.error('📝 Détails:', error.message, error.code);
                 console.warn('⚠️ Score enregistré localement uniquement');
             }
         } else {

@@ -141,36 +141,34 @@ async function saveScoreToSupabase(name, score, level) {
     try {
         console.log('💾 Sauvegarde du score dans Supabase...');
         console.log('🔗 URL:', window.supabaseClient?.supabaseUrl || 'Non disponible');
-        console.log('Données:', { name: name.substring(0, 20), score, level });
+        console.log('📝 Données à enregistrer:', { 
+            name: name.substring(0, 20), 
+            score: Number(score), 
+            level: Number(level) 
+        });
+        
+        const scoreData = {
+            name: name.substring(0, 20).trim(),
+            score: Number(score),
+            level: Number(level)
+        };
+        
+        console.log('📦 Données formatées:', scoreData);
         
         const { data, error } = await supabase
             .from('leaderboard')
-            .insert([
-                {
-                    name: name.substring(0, 20),
-                    score: Number(score),
-                    level: Number(level)
-                }
-            ])
+            .insert([scoreData])
             .select();
         
+        console.log('📊 Réponse Supabase (insert):', { data, error });
+        
         if (error) {
+            console.error('❌ Erreur lors de l\'insertion:', error);
             throw error;
         }
         
         console.log('✅ Score enregistré dans Supabase avec ID:', data[0]?.id);
-        
-        // Recharger le leaderboard après un court délai
-        setTimeout(() => {
-            loadLeaderboardFromSupabase().then(newLeaderboard => {
-                if (newLeaderboard) {
-                    leaderboard = newLeaderboard;
-                    updateLeaderboardDisplay();
-                }
-            }).catch(err => {
-                console.warn('Erreur rechargement leaderboard:', err);
-            });
-        }, 1000);
+        console.log('✅ Données enregistrées:', data[0]);
         
         return true;
         
