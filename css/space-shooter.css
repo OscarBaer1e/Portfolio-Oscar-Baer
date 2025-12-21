@@ -863,17 +863,23 @@
 
 .leaderboard-entry.first-place .leaderboard-name {
     position: relative;
-    padding-right: 30px;
+    padding-right: 35px;
+    display: inline-block;
 }
 
 .leaderboard-entry.first-place .leaderboard-name::after {
     content: '👑';
     position: absolute;
-    top: -8px;
-    right: 0;
-    font-size: 1.4rem;
+    top: -10px;
+    right: -5px;
+    font-size: 1.5rem;
+    line-height: 1;
     filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.9));
     animation: crownFloat 2s ease-in-out infinite;
+    z-index: 10;
+    pointer-events: none;
+    background: transparent;
+    text-shadow: none;
 }
 
 @keyframes crownFloat {
