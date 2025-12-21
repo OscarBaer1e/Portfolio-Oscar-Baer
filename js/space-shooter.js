@@ -1943,6 +1943,30 @@ document.addEventListener('DOMContentLoaded', function() {
         return asteroid.size > 25;
     }
     
+    // Calcule l'augmentation de vitesse de manière progressive (élevée au début, faible après)
+    function getSpeedIncrease(level) {
+        // Augmentation décroissante mais toujours visible
+        // Niveau 1-10 : 0.5 → 0.4
+        // Niveau 11-20 : 0.4 → 0.3
+        // Niveau 21-30 : 0.3 → 0.25
+        // Niveau 31+ : 0.25 → 0.2 (minimum)
+        
+        if (level <= 10) {
+            // Niveaux 1-10 : de 0.5 à 0.4 (décroissance linéaire)
+            return 0.5 - ((level - 1) / 10) * 0.1;
+        } else if (level <= 20) {
+            // Niveaux 11-20 : de 0.4 à 0.3
+            return 0.4 - ((level - 11) / 10) * 0.1;
+        } else if (level <= 30) {
+            // Niveaux 21-30 : de 0.3 à 0.25
+            return 0.3 - ((level - 21) / 10) * 0.05;
+        } else {
+            // Niveaux 31+ : de 0.25 à 0.2 (minimum)
+            const extraLevels = level - 31;
+            return Math.max(0.2, 0.25 - (extraLevels / 20) * 0.05);
+        }
+    }
+    
     function checkLevel() {
         // Ne pas augmenter le niveau si un boss est actif
         if (gameState.bossActive && boss) {
@@ -1954,7 +1978,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const newLevel = Math.floor(gameState.score / 500) + 1;
             if (newLevel > gameState.level) {
             gameState.level = newLevel;
-            gameState.gameSpeed += 0.3;
+            // Augmentation progressive de la vitesse
+            const speedIncrease = getSpeedIncrease(gameState.level) * 0.6; // Un peu moins en mode infini
+            gameState.gameSpeed += speedIncrease;
             if (levelElement) levelElement.textContent = gameState.level;
             if (currentLevelDisplay) currentLevelDisplay.textContent = gameState.level;
                 // Animation de niveau supprimée
@@ -1967,7 +1993,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const newLevel = Math.floor(gameState.score / 500) + 1;
         if (newLevel > gameState.level) {
             gameState.level = newLevel;
-            gameState.gameSpeed += 0.5;
+            // Augmentation progressive de la vitesse
+            const speedIncrease = getSpeedIncrease(gameState.level);
+            gameState.gameSpeed += speedIncrease;
             if (levelElement) levelElement.textContent = gameState.level;
             if (currentLevelDisplay) currentLevelDisplay.textContent = gameState.level;
             
