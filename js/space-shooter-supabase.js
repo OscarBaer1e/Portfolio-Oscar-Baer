@@ -139,8 +139,11 @@ async function saveScoreToSupabase(name, score, level) {
     }
     
     try {
-        console.log('💾 Sauvegarde du score dans Supabase...');
+        console.log('💾 ============================================');
+        console.log('💾 SAUVEGARDE DU SCORE DANS SUPABASE');
+        console.log('💾 ============================================');
         console.log('🔗 URL:', window.supabaseClient?.supabaseUrl || 'Non disponible');
+        console.log('🔑 Client Supabase:', window.supabaseClient ? '✅ Disponible' : '❌ Non disponible');
         console.log('📝 Données à enregistrer:', { 
             name: name.substring(0, 20), 
             score: Number(score), 
