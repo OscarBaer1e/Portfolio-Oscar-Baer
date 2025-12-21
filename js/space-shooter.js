@@ -2037,14 +2037,19 @@ document.addEventListener('DOMContentLoaded', function() {
         // Ne JAMAIS mettre le jeu en pause automatiquement (seulement si le joueur appuie sur le bouton)
         // Le jeu continue normalement même lors du spawn d'un boss
         
+        // Sons et messages en arrière-plan pour ne pas bloquer le spawn
         try {
-            playSound('bossSpawn');
+            setTimeout(() => {
+                playSound('bossSpawn');
+            }, 0);
         } catch (e) {
             console.warn('Erreur son bossSpawn:', e);
         }
         
         try {
-            showMessage(`${bossName} apparaît !`, 'boss');
+            setTimeout(() => {
+                showMessage(`${bossName} apparaît !`, 'boss');
+            }, 0);
         } catch (e) {
             console.warn('Erreur message boss:', e);
         }
