@@ -1319,13 +1319,16 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Mise à jour des projectiles
         bullets.forEach((bullet, index) => {
-            if (bullet.vx !== undefined) {
-                bullet.y += bullet.vy || bullet.speed;
-                bullet.x += bullet.vx;
+            if (bullet.vx !== undefined || bullet.vy !== undefined) {
+                // Projectile avec direction personnalisée
+                bullet.y += bullet.vy !== undefined ? bullet.vy : -bullet.speed;
+                bullet.x += bullet.vx || 0;
             } else {
+                // Projectile standard (vers le haut)
                 bullet.y -= bullet.speed;
             }
-            if (bullet.y < 0) {
+            // Supprimer si hors écran (haut ou bas)
+            if (bullet.y < 0 || bullet.y > canvas.height) {
                 bullets.splice(index, 1);
             }
         });
