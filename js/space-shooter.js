@@ -269,9 +269,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const img = new Image();
             img.onload = function() {
                 bossPhotos[parseInt(bossNum)] = img;
+                console.log(`✅ Image boss ${bossNum} chargée: ${bossImagePaths[bossNum]}`);
             };
             img.onerror = function() {
-                console.warn(`Image boss ${bossNum} non trouvée: ${bossImagePaths[bossNum]}`);
+                console.error(`❌ Image boss ${bossNum} NON chargée: ${bossImagePaths[bossNum]}`);
+                console.error('Vérifiez que le fichier existe et que le format est supporté');
             };
             img.src = bossImagePaths[bossNum];
         });
@@ -908,29 +910,39 @@ document.addEventListener('DOMContentLoaded', function() {
         const imageSize = boss.size * 2;
         
         // Image du boss si disponible
-        if (boss.image && boss.image.complete && boss.image.naturalWidth > 0) {
-            // Dessiner l'effet autour de l'image AVANT l'image
-            drawBossImageEffect(effect, imageSize);
-            
-            // Créer un masque circulaire pour arrondir l'image
-            ctx.save();
-            ctx.beginPath();
-            ctx.arc(0, 0, imageSize / 2, 0, Math.PI * 2);
-            ctx.clip();
-            
-            // Dessiner l'image arrondie
-            ctx.drawImage(boss.image, -imageSize / 2, -imageSize / 2, imageSize, imageSize);
-            ctx.restore();
-            
-            // Contour de l'image arrondie
-            ctx.strokeStyle = effect.color;
-            ctx.lineWidth = 3;
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = effect.color;
-            ctx.beginPath();
-            ctx.arc(0, 0, imageSize / 2, 0, Math.PI * 2);
-            ctx.stroke();
-        } else {
+        if (boss.image) {
+            // Vérifier si l'image est chargée
+            if (boss.image.complete && boss.image.naturalWidth > 0) {
+                // Dessiner l'effet autour de l'image AVANT l'image
+                drawBossImageEffect(effect, imageSize);
+                
+                // Créer un masque circulaire pour arrondir l'image
+                ctx.save();
+                ctx.beginPath();
+                ctx.arc(0, 0, imageSize / 2, 0, Math.PI * 2);
+                ctx.clip();
+                
+                // Dessiner l'image arrondie
+                ctx.drawImage(boss.image, -imageSize / 2, -imageSize / 2, imageSize, imageSize);
+                ctx.restore();
+                
+                // Contour de l'image arrondie
+                ctx.strokeStyle = effect.color;
+                ctx.lineWidth = 3;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = effect.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, imageSize / 2, 0, Math.PI * 2);
+                ctx.stroke();
+            } else {
+                // Image pas encore chargée, afficher la forme par défaut temporairement
+                console.warn('Image boss pas encore chargée, affichage forme par défaut');
+                // Continuer vers le else pour afficher la forme par défaut
+            }
+        }
+        
+        // Forme par défaut si pas d'image ou image non chargée
+        if (!boss.image || !boss.image.complete || boss.image.naturalWidth === 0) {
             // Forme par défaut : boule colorée avec effets
             const gradient = ctx.createRadialGradient(0, -boss.size * 0.3, 0, 0, 0, boss.size);
             gradient.addColorStop(0, boss.color);
@@ -1844,6 +1856,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Charger l'image du boss si disponible
         if (bossPhotos[bossNumber]) {
             boss.image = bossPhotos[bossNumber];
+            console.log(`Image boss ${bossNumber} assignée:`, boss.image.complete, boss.image.naturalWidth);
+        } else {
+            console.warn(`⚠️ Image boss ${bossNumber} non disponible dans bossPhotos`);
+            console.log('bossPhotos disponibles:', Object.keys(bossPhotos));
         }
         
         gameState.bossActive = true;
