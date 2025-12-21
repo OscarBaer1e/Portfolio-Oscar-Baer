@@ -569,8 +569,18 @@ document.addEventListener('DOMContentLoaded', function() {
     
     async function showLeaderboard() {
         console.log('📊 showLeaderboard() appelé');
+        console.log('🔍 leaderboardModal:', leaderboardModal);
+        console.log('🔍 leaderboardList:', leaderboardList);
+        
         if (!leaderboardModal) {
             console.error('❌ leaderboardModal non trouvé');
+            console.error('💡 Vérifiez que l\'élément #leaderboard-modal existe dans le HTML');
+            return;
+        }
+        
+        if (!leaderboardList) {
+            console.error('❌ leaderboardList non trouvé');
+            console.error('💡 Vérifiez que l\'élément #leaderboard-list existe dans le HTML');
             return;
         }
         
@@ -578,10 +588,17 @@ document.addEventListener('DOMContentLoaded', function() {
         await loadLeaderboard();
         
         console.log('📋 Leaderboard après chargement:', leaderboard);
+        console.log('📊 Nombre de scores:', leaderboard.length);
+        
         console.log('🔄 Mise à jour de l\'affichage...');
         updateLeaderboardDisplay();
         
+        console.log('🔄 Suppression de la classe "hidden"...');
         leaderboardModal.classList.remove('hidden');
+        
+        console.log('🔍 Classes du modal après:', leaderboardModal.className);
+        console.log('🔍 Display du modal:', window.getComputedStyle(leaderboardModal).display);
+        
         startLeaderboardSync();
         
         console.log('✅ Leaderboard affiché');
@@ -2087,10 +2104,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Leaderboard
     if (showLeaderboardBtn) {
-        showLeaderboardBtn.addEventListener('click', showLeaderboard);
+        console.log('✅ Bouton leaderboard trouvé, ajout de l\'event listener');
+        showLeaderboardBtn.addEventListener('click', function(e) {
+            console.log('🖱️ Clic sur le bouton leaderboard détecté');
+            e.preventDefault();
+            e.stopPropagation();
+            showLeaderboard();
+        });
+    } else {
+        console.error('❌ Bouton leaderboard non trouvé');
+        console.error('💡 Vérifiez que l\'élément #show-leaderboard existe dans le HTML');
     }
     if (closeLeaderboardBtn) {
+        console.log('✅ Bouton fermer leaderboard trouvé');
         closeLeaderboardBtn.addEventListener('click', hideLeaderboard);
+    } else {
+        console.warn('⚠️ Bouton fermer leaderboard non trouvé');
     }
     
     // Fermer le leaderboard en cliquant à l'extérieur
