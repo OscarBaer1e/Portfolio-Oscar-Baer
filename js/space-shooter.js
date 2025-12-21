@@ -669,66 +669,22 @@ document.addEventListener('DOMContentLoaded', function() {
         // Sauvegarder localement
         saveLeaderboard();
         
-        // Enregistrer dans Firebase en arrière-plan (sans bloquer)
-        const firestoreDb = initFirebase();
-        if (firestoreDb) {
+        // Enregistrer dans Supabase en arrière-plan (sans bloquer)
+        if (window.supabaseLeaderboard && window.supabaseLeaderboard.save) {
             try {
-                console.log('Tentative d\'enregistrement dans Firebase...');
-                console.log('Données à enregistrer:', { name: name.substring(0, 20), score, level });
-                
-                // Utiliser Timestamp.now() de Firebase
-                const timestamp = window.firebaseTimestamp ? window.firebaseTimestamp.now() : new Date();
-                console.log('Timestamp créé:', timestamp);
-                
-                const dataToSave = {
-                    name: name.substring(0, 20),
-                    score: Number(score), // S'assurer que c'est un nombre
-                    level: Number(level), // S'assurer que c'est un nombre
-                    date: timestamp
-                };
-                
-                console.log('Données formatées:', dataToSave);
-                
-                const docRef = await firestoreDb.collection('leaderboard').add(dataToSave);
-                console.log('✅ Score enregistré dans Firebase avec ID:', docRef.id);
-                
-                // Recharger depuis Firebase pour synchroniser avec les autres joueurs
-                setTimeout(() => {
-                    loadLeaderboard().catch((err) => {
-                        console.warn('Erreur rechargement leaderboard:', err);
-                    });
-                }, 1000);
-            } catch (error) {
-                console.error('❌ Erreur enregistrement Firebase:', error);
-                console.error('Code erreur:', error.code);
-                console.error('Message:', error.message);
-                console.error('Stack:', error.stack);
-                
-                // Afficher un message à l'utilisateur
-                if (error.code === 'permission-denied') {
-                    console.error('🔒 PERMISSION DENIED - Les règles Firestore bloquent l\'écriture');
-                    console.error('📋 Solution: Vérifiez les règles dans Firebase Console:');
-                    console.error('   1. Allez dans Firestore Database → Rules');
-                    console.error('   2. Assurez-vous d\'avoir: allow create: if true;');
-                    console.error('   3. Cliquez sur "Publier" et attendez 10-20 secondes');
-                    console.error('   4. Voir le guide: REPARER_PERMISSIONS_FIRESTORE.md');
-                    
-                    // Afficher une alerte à l'utilisateur
-                    alert('❌ Erreur de permissions Firestore\n\n' +
-                          'Votre score a été enregistré localement mais n\'a pas pu être sauvegardé en ligne.\n\n' +
-                          'Vérifiez les règles Firestore dans Firebase Console.\n' +
-                          'Voir: REPARER_PERMISSIONS_FIRESTORE.md');
-                } else if (error.code === 'unavailable') {
-                    console.error('🌐 Firebase indisponible - Vérifiez votre connexion');
-                } else if (error.code === 'not-found') {
-                    console.error('📦 Collection non trouvée - Normal si c\'est le premier score');
+                const success = await window.supabaseLeaderboard.save(name, score, level);
+                if (success) {
+                    console.log('✅ Score enregistré dans Supabase');
+                } else {
+                    console.warn('⚠️ Score enregistré localement uniquement');
                 }
-                
-                // Ne pas bloquer si Firebase échoue, le score est déjà enregistré localement
+            } catch (error) {
+                console.error('❌ Erreur enregistrement Supabase:', error);
+                console.warn('⚠️ Score enregistré localement uniquement');
             }
         } else {
-            console.warn('⚠️ Firebase non disponible, score enregistré uniquement en local');
-            console.warn('Vérifiez que Firebase est bien initialisé');
+            console.warn('⚠️ Supabase non disponible, score enregistré uniquement en local');
+            console.warn('💡 Vérifiez que Supabase est bien initialisé (voir SETUP_SUPABASE.md)');
         }
         
         updateLeaderboardDisplay();
