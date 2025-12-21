@@ -406,6 +406,7 @@ document.addEventListener('DOMContentLoaded', function() {
             leaderboard = [];
             console.log('📭 Aucun leaderboard trouvé (ni Supabase ni localStorage)');
         }
+    }
     
     async function saveLeaderboard() {
         localStorage.setItem('spaceShooterLeaderboard', JSON.stringify(leaderboard));
@@ -2250,5 +2251,5 @@ document.addEventListener('DOMContentLoaded', function() {
         init();
         draw();
     });
-});
+}); // Fin de document.addEventListener('DOMContentLoaded')
 
