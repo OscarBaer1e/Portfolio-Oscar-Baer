@@ -258,9 +258,9 @@ document.addEventListener('DOMContentLoaded', function() {
         console.log('📌 Utilisation des valeurs par défaut (config directe)');
         FIREBASE_CONFIG = {
             apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
-            authDomain: "leaderboard.firebaseapp.com",
-            projectId: "leaderboard",
-            storageBucket: "leaderboard.firebasestorage.app",
+            authDomain: "oscar-baer.firebaseapp.com",
+            projectId: "oscar-baer", // ID du projet (ne change pas même si le nom change)
+            storageBucket: "oscar-baer.firebasestorage.app",
             messagingSenderId: "419618942184",
             appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
         };
@@ -510,7 +510,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.error('');
                     console.error('📋 SOLUTION IMMÉDIATE:');
                     console.error('   1. Allez sur: https://console.firebase.google.com/');
-                    console.error('   2. Projet leaderboard → Firestore Database → Rules');
+                    console.error('   2. Projet oscar-baer (nom: Leaderboard) → Firestore Database → Rules');
                     console.error('   3. Vérifiez que vous avez EXACTEMENT:');
                     console.error('      allow read: if true;');
                     console.error('      allow create: if true;');
