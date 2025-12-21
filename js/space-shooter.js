@@ -205,6 +205,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Animations de fond rares
     let backgroundEvents = [];
     
+    // Animations visuelles pour les bonus (remplace les messages texte)
+    let powerUpVisualAnimations = [];
+    
     // Boss
     let boss = null;
     let bossBullets = [];
@@ -801,6 +804,9 @@ document.addEventListener('DOMContentLoaded', function() {
             drawBackgroundEvent(event);
         });
         
+        // Animations visuelles des bonus
+        drawPowerUpVisualAnimations();
+        
         // Boss
         if (boss && gameState.bossActive) {
             drawBoss();
@@ -1103,6 +1109,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
+        // Mise à jour des animations visuelles des bonus
+        updatePowerUpVisualAnimations();
+        
         // Mise à jour du boss
         updateBoss();
         
@@ -1258,7 +1267,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     createEnhancedExplosion(asteroid.x, asteroid.y, asteroid.color, asteroid.size);
                     playSound('hit');
                     asteroids.splice(index, 1);
-                    showMessage('Bouclier actif !', 'powerup');
+                    // Animation visuelle remplace le message texte
                 } else {
                 // Explosion
                     createEnhancedExplosion(ship.x, ship.y, ship.color, 30);
@@ -1414,6 +1423,174 @@ document.addEventListener('DOMContentLoaded', function() {
         return color;
     }
     
+    // Crée une animation visuelle pour un bonus (remplace les messages texte)
+    function createPowerUpVisualAnimation(type, x, y) {
+        const animation = {
+            type: type,
+            x: x,
+            y: y,
+            life: 1.0,
+            alpha: 1.0,
+            scale: 0.5,
+            rotation: 0,
+            particles: []
+        };
+        
+        // Créer des particules spécifiques selon le type
+        if (type === 'rapidFire') {
+            // Éclairs jaunes qui tournent
+            for (let i = 0; i < 12; i++) {
+                const angle = (Math.PI * 2 / 12) * i;
+                animation.particles.push({
+                    angle: angle,
+                    distance: 30,
+                    size: 4,
+                    color: '#ffff00',
+                    speed: 0.1
+                });
+            }
+        } else if (type === 'shield') {
+            // Cercles concentriques bleus
+            for (let i = 0; i < 3; i++) {
+                animation.particles.push({
+                    radius: 20 + i * 15,
+                    size: 3 - i,
+                    color: '#00ffff',
+                    speed: 0.05
+                });
+            }
+        } else if (type === 'life') {
+            // Cœurs qui montent
+            for (let i = 0; i < 5; i++) {
+                animation.particles.push({
+                    x: x + (Math.random() - 0.5) * 40,
+                    y: y,
+                    vy: -2 - Math.random() * 2,
+                    size: 8 + Math.random() * 4,
+                    color: '#ff00ff',
+                    life: 1.0
+                });
+            }
+        } else if (type === 'lifeMax') {
+            // Particules statiques pour "vies max"
+            for (let i = 0; i < 8; i++) {
+                animation.particles.push({
+                    angle: (Math.PI * 2 / 8) * i,
+                    distance: 25,
+                    size: 3,
+                    color: '#ff0000',
+                    speed: 0.08
+                });
+            }
+        }
+        
+        powerUpVisualAnimations.push(animation);
+    }
+    
+    // Dessine les animations visuelles des bonus
+    function drawPowerUpVisualAnimations() {
+        powerUpVisualAnimations.forEach((anim, index) => {
+            if (!anim || anim.life <= 0) {
+                powerUpVisualAnimations.splice(index, 1);
+                return;
+            }
+            
+            ctx.save();
+            ctx.globalAlpha = anim.alpha;
+            ctx.translate(anim.x, anim.y);
+            ctx.scale(anim.scale, anim.scale);
+            
+            if (anim.type === 'rapidFire') {
+                // Dessiner des éclairs jaunes qui tournent
+                anim.rotation += 0.15;
+                anim.particles.forEach(particle => {
+                    const px = Math.cos(particle.angle + anim.rotation) * particle.distance;
+                    const py = Math.sin(particle.angle + anim.rotation) * particle.distance;
+                    
+                    ctx.fillStyle = particle.color;
+                    ctx.shadowBlur = particle.size * 3;
+                    ctx.shadowColor = particle.color;
+                    ctx.beginPath();
+                    // Dessiner un éclair
+                    ctx.moveTo(px, py - particle.size);
+                    ctx.lineTo(px + particle.size * 0.5, py);
+                    ctx.lineTo(px, py + particle.size);
+                    ctx.lineTo(px - particle.size * 0.5, py);
+                    ctx.closePath();
+                    ctx.fill();
+                });
+            } else if (anim.type === 'shield') {
+                // Dessiner des cercles concentriques bleus
+                anim.particles.forEach(particle => {
+                    const currentRadius = particle.radius * (1 + Math.sin(Date.now() * particle.speed) * 0.2);
+                    ctx.strokeStyle = particle.color;
+                    ctx.lineWidth = particle.size;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = particle.color;
+                    ctx.beginPath();
+                    ctx.arc(0, 0, currentRadius, 0, Math.PI * 2);
+                    ctx.stroke();
+                });
+            } else if (anim.type === 'life') {
+                // Dessiner des cœurs qui montent
+                anim.particles.forEach(particle => {
+                    if (particle.life <= 0) return;
+                    
+                    ctx.fillStyle = particle.color;
+                    ctx.shadowBlur = particle.size * 2;
+                    ctx.shadowColor = particle.color;
+                    ctx.beginPath();
+                    // Forme de cœur simplifiée
+                    ctx.arc(particle.x - anim.x, particle.y - anim.y, particle.size / 2, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            } else if (anim.type === 'lifeMax') {
+                // Dessiner des particules statiques pour "vies max"
+                anim.rotation += 0.1;
+                anim.particles.forEach(particle => {
+                    const px = Math.cos(particle.angle + anim.rotation) * particle.distance;
+                    const py = Math.sin(particle.angle + anim.rotation) * particle.distance;
+                    
+                    ctx.fillStyle = particle.color;
+                    ctx.shadowBlur = particle.size * 2;
+                    ctx.shadowColor = particle.color;
+                    ctx.beginPath();
+                    ctx.arc(px, py, particle.size, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            }
+            
+            ctx.restore();
+        });
+    }
+    
+    // Met à jour les animations visuelles des bonus
+    function updatePowerUpVisualAnimations() {
+        powerUpVisualAnimations.forEach((anim, index) => {
+            if (!anim) {
+                powerUpVisualAnimations.splice(index, 1);
+                return;
+            }
+            
+            anim.life -= 0.02;
+            anim.alpha = Math.max(0, anim.life);
+            anim.scale = 0.5 + (1 - anim.life) * 0.5;
+            
+            // Mettre à jour les particules selon le type
+            if (anim.type === 'life') {
+                anim.particles.forEach(particle => {
+                    particle.y += particle.vy;
+                    particle.life -= 0.03;
+                    particle.alpha = Math.max(0, particle.life);
+                });
+            }
+            
+            if (anim.life <= 0) {
+                powerUpVisualAnimations.splice(index, 1);
+            }
+        });
+    }
+    
     // Explosion améliorée avec plus de particules et effets
     function createEnhancedExplosion(x, y, color, size) {
         try {
@@ -1479,19 +1656,19 @@ document.addEventListener('DOMContentLoaded', function() {
             activePowerUps.rapidFire = true;
             activePowerUps.rapidFireEndTime = now + 10000; // 10 secondes
             currentFireRate = baseFireRate / 3; // 3x plus rapide
-            showMessage('⚡ Tir Rapide', 'powerup');
+            createPowerUpVisualAnimation('rapidFire', ship.x, ship.y);
         } else if (powerUp.type === 'shield') {
             activePowerUps.shield = true;
             activePowerUps.shieldEndTime = now + 8000; // 8 secondes
-            showMessage('🛡️ Bouclier', 'powerup');
+            createPowerUpVisualAnimation('shield', ship.x, ship.y);
         } else if (powerUp.type === 'life') {
             if (gameState.lives < 5) { // Maximum 5 vies
                 gameState.lives++;
                 gameState.maxLives = Math.max(gameState.maxLives, gameState.lives);
                 if (livesElement) livesElement.textContent = gameState.lives;
-                showMessage('❤️ +1 Vie', 'powerup');
+                createPowerUpVisualAnimation('life', ship.x, ship.y);
             } else {
-                showMessage('Vies au maximum !', 'powerup');
+                createPowerUpVisualAnimation('lifeMax', ship.x, ship.y);
             }
         }
         
@@ -1734,7 +1911,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (activePowerUps.shield && Date.now() < activePowerUps.shieldEndTime) {
                     playSound('hit');
                     bossBullets.splice(index, 1);
-                    showMessage('Bouclier actif !', 'powerup');
+                    // Animation visuelle remplace le message texte
                 } else {
                     createEnhancedExplosion(ship.x, ship.y, ship.color, 30);
                     playSound('hit');
