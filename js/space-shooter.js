@@ -429,9 +429,16 @@ document.addEventListener('DOMContentLoaded', function() {
     async function loadLeaderboard() {
         const firestoreDb = initFirebase();
         
+        if (!firestoreDb) {
+            console.warn('⚠️ Firebase non disponible, chargement depuis localStorage');
+            console.warn('💡 Diagnostic: Vérifiez que window.firebaseDb existe');
+            console.warn('💡 Voir: DIAGNOSTIC_LEADERBOARD.md');
+        }
+        
         if (firestoreDb) {
             try {
-                console.log('Chargement du leaderboard depuis Firebase...');
+                console.log('📥 Chargement du leaderboard depuis Firebase...');
+                console.log('🔍 firestoreDb:', firestoreDb);
                 
                 // Essayer avec orderBy, si ça échoue (index manquant), charger tout et trier
                 let snapshot;
