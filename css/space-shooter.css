@@ -863,23 +863,28 @@
 
 .leaderboard-entry.first-place .leaderboard-name {
     position: relative;
-    padding-right: 35px;
+    padding-right: 40px;
     display: inline-block;
+    overflow: visible;
+    z-index: 1;
 }
 
 .leaderboard-entry.first-place .leaderboard-name::after {
     content: '👑';
     position: absolute;
-    top: -10px;
-    right: -5px;
-    font-size: 1.5rem;
+    top: -12px;
+    right: -8px;
+    font-size: 1.6rem;
     line-height: 1;
-    filter: drop-shadow(0 0 8px rgba(255, 215, 0, 0.9));
+    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 1));
     animation: crownFloat 2s ease-in-out infinite;
-    z-index: 10;
+    z-index: 100;
     pointer-events: none;
-    background: transparent;
+    background: none;
     text-shadow: none;
+    display: block;
+    width: auto;
+    height: auto;
 }
 
 @keyframes crownFloat {
@@ -977,10 +982,11 @@
     color: var(--primary-color);
     font-weight: bold;
     font-size: 1.1rem;
-    overflow: hidden;
+    overflow: visible;
     text-overflow: ellipsis;
     white-space: nowrap;
     min-width: 0;
+    position: relative;
 }
 
 .leaderboard-score {
