@@ -1838,6 +1838,9 @@ document.addEventListener('DOMContentLoaded', function() {
             patternConfig = getBossPattern(1); // Fallback sur boss 1
         }
         
+        // Obtenir le nom du boss
+        const bossName = getBossName(bossNumber);
+        
         boss = {
             x: canvas.width / 2,
             y: 100,
@@ -1884,7 +1887,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         try {
-            const bossName = getBossName(bossNumber);
             showMessage(`${bossName} apparaît !`, 'boss');
         } catch (e) {
             console.warn('Erreur message boss:', e);
@@ -1896,7 +1898,8 @@ document.addEventListener('DOMContentLoaded', function() {
             console.warn('Erreur updateHealthBars:', e);
         }
         
-        console.log('Boss spawné:', bossNumber, boss);
+        console.log('✅ Boss spawné avec succès:', bossNumber, bossName, boss);
+        console.log('Boss actif:', gameState.bossActive, 'Boss object:', boss);
     }
     
     // Retourne le nom d'un boss selon son numéro
