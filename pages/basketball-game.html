@@ -288,7 +288,63 @@
     </footer>
     
     <script>
-        document.getElementById('current-year-space').textContent = new Date().getFullYear();
+        // Configuration Firebase IMMÉDIATE - AVANT TOUT
+        (function() {
+            'use strict';
+            try {
+                window.FIREBASE_CONFIG = {
+                    apiKey: "AIzaSyCeZAZ6wQDqZ7ttzAt6VtvON5DDl1M5HSM",
+                    authDomain: "oscar-baer.firebaseapp.com",
+                    projectId: "oscar-baer",
+                    storageBucket: "oscar-baer.firebasestorage.app",
+                    messagingSenderId: "419618942184",
+                    appId: "1:419618942184:web:60e8e58c6c3348a3fbad5d"
+                };
+                Object.freeze(window.FIREBASE_CONFIG);
+                window.diagnosticFirebase = function() {
+                    console.log('🔍 === DIAGNOSTIC FIREBASE ===');
+                    console.log('1. window.FIREBASE_CONFIG:', window.FIREBASE_CONFIG);
+                    console.log('2. firebase SDK:', typeof firebase !== 'undefined');
+                    console.log('3. window.firebaseApp:', window.firebaseApp);
+                    console.log('4. window.firebaseDb:', window.firebaseDb);
+                    console.log('========================');
+                };
+                window.reinitFirebase = function() {
+                    if (typeof firebase === 'undefined') {
+                        console.error('❌ Firebase SDK non chargé');
+                        return false;
+                    }
+                    while (firebase.apps && firebase.apps.length > 0) {
+                        try { firebase.apps[0].delete(); } catch(e) { break; }
+                    }
+                    window.firebaseApp = undefined;
+                    window.firebaseDb = undefined;
+                    setTimeout(() => {
+                        try {
+                            const app = firebase.initializeApp(window.FIREBASE_CONFIG);
+                            window.firebaseApp = app;
+                            window.firebaseDb = firebase.firestore();
+                            window.firebaseTimestamp = firebase.firestore.Timestamp;
+                            window.firebaseInitialized = true;
+                            console.log('✅ Firebase réinitialisé ! projectId:', app.options.projectId);
+                        } catch(e) {
+                            console.error('❌ Erreur:', e);
+                        }
+                    }, 200);
+                    return true;
+                };
+                console.log('✅ Firebase setup initial chargé');
+            } catch(e) {
+                console.error('❌ Erreur setup initial:', e);
+            }
+        })();
+        
+        // Année
+        try {
+            document.getElementById('current-year-space').textContent = new Date().getFullYear();
+        } catch(e) {
+            // Ignorer si l'élément n'existe pas encore
+        }
         
         // FORCER la configuration Firebase - Écraser TOUT ce qui pourrait exister
         // Cette configuration est définie AVANT tout autre script pour garantir qu'elle est utilisée
