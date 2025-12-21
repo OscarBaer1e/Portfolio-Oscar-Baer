@@ -2367,21 +2367,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     const defeatedBossColor = boss.color;
                     const defeatedBossSize = Math.min(boss.size || 50, 80);
                     
-                    // Boss vaincu - explosion colorée stylée
+                    // Mise à jour du score immédiatement (ne bloque pas)
+                    gameState.score += defeatedBossNumber * 1000;
+                    if (scoreElement) scoreElement.textContent = gameState.score;
+                    
+                    // Animations et sons en arrière-plan pour ne pas bloquer le jeu
                     try {
-                        createBossDeathExplosion(defeatedBossX, defeatedBossY, defeatedBossColor, defeatedBossSize);
+                        setTimeout(() => {
+                            createBossDeathExplosion(defeatedBossX, defeatedBossY, defeatedBossColor, defeatedBossSize);
+                        }, 0);
                     } catch (e) {
                         console.warn('Erreur explosion boss:', e);
                     }
                     
                     try {
-                        playSound('victory');
+                        setTimeout(() => {
+                            playSound('victory');
+                        }, 0);
                     } catch (e) {
                         console.warn('Erreur son victory:', e);
                     }
-                    
-                    gameState.score += defeatedBossNumber * 1000;
-                    if (scoreElement) scoreElement.textContent = gameState.score;
                     
                     // Animation visuelle du score à côté du boss mort (comme les bonus)
                     try {
