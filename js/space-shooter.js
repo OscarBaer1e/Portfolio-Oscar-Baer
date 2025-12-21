@@ -244,29 +244,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Leaderboard
     let leaderboard = [];
     const MAX_LEADERBOARD_ENTRIES = 10;
-            firebaseInitialized = true;
-            console.log('✅ Firebase accessible via window');
-            return db;
-        }
-        
-        // Attendre que Firebase soit initialisé
-        if (!window.firebaseInitialized) {
-            console.log('⏳ Attente de l\'initialisation Firebase...');
-            // Réessayer après un court délai
-            setTimeout(() => {
-                if (window.firebaseDb) {
-                    db = window.firebaseDb;
-                    firebaseInitialized = true;
-                    console.log('✅ Firebase initialisé après attente');
-                } else {
-                    console.warn('⚠️ Firebase non initialisé après attente');
-                }
-            }, 1000);
-            return null;
-        }
-        
-        return null;
-    }
     
     let leaderboardSyncInterval = null;
     let leaderboardUnsubscribe = null;
@@ -2361,26 +2338,12 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialisation
     // Attendre que Firebase soit chargé avant d'initialiser
-    function waitForFirebase(callback, maxAttempts = 30) {
-        let attempts = 0;
-        const checkFirebase = () => {
-            // Vérifier si Firebase est initialisé via window (npm ou CDN)
-            if (window.firebaseInitialized && window.firebaseDb) {
-                callback();
-            } else if (attempts < maxAttempts) {
-                attempts++;
-                setTimeout(checkFirebase, 100);
-            } else {
-                // Firebase n'est pas disponible, continuer avec localStorage
-                console.warn('⚠️ Firebase non initialisé après', maxAttempts, 'tentatives, utilisation de localStorage');
-                callback();
-            }
-        };
-        checkFirebase();
-    }
-    
-    waitForFirebase(() => {
-        loadLeaderboard();
+    // Initialiser le jeu (utilise Supabase maintenant, pas Firebase)
+    loadLeaderboard().then(() => {
+        init();
+        draw();
+    }).catch(() => {
+        // En cas d'erreur, continuer quand même
         init();
         draw();
     });
