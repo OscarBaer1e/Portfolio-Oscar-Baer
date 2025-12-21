@@ -504,6 +504,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         topScores.forEach((entry, index) => {
+            console.log(`📝 Affichage entrée ${index + 1}:`, entry);
+            
             const entryDiv = document.createElement('div');
             entryDiv.className = 'leaderboard-entry';
             
@@ -512,21 +514,37 @@ document.addEventListener('DOMContentLoaded', function() {
             
             const rank = index + 1;
             const medal = rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : `${rank}.`;
-            const date = new Date(entry.date).toLocaleDateString('fr-FR', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            });
+            
+            // Gérer les dates (peuvent être des strings ou des objets Date)
+            let dateStr = '';
+            try {
+                const dateObj = entry.date ? new Date(entry.date) : new Date();
+                dateStr = dateObj.toLocaleDateString('fr-FR', {
+                    day: '2-digit',
+                    month: '2-digit',
+                    year: 'numeric'
+                });
+            } catch (e) {
+                console.warn('⚠️ Erreur formatage date:', e, entry.date);
+                dateStr = 'Date inconnue';
+            }
+            
+            // S'assurer que les valeurs sont bien définies
+            const name = entry.name || 'Anonyme';
+            const score = Number(entry.score) || 0;
+            const level = Number(entry.level) || 1;
             
             entryDiv.innerHTML = `
                 <div class="leaderboard-rank">${medal}</div>
-                <div class="leaderboard-name">${entry.name}</div>
-                <div class="leaderboard-score">${entry.score.toLocaleString()}</div>
-                <div class="leaderboard-level">Niveau ${entry.level}</div>
-                <div class="leaderboard-date">${date}</div>
+                <div class="leaderboard-name">${name}</div>
+                <div class="leaderboard-score">${score.toLocaleString()}</div>
+                <div class="leaderboard-level">Niveau ${level}</div>
+                <div class="leaderboard-date">${dateStr}</div>
             `;
             leaderboardList.appendChild(entryDiv);
         });
+        
+        console.log(`✅ ${topScores.length} entrées affichées dans le leaderboard`);
     }
     
     // Calcule la position qu'aura le score dans le leaderboard
@@ -2193,9 +2211,12 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialisation
     // Initialiser le jeu (utilise Supabase)
     loadLeaderboard().then(() => {
+        console.log('✅ Leaderboard chargé à l\'initialisation');
+        console.log('📊 Leaderboard:', leaderboard);
         init();
         draw();
-    }).catch(() => {
+    }).catch((error) => {
+        console.error('❌ Erreur chargement leaderboard à l\'initialisation:', error);
         // En cas d'erreur, continuer quand même
         init();
         draw();
