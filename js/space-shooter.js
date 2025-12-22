@@ -166,20 +166,65 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Système de contrôle de volume global
     let globalVolume = parseFloat(localStorage.getItem('spaceShooterVolume')) || 0.7; // Volume par défaut à 70%
+    let previousVolume = globalVolume; // Pour le bouton mute/unmute
     
     // Fonction pour définir le volume global
     function setGlobalVolume(volume) {
         globalVolume = Math.max(0, Math.min(1, volume)); // Limiter entre 0 et 1
         localStorage.setItem('spaceShooterVolume', globalVolume.toString());
         
-        // Mettre à jour l'affichage du slider si présent
+        // Sauvegarder le volume précédent si on n'est pas en mute
+        if (globalVolume > 0) {
+            previousVolume = globalVolume;
+        }
+        
+        // Mettre à jour l'affichage
+        updateVolumeUI();
+    }
+    
+    // Fonction pour mettre à jour l'interface du volume
+    function updateVolumeUI() {
         const volumeSlider = document.getElementById('volume-slider');
         const volumeValue = document.getElementById('volume-value');
+        const volumeIcon = document.getElementById('volume-icon');
+        const volumeSliderFill = document.getElementById('volume-slider-fill');
+        
         if (volumeSlider) {
             volumeSlider.value = globalVolume;
         }
+        
         if (volumeValue) {
             volumeValue.textContent = Math.round(globalVolume * 100) + '%';
+        }
+        
+        if (volumeSliderFill) {
+            volumeSliderFill.style.width = (globalVolume * 100) + '%';
+        }
+        
+        // Mettre à jour l'icône selon le volume
+        if (volumeIcon) {
+            if (globalVolume === 0) {
+                volumeIcon.className = 'fas fa-volume-mute';
+                volumeIcon.style.color = 'var(--secondary-color)';
+            } else if (globalVolume < 0.3) {
+                volumeIcon.className = 'fas fa-volume-down';
+                volumeIcon.style.color = 'var(--primary-color)';
+            } else {
+                volumeIcon.className = 'fas fa-volume-up';
+                volumeIcon.style.color = 'var(--primary-color)';
+            }
+        }
+    }
+    
+    // Fonction pour mute/unmute
+    function toggleMute() {
+        if (globalVolume > 0) {
+            // Mute : sauvegarder le volume actuel et mettre à 0
+            previousVolume = globalVolume;
+            setGlobalVolume(0);
+        } else {
+            // Unmute : restaurer le volume précédent
+            setGlobalVolume(previousVolume > 0 ? previousVolume : 0.7);
         }
     }
     
@@ -3680,18 +3725,31 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialisation du contrôleur de volume
     function initVolumeControl() {
         const volumeSlider = document.getElementById('volume-slider');
-        const volumeValue = document.getElementById('volume-value');
+        const volumeMuteBtn = document.getElementById('volume-mute-btn');
+        
+        // Initialiser l'interface
+        updateVolumeUI();
         
         if (volumeSlider) {
-            // Initialiser le slider avec la valeur sauvegardée
+            // Mettre à jour le slider avec la valeur sauvegardée
             volumeSlider.value = globalVolume;
+            
+            // Événement pour le slider
             volumeSlider.addEventListener('input', (e) => {
                 setGlobalVolume(parseFloat(e.target.value));
             });
+            
+            // Mettre à jour la barre de remplissage en temps réel
+            volumeSlider.addEventListener('input', (e) => {
+                const volumeSliderFill = document.getElementById('volume-slider-fill');
+                if (volumeSliderFill) {
+                    volumeSliderFill.style.width = (parseFloat(e.target.value) * 100) + '%';
+                }
+            });
         }
         
-        if (volumeValue) {
-            volumeValue.textContent = Math.round(globalVolume * 100) + '%';
+        if (volumeMuteBtn) {
+            volumeMuteBtn.addEventListener('click', toggleMute);
         }
     }
     
