@@ -1,6 +1,6 @@
 /**
- * Mini-jeu de Bowling
- * Mode 1V1 avec lancer à la souris et tableau des scores
+ * Mini-jeu de Bowling avec la tête d'Oscar comme boule
+ * Version améliorée avec mode 1V1, lancer à la souris et tableau des scores
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -296,25 +296,24 @@ document.addEventListener('DOMContentLoaded', function() {
         pinData = [];
         
         const rows = [
-            [7, 8, 9, 10],  // Rangée 1 : 4 quilles (en haut)
-            [4, 5, 6],      // Rangée 2 : 3 quilles
-            [2, 3],         // Rangée 3 : 2 quilles
-            [1]             // Rangée 4 : 1 quille (en bas, vers la boule)
+            [1],           // Rangée 1 : 1 quille
+            [2, 3],        // Rangée 2 : 2 quilles
+            [4, 5, 6],     // Rangée 3 : 3 quilles
+            [7, 8, 9, 10]  // Rangée 4 : 4 quilles
         ];
         
         // Positions relatives des quilles (en pixels depuis le centre)
-        // Pyramide inversée : la pointe (1 quille) est en bas
         const pinPositions = [
-            { x: 0, y: 120 },         // 1 (en bas)
-            { x: -30, y: 80 },       // 2
-            { x: 30, y: 80 },        // 3
-            { x: -60, y: 40 },       // 4
-            { x: 0, y: 40 },         // 5
-            { x: 60, y: 40 },        // 6
-            { x: -90, y: 0 },        // 7 (en haut)
-            { x: -30, y: 0 },        // 8
-            { x: 30, y: 0 },         // 9
-            { x: 90, y: 0 }          // 10
+            { x: 0, y: 0 },           // 1
+            { x: -30, y: 40 },        // 2
+            { x: 30, y: 40 },         // 3
+            { x: -60, y: 80 },        // 4
+            { x: 0, y: 80 },          // 5
+            { x: 60, y: 80 },         // 6
+            { x: -90, y: 120 },       // 7
+            { x: -30, y: 120 },       // 8
+            { x: 30, y: 120 },        // 9
+            { x: 90, y: 120 }         // 10
         ];
         
         rows.forEach((rowPins, rowIndex) => {
@@ -326,14 +325,11 @@ document.addEventListener('DOMContentLoaded', function() {
                 pin.className = 'pin';
                 pin.dataset.index = pinNum - 1;
                 pin.dataset.pinNumber = pinNum;
+                // Tours au lieu de quilles
                 pin.textContent = '🗼';
                 pin.style.fontSize = '40px';
                 pin.style.textAlign = 'center';
                 pin.style.lineHeight = '50px';
-                pin.style.userSelect = 'none';
-                pin.style.webkitUserSelect = 'none';
-                pin.style.mozUserSelect = 'none';
-                pin.style.msUserSelect = 'none';
                 
                 const pos = pinPositions[pinNum - 1];
                 const pinInfo = {
@@ -518,6 +514,17 @@ document.addEventListener('DOMContentLoaded', function() {
         const ballX = finalX;
         const ballY = -totalDistance; // Distance à parcourir vers le haut
         
+        // Calcule la distance totale parcourue (2D) pour normaliser la vitesse
+        const totalDistance2D = Math.sqrt(ballX * ballX + ballY * ballY);
+        
+        // Vitesse constante en pixels par seconde (ajustable pour contrôler la vitesse globale)
+        // Cette valeur détermine la vitesse de base de la boule
+        const constantSpeed = 225; // pixels par seconde
+        
+        // Calcule la durée de l'animation en fonction de la distance et de la vitesse
+        // Limite entre 0.8s (minimum) et 3.0s (maximum) pour éviter des animations trop rapides ou trop lentes
+        const animationDuration = Math.max(0.8, Math.min(3.0, totalDistance2D / constantSpeed));
+        
         // Rotation de la boule avec probabilité de rotation légère aléatoire
         const baseRotation = angle * 8; // Rotation de base proportionnelle à l'angle
         // 70% de chance d'avoir une rotation légère supplémentaire aléatoire
@@ -534,27 +541,31 @@ document.addEventListener('DOMContentLoaded', function() {
             rotationDirection = -1; // Rotation inverse
         }
         
-        // Applique l'animation avec rotation améliorée
+        // Applique l'animation avec rotation améliorée et durée dynamique
         ball.style.setProperty('--ball-x', ballX + 'px');
         ball.style.setProperty('--ball-y', ballY + 'px');
         ball.style.setProperty('--ball-rotation', (rotation * rotationDirection) + 'deg');
+        // Définit la durée de l'animation dynamiquement pour maintenir une vitesse constante
+        ball.style.animationDuration = animationDuration + 's';
         ball.classList.add('rolling');
         
         // Améliore la trajectoire avec une courbe plus réaliste
         const trajectoryCurve = curveAmount * 0.5; // Courbe plus douce
         ball.style.setProperty('--trajectory-curve', trajectoryCurve + 'px');
         
-        // Joue le son de la boule qui roule
-        playRollingSound(2000);
+        // Joue le son de la boule qui roule (durée basée sur l'animation)
+        playRollingSound(animationDuration * 1000);
         
         // Calcule le chemin de la boule pour vérifier toutes les quilles traversées
         const ballPath = calculateBallPath(0, ballStartY, finalX, pinsY, angleRad, driftX, curveAmount);
         
-        // Après l'animation, vérifie les collisions
+        // Après l'animation, vérifie les collisions (utilise la durée calculée)
         setTimeout(() => {
             checkCollisions(ballPath, power, finalX);
             ball.classList.remove('rolling');
             ball.style.transform = 'translateX(0) translateY(0) rotate(0deg)';
+            // Réinitialise la durée d'animation pour le prochain lancer
+            ball.style.animationDuration = '';
             
             // Attend que toutes les quilles tombent avant d'enregistrer le score
             setTimeout(() => {
@@ -580,7 +591,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     isThrowing = false;
                 }, 500);
             }, 1500);
-        }, 2000);
+        }, animationDuration * 1000);
     }
     
     // Calcule le chemin de la boule (points successifs) - amélioré
@@ -787,7 +798,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function checkCollisions(ballPath, power, finalBallX) {
         const hitRadius = 30 + (power / 20); // Rayon d'impact ajusté
-        const pinsContainerY = 50; // Position Y du conteneur des quilles depuis le haut (en haut de la piste)
+        const pinsContainerY = 50; // Position Y du conteneur des quilles depuis le haut
         
         // Liste des quilles touchées (directement ou sur le chemin)
         const hitPins = [];
