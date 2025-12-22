@@ -459,8 +459,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let bossPhotos = {}; // Stocke les photos des boss (1-10)
     
     // Variables de tir (normalisées par delta time)
+    // Vitesse inspirée des jeux classiques (Space Invaders, Galaga) : ~1.2-1.5s entre les tirs
     let shootCooldown = 0; // Compteur de cooldown en secondes (normalisé)
-    let baseFireRate = 0.8; // Temps entre les tirs en secondes (800ms = 0.8s) - vitesse plus lente
+    let baseFireRate = 1.2; // Temps entre les tirs en secondes (1200ms = 1.2s) - vitesse classique
     let currentFireRate = baseFireRate; // Temps de cooldown actuel en secondes
     
     // Vérifications de sécurité pour tous les éléments
@@ -2510,7 +2511,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (powerUp.type === 'rapidFire') {
             activePowerUps.rapidFire = true;
             activePowerUps.rapidFireEndTime = now + 10000; // 10 secondes
-            currentFireRate = baseFireRate / 3; // 3x plus rapide (0.267s au lieu de 0.8s)
+            currentFireRate = baseFireRate / 2.5; // 2.5x plus rapide (0.48s au lieu de 1.2s) - boost significatif mais équilibré
             createPowerUpVisualAnimation('rapidFire', ship.x, ship.y);
         } else if (powerUp.type === 'shield') {
             activePowerUps.shield = true;
