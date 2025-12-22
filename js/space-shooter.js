@@ -3652,6 +3652,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
+        // Empêcher le défilement de la page avec les flèches haut/bas pendant le jeu
+        if (gameState.isPlaying && !gameState.isPaused) {
+            if ((e.code === 'ArrowUp' || e.code === 'ArrowDown') && !(e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+            }
+        }
+        
         if (e.code === 'Space') {
             e.preventDefault();
             if (gameState.isPlaying) {
