@@ -459,9 +459,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let bossPhotos = {}; // Stocke les photos des boss (1-10)
     
     // Variables de tir (normalisées par delta time)
-    // Vitesse lente et stratégique pour un gameplay plus réfléchi
+    // 1 balle toutes les secondes
     let shootCooldown = 0; // Compteur de cooldown en secondes (normalisé)
-    let baseFireRate = 2.0; // Temps entre les tirs en secondes (2000ms = 2.0s) - tir lent et stratégique
+    let baseFireRate = 1.0; // Temps entre les tirs en secondes (1000ms = 1.0s) - 1 balle par seconde
     let currentFireRate = baseFireRate; // Temps de cooldown actuel en secondes
     
     // Vérifications de sécurité pour tous les éléments
@@ -2511,7 +2511,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (powerUp.type === 'rapidFire') {
             activePowerUps.rapidFire = true;
             activePowerUps.rapidFireEndTime = now + 10000; // 10 secondes
-            currentFireRate = baseFireRate / 2.5; // 2.5x plus rapide (0.8s au lieu de 2.0s) - boost significatif mais équilibré
+            currentFireRate = baseFireRate / 2.5; // 2.5x plus rapide (0.4s au lieu de 1.0s) - boost significatif mais équilibré
             createPowerUpVisualAnimation('rapidFire', ship.x, ship.y);
         } else if (powerUp.type === 'shield') {
             activePowerUps.shield = true;
