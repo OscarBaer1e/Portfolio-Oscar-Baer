@@ -329,7 +329,8 @@ document.addEventListener('DOMContentLoaded', function() {
         width: 40,
         height: 40,
         speed: 5,
-        color: '#00ffff'
+        color: '#00ffff',
+        invincible: false
     };
     
     // Projectiles
