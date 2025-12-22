@@ -1350,6 +1350,65 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         ctx.restore();
+        
+        // Dessiner la barre de vie au-dessus du boss
+        drawBossHealthBar();
+    }
+    
+    // Dessine la barre de vie du boss au-dessus de lui
+    function drawBossHealthBar() {
+        if (!boss || !gameState.bossActive) return;
+        
+        const barWidth = 150;
+        const barHeight = 12;
+        const barX = boss.x - barWidth / 2;
+        const barY = boss.y - boss.size - 30;
+        
+        const healthPercent = boss.health / boss.maxHealth;
+        
+        // Fond de la barre (noir avec bordure)
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.8)';
+        ctx.fillRect(barX - 2, barY - 2, barWidth + 4, barHeight + 4);
+        
+        ctx.strokeStyle = boss.color;
+        ctx.lineWidth = 2;
+        ctx.strokeRect(barX - 2, barY - 2, barWidth + 4, barHeight + 4);
+        
+        // Barre de vie (dégradé selon la santé)
+        const fillWidth = barWidth * healthPercent;
+        let fillColor;
+        if (healthPercent > 0.6) {
+            fillColor = '#00ff00'; // Vert si > 60%
+        } else if (healthPercent > 0.3) {
+            fillColor = '#ffaa00'; // Orange si entre 30% et 60%
+        } else {
+            fillColor = '#ff0000'; // Rouge si < 30%
+        }
+        
+        // Dégradé pour la barre de vie
+        const gradient = ctx.createLinearGradient(barX, barY, barX + fillWidth, barY);
+        gradient.addColorStop(0, fillColor);
+        gradient.addColorStop(1, fillColor + '88');
+        
+        ctx.fillStyle = gradient;
+        ctx.fillRect(barX, barY, fillWidth, barHeight);
+        
+        // Effet de brillance
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
+        ctx.fillRect(barX, barY, fillWidth, barHeight / 2);
+        
+        // Texte avec le nom du boss et les PV
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 10px Arial';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(`${boss.bossName} - ${boss.health}/${boss.maxHealth}`, boss.x, barY - 10);
+        
+        // Ombre du texte
+        ctx.shadowBlur = 5;
+        ctx.shadowColor = boss.color;
+        ctx.fillText(`${boss.bossName} - ${boss.health}/${boss.maxHealth}`, boss.x, barY - 10);
+        ctx.shadowBlur = 0;
     }
     
     function drawShip(x, y) {
