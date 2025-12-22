@@ -156,6 +156,11 @@ document.addEventListener('DOMContentLoaded', function() {
         bossActive: false
     };
     
+    // Delta time pour vitesse constante sur tous les navigateurs
+    let lastFrameTime = performance.now();
+    const TARGET_FPS = 60;
+    const FRAME_TIME = 1000 / TARGET_FPS; // ~16.67ms par frame à 60fps
+    
     // Statistiques de la partie
     let gameStats = {
         asteroidsDestroyed: 0,
@@ -1620,13 +1625,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Mise à jour des événements de fond
         backgroundEvents.forEach((event, index) => {
             if (event.type === 'rocket') {
-                event.y -= event.speed;
+                event.y -= event.speed * speedFactor;
             } else if (event.type === 'shootingStar') {
-                event.x += event.speed * 0.5;
-                event.y += event.speed;
+                event.x += event.speed * 0.5 * speedFactor;
+                event.y += event.speed * speedFactor;
             }
-            event.life--;
-            event.alpha = Math.max(0, event.alpha - 0.01);
+            event.life -= speedFactor;
+            event.alpha = Math.max(0, event.alpha - 0.01 * speedFactor);
             
             if (event.life <= 0 || event.y < -50 || event.y > canvas.height + 50 || event.x > canvas.width + 50) {
                 backgroundEvents.splice(index, 1);
@@ -1637,17 +1642,17 @@ document.addEventListener('DOMContentLoaded', function() {
         updatePowerUpVisualAnimations();
         
         // Mise à jour du boss
-        updateBoss();
+        updateBoss(speedFactor);
         
         // Mise à jour des projectiles
         bullets.forEach((bullet, index) => {
             if (bullet.vx !== undefined || bullet.vy !== undefined) {
                 // Projectile avec direction personnalisée
-                bullet.y += bullet.vy !== undefined ? bullet.vy : -bullet.speed;
-                bullet.x += bullet.vx || 0;
+                bullet.y += (bullet.vy !== undefined ? bullet.vy : -bullet.speed) * speedFactor;
+                bullet.x += (bullet.vx || 0) * speedFactor;
             } else {
                 // Projectile standard (vers le haut)
-                bullet.y -= bullet.speed;
+                bullet.y -= bullet.speed * speedFactor;
             }
             // Supprimer si hors écran (haut ou bas)
             if (bullet.y < 0 || bullet.y > canvas.height) {
@@ -1657,8 +1662,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Mise à jour des astéroïdes
         asteroids.forEach((asteroid, index) => {
-            asteroid.y += asteroid.speed;
-            asteroid.rotation += asteroid.rotationSpeed;
+            asteroid.y += asteroid.speed * speedFactor;
+            asteroid.rotation += asteroid.rotationSpeed * speedFactor;
             
             if (asteroid.y > canvas.height + 50) {
                 asteroids.splice(index, 1);
@@ -1679,11 +1684,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             try {
-                particle.x += particle.vx || 0;
-                particle.y += particle.vy || 0;
-                particle.vy = (particle.vy || 0) + 0.1; // Gravité
-                particle.alpha = (particle.alpha || 1) - 0.02;
-                particle.size = (particle.size || 1) - 0.1;
+                particle.x += (particle.vx || 0) * speedFactor;
+                particle.y += (particle.vy || 0) * speedFactor;
+                particle.vy = (particle.vy || 0) + 0.1 * speedFactor; // Gravité
+                particle.alpha = (particle.alpha || 1) - 0.02 * speedFactor;
+                particle.size = (particle.size || 1) - 0.1 * speedFactor;
                 
                 if (particle.alpha <= 0 || particle.size <= 0 || isNaN(particle.x) || isNaN(particle.y)) {
                     particles.splice(index, 1);
@@ -1698,8 +1703,8 @@ document.addEventListener('DOMContentLoaded', function() {
         powerUps.forEach((powerUp, index) => {
             // Ralentissement temporel : ralentit la chute des bonus
             const timeSlowMultiplier = (activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime) ? 0.5 : 1.0;
-            powerUp.y += powerUp.speed * timeSlowMultiplier;
-            powerUp.rotation += 0.05;
+            powerUp.y += powerUp.speed * timeSlowMultiplier * speedFactor;
+            powerUp.rotation += 0.05 * speedFactor;
             
             if (powerUp.y > canvas.height + 20) {
                 powerUps.splice(index, 1);
@@ -2771,7 +2776,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Met à jour le boss
-    function updateBoss() {
+    function updateBoss(speedFactor = 1) {
         if (!boss || !gameState.bossActive) return;
         
         // Le boss continue de bouger même si le jeu est en pause (pour éviter les bugs)
@@ -2789,10 +2794,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof boss.patternTime !== 'number') {
             boss.patternTime = 0;
         }
-        boss.patternTime += 16; // ~60fps
+        boss.patternTime += 16 * speedFactor; // Ajusté selon le delta time
         
         // Appliquer le pattern de mouvement selon le numéro du boss
-        updateBossMovement();
+        updateBossMovement(speedFactor);
         
         // Tir du boss
         if (now - boss.lastShot > boss.shootInterval) {
@@ -3009,7 +3014,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Met à jour le mouvement du boss selon son pattern
-    function updateBossMovement() {
+    function updateBossMovement(speedFactor = 1) {
         if (!boss || !gameState.bossActive) return;
         
         const pattern = getBossPattern(boss.pattern);
@@ -3018,7 +3023,7 @@ document.addEventListener('DOMContentLoaded', function() {
         switch(pattern.type) {
             case 'horizontal':
                 // Boss 1 : Mouvement horizontal simple
-                boss.x += boss.speed * boss.direction;
+                boss.x += boss.speed * boss.direction * speedFactor;
                 if (boss.x <= boss.size || boss.x >= canvas.width - boss.size) {
                     boss.direction *= -1;
                 }
@@ -3026,7 +3031,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
             case 'zigzag':
                 // Boss 2 : Zigzag
-                boss.x += boss.speed * boss.direction;
+                boss.x += boss.speed * boss.direction * speedFactor;
                 boss.y = 100 + Math.sin(time * 2) * 30;
                 if (boss.x <= boss.size || boss.x >= canvas.width - boss.size) {
                     boss.direction *= -1;
@@ -3046,14 +3051,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Phase de charge
                     boss.targetX = ship.x;
                     const dx = boss.targetX - boss.x;
-                    boss.x += Math.sign(dx) * boss.speed * 1.5;
+                    boss.x += Math.sign(dx) * boss.speed * 1.5 * speedFactor;
                     if (Math.abs(dx) < 10) {
                         boss.patternPhase = 1;
                         boss.patternTime = 0;
                     }
                 } else {
                     // Phase de recul
-                    boss.x += (canvas.width / 2 - boss.x) * 0.1;
+                    boss.x += (canvas.width / 2 - boss.x) * 0.1 * speedFactor;
                     if (Math.abs(boss.x - canvas.width / 2) < 5) {
                         boss.patternPhase = 0;
                         boss.patternTime = 0;
@@ -3063,7 +3068,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
             case 'teleport':
                 // Boss 5 : Téléportation aléatoire
-                if (boss.patternTime % 2000 < 16) {
+                if (boss.patternTime % 2000 < 16 * speedFactor) {
                     boss.x = Math.random() * (canvas.width - boss.size * 2) + boss.size;
                     boss.y = 50 + Math.random() * 100;
                 }
@@ -3080,7 +3085,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Boss 7 : Suit le joueur agressivement
                 const targetX = ship.x;
                 const diffX = targetX - boss.x;
-                boss.x += Math.sign(diffX) * Math.min(Math.abs(diffX) * 0.1, boss.speed);
+                boss.x += Math.sign(diffX) * Math.min(Math.abs(diffX) * 0.1, boss.speed) * speedFactor;
                 boss.y = 80 + Math.sin(time * 3) * 20;
                 break;
                 
@@ -3402,22 +3407,31 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Mouvement du vaisseau
-    function handleMovement() {
+    function handleMovement(speedFactor = 1) {
         if (!gameState.isPlaying || gameState.isPaused) return;
         
         const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
         if (keys['ArrowLeft'] || keys['KeyA']) {
-            ship.x = Math.max(shipSize, ship.x - ship.speed);
+            ship.x = Math.max(shipSize, ship.x - ship.speed * speedFactor);
         }
         if (keys['ArrowRight'] || keys['KeyD']) {
-            ship.x = Math.min(canvas.width - shipSize, ship.x + ship.speed);
+            ship.x = Math.min(canvas.width - shipSize, ship.x + ship.speed * speedFactor);
         }
     }
     
     // Boucle de jeu
-    function gameLoop() {
-        handleMovement();
-        update();
+    function gameLoop(currentTime) {
+        // Calculer le delta time pour vitesse constante
+        const deltaTime = currentTime - lastFrameTime;
+        lastFrameTime = currentTime;
+        
+        // Normaliser pour 60fps (facteur de vitesse)
+        // Si on tourne à 30fps, deltaTime sera ~33ms, donc factor = 33/16.67 = ~2
+        // Si on tourne à 60fps, deltaTime sera ~16.67ms, donc factor = 1
+        const speedFactor = Math.min(deltaTime / FRAME_TIME, 2.0); // Limiter à 2x pour éviter les sauts
+        
+        handleMovement(speedFactor);
+        update(speedFactor);
         draw();
         updateHealthBars(); // Mise à jour des barres de vie
         
@@ -3465,10 +3479,12 @@ document.addEventListener('DOMContentLoaded', function() {
         init();
         gameState.isPlaying = true;
         gameState.isPaused = false;
+        // Réinitialiser le delta time au démarrage
+        lastFrameTime = performance.now();
         if (gameOver) gameOver.classList.add('hidden');
         if (startScreen) startScreen.classList.add('hidden');
         if (startBtn) startBtn.textContent = 'Pause';
-        gameLoop();
+        gameLoop(performance.now());
     }
     
     function pauseGame() {

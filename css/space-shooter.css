@@ -1536,14 +1536,14 @@
 
 /* Statistiques post-partie */
 .game-stats {
-    margin-top: 25px;
-    padding: 20px;
+    margin-top: 15px;
+    padding: 12px;
     background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(10, 10, 30, 0.95) 100%);
-    border: 3px solid var(--primary-color);
-    border-radius: 12px;
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
     box-shadow: 
-        0 0 25px rgba(0, 255, 255, 0.5),
-        inset 0 0 20px rgba(0, 255, 255, 0.1);
+        0 0 20px rgba(0, 255, 255, 0.4),
+        inset 0 0 15px rgba(0, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     animation: statsGlow 2s ease-in-out infinite alternate;
 }
@@ -1551,26 +1551,26 @@
 @keyframes statsGlow {
     from {
         box-shadow: 
-            0 0 25px rgba(0, 255, 255, 0.5),
-            inset 0 0 20px rgba(0, 255, 255, 0.1);
+            0 0 20px rgba(0, 255, 255, 0.4),
+            inset 0 0 15px rgba(0, 255, 255, 0.1);
     }
     to {
         box-shadow: 
-            0 0 35px rgba(0, 255, 255, 0.7),
-            inset 0 0 25px rgba(0, 255, 255, 0.15);
+            0 0 30px rgba(0, 255, 255, 0.6),
+            inset 0 0 20px rgba(0, 255, 255, 0.15);
     }
 }
 
 .game-stats h4 {
     color: var(--primary-color);
     font-family: 'Anta', sans-serif;
-    margin-bottom: 20px;
+    margin-bottom: 12px;
     text-align: center;
-    font-size: 1.4rem;
-    text-shadow: 0 0 15px var(--primary-color);
-    letter-spacing: 2px;
+    font-size: 1.1rem;
+    text-shadow: 0 0 10px var(--primary-color);
+    letter-spacing: 1px;
     position: relative;
-    padding-bottom: 10px;
+    padding-bottom: 8px;
 }
 
 .game-stats h4::after {
@@ -1579,29 +1579,29 @@
     bottom: 0;
     left: 50%;
     transform: translateX(-50%);
-    width: 60%;
-    height: 2px;
+    width: 50%;
+    height: 1.5px;
     background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
-    box-shadow: 0 0 10px var(--primary-color);
+    box-shadow: 0 0 8px var(--primary-color);
 }
 
 .stats-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 15px;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 8px;
 }
 
 .stat-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 12px 15px;
+    padding: 8px 10px;
     background: linear-gradient(135deg, rgba(0, 255, 255, 0.15) 0%, rgba(0, 200, 255, 0.1) 100%);
-    border-radius: 8px;
-    border: 2px solid rgba(0, 255, 255, 0.4);
+    border-radius: 6px;
+    border: 1.5px solid rgba(0, 255, 255, 0.4);
     box-shadow: 
-        0 0 10px rgba(0, 255, 255, 0.3),
-        inset 0 0 10px rgba(0, 255, 255, 0.1);
+        0 0 8px rgba(0, 255, 255, 0.3),
+        inset 0 0 8px rgba(0, 255, 255, 0.1);
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
@@ -1623,28 +1623,28 @@
 }
 
 .stat-item:hover {
-    transform: translateY(-2px);
+    transform: translateY(-1px);
     border-color: var(--primary-color);
     box-shadow: 
-        0 0 15px rgba(0, 255, 255, 0.5),
-        inset 0 0 15px rgba(0, 255, 255, 0.15);
+        0 0 12px rgba(0, 255, 255, 0.5),
+        inset 0 0 12px rgba(0, 255, 255, 0.15);
 }
 
 .stat-item .stat-label {
     color: rgba(255, 255, 255, 0.8);
-    font-size: 0.95rem;
+    font-size: 0.8rem;
     font-weight: 500;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.3px;
 }
 
 .stat-item .stat-value {
     color: var(--primary-color);
     font-weight: bold;
     font-family: 'Anta', sans-serif;
-    font-size: 1.4rem;
-    text-shadow: 0 0 10px var(--primary-color);
-    min-width: 60px;
+    font-size: 1.1rem;
+    text-shadow: 0 0 8px var(--primary-color);
+    min-width: 50px;
     text-align: right;
 }
 
