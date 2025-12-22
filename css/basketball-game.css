@@ -256,7 +256,9 @@
     transition: transform 0.1s ease-out;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
     cursor: pointer;
-    will-change: transform, left, top;
+    will-change: transform;
+    left: 0;
+    top: 0;
 }
 
 .basketball::before {
@@ -300,7 +302,8 @@
     height: 80px;
     bottom: 0;
     z-index: 8;
-    transition: transform 0.2s ease;
+    transition: transform 0.15s ease-out, bottom 0.15s ease-out;
+    will-change: transform, bottom;
 }
 
 .player1 {
@@ -444,11 +447,14 @@
     font-size: 1.2rem;
     font-weight: bold;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transform: translateY(-10px);
+    transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1), transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: opacity, transform;
 }
 
 .game-message.show {
     opacity: 1;
+    transform: translateY(0);
 }
 
 .game-message.score {

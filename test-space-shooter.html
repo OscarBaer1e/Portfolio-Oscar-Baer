@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🧪 TEST - Space Shooter | Oscar Baer</title>
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/space-shooter.css">
+    <link href="https://fonts.googleapis.com/css2?family=Anta&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* Styles spécifiques pour la page de test */
+        .test-banner {
+            background: linear-gradient(135deg, #ff6b00 0%, #ff8c00 100%);
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            position: sticky;
+            top: 0;
+            z-index: 2000;
+        }
+        
+        .test-banner i {
+            margin-right: 10px;
+        }
+        
+        .test-info {
+            background: rgba(255, 193, 7, 0.1);
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 1200px;
+        }
+        
+        .test-info h3 {
+            color: #ffc107;
+            margin-bottom: 15px;
+        }
+        
+        .test-info ul {
+            list-style: none;
+            padding-left: 0;
+        }
+        
+        .test-info li {
+            margin: 10px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+        
+        .test-info li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #ffc107;
+            font-weight: bold;
+        }
+    </style>
+    
+    <script src="js/block-firebase.js"></script>
+</head>
+<body>
+    <div class="animated-background">
+        <div class="grid-lines"></div>
+        <div class="floating-particles"></div>
+        <div class="animated-lines"></div>
+    </div>
+    
+    <!-- Bannière de test -->
+    <div class="test-banner">
+        <i class="fas fa-flask"></i>
+        PAGE DE TEST - Space Shooter | Cette page n'est pas accessible depuis le site principal
+    </div>
+    
+    <!-- Informations de test -->
+    <div class="test-info">
+        <h3><i class="fas fa-info-circle"></i> Instructions de test</h3>
+        <ul>
+            <li>Cette page permet de tester les modifications avant de les appliquer au jeu principal</li>
+            <li>Modifiez le fichier <code>test-space-shooter.js</code> pour tester vos changements</li>
+            <li>Une fois validé, copiez les modifications vers <code>js/space-shooter.js</code></li>
+            <li>Cette page utilise les mêmes CSS et structure que le jeu principal</li>
+            <li>Les dépendances (Supabase, etc.) sont incluses pour un test complet</li>
+        </ul>
+    </div>
+
+    <!-- Section du jeu -->
+    <section id="space-shooter-section" class="section-padding">
+        <div class="container">
+            <div class="space-shooter-container">
+                <div class="game-header">
+                    <h2 class="game-title">🚀 Space Shooter TEST 🚀</h2>
+                    <div class="game-stats">
+                        <div class="stat">
+                            <span class="stat-label">Score:</span>
+                            <span id="score" class="stat-value">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Meilleur Score:</span>
+                            <span id="high-score" class="stat-value">0</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Niveau:</span>
+                            <span id="level" class="stat-value">1</span>
+                        </div>
+                        <div class="stat">
+                            <span class="stat-label">Vies:</span>
+                            <span id="lives" class="stat-value">3</span>
+                        </div>
+                    </div>
+                    <div class="game-controls-header">
+                        <button id="start-game" class="btn primary-btn">Commencer</button>
+                        <button id="reset-game" class="btn secondary-btn">Réinitialiser</button>
+                        <button id="show-leaderboard" class="btn secondary-btn">🏆 Leaderboard</button>
+                        <button id="fullscreen-btn" class="btn secondary-btn">⛶ Plein Écran</button>
+                    </div>
+                </div>
+                
+                <div class="game-wrapper">
+                    <canvas id="gameCanvas" width="800" height="600"></canvas>
+                    <div class="active-buffs" id="active-buffs">
+                    </div>
+                    <div class="health-bars">
+                        <div class="health-bar-container">
+                            <div class="health-bar-label">PV</div>
+                            <div class="health-bar">
+                                <div id="health-bar-fill" class="health-bar-fill"></div>
+                            </div>
+                        </div>
+                        <div class="health-bar-container">
+                            <div class="shield-bar-label">Shield</div>
+                            <div class="shield-bar">
+                                <div id="shield-bar-fill" class="shield-bar-fill"></div>
+                            </div>
+                        </div>
+                        <div class="health-bar-container" id="boss-health-container" style="display: none;">
+                            <div class="boss-bar-label">Boss</div>
+                            <div class="boss-bar">
+                                <div id="boss-bar-fill" class="boss-bar-fill"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="level-display">
+                        <div class="level-label">Niveau</div>
+                        <div id="current-level-display" class="level-value">1</div>
+                    </div>
+                    <div id="game-over" class="game-over hidden">
+                        <h3>Mission Échouée!</h3>
+                        <p>Score Final: <span id="final-score">0</span></p>
+                        <p>Meilleur Score: <span id="final-high-score">0</span></p>
+                        <p>Niveau Atteint: <span id="final-level">1</span></p>
+                        <p id="score-message" class="score-message"></p>
+                        <div class="game-over-buttons">
+                            <button id="restart-btn" class="btn primary-btn">Rejouer</button>
+                            <button id="register-score-btn" class="btn secondary-btn hidden">💾 Enregistrer mon Score</button>
+                        </div>
+                    </div>
+                    <div id="start-screen" class="start-screen">
+                        <h3>🚀 Space Shooter</h3>
+                        <p>Appuyez sur ESPACE pour commencer</p>
+                    </div>
+                </div>
+                
+                <div class="game-instructions">
+                    <h3>Contrôles:</h3>
+                    <div class="instructions-grid">
+                        <div class="instruction">
+                            <p><kbd>←</kbd> <kbd>→</kbd> ou <kbd>A</kbd> <kbd>D</kbd> - Déplacer le vaisseau</p>
+                            <p><kbd>ESPACE</kbd> - Tirer</p>
+                            <p><small>💡 Évitez les astéroïdes et détruisez-les pour gagner des points !</small></p>
+                        </div>
+                    </div>
+                    <p class="tip">💡 <strong>Objectif:</strong> Survivez le plus longtemps possible ! Détruisez les astéroïdes pour gagner des points. Plus vous progressez, plus la difficulté augmente. Vous avez 3 vies !</p>
+                </div>
+                
+                <div id="game-message" class="game-message"></div>
+                
+                <div id="leaderboard-modal" class="leaderboard-modal hidden">
+                    <div class="leaderboard-content">
+                        <div class="leaderboard-header">
+                            <h2>🏆 Leaderboard</h2>
+                            <button id="close-leaderboard" class="close-btn">&times;</button>
+                        </div>
+                        <div id="leaderboard-list" class="leaderboard-list">
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="score-register" class="score-register hidden">
+                    <div class="score-register-content">
+                        <div class="score-register-header">
+                            <h3>🎉 Nouveau Record !</h3>
+                            <div class="score-register-stats">
+                                <div class="stat-item">
+                                    <span class="stat-label">Score</span>
+                                    <span id="register-score-value" class="stat-value">0</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Niveau</span>
+                                    <span id="register-level-value" class="stat-value">1</span>
+                                </div>
+                                <div class="stat-item">
+                                    <span class="stat-label">Position</span>
+                                    <span id="register-position-value" class="stat-value">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        <p class="score-register-message">Félicitations ! Votre score peut être enregistré dans le leaderboard des 10 meilleurs joueurs !</p>
+                        <form id="score-register-form">
+                            <div class="input-group">
+                                <label for="player-name">Entrez votre nom :</label>
+                                <input type="text" id="player-name" placeholder="Votre nom (max 20 caractères)" maxlength="20" required autofocus>
+                                <small class="input-hint">Ce nom sera visible par tous les joueurs</small>
+                            </div>
+                            <div class="score-register-buttons">
+                                <button type="submit" class="btn primary-btn">
+                                    <span class="btn-icon">💾</span>
+                                    Enregistrer dans le Leaderboard
+                                </button>
+                                <button type="button" id="cancel-register" class="btn secondary-btn">
+                                    <span class="btn-icon">✕</span>
+                                    Annuler
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+                
+                <div class="boss-photos-section">
+                    <h3>Photos des Boss</h3>
+                    <div class="boss-photos-grid">
+                        <div class="boss-photo-item" data-boss="1">
+                            <label>
+                                <input type="file" accept="image/*" class="boss-photo-input" data-boss-num="1">
+                                <div class="boss-photo-preview" data-boss-num="1">
+                                    <span>Boss 1</span>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="boss-photo-item" data-boss="2">
+                            <label>
+                                <input type="file" accept="image/*" class="boss-photo-input" data-boss-num="2">
+                                <div class="boss-photo-preview" data-boss-num="2">
+                                    <span>Boss 2</span>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="boss-photo-item" data-boss="3">
+                            <label>
+                                <input type="file" accept="image/*" class="boss-photo-input" data-boss-num="3">
+                                <div class="boss-photo-preview" data-boss-num="3">
+                                    <span>Boss 3</span>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="boss-photo-item" data-boss="4">
+                            <label>
+                                <input type="file" accept="image/*" class="boss-photo-input" data-boss-num="4">
+                                <div class="boss-photo-preview" data-boss-num="4">
+                                    <span>Boss 4</span>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="boss-photo-item" data-boss="5">
+                            <label>
+                                <input type="file" accept="image/*" class="boss-photo-input" data-boss-num="5">
+                                <div class="boss-photo-preview" data-boss-num="5">
+                                    <span>Boss 5</span>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="boss-photo-item" data-boss="6">
+                            <label>
+                                <input type="file" accept="image/*" class="boss-photo-input" data-boss-num="6">
+                                <div class="boss-photo-preview" data-boss-num="6">
+                                    <span>Boss 6</span>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="boss-photo-item" data-boss="7">
+                            <label>
+                                <input type="file" accept="image/*" class="boss-photo-input" data-boss-num="7">
+                                <div class="boss-photo-preview" data-boss-num="7">
+                                    <span>Boss 7</span>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="boss-photo-item" data-boss="8">
+                            <label>
+                                <input type="file" accept="image/*" class="boss-photo-input" data-boss-num="8">
+                                <div class="boss-photo-preview" data-boss-num="8">
+                                    <span>Boss 8</span>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="boss-photo-item" data-boss="9">
+                            <label>
+                                <input type="file" accept="image/*" class="boss-photo-input" data-boss-num="9">
+                                <div class="boss-photo-preview" data-boss-num="9">
+                                    <span>Boss 9</span>
+                                </div>
+                            </label>
+                        </div>
+                        <div class="boss-photo-item" data-boss="10">
+                            <label>
+                                <input type="file" accept="image/*" class="boss-photo-input" data-boss-num="10">
+                                <div class="boss-photo-preview" data-boss-num="10">
+                                    <span>Boss 10</span>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="game-mode-selector">
+                    <label for="game-mode-select">Mode de jeu:</label>
+                    <select id="game-mode-select" class="mode-select">
+                        <option value="normal">Normal</option>
+                        <option value="infinite">Infini</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script>
+        // Blocage ULTRA-AGGRESSIF Firebase - S'exécute IMMÉDIATEMENT
+        (function() {
+            'use strict';
+            console.log('🛡️ Blocage Firebase ULTRA-AGGRESSIF activé (TEST)');
+            
+            // Supprimer Firebase immédiatement
+            function killFirebase() {
+                try {
+                    if (window.firebase) {
+                        console.warn('🚫 Firebase détecté, suppression...');
+                        if (window.firebase.apps) {
+                            window.firebase.apps.forEach(app => {
+                                try { app.delete(); } catch(e) {}
+                            });
+                        }
+                        delete window.firebase;
+                    }
+                    delete window.firebaseApp;
+                    delete window.firebaseDb;
+                    delete window.firebaseInitialized;
+                    delete window.FIREBASE_CONFIG;
+                } catch(e) {}
+            }
+            
+            killFirebase();
+            setInterval(killFirebase, 100);
+        })();
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase-init.js"></script>
+    <script>
+        // Vérifier que Supabase est bien initialisé après chargement
+        window.addEventListener('load', function() {
+            setTimeout(function() {
+                if (typeof window.diagnosticSupabase === 'function') {
+                    console.log('✅ Supabase correctement chargé (TEST)');
+                } else {
+                    console.error('❌ ERREUR: window.diagnosticSupabase n\'existe pas');
+                    console.error('💡 Vérifiez que js/supabase-init.js est bien chargé');
+                }
+            }, 500);
+        });
+    </script>
+    <script src="js/space-shooter-supabase.js"></script>
+    <script src="js/test-space-shooter.js"></script>
+    <script src="js/script.js"></script>
+</body>
+</html>
+
+

@@ -199,19 +199,28 @@ document.addEventListener('DOMContentLoaded', function() {
         revealObserver.observe(card);
     });
     let lastScrollTop = 0;
+    let ticking = false;
     const parallaxElements = document.querySelectorAll('.parallax-section, .hero-content, .morph');
     
-    window.addEventListener('scroll', () => {
+    function updateParallax() {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
         const scrollDirection = scrollTop > lastScrollTop ? 'down' : 'up';
         
         parallaxElements.forEach((el, index) => {
             const speed = 0.5 + (index * 0.1);
             const yPos = -(scrollTop * speed);
-            el.style.transform = `translateY(${yPos}px)`;
+            el.style.transform = `translate3d(0, ${yPos}px, 0)`;
         });
         
         lastScrollTop = scrollTop;
+        ticking = false;
+    }
+    
+    window.addEventListener('scroll', () => {
+        if (!ticking) {
+            requestAnimationFrame(updateParallax);
+            ticking = true;
+        }
     }, { passive: true });
     const buttons = document.querySelectorAll('.btn, .btn-overlay');
     buttons.forEach(button => {
@@ -249,8 +258,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function animateCursor() {
         cursorX += (mouseX - cursorX) * 0.1;
         cursorY += (mouseY - cursorY) * 0.1;
-        cursor.style.left = cursorX + 'px';
-        cursor.style.top = cursorY + 'px';
+        cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
         requestAnimationFrame(animateCursor);
     }
     animateCursor();
