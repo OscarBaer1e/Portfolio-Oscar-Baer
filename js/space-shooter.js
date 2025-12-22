@@ -2604,6 +2604,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Mode normal : boss tous les 10 niveaux
         const newLevel = Math.floor(gameState.score / 500) + 1;
         if (newLevel > gameState.level) {
+            const previousLevel = gameState.level;
             gameState.level = newLevel;
             // Augmentation progressive de la vitesse
             const speedIncrease = getSpeedIncrease(gameState.level);
@@ -2614,12 +2615,21 @@ document.addEventListener('DOMContentLoaded', function() {
             // Animation de niveau supprimée
             
             // Vérifier si un boss doit apparaître (tous les 10 niveaux)
-            // Ne pas spawn si on dépasse le niveau 100 (tous les boss sont vaincus)
-            if (gameState.level % 10 === 0 && !gameState.bossActive && !boss && gameState.level <= 100) {
+            // Vérifier aussi si on vient de passer d'un niveau non-multiple de 10 à un multiple de 10
+            // (pour gérer le cas où le niveau saute de 9 à 11 par exemple)
+            const shouldSpawnBoss = (gameState.level % 10 === 0) && 
+                                    (previousLevel % 10 !== 0 || previousLevel === 0) &&
+                                    !gameState.bossActive && 
+                                    !boss && 
+                                    gameState.level <= 100;
+            
+            if (shouldSpawnBoss) {
                 console.log(`🎯 Niveau ${gameState.level} atteint - Tentative spawn boss`);
                 console.log('Conditions:', {
                     level: gameState.level,
+                    previousLevel: previousLevel,
                     levelMod10: gameState.level % 10,
+                    previousLevelMod10: previousLevel % 10,
                     bossActive: gameState.bossActive,
                     boss: boss,
                     levelUnder100: gameState.level <= 100
@@ -2644,15 +2654,22 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Calcul du numéro du boss : niveau 10 = boss 1, niveau 20 = boss 2, etc.
         const bossNumber = Math.min(10, Math.floor(gameState.level / 10));
         
         // Vérifier que le bossNumber est valide
         if (bossNumber < 1 || bossNumber > 10) {
-            console.error('Boss number invalide:', bossNumber, 'level:', gameState.level);
+            console.error('❌ Boss number invalide:', bossNumber, 'level:', gameState.level);
             return;
         }
         
-        console.log('Spawning boss', bossNumber, 'at level', gameState.level);
+        // Vérifier que le niveau est bien un multiple de 10
+        if (gameState.level % 10 !== 0) {
+            console.warn('⚠️ Tentative de spawn boss à un niveau non-multiple de 10:', gameState.level);
+            // Ne pas empêcher le spawn, mais logger pour debug
+        }
+        
+        console.log(`✅ Spawning boss ${bossNumber} (${getBossName(bossNumber)}) at level ${gameState.level}`);
         
         // Jouer le son d'arrivée du boss
         playAudioFile('../ressources/Sons/Arrivée Boss.mp3', 0.6);
