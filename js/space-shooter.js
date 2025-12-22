@@ -1126,7 +1126,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (particle.type === 'star') {
                 // Étoile stylée avec 4 branches
-                ctx.fillStyle = particle.color;
+            ctx.fillStyle = particle.color;
                 ctx.shadowBlur = particle.size * 3;
                 ctx.shadowColor = particle.color;
                 ctx.translate(particle.x, particle.y);
@@ -1144,9 +1144,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 ctx.fillStyle = particle.color;
                 ctx.shadowBlur = particle.size * 4;
                 ctx.shadowColor = particle.color;
-                ctx.beginPath();
-                ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
-                ctx.fill();
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+            ctx.fill();
                 // Cœur brillant supplémentaire
                 ctx.globalAlpha = particle.alpha * 0.5;
                 ctx.beginPath();
@@ -2494,8 +2494,8 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (gameState.gameMode === 'infinite') {
             // Mode infini : le niveau augmente continuellement
-            const newLevel = Math.floor(gameState.score / 500) + 1;
-            if (newLevel > gameState.level) {
+        const newLevel = Math.floor(gameState.score / 500) + 1;
+        if (newLevel > gameState.level) {
             gameState.level = newLevel;
             // Augmentation progressive de la vitesse
             const speedIncrease = getSpeedIncrease(gameState.level) * 0.6; // Un peu moins en mode infini
@@ -2520,26 +2520,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Animation de niveau supprimée
             
-            // Vérifier si un boss doit apparaître (tous les 10 niveaux)
-            // Ne pas spawn si on dépasse le niveau 100 (tous les boss sont vaincus)
-            if (gameState.level % 10 === 0 && !gameState.bossActive && !boss && gameState.level <= 100) {
-                console.log(`🎯 Niveau ${gameState.level} atteint - Tentative spawn boss`);
-                console.log('Conditions:', {
-                    level: gameState.level,
-                    levelMod10: gameState.level % 10,
-                    bossActive: gameState.bossActive,
-                    boss: boss,
-                    levelUnder100: gameState.level <= 100
-                });
-                try {
-                    spawnBoss();
-                } catch (e) {
-                    console.error('❌ Erreur spawnBoss:', e);
-                    console.error('Stack:', e.stack);
-                    gameState.bossActive = false;
-                    boss = null;
-                }
-            }
+            // Système de boss désactivé - plus de boss aléatoire entre les niveaux 1 et 9
         }
     }
     
@@ -3435,9 +3416,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (activePowerUps.tripleShot) {
             // Tir triple : 3 projectiles en éventail
-            bullets.push({
-                x: ship.x,
-                y: ship.y - ship.height / 2,
+        bullets.push({
+            x: ship.x,
+            y: ship.y - ship.height / 2,
                 speed: 8,
                 vx: -0.5,
                 vy: -8,
@@ -3679,20 +3660,20 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Boutons
     if (startBtn) {
-        startBtn.addEventListener('click', () => {
-            if (gameState.isPlaying) {
-                pauseGame();
-            } else {
-                startGame();
-            }
-        });
+    startBtn.addEventListener('click', () => {
+        if (gameState.isPlaying) {
+            pauseGame();
+        } else {
+            startGame();
+        }
+    });
     }
     
     if (resetBtn) {
-        resetBtn.addEventListener('click', resetGame);
+    resetBtn.addEventListener('click', resetGame);
     }
     if (restartBtn) {
-        restartBtn.addEventListener('click', startGame);
+    restartBtn.addEventListener('click', startGame);
     }
     
     // Leaderboard
@@ -3840,8 +3821,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }).catch((error) => {
         console.error('❌ Erreur chargement leaderboard à l\'initialisation:', error);
         // En cas d'erreur, continuer quand même
-        init();
-        draw();
-    });
+    init();
+    draw();
+});
 }); // Fin de document.addEventListener('DOMContentLoaded')
 
