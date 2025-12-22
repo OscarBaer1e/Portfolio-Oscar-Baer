@@ -450,8 +450,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 2000);
     }
     
-    // Système de delta time pour normaliser la vitesse
-    let lastFrameTime = performance.now();
+    // Système de delta time pour normaliser la vitesse (compatible Firefox)
+    // Fallback pour performance.now() si non disponible
+    const getTime = (function() {
+        if (typeof performance !== 'undefined' && performance.now) {
+            return performance.now.bind(performance);
+        } else {
+            return Date.now;
+        }
+    })();
+    
+    let lastFrameTime = getTime();
     const targetFPS = 60;
     const frameTime = 1000 / targetFPS; // Temps par frame à 60fps (16.67ms)
     gameState.deltaTime = 1.0; // Multiplicateur de vitesse normalisé (1.0 = 60fps)
@@ -467,12 +476,22 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Firefox peut ne pas passer currentTime, utiliser getTime() comme fallback
+        const now = currentTime || getTime();
+        
         // Calcul du delta time normalisé (1.0 = 60fps, 2.0 = 30fps, 0.5 = 120fps)
-        const deltaTime = currentTime ? (currentTime - lastFrameTime) / frameTime : 1.0;
-        lastFrameTime = currentTime || performance.now();
+        // Protection contre les valeurs invalides
+        let deltaTime = 1.0;
+        if (lastFrameTime && now && !isNaN(now) && !isNaN(lastFrameTime)) {
+            const timeDiff = now - lastFrameTime;
+            if (timeDiff > 0 && timeDiff < 1000) { // Protection contre les sauts anormaux
+                deltaTime = timeDiff / frameTime;
+            }
+        }
+        lastFrameTime = now;
         
         // Limiter le delta time pour éviter les sauts trop importants (cap à 2x la vitesse normale)
-        gameState.deltaTime = Math.min(deltaTime, 2.0);
+        gameState.deltaTime = Math.min(Math.max(deltaTime, 0.1), 2.0); // Min 0.1, Max 2.0
         
         updatePlayers();
         updateBall();
