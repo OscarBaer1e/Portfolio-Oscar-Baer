@@ -423,8 +423,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Éléments UI
     const healthBarFill = document.getElementById('health-bar-fill');
     const shieldBarFill = document.getElementById('shield-bar-fill');
-    const bossHealthContainer = document.getElementById('boss-health-container');
-    const bossBarFill = document.getElementById('boss-bar-fill');
+    // Barre de vie du boss supprimée - maintenant dessinée directement sur le canvas au-dessus du boss
     const gameModeSelect = document.getElementById('game-mode-select');
     const leaderboardModal = document.getElementById('leaderboard-modal');
     const showLeaderboardBtn = document.getElementById('show-leaderboard');
@@ -1012,7 +1011,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Met à jour les barres de vie et shield
     function updateHealthBars() {
-        if (!healthBarFill || !shieldBarFill || !bossBarFill) return;
+        if (!healthBarFill || !shieldBarFill) return;
         
         const healthPercent = (gameState.lives / gameState.maxLives) * 100;
         healthBarFill.style.width = healthPercent + '%';
@@ -1024,17 +1023,7 @@ document.addEventListener('DOMContentLoaded', function() {
             shieldBarFill.style.width = '0%';
         }
         
-        if (boss && gameState.bossActive) {
-            const bossPercent = (boss.health / boss.maxHealth) * 100;
-            bossBarFill.style.width = bossPercent + '%';
-            if (bossHealthContainer) {
-                bossHealthContainer.style.display = 'block';
-            }
-        } else {
-            if (bossHealthContainer) {
-                bossHealthContainer.style.display = 'none';
-            }
-        }
+        // Barre de vie du boss supprimée - maintenant dessinée directement sur le canvas au-dessus du boss
     }
     
     function updateHighScore() {
