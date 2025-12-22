@@ -791,9 +791,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 buffIcon.className = 'buff-icon';
                 buffIcon.id = `buff-${buff.type}`;
                 
-                // Pour le rétrécissement, créer une icône personnalisée (flèche verte)
+                // Pour le rétrécissement, créer une icône personnalisée (flèche verte identique au jeu)
                 if (buff.type === 'shrink') {
-                    buffIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 4 L6 10 L9 10 L9 18 L15 18 L15 10 L18 10 Z" fill="#00ff00" stroke="#00aa00" stroke-width="2"/></svg>';
+                    // Flèche vers le bas verte : forme identique à drawPowerUp
+                    buffIcon.innerHTML = '<svg width="24" height="24" viewBox="-8 -8 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M 0 -8 L -6 0 L -3 0 L -3 8 L 3 8 L 3 0 L 6 0 Z" fill="#00ff00" stroke="#00aa00" stroke-width="1.5" stroke-linejoin="round"/></svg>';
                 } else {
                     buffIcon.textContent = buff.emoji;
                 }
