@@ -489,6 +489,15 @@
     min-width: 200px;
 }
 
+/* Barre de vie du boss en haut à droite */
+#boss-health-container {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    bottom: auto !important;
+    z-index: 10;
+}
+
 /* Affichage du niveau */
 .level-display {
     position: absolute;
@@ -1514,8 +1523,61 @@
     .score-register-content h3 {
         font-size: 1.5rem;
     }
-=======
->>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
+}
+
+/* Barre de vie du boss en haut à droite */
+#boss-health-container {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    bottom: auto !important;
+    z-index: 10;
+}
+
+/* Statistiques post-partie */
+.game-stats {
+    margin-top: 20px;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.75);
+    border: 2px solid var(--primary-color);
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+}
+
+.game-stats h4 {
+    color: var(--primary-color);
+    font-family: 'Anta', sans-serif;
+    margin-bottom: 15px;
+    text-align: center;
+    font-size: 1.2rem;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 10px;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background: rgba(0, 255, 255, 0.1);
+    border-radius: 5px;
+    border: 1px solid rgba(0, 255, 255, 0.3);
+}
+
+.stat-item .stat-label {
+    color: var(--dim-text-color);
+    font-size: 0.9rem;
+}
+
+.stat-item .stat-value {
+    color: var(--primary-color);
+    font-weight: bold;
+    font-family: 'Anta', sans-serif;
+    font-size: 1.1rem;
 }
 
 

@@ -36,7 +36,10 @@ document.addEventListener('DOMContentLoaded', function() {
         rapidFire: '⚡',
         shrink: '🔽',
         bigBullets: '💥',
-        tripleShot: '🎯'
+        tripleShot: '🎯',
+        timeSlow: '⏱️',
+        offensiveShield: '🛡️',
+        magnet: '🧲'
     };
     
     // Système de thèmes qui change tous les 10 niveaux
@@ -151,6 +154,17 @@ document.addEventListener('DOMContentLoaded', function() {
         gameSpeed: 2,
         gameMode: 'normal', // 'normal' ou 'infinite'
         bossActive: false
+    };
+    
+    // Statistiques de la partie
+    let gameStats = {
+        asteroidsDestroyed: 0,
+        bossesDefeated: 0,
+        powerUpsCollected: 0,
+        shotsFired: 0,
+        shotsHit: 0,
+        startTime: 0,
+        endTime: 0
     };
     
     // Système de sons
@@ -332,12 +346,23 @@ document.addEventListener('DOMContentLoaded', function() {
         shrink: false,
         bigBullets: false,
         tripleShot: false,
+        timeSlow: false,
+        offensiveShield: false,
+        magnet: false,
         rapidFireEndTime: 0,
         shieldEndTime: 0,
         shrinkEndTime: 0,
         bigBulletsEndTime: 0,
-        tripleShotEndTime: 0
+        tripleShotEndTime: 0,
+        timeSlowEndTime: 0,
+        offensiveShieldEndTime: 0,
+        magnetEndTime: 0
     };
+    
+    // Variables pour effets visuels
+    let screenShake = { x: 0, y: 0, intensity: 0 };
+    let shipTrail = []; // Traînées derrière le vaisseau
+    let scoreParticles = []; // Particules de score qui montent
     
     // Étoiles de fond
     let stars = [];
@@ -835,6 +860,13 @@ document.addEventListener('DOMContentLoaded', function() {
         backgroundEvents = [];
         boss = null;
         bossBullets = [];
+        shipTrail = [];
+        scoreParticles = [];
+        screenShake = { x: 0, y: 0, intensity: 0 };
+        
+        // SUPPRIMER TOUTES LES IMAGES UPLOADÉES PAR L'UTILISATEUR (y compris job_application)
+        bossPhotos = {};
+        
         gameState.score = 0;
         gameState.level = 1;
         gameState.lives = 3;
@@ -848,11 +880,17 @@ document.addEventListener('DOMContentLoaded', function() {
             shrink: false,
             bigBullets: false,
             tripleShot: false,
+            timeSlow: false,
+            offensiveShield: false,
+            magnet: false,
             rapidFireEndTime: 0,
             shieldEndTime: 0,
             shrinkEndTime: 0,
             bigBulletsEndTime: 0,
-            tripleShotEndTime: 0
+            tripleShotEndTime: 0,
+            timeSlowEndTime: 0,
+            offensiveShieldEndTime: 0,
+            magnetEndTime: 0
         };
         lastShotTime = 0;
         if (currentLevelDisplay) {
@@ -966,6 +1004,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Dessin
     function draw() {
         if (!canvas || !ctx) return;
+        
+        // Effet de shake (écran qui tremble)
+        ctx.save();
+        if (screenShake.intensity > 0) {
+            ctx.translate(
+                (Math.random() - 0.5) * screenShake.intensity,
+                (Math.random() - 0.5) * screenShake.intensity
+            );
+            screenShake.intensity *= 0.9; // Diminue progressivement
+            if (screenShake.intensity < 0.1) screenShake.intensity = 0;
+        }
+        
         // Fond avec gradient selon le thème
         const currentTheme = getCurrentTheme();
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -1013,6 +1063,28 @@ document.addEventListener('DOMContentLoaded', function() {
         if (activePowerUps.shield && Date.now() < activePowerUps.shieldEndTime) {
             drawShield();
         }
+        
+        // Particules de score qui montent
+        scoreParticles.forEach((particle, index) => {
+            ctx.save();
+            ctx.globalAlpha = particle.alpha;
+            ctx.fillStyle = particle.color;
+            ctx.font = `bold ${particle.size}px 'Anta', sans-serif`;
+            ctx.textAlign = 'center';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = particle.color;
+            ctx.fillText(particle.text, particle.x, particle.y);
+            ctx.restore();
+            
+            // Mise à jour
+            particle.y -= 2;
+            particle.alpha -= 0.02;
+            particle.size += 0.3;
+            
+            if (particle.alpha <= 0) {
+                scoreParticles.splice(index, 1);
+            }
+        });
         
         // Particules avec effets stylés selon le type
         particles.forEach(particle => {
@@ -1083,16 +1155,23 @@ document.addEventListener('DOMContentLoaded', function() {
             gameState.bossActive = false;
         }
         
-        // Projectiles du boss
+        // Projectiles du boss (avec effet visuel si renvoyés)
         bossBullets.forEach(bullet => {
-            ctx.fillStyle = bullet.color;
+            ctx.fillStyle = bullet.color || '#ff0000';
             ctx.shadowBlur = 10;
-            ctx.shadowColor = bullet.color;
+            ctx.shadowColor = bullet.color || '#ff0000';
+            // Effet spécial pour projectiles renvoyés (vert)
+            if (bullet.color === '#00ff00') {
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#00ff00';
+            }
             ctx.beginPath();
-            ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
+            ctx.arc(bullet.x, bullet.y, bullet.size || 6, 0, Math.PI * 2);
             ctx.fill();
             ctx.shadowBlur = 0;
         });
+        
+        ctx.restore(); // Restaurer le contexte après le shake
     }
     
     // Dessine les événements de fond
@@ -1408,6 +1487,56 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.moveTo(8, -8);
             ctx.lineTo(0, 8);
             ctx.stroke();
+        } else if (powerUp.type === 'timeSlow') {
+            // Ralentissement temporel - horloge
+            ctx.fillStyle = '#9b59b6';
+            ctx.strokeStyle = '#7d3c98';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            // Aiguilles
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, -6);
+            ctx.moveTo(0, 0);
+            ctx.lineTo(4, 0);
+            ctx.stroke();
+        } else if (powerUp.type === 'offensiveShield') {
+            // Bouclier offensif - bouclier avec flèches
+            ctx.fillStyle = '#ff6b6b';
+            ctx.strokeStyle = '#ff4757';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, 12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            // Flèches vers l'extérieur
+            for (let i = 0; i < 4; i++) {
+                const angle = (Math.PI / 2) * i;
+                ctx.beginPath();
+                ctx.moveTo(Math.cos(angle) * 8, Math.sin(angle) * 8);
+                ctx.lineTo(Math.cos(angle) * 15, Math.sin(angle) * 15);
+                ctx.stroke();
+            }
+        } else if (powerUp.type === 'magnet') {
+            // Magnet - aimant
+            ctx.fillStyle = '#e74c3c';
+            ctx.strokeStyle = '#c0392b';
+            ctx.lineWidth = 2;
+            // Forme d'aimant en U
+            ctx.beginPath();
+            ctx.arc(-6, 0, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(6, 0, 4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillRect(-6, -4, 12, 8);
         }
         
         ctx.restore();
@@ -1567,7 +1696,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Mise à jour des boosts
         powerUps.forEach((powerUp, index) => {
-            powerUp.y += powerUp.speed;
+            // Ralentissement temporel : ralentit la chute des bonus
+            const timeSlowMultiplier = (activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime) ? 0.5 : 1.0;
+            powerUp.y += powerUp.speed * timeSlowMultiplier;
             powerUp.rotation += 0.05;
             
             if (powerUp.y > canvas.height + 20) {
@@ -1627,8 +1758,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Score
                     // Ne pas ajouter de score si un boss est actif
                     if (!gameState.bossActive) {
-                        gameState.score += Math.floor(asteroid.size / 5) * 10;
+                        const points = Math.floor(asteroid.size / 5) * 10;
+                        gameState.score += points;
                         if (scoreElement) scoreElement.textContent = gameState.score;
+                        
+                        // Particule de score qui monte
+                        scoreParticles.push({
+                            x: asteroid.x,
+                            y: asteroid.y,
+                            text: `+${points}`,
+                            color: '#00ff00',
+                            size: 16,
+                            alpha: 1.0
+                        });
                     }
                     
                     // Supprimer le projectile
@@ -1703,6 +1845,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Explosion
                     createEnhancedExplosion(ship.x, ship.y, ship.color, 30);
                     playSound('hit');
+                
+                // Effet de shake
+                screenShake.intensity = 10;
                 
                 // Perdre une vie
                 gameState.lives--;
@@ -2117,7 +2262,22 @@ document.addEventListener('DOMContentLoaded', function() {
             activePowerUps.tripleShot = true;
             activePowerUps.tripleShotEndTime = now + 10000; // 10 secondes
             createPowerUpVisualAnimation('tripleShot', ship.x, ship.y);
+        } else if (powerUp.type === 'timeSlow') {
+            activePowerUps.timeSlow = true;
+            activePowerUps.timeSlowEndTime = now + 12000; // 12 secondes
+            createPowerUpVisualAnimation('timeSlow', ship.x, ship.y);
+        } else if (powerUp.type === 'offensiveShield') {
+            activePowerUps.offensiveShield = true;
+            activePowerUps.offensiveShieldEndTime = now + 15000; // 15 secondes
+            createPowerUpVisualAnimation('offensiveShield', ship.x, ship.y);
+        } else if (powerUp.type === 'magnet') {
+            activePowerUps.magnet = true;
+            activePowerUps.magnetEndTime = now + 20000; // 20 secondes
+            createPowerUpVisualAnimation('magnet', ship.x, ship.y);
         }
+        
+        // Statistiques
+        gameStats.powerUpsCollected++;
         
         // Effet visuel de collecte (discret)
         try {
@@ -2293,7 +2453,8 @@ document.addEventListener('DOMContentLoaded', function() {
             patternPhase: 0, // Phase actuelle du pattern
             vy: 0, // Vitesse verticale pour certains patterns
             targetX: canvas.width / 2, // Position cible pour certains patterns
-            targetY: 100
+            targetY: 100,
+            phaseChanged: false // Pour les phases à mi-vie
         };
         
         // Charger l'image du boss si disponible (mais ne pas bloquer si elle n'est pas là)
@@ -2606,10 +2767,27 @@ document.addEventListener('DOMContentLoaded', function() {
             boss.lastShot = now;
         }
         
-        // Mise à jour des projectiles du boss
+        // Mise à jour des projectiles du boss (avec ralentissement temporel)
+        const timeSlowMultiplier = (activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime) ? 0.5 : 1.0;
         bossBullets.forEach((bullet, index) => {
-            bullet.y += (bullet.vy !== undefined ? bullet.vy : bullet.speed);
-            bullet.x += bullet.vx;
+            // Vérifier si le projectile est renvoyé (bouclier offensif)
+            if (bullet.color === '#00ff00' && boss && gameState.bossActive) {
+                // Projectile renvoyé : collision avec le boss
+                const bossDx = bullet.x - boss.x;
+                const bossDy = bullet.y - boss.y;
+                const bossDist = Math.sqrt(bossDx * bossDx + bossDy * bossDy);
+                if (bossDist < boss.size + 5) {
+                    boss.health--;
+                    playSound('bossHit');
+                    bossBullets.splice(index, 1);
+                    updateHealthBars();
+                    const healthPercent = boss.health / boss.maxHealth;
+                    boss.size = boss.maxSize * (0.5 + healthPercent * 0.5);
+                    return;
+                }
+            }
+            bullet.y += (bullet.vy !== undefined ? bullet.vy : bullet.speed) * timeSlowMultiplier;
+            bullet.x += (bullet.vx || 0) * timeSlowMultiplier;
             
             // Supprimer si hors écran
             if (bullet.y > canvas.height + 20 || bullet.y < -20 || bullet.x < -20 || bullet.x > canvas.width + 20) {
@@ -2717,7 +2895,24 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
                 if (distance < bullet.size + shipSize) {
-                    if (activePowerUps.shield && Date.now() < activePowerUps.shieldEndTime) {
+                    // Bouclier offensif : renvoie les projectiles vers le boss
+                    if (activePowerUps.offensiveShield && Date.now() < activePowerUps.offensiveShieldEndTime) {
+                        playSound('hit');
+                        // Inverser la direction du projectile vers le boss
+                        if (boss && gameState.bossActive) {
+                            const bossDx = boss.x - bullet.x;
+                            const bossDy = boss.y - bullet.y;
+                            const bossDist = Math.sqrt(bossDx * bossDx + bossDy * bossDy);
+                            if (bossDist > 0) {
+                                bullet.vx = (bossDx / bossDist) * 4;
+                                bullet.vy = (bossDy / bossDist) * 4;
+                                bullet.speed = 0; // Utiliser vx/vy au lieu de speed
+                                bullet.color = '#00ff00'; // Vert pour indiquer qu'il est renvoyé
+                            }
+                        } else {
+                            bossBullets.splice(index, 1);
+                        }
+                    } else if (activePowerUps.shield && Date.now() < activePowerUps.shieldEndTime) {
                         playSound('hit');
                         bossBullets.splice(index, 1);
                         // Animation visuelle remplace le message texte
@@ -2755,6 +2950,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (!ship.invincible) {
                     createEnhancedExplosion(ship.x, ship.y, ship.color, 30);
                     playSound('hit');
+                    
+                    // Effet de shake
+                    screenShake.intensity = 10;
                     
                     gameState.lives--;
                     if (livesElement) livesElement.textContent = gameState.lives;
@@ -3121,6 +3319,9 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
+        // Statistiques
+        gameStats.shotsFired += activePowerUps.tripleShot && Date.now() < activePowerUps.tripleShotEndTime ? 3 : 1;
+        
         playSound('shoot');
     }
     
@@ -3202,6 +3403,20 @@ document.addEventListener('DOMContentLoaded', function() {
             gameState.gameMode = gameModeSelect.value;
         }
         
+        // Réinitialiser les statistiques
+        gameStats = {
+            asteroidsDestroyed: 0,
+            bossesDefeated: 0,
+            powerUpsCollected: 0,
+            shotsFired: 0,
+            shotsHit: 0,
+            startTime: Date.now(),
+            endTime: 0
+        };
+        
+        // SUPPRIMER TOUTES LES IMAGES UPLOADÉES PAR L'UTILISATEUR (y compris job_application)
+        bossPhotos = {};
+        
         init();
         gameState.isPlaying = true;
         gameState.isPaused = false;
@@ -3221,6 +3436,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function endGame() {
         gameState.isPlaying = false;
+        gameStats.endTime = Date.now();
         
         // Sauvegarde du meilleur score
         if (gameState.score > gameState.highScore) {
@@ -3231,6 +3447,27 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (finalScore) finalScore.textContent = gameState.score;
         if (finalLevel) finalLevel.textContent = gameState.level;
+        
+        // Afficher les statistiques
+        const statAsteroids = document.getElementById('stat-asteroids');
+        const statBosses = document.getElementById('stat-bosses');
+        const statPowerups = document.getElementById('stat-powerups');
+        const statAccuracy = document.getElementById('stat-accuracy');
+        const statTime = document.getElementById('stat-time');
+        
+        if (statAsteroids) statAsteroids.textContent = gameStats.asteroidsDestroyed;
+        if (statBosses) statBosses.textContent = gameStats.bossesDefeated;
+        if (statPowerups) statPowerups.textContent = gameStats.powerUpsCollected;
+        
+        // Calculer la précision
+        const accuracy = gameStats.shotsFired > 0 
+            ? Math.round((gameStats.shotsHit / gameStats.shotsFired) * 100) 
+            : 0;
+        if (statAccuracy) statAccuracy.textContent = accuracy + '%';
+        
+        // Calculer le temps de jeu
+        const gameTime = Math.round((gameStats.endTime - gameStats.startTime) / 1000);
+        if (statTime) statTime.textContent = gameTime + 's';
         
         // Message humoristique si le score est inférieur à 500
         if (scoreMessage) {
@@ -3250,7 +3487,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (gameOver) gameOver.classList.remove('hidden');
-        startBtn.textContent = 'Commencer';
+        if (startBtn) startBtn.textContent = 'Commencer';
         
         // Vérifier si le score peut être enregistré dans le leaderboard
         // Utilisation du leaderboard local
@@ -3300,6 +3537,14 @@ document.addEventListener('DOMContentLoaded', function() {
             const bossNum = parseInt(e.target.dataset.bossNum);
             
             if (file && file.type.startsWith('image/')) {
+                // Vérifier que le nom du fichier ne contient pas "job" ou "application"
+                const fileName = file.name.toLowerCase();
+                if (fileName.includes('job') || fileName.includes('application')) {
+                    alert('Cette image n\'est pas autorisée. Veuillez choisir une autre image.');
+                    e.target.value = ''; // Réinitialiser l'input
+                    return;
+                }
+                
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     const img = new Image();
