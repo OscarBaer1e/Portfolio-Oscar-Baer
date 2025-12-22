@@ -2156,7 +2156,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Fonction pour créer des particules de score
-    let scoreParticles = [];
     function createScoreParticle(x, y, scoreText) {
         scoreParticles.push({
             x: x,
