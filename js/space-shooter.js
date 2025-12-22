@@ -39,6 +39,106 @@ document.addEventListener('DOMContentLoaded', function() {
         tripleShot: '🎯'
     };
     
+    // Système de thèmes qui change tous les 10 niveaux
+    const themes = [
+        // Thème 1 : Espace profond (niveaux 1-10)
+        {
+            name: 'Espace profond',
+            background: { top: '#0a0a1a', bottom: '#000000' },
+            stars: '#ffffff',
+            bullets: '#00ffff',
+            asteroids: ['#888888', '#666666', '#999999'],
+            particles: ['#00ffff', '#0088ff', '#00aaff']
+        },
+        // Thème 2 : Nébuleuse bleue (niveaux 11-20)
+        {
+            name: 'Nébuleuse bleue',
+            background: { top: '#1a0a2a', bottom: '#0a0a1a' },
+            stars: '#aaccff',
+            bullets: '#66ccff',
+            asteroids: ['#4466aa', '#335599', '#5577bb'],
+            particles: ['#66ccff', '#4488ff', '#66aaff']
+        },
+        // Thème 3 : Nébuleuse violette (niveaux 21-30)
+        {
+            name: 'Nébuleuse violette',
+            background: { top: '#2a0a3a', bottom: '#1a0a2a' },
+            stars: '#cc99ff',
+            bullets: '#aa66ff',
+            asteroids: ['#6644aa', '#553399', '#7755bb'],
+            particles: ['#aa66ff', '#8844ff', '#aa88ff']
+        },
+        // Thème 4 : Nébuleuse rose (niveaux 31-40)
+        {
+            name: 'Nébuleuse rose',
+            background: { top: '#3a0a2a', bottom: '#2a0a1a' },
+            stars: '#ff99cc',
+            bullets: '#ff66aa',
+            asteroids: ['#aa4466', '#993355', '#bb5577'],
+            particles: ['#ff66aa', '#ff4488', '#ff88aa']
+        },
+        // Thème 5 : Nébuleuse orange (niveaux 41-50)
+        {
+            name: 'Nébuleuse orange',
+            background: { top: '#3a1a0a', bottom: '#2a0a0a' },
+            stars: '#ffcc99',
+            bullets: '#ffaa66',
+            asteroids: ['#aa6644', '#995533', '#bb7755'],
+            particles: ['#ffaa66', '#ff8844', '#ffcc88']
+        },
+        // Thème 6 : Nébuleuse verte (niveaux 51-60)
+        {
+            name: 'Nébuleuse verte',
+            background: { top: '#0a2a1a', bottom: '#0a1a0a' },
+            stars: '#99ffcc',
+            bullets: '#66ffaa',
+            asteroids: ['#44aa66', '#339955', '#55bb77'],
+            particles: ['#66ffaa', '#44ff88', '#88ffcc']
+        },
+        // Thème 7 : Nébuleuse cyan (niveaux 61-70)
+        {
+            name: 'Nébuleuse cyan',
+            background: { top: '#0a2a2a', bottom: '#0a1a1a' },
+            stars: '#99ffff',
+            bullets: '#66ffff',
+            asteroids: ['#44aaaa', '#339999', '#55bbbb'],
+            particles: ['#66ffff', '#44ffff', '#88ffff']
+        },
+        // Thème 8 : Nébuleuse rouge (niveaux 71-80)
+        {
+            name: 'Nébuleuse rouge',
+            background: { top: '#2a0a0a', bottom: '#1a0000' },
+            stars: '#ff9999',
+            bullets: '#ff6666',
+            asteroids: ['#aa4444', '#993333', '#bb5555'],
+            particles: ['#ff6666', '#ff4444', '#ff8888']
+        },
+        // Thème 9 : Nébuleuse jaune (niveaux 81-90)
+        {
+            name: 'Nébuleuse jaune',
+            background: { top: '#2a2a0a', bottom: '#1a1a00' },
+            stars: '#ffff99',
+            bullets: '#ffff66',
+            asteroids: ['#aaaa44', '#999933', '#bbbb55'],
+            particles: ['#ffff66', '#ffff44', '#ffff88']
+        },
+        // Thème 10 : Espace final (niveaux 91+)
+        {
+            name: 'Espace final',
+            background: { top: '#1a1a2a', bottom: '#0a0a1a' },
+            stars: '#ffffff',
+            bullets: '#ffffff',
+            asteroids: ['#ffffff', '#cccccc', '#dddddd'],
+            particles: ['#ffffff', '#ffccff', '#ccffff']
+        }
+    ];
+    
+    // Fonction pour obtenir le thème actuel selon le niveau
+    function getCurrentTheme() {
+        const themeIndex = Math.floor((gameState.level - 1) / 10) % themes.length;
+        return themes[themeIndex];
+    }
+    
     // État du jeu
     let gameState = {
         isPlaying: false,
@@ -843,16 +943,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Dessin
     function draw() {
         if (!canvas || !ctx) return;
-        // Fond noir avec dégradé
+        // Fond avec gradient selon le thème
+        const currentTheme = getCurrentTheme();
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        gradient.addColorStop(0, '#0a0a1a');
-        gradient.addColorStop(1, '#000000');
+        gradient.addColorStop(0, currentTheme.background.top);
+        gradient.addColorStop(1, currentTheme.background.bottom);
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        // Étoiles
+        // Étoiles selon le thème
         stars.forEach(star => {
-            ctx.fillStyle = '#ffffff';
+            ctx.fillStyle = currentTheme.stars;
             ctx.beginPath();
             ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
             ctx.fill();
@@ -863,11 +964,12 @@ document.addEventListener('DOMContentLoaded', function() {
             drawShip(ship.x, ship.y);
         }
         
-        // Projectiles
+        // Projectiles selon le thème
+        const currentTheme = getCurrentTheme();
         bullets.forEach(bullet => {
-            ctx.fillStyle = '#00ffff';
+            ctx.fillStyle = currentTheme.bullets;
             ctx.shadowBlur = 10;
-            ctx.shadowColor = '#00ffff';
+            ctx.shadowColor = currentTheme.bullets;
             const bulletSize = bullet.size || 4;
             ctx.beginPath();
             ctx.arc(bullet.x, bullet.y, bulletSize, 0, Math.PI * 2);
@@ -2011,6 +2113,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function spawnAsteroid() {
         const size = Math.random() * 30 + 15;
+        const currentTheme = getCurrentTheme();
+        const asteroidColors = currentTheme.asteroids;
+        const randomColor = asteroidColors[Math.floor(Math.random() * asteroidColors.length)];
+        
         asteroids.push({
             x: Math.random() * (canvas.width - size * 2) + size,
             y: -size,
@@ -2018,7 +2124,7 @@ document.addEventListener('DOMContentLoaded', function() {
             speed: Math.random() * 2 + gameState.gameSpeed,
             rotation: 0,
             rotationSpeed: (Math.random() - 0.5) * 0.1,
-            color: `hsl(${Math.random() * 60 + 200}, 70%, 50%)` // Couleurs cyan/magenta
+            color: randomColor
         });
     }
     
