@@ -2022,25 +2022,29 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Calcule l'augmentation de vitesse de manière progressive (élevée au début, faible après)
     function getSpeedIncrease(level) {
-        // Augmentation décroissante mais toujours visible
-        // Niveau 1-10 : 0.5 → 0.4
-        // Niveau 11-20 : 0.4 → 0.3
-        // Niveau 21-30 : 0.3 → 0.25
-        // Niveau 31+ : 0.25 → 0.2 (minimum)
+        // Augmentation très progressive et ralentie sur tout le jeu
+        // Niveau 1-20 : 0.3 → 0.25
+        // Niveau 21-40 : 0.25 → 0.2
+        // Niveau 41-60 : 0.2 → 0.15
+        // Niveau 61-80 : 0.15 → 0.12
+        // Niveau 81+ : 0.12 → 0.1 (minimum)
         
-        if (level <= 10) {
-            // Niveaux 1-10 : de 0.5 à 0.4 (décroissance linéaire)
-            return 0.5 - ((level - 1) / 10) * 0.1;
-        } else if (level <= 20) {
-            // Niveaux 11-20 : de 0.4 à 0.3
-            return 0.4 - ((level - 11) / 10) * 0.1;
-        } else if (level <= 30) {
-            // Niveaux 21-30 : de 0.3 à 0.25
-            return 0.3 - ((level - 21) / 10) * 0.05;
+        if (level <= 20) {
+            // Niveaux 1-20 : de 0.3 à 0.25 (décroissance très lente)
+            return 0.3 - ((level - 1) / 20) * 0.05;
+        } else if (level <= 40) {
+            // Niveaux 21-40 : de 0.25 à 0.2
+            return 0.25 - ((level - 21) / 20) * 0.05;
+        } else if (level <= 60) {
+            // Niveaux 41-60 : de 0.2 à 0.15
+            return 0.2 - ((level - 41) / 20) * 0.05;
+        } else if (level <= 80) {
+            // Niveaux 61-80 : de 0.15 à 0.12
+            return 0.15 - ((level - 61) / 20) * 0.03;
         } else {
-            // Niveaux 31+ : de 0.25 à 0.2 (minimum)
-            const extraLevels = level - 31;
-            return Math.max(0.2, 0.25 - (extraLevels / 20) * 0.05);
+            // Niveaux 81+ : de 0.12 à 0.1 (minimum)
+            const extraLevels = level - 81;
+            return Math.max(0.1, 0.12 - (extraLevels / 50) * 0.02);
         }
     }
     
