@@ -2521,7 +2521,26 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Animation de niveau supprimée
             
-            // Système de boss désactivé - plus de boss aléatoire entre les niveaux 1 et 9
+            // Vérifier si un boss doit apparaître (tous les 10 niveaux)
+            // Ne pas spawn si on dépasse le niveau 100 (tous les boss sont vaincus)
+            if (gameState.level % 10 === 0 && !gameState.bossActive && !boss && gameState.level <= 100) {
+                console.log(`🎯 Niveau ${gameState.level} atteint - Tentative spawn boss`);
+                console.log('Conditions:', {
+                    level: gameState.level,
+                    levelMod10: gameState.level % 10,
+                    bossActive: gameState.bossActive,
+                    boss: boss,
+                    levelUnder100: gameState.level <= 100
+                });
+                try {
+                    spawnBoss();
+                } catch (e) {
+                    console.error('❌ Erreur spawnBoss:', e);
+                    console.error('Stack:', e.stack);
+                    gameState.bossActive = false;
+                    boss = null;
+                }
+            }
         }
     }
     
