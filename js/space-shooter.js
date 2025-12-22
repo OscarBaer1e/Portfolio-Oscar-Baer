@@ -3455,6 +3455,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // SUPPRIMER TOUTES LES IMAGES UPLOADÉES PAR L'UTILISATEUR (y compris job_application)
         bossPhotos = {};
         
+        // S'ASSURER QUE LA VITESSE EST RÉINITIALISÉE À 2 (vitesse de base)
+        // Important pour éviter que les nouveaux joueurs aient une vitesse trop élevée
+        gameState.gameSpeed = 2;
+        gameState.level = 1;
+        
+        console.log('🎮 Vitesse réinitialisée:', gameState.gameSpeed, 'Niveau:', gameState.level);
+        
         init();
         gameState.isPlaying = true;
         gameState.isPaused = false;
