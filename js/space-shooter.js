@@ -1927,8 +1927,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Vérifier si l'astéroïde doit se séparer
                     const isLarge = asteroid.size > 25;
-                    if (isLarge && Math.random() < 0.6) {
-                        // 60% de chance de se séparer en 2-3 petits astéroïdes
+                    if (isLarge && Math.random() < 0.45) {
+                        // 45% de chance de se séparer en 2-3 petits astéroïdes (réduit de 60% pour équilibrer)
                         const numPieces = Math.floor(Math.random() * 2) + 2; // 2 ou 3 pièces
                         for (let i = 0; i < numPieces; i++) {
                             const angle = (Math.PI * 2 / numPieces) * i;
@@ -1945,35 +1945,41 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                     
-                    // Chance de faire apparaître un boost (équilibré selon l'impact)
+                    // Chance de faire apparaître un boost (équilibré selon l'impact et la rareté)
+                    // Taux global réduit à ~12% pour équilibrer le gameplay
                     const boostChance = Math.random();
-                    if (boostChance < 0.05) {
-                        // 5% - Tir rapide (fort impact)
-                        spawnPowerUp(asteroid.x, asteroid.y, 'rapidFire');
-                    } else if (boostChance < 0.08) {
-                        // 3% - Bouclier (fort impact)
-                        spawnPowerUp(asteroid.x, asteroid.y, 'shield');
-                    } else if (boostChance < 0.09) {
-                        // 1% - Vie (très fort impact, très rare)
-                        spawnPowerUp(asteroid.x, asteroid.y, 'life');
-                    } else if (boostChance < 0.11) {
-                        // 2% - Rétrécissement (impact moyen)
-                        spawnPowerUp(asteroid.x, asteroid.y, 'shrink');
-                    } else if (boostChance < 0.13) {
-                        // 2% - Munitions XL (impact moyen)
-                        spawnPowerUp(asteroid.x, asteroid.y, 'bigBullets');
-                    } else if (boostChance < 0.145) {
-                        // 1.5% - Tir triple (fort impact, rare)
-                        spawnPowerUp(asteroid.x, asteroid.y, 'tripleShot');
-                    } else if (boostChance < 0.16) {
-                        // 1.5% - Ralentissement temporel (fort impact)
-                        spawnPowerUp(asteroid.x, asteroid.y, 'timeSlow');
-                    } else if (boostChance < 0.175) {
-                        // 1.5% - Bouclier offensif (fort impact)
-                        spawnPowerUp(asteroid.x, asteroid.y, 'offensiveShield');
-                    } else if (boostChance < 0.19) {
-                        // 1.5% - Magnet (impact moyen, utile)
-                        spawnPowerUp(asteroid.x, asteroid.y, 'magnet');
+                    if (boostChance < 0.12) {
+                        // 12% de chance totale de drop
+                        const powerUpType = Math.random();
+                        
+                        if (powerUpType < 0.25) {
+                            // 25% des drops = 3% total - Tir rapide (commun, utile)
+                            spawnPowerUp(asteroid.x, asteroid.y, 'rapidFire');
+                        } else if (powerUpType < 0.45) {
+                            // 20% des drops = 2.4% total - Bouclier (commun, très utile)
+                            spawnPowerUp(asteroid.x, asteroid.y, 'shield');
+                        } else if (powerUpType < 0.60) {
+                            // 15% des drops = 1.8% total - Rétrécissement (commun, utile)
+                            spawnPowerUp(asteroid.x, asteroid.y, 'shrink');
+                        } else if (powerUpType < 0.72) {
+                            // 12% des drops = 1.44% total - Magnet (commun, pratique)
+                            spawnPowerUp(asteroid.x, asteroid.y, 'magnet');
+                        } else if (powerUpType < 0.82) {
+                            // 10% des drops = 1.2% total - Munitions XL (rare, utile)
+                            spawnPowerUp(asteroid.x, asteroid.y, 'bigBullets');
+                        } else if (powerUpType < 0.88) {
+                            // 6% des drops = 0.72% total - Tir triple (rare, puissant)
+                            spawnPowerUp(asteroid.x, asteroid.y, 'tripleShot');
+                        } else if (powerUpType < 0.93) {
+                            // 5% des drops = 0.6% total - Ralentissement temporel (rare, puissant)
+                            spawnPowerUp(asteroid.x, asteroid.y, 'timeSlow');
+                        } else if (powerUpType < 0.97) {
+                            // 4% des drops = 0.48% total - Bouclier offensif (très rare, puissant)
+                            spawnPowerUp(asteroid.x, asteroid.y, 'offensiveShield');
+                        } else {
+                            // 3% des drops = 0.36% total - Vie (très rare, très puissant)
+                            spawnPowerUp(asteroid.x, asteroid.y, 'life');
+                        }
                     }
                     
                     // Supprimer l'astéroïde
