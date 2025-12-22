@@ -965,7 +965,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Projectiles selon le thème
-        const currentTheme = getCurrentTheme();
         bullets.forEach(bullet => {
             ctx.fillStyle = currentTheme.bullets;
             ctx.shadowBlur = 10;
