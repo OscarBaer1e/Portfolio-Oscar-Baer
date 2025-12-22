@@ -1587,13 +1587,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Mise à jour des événements de fond
+        // Mise à jour des événements de fond (ralentissement temporel)
+        const slowMultiplierEvents = activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime ? timeSlowMultiplier : 1.0;
         backgroundEvents.forEach((event, index) => {
             if (event.type === 'rocket') {
-                event.y -= event.speed;
+                event.y -= event.speed * slowMultiplierEvents;
             } else if (event.type === 'shootingStar') {
-                event.x += event.speed * 0.5;
-                event.y += event.speed;
+                event.x += event.speed * 0.5 * slowMultiplierEvents;
+                event.y += event.speed * slowMultiplierEvents;
             }
             event.life--;
             event.alpha = Math.max(0, event.alpha - 0.01);
