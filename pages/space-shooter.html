@@ -65,6 +65,13 @@
                             <button id="fullscreen-btn" class="btn secondary-btn">⛶ Plein Écran</button>
                             <a href="../index.html" class="btn secondary-btn"><i class="fas fa-home"></i> Retour</a>
                         </div>
+                        <div class="volume-control">
+                            <label for="volume-slider" style="color: var(--primary-color); margin-right: 10px;">
+                                <i class="fas fa-volume-up"></i> Volume:
+                            </label>
+                            <input type="range" id="volume-slider" min="0" max="1" step="0.01" value="0.7" style="width: 150px; margin-right: 10px;">
+                            <span id="volume-value" style="color: var(--primary-color); font-weight: bold;">70%</span>
+                        </div>
                     </div>
                     
                     <div class="game-wrapper">

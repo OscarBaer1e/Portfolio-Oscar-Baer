@@ -164,6 +164,30 @@ document.addEventListener('DOMContentLoaded', function() {
     // Cache pour les fichiers audio
     const audioCache = {};
     
+    // Système de contrôle de volume global
+    let globalVolume = parseFloat(localStorage.getItem('spaceShooterVolume')) || 0.7; // Volume par défaut à 70%
+    
+    // Fonction pour définir le volume global
+    function setGlobalVolume(volume) {
+        globalVolume = Math.max(0, Math.min(1, volume)); // Limiter entre 0 et 1
+        localStorage.setItem('spaceShooterVolume', globalVolume.toString());
+        
+        // Mettre à jour l'affichage du slider si présent
+        const volumeSlider = document.getElementById('volume-slider');
+        const volumeValue = document.getElementById('volume-value');
+        if (volumeSlider) {
+            volumeSlider.value = globalVolume;
+        }
+        if (volumeValue) {
+            volumeValue.textContent = Math.round(globalVolume * 100) + '%';
+        }
+    }
+    
+    // Fonction pour obtenir le volume global
+    function getGlobalVolume() {
+        return globalVolume;
+    }
+    
     function initAudioContext() {
         if (!audioContextInitialized) {
             try {
@@ -183,18 +207,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }, { once: true });
     
-    // Fonction pour jouer un fichier audio
+    // Fonction pour jouer un fichier audio (volume relatif multiplié par le volume global)
     function playAudioFile(src, volume = 0.5) {
         try {
+            // Appliquer le volume global
+            const finalVolume = volume * globalVolume;
+            
             // Vérifier si l'audio est déjà en cache
             if (!audioCache[src]) {
                 const audio = new Audio(src);
-                audio.volume = volume;
+                audio.volume = finalVolume;
                 audioCache[src] = audio;
             }
             
             const audio = audioCache[src].cloneNode();
-            audio.volume = volume;
+            audio.volume = finalVolume;
             audio.play().catch(e => {
                 console.warn('Erreur lecture audio:', e);
             });
@@ -203,7 +230,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Sons du jeu
+    // Sons du jeu (avec application du volume global)
     function playSound(type, frequency = 440, duration = 0.1) {
         const ctx = initAudioContext();
         if (!ctx) return;
@@ -219,8 +246,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 case 'shoot':
                     oscillator.frequency.setValueAtTime(800, ctx.currentTime);
                     oscillator.type = 'square';
-                    gainNode.gain.setValueAtTime(0.1, ctx.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
+                    gainNode.gain.setValueAtTime(0.1 * globalVolume, ctx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01 * globalVolume, ctx.currentTime + 0.05);
                     oscillator.start();
                     oscillator.stop(ctx.currentTime + 0.05);
                     break;
@@ -228,8 +255,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     oscillator.frequency.setValueAtTime(150, ctx.currentTime);
                     oscillator.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.3);
                     oscillator.type = 'sawtooth';
-                    gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                    gainNode.gain.setValueAtTime(0.2 * globalVolume, ctx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01 * globalVolume, ctx.currentTime + 0.3);
                     oscillator.start();
                     oscillator.stop(ctx.currentTime + 0.3);
                     break;
@@ -237,24 +264,24 @@ document.addEventListener('DOMContentLoaded', function() {
                     oscillator.frequency.setValueAtTime(600, ctx.currentTime);
                     oscillator.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.2);
                     oscillator.type = 'sine';
-                    gainNode.gain.setValueAtTime(0.15, ctx.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+                    gainNode.gain.setValueAtTime(0.15 * globalVolume, ctx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01 * globalVolume, ctx.currentTime + 0.2);
                     oscillator.start();
                     oscillator.stop(ctx.currentTime + 0.2);
                     break;
                 case 'hit':
                     oscillator.frequency.setValueAtTime(200, ctx.currentTime);
                     oscillator.type = 'square';
-                    gainNode.gain.setValueAtTime(0.15, ctx.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.1);
+                    gainNode.gain.setValueAtTime(0.15 * globalVolume, ctx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01 * globalVolume, ctx.currentTime + 0.1);
                     oscillator.start();
                     oscillator.stop(ctx.currentTime + 0.1);
                     break;
                 case 'bossHit':
                     oscillator.frequency.setValueAtTime(100, ctx.currentTime);
                     oscillator.type = 'sawtooth';
-                    gainNode.gain.setValueAtTime(0.25, ctx.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.2);
+                    gainNode.gain.setValueAtTime(0.25 * globalVolume, ctx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01 * globalVolume, ctx.currentTime + 0.2);
                     oscillator.start();
                     oscillator.stop(ctx.currentTime + 0.2);
                     break;
@@ -262,8 +289,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     oscillator.frequency.setValueAtTime(300, ctx.currentTime);
                     oscillator.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.15);
                     oscillator.type = 'square';
-                    gainNode.gain.setValueAtTime(0.2, ctx.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.15);
+                    gainNode.gain.setValueAtTime(0.2 * globalVolume, ctx.currentTime);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01 * globalVolume, ctx.currentTime + 0.15);
                     oscillator.start();
                     oscillator.stop(ctx.currentTime + 0.15);
                     break;
@@ -277,8 +304,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             gain.connect(ctx.destination);
                             osc.frequency.setValueAtTime(freq, ctx.currentTime);
                             osc.type = 'sine';
-                            gain.gain.setValueAtTime(0.2, ctx.currentTime);
-                            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.3);
+                            gain.gain.setValueAtTime(0.2 * globalVolume, ctx.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.01 * globalVolume, ctx.currentTime + 0.3);
                             osc.start();
                             osc.stop(ctx.currentTime + 0.3);
                         }, i * 100);
@@ -294,8 +321,8 @@ document.addEventListener('DOMContentLoaded', function() {
                             gain.connect(ctx.destination);
                             osc.frequency.setValueAtTime(freq, ctx.currentTime);
                             osc.type = 'sine';
-                            gain.gain.setValueAtTime(0.3, ctx.currentTime);
-                            gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.4);
+                            gain.gain.setValueAtTime(0.3 * globalVolume, ctx.currentTime);
+                            gain.gain.exponentialRampToValueAtTime(0.01 * globalVolume, ctx.currentTime + 0.4);
                             osc.start();
                             osc.stop(ctx.currentTime + 0.4);
                         }, i * 150);
@@ -3644,6 +3671,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Initialisation du contrôleur de volume
+    function initVolumeControl() {
+        const volumeSlider = document.getElementById('volume-slider');
+        const volumeValue = document.getElementById('volume-value');
+        
+        if (volumeSlider) {
+            // Initialiser le slider avec la valeur sauvegardée
+            volumeSlider.value = globalVolume;
+            volumeSlider.addEventListener('input', (e) => {
+                setGlobalVolume(parseFloat(e.target.value));
+            });
+        }
+        
+        if (volumeValue) {
+            volumeValue.textContent = Math.round(globalVolume * 100) + '%';
+        }
+    }
+    
     function startGame() {
         // Récupérer le mode de jeu sélectionné
         if (gameModeSelect) {
@@ -3658,6 +3703,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (startBtn) startBtn.textContent = 'Pause';
         gameLoop();
     }
+    
+    // Initialiser le contrôleur de volume au chargement
+    initVolumeControl();
     
     function pauseGame() {
         gameState.isPaused = !gameState.isPaused;
