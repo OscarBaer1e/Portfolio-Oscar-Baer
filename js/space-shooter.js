@@ -458,10 +458,10 @@ document.addEventListener('DOMContentLoaded', function() {
     let bossBullets = [];
     let bossPhotos = {}; // Stocke les photos des boss (1-10)
     
-    // Variables de tir
-    let lastShotTime = 0;
-    let baseFireRate = 300; // Temps entre les tirs en ms
-    let currentFireRate = baseFireRate;
+    // Variables de tir (normalisées par delta time)
+    let shootCooldown = 0; // Compteur de cooldown en secondes (normalisé)
+    let baseFireRate = 0.3; // Temps entre les tirs en secondes (300ms = 0.3s)
+    let currentFireRate = baseFireRate; // Temps de cooldown actuel en secondes
     
     // Vérifications de sécurité pour tous les éléments
     if (!canvas || !ctx) return;
@@ -958,6 +958,7 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.maxLives = 3;
         gameState.gameSpeed = 2;
         gameState.bossActive = false;
+        shootCooldown = 0;
         currentFireRate = baseFireRate;
         activePowerUps = {
             rapidFire: false,
@@ -978,7 +979,7 @@ document.addEventListener('DOMContentLoaded', function() {
             magnetEndTime: 0
         };
         timeSlowMultiplier = 1.0;
-        lastShotTime = 0;
+        shootCooldown = 0;
         if (currentLevelDisplay) {
             currentLevelDisplay.textContent = gameState.level;
         }
@@ -1800,6 +1801,17 @@ document.addEventListener('DOMContentLoaded', function() {
             gameStats.timePlayed = Date.now() - gameStats.startTime;
         }
         
+        // Mise à jour du cooldown de tir (normalisé par delta time)
+        if (shootCooldown > 0) {
+            shootCooldown -= gameState.deltaTime;
+            if (shootCooldown < 0) shootCooldown = 0;
+        }
+        
+        // Tir automatique (basé sur delta time au lieu de setInterval)
+        if (gameState.isPlaying && !gameState.isPaused && keys['Space'] && shootCooldown <= 0) {
+            shoot();
+        }
+        
         // Mise à jour des projectiles (normalisé par delta time)
         const slowMultiplierBullets = activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime ? timeSlowMultiplier : 1.0;
         bullets.forEach((bullet, index) => {
@@ -1917,20 +1929,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const now = Date.now();
         if (activePowerUps.rapidFire && now > activePowerUps.rapidFireEndTime) {
             activePowerUps.rapidFire = false;
+            shootCooldown = 0;
             currentFireRate = baseFireRate;
-            // Réinitialiser l'intervalle de tir automatique
-            if (autoShootInterval) {
-                clearInterval(autoShootInterval);
-                autoShootInterval = null;
-                if (keys['Space']) {
-                    // Redémarrer avec la nouvelle vitesse
-                    autoShootInterval = setInterval(() => {
-                        if (gameState.isPlaying && !gameState.isPaused && keys['Space']) {
-                            shoot();
-                        }
-                    }, currentFireRate);
-                }
-            }
+            // Le tir automatique est maintenant géré dans update() avec delta time
             // Pas de message de fin
         }
         if (activePowerUps.shield && now > activePowerUps.shieldEndTime) {
@@ -2509,7 +2510,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (powerUp.type === 'rapidFire') {
             activePowerUps.rapidFire = true;
             activePowerUps.rapidFireEndTime = now + 10000; // 10 secondes
-            currentFireRate = baseFireRate / 3; // 3x plus rapide
+            currentFireRate = baseFireRate / 3; // 3x plus rapide (0.1s au lieu de 0.3s)
             createPowerUpVisualAnimation('rapidFire', ship.x, ship.y);
         } else if (powerUp.type === 'shield') {
             activePowerUps.shield = true;
@@ -2736,8 +2737,8 @@ document.addEventListener('DOMContentLoaded', function() {
             color: `hsl(${bossNumber * 36}, 70%, 50%)`,
             bossNumber: bossNumber,
             bossName: bossName,
-            lastShot: Date.now(),
-            shootInterval: patternConfig.shootInterval,
+            shootCooldown: 0, // Compteur de cooldown en secondes (normalisé)
+            shootInterval: patternConfig.shootInterval, // Temps entre les tirs en secondes
             image: null,
             pattern: bossNumber,
             patternTime: 0, // Temps écoulé pour le pattern
@@ -3011,19 +3012,19 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.restore();
     }
     
-    // Retourne la configuration du pattern pour un boss donné
+    // Retourne la configuration du pattern pour un boss donné (shootInterval en secondes pour delta time)
     function getBossPattern(bossNumber) {
         const patterns = {
-            1: { speed: 2, initialDirection: 1, shootInterval: 1500, type: 'horizontal' },
-            2: { speed: 2.5, initialDirection: 1, shootInterval: 1200, type: 'zigzag' },
-            3: { speed: 3, initialDirection: 1, shootInterval: 1000, type: 'circular' },
-            4: { speed: 2.5, initialDirection: 1, shootInterval: 900, type: 'charge' },
-            5: { speed: 3.5, initialDirection: 1, shootInterval: 800, type: 'teleport' },
-            6: { speed: 3, initialDirection: 1, shootInterval: 700, type: 'spiral' },
-            7: { speed: 4, initialDirection: 1, shootInterval: 600, type: 'aggressive' },
-            8: { speed: 3.5, initialDirection: 1, shootInterval: 500, type: 'wave' },
-            9: { speed: 4.5, initialDirection: 1, shootInterval: 400, type: 'chaos' },
-            10: { speed: 5, initialDirection: 1, shootInterval: 300, type: 'final' }
+            1: { speed: 2, initialDirection: 1, shootInterval: 1.5, type: 'horizontal' }, // 1500ms = 1.5s
+            2: { speed: 2.5, initialDirection: 1, shootInterval: 1.2, type: 'zigzag' }, // 1200ms = 1.2s
+            3: { speed: 3, initialDirection: 1, shootInterval: 1.0, type: 'circular' }, // 1000ms = 1.0s
+            4: { speed: 2.5, initialDirection: 1, shootInterval: 0.9, type: 'charge' }, // 900ms = 0.9s
+            5: { speed: 3.5, initialDirection: 1, shootInterval: 0.8, type: 'teleport' }, // 800ms = 0.8s
+            6: { speed: 3, initialDirection: 1, shootInterval: 0.7, type: 'spiral' }, // 700ms = 0.7s
+            7: { speed: 4, initialDirection: 1, shootInterval: 0.6, type: 'aggressive' }, // 600ms = 0.6s
+            8: { speed: 3.5, initialDirection: 1, shootInterval: 0.5, type: 'wave' }, // 500ms = 0.5s
+            9: { speed: 4.5, initialDirection: 1, shootInterval: 0.4, type: 'chaos' }, // 400ms = 0.4s
+            10: { speed: 5, initialDirection: 1, shootInterval: 0.3, type: 'final' } // 300ms = 0.3s
         };
         
         return patterns[bossNumber] || patterns[1];
@@ -3054,10 +3055,16 @@ document.addEventListener('DOMContentLoaded', function() {
         // Appliquer le pattern de mouvement selon le numéro du boss
         updateBossMovement();
         
-        // Tir du boss
-        if (now - boss.lastShot > boss.shootInterval) {
+        // Mise à jour du cooldown de tir du boss (normalisé par delta time)
+        if (boss.shootCooldown > 0) {
+            boss.shootCooldown -= gameState.deltaTime;
+            if (boss.shootCooldown < 0) boss.shootCooldown = 0;
+        }
+        
+        // Tir du boss (normalisé par delta time)
+        if (boss.shootCooldown <= 0) {
             bossShoot();
-            boss.lastShot = now;
+            boss.shootCooldown = boss.shootInterval;
         }
         
         // Mise à jour des projectiles du boss (ralentissement temporel + delta time)
@@ -3076,8 +3083,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (boss && !boss.phaseChanged && boss.health <= boss.maxHealth / 2) {
             boss.phaseChanged = true;
             boss.phase = 2; // Phase 2 activée
-            // Augmenter la vitesse de tir et changer le pattern
-            boss.shootInterval = Math.max(300, boss.shootInterval * 0.7);
+            // Augmenter la vitesse de tir et changer le pattern (normalisé en secondes)
+            boss.shootInterval = Math.max(0.3, boss.shootInterval * 0.7); // 0.3s minimum (300ms)
             console.log(`Boss ${boss.bossNumber} entre en phase 2 !`);
         }
         
@@ -3580,13 +3587,13 @@ document.addEventListener('DOMContentLoaded', function() {
         gameStats.bulletsFired++;
         if (!gameState.isPlaying || gameState.isPaused) return;
         
-        // Vérifie le cooldown de tir
-        const now = Date.now();
-        if (now - lastShotTime < currentFireRate) {
+        // Vérifie le cooldown de tir (normalisé par delta time)
+        if (shootCooldown > 0) {
             return;
         }
         
-        lastShotTime = now;
+        // Réinitialiser le cooldown
+        shootCooldown = currentFireRate;
         
         const bulletSize = activePowerUps.bigBullets ? 8 : 4;
         
@@ -3630,7 +3637,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Contrôles
     let keys = {};
-    let autoShootInterval = null;
     
     document.addEventListener('keydown', (e) => {
         keys[e.code] = true;
@@ -3673,18 +3679,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.code === 'Space') {
             e.preventDefault();
             if (gameState.isPlaying) {
+                // Le tir automatique est maintenant géré dans update() avec delta time
                 shoot();
-                // Démarrer le tir automatique
-                if (!autoShootInterval) {
-                    const startAutoShoot = () => {
-                        autoShootInterval = setInterval(() => {
-                            if (gameState.isPlaying && !gameState.isPaused && keys['Space']) {
-                                shoot();
-                            }
-                        }, currentFireRate);
-                    };
-                    startAutoShoot();
-                }
             } else if (startScreen && !startScreen.classList.contains('hidden')) {
                 startGame();
             } else if (gameOver && !gameOver.classList.contains('hidden')) {
@@ -3695,12 +3691,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     document.addEventListener('keyup', (e) => {
         keys[e.code] = false;
-        
-        // Arrêter le tir automatique
-        if (e.code === 'Space' && autoShootInterval) {
-            clearInterval(autoShootInterval);
-            autoShootInterval = null;
-        }
+        // Le tir automatique est maintenant géré dans update() avec delta time, pas besoin de clearInterval
     });
     
     // Mouvement du vaisseau (normalisé par delta time)
@@ -3772,13 +3763,7 @@ document.addEventListener('DOMContentLoaded', function() {
         update();
         draw();
         updateHealthBars(); // Mise à jour des barres de vie
-        
-        // Mise à jour du tir automatique si actif et que le boost de tir rapide change
-        if (gameState.isPlaying && autoShootInterval && keys['Space']) {
-            // Le tir automatique s'adapte à la vitesse de tir
-            const intervalTime = activePowerUps.rapidFire ? currentFireRate : baseFireRate;
-            // On ne recrée l'interval que si nécessaire (optimisation)
-        }
+        // Le tir automatique est maintenant géré dans update() avec delta time
         
         if (gameState.isPlaying) {
             requestAnimationFrame(gameLoop);
