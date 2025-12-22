@@ -129,6 +129,83 @@ function loadLeaderboardFromLocalStorage() {
     return [];
 }
 
+// Fonction pour nettoyer les scores en dessous du top 10
+async function cleanupOldScores(supabase) {
+    try {
+        console.log('🧹 Nettoyage des scores en dessous du top 10...');
+        
+        // Récupérer le top 10
+        const { data: topScores, error: selectError } = await supabase
+            .from('leaderboard')
+            .select('id, score')
+            .order('score', { ascending: false })
+            .limit(MAX_LEADERBOARD_ENTRIES);
+        
+        if (selectError) {
+            console.warn('⚠️ Erreur lors de la récupération du top 10:', selectError);
+            return;
+        }
+        
+        if (!topScores || topScores.length === 0) {
+            console.log('📭 Aucun score dans la base, pas de nettoyage nécessaire');
+            return;
+        }
+        
+        // Si on a moins de 10 scores, pas besoin de nettoyer
+        if (topScores.length < MAX_LEADERBOARD_ENTRIES) {
+            console.log(`📊 Seulement ${topScores.length} scores, pas de nettoyage nécessaire`);
+            return;
+        }
+        
+        // Récupérer le score minimum du top 10
+        const minTopScore = topScores[topScores.length - 1].score;
+        const topScoreIds = topScores.map(s => s.id);
+        
+        console.log(`📊 Top 10: score minimum = ${minTopScore}`);
+        console.log(`📊 IDs à garder:`, topScoreIds);
+        
+        // Supprimer tous les scores en dessous du top 10
+        // On supprime ceux qui ont un score inférieur OU qui ne sont pas dans le top 10
+        const { data: deletedData, error: deleteError } = await supabase
+            .from('leaderboard')
+            .delete()
+            .lt('score', minTopScore);
+        
+        if (deleteError) {
+            console.warn('⚠️ Erreur lors de la suppression des anciens scores:', deleteError);
+            // Essayer une méthode alternative : supprimer par ID
+            const { data: allScores, error: allError } = await supabase
+                .from('leaderboard')
+                .select('id, score')
+                .order('score', { ascending: false });
+            
+            if (!allError && allScores && allScores.length > MAX_LEADERBOARD_ENTRIES) {
+                const scoresToDelete = allScores.slice(MAX_LEADERBOARD_ENTRIES);
+                const idsToDelete = scoresToDelete.map(s => s.id);
+                
+                if (idsToDelete.length > 0) {
+                    const { error: deleteByIdError } = await supabase
+                        .from('leaderboard')
+                        .delete()
+                        .in('id', idsToDelete);
+                    
+                    if (deleteByIdError) {
+                        console.warn('⚠️ Erreur lors de la suppression par ID:', deleteByIdError);
+                    } else {
+                        console.log(`✅ ${idsToDelete.length} scores supprimés (méthode alternative)`);
+                    }
+                }
+            }
+        } else {
+            console.log(`✅ Nettoyage réussi: scores en dessous de ${minTopScore} supprimés`);
+        }
+        
+    } catch (error) {
+        console.warn('⚠️ Erreur lors du nettoyage des scores:', error);
+        // Ne pas bloquer si le nettoyage échoue
+    }
+}
+
 // Fonction pour sauvegarder un score dans Supabase
 async function saveScoreToSupabase(name, score, level) {
     const supabase = initSupabase();
