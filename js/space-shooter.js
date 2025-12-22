@@ -1829,6 +1829,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else if (boostChance < 0.145) {
                         // 1.5% - Tir triple (fort impact, rare)
                         spawnPowerUp(asteroid.x, asteroid.y, 'tripleShot');
+                    } else if (boostChance < 0.16) {
+                        // 1.5% - Ralentissement temporel (fort impact, rare)
+                        spawnPowerUp(asteroid.x, asteroid.y, 'timeSlow');
+                    } else if (boostChance < 0.17) {
+                        // 1% - Bouclier offensif (très fort impact, très rare)
+                        spawnPowerUp(asteroid.x, asteroid.y, 'offensiveShield');
+                    } else if (boostChance < 0.19) {
+                        // 2% - Magnet (impact moyen)
+                        spawnPowerUp(asteroid.x, asteroid.y, 'magnet');
                     }
                     
                     // Supprimer l'astéroïde
@@ -2473,25 +2482,25 @@ document.addEventListener('DOMContentLoaded', function() {
         // Charger l'image du boss si disponible
         // Les images par défaut sont chargées au démarrage dans bossPhotos
         // Si une image uploadée existe, elle prend priorité
-        // Vérifier immédiatement puis avec un petit délai pour les images en cours de chargement
-        const assignBossImage = () => {
+        // Essayer plusieurs fois avec des délais croissants pour le chargement asynchrone
+        let attempts = 0;
+        const maxAttempts = 10;
+        const checkImage = () => {
+            attempts++;
             if (bossPhotos[bossNumber] && bossPhotos[bossNumber].complete && bossPhotos[bossNumber].naturalWidth > 0) {
                 boss.image = bossPhotos[bossNumber];
-                console.log(`✅ Image boss ${bossNumber} assignée`);
+                console.log(`✅ Image boss ${bossNumber} assignée après ${attempts} tentative(s)`);
                 return true;
+            }
+            if (attempts < maxAttempts) {
+                setTimeout(checkImage, 100 * attempts); // Délai croissant : 100ms, 200ms, 300ms...
+            } else {
+                boss.image = null;
+                console.log(`ℹ️ Boss ${bossNumber} sans image après ${maxAttempts} tentatives - forme par défaut utilisée`);
             }
             return false;
         };
-        
-        if (!assignBossImage()) {
-            // Attendre un peu pour que les images par défaut se chargent (chargement asynchrone)
-            setTimeout(() => {
-                if (!assignBossImage()) {
-                    boss.image = null;
-                    console.log(`ℹ️ Boss ${bossNumber} sans image - forme par défaut utilisée`);
-                }
-            }, 200);
-        }
+        checkImage();
         
         gameState.bossActive = true;
         
