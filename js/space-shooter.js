@@ -1494,8 +1494,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     playSound('explosion');
                     
                     // Score
-                    gameState.score += Math.floor(asteroid.size / 5) * 10;
-                    if (scoreElement) scoreElement.textContent = gameState.score;
+                    // Ne pas ajouter de score si un boss est actif
+                    if (!gameState.bossActive) {
+                        gameState.score += Math.floor(asteroid.size / 5) * 10;
+                        if (scoreElement) scoreElement.textContent = gameState.score;
+                    }
                     
                     // Supprimer le projectile
                     bullets.splice(bulletIndex, 1);
