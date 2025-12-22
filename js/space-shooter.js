@@ -167,6 +167,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Système de contrôle de volume global
     let globalVolume = parseFloat(localStorage.getItem('spaceShooterVolume')) || 0.7; // Volume par défaut à 70%
     let previousVolume = globalVolume; // Pour le bouton mute/unmute
+    let volumeManuallyModified = localStorage.getItem('volumeManuallyModified') === 'true'; // Flag pour désactiver les raccourcis clavier
     
     // Fonction pour définir le volume global
     function setGlobalVolume(volume) {
@@ -3623,6 +3624,34 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('keydown', (e) => {
         keys[e.code] = true;
         
+        // Raccourcis clavier pour le volume (désactivés si modifié manuellement)
+        if (!volumeManuallyModified) {
+            if (e.code === 'ArrowUp' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                const newVolume = Math.min(1, globalVolume + 0.1);
+                setGlobalVolume(newVolume);
+                return;
+            }
+            if (e.code === 'ArrowDown' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                const newVolume = Math.max(0, globalVolume - 0.1);
+                setGlobalVolume(newVolume);
+                return;
+            }
+            if (e.code === 'Equal' && (e.ctrlKey || e.metaKey) || e.code === 'NumpadAdd' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                const newVolume = Math.min(1, globalVolume + 0.1);
+                setGlobalVolume(newVolume);
+                return;
+            }
+            if (e.code === 'Minus' && (e.ctrlKey || e.metaKey) || e.code === 'NumpadSubtract' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();
+                const newVolume = Math.max(0, globalVolume - 0.1);
+                setGlobalVolume(newVolume);
+                return;
+            }
+        }
+        
         if (e.code === 'Space') {
             e.preventDefault();
             if (gameState.isPlaying) {
@@ -3734,8 +3763,10 @@ document.addEventListener('DOMContentLoaded', function() {
             // Mettre à jour le slider avec la valeur sauvegardée
             volumeSlider.value = globalVolume;
             
-            // Événement pour le slider
+            // Événement pour le slider - marquer comme modifié manuellement
             volumeSlider.addEventListener('input', (e) => {
+                volumeManuallyModified = true;
+                localStorage.setItem('volumeManuallyModified', 'true');
                 setGlobalVolume(parseFloat(e.target.value));
             });
             
@@ -3746,10 +3777,20 @@ document.addEventListener('DOMContentLoaded', function() {
                     volumeSliderFill.style.width = (parseFloat(e.target.value) * 100) + '%';
                 }
             });
+            
+            // Marquer comme modifié manuellement au changement (mouseup pour être sûr)
+            volumeSlider.addEventListener('change', () => {
+                volumeManuallyModified = true;
+                localStorage.setItem('volumeManuallyModified', 'true');
+            });
         }
         
         if (volumeMuteBtn) {
-            volumeMuteBtn.addEventListener('click', toggleMute);
+            volumeMuteBtn.addEventListener('click', () => {
+                volumeManuallyModified = true;
+                localStorage.setItem('volumeManuallyModified', 'true');
+                toggleMute();
+            });
         }
     }
     
