@@ -2502,8 +2502,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         // Sauvegarder le numéro du boss pour le score
                         const defeatedBossNumber = boss.bossNumber;
                         
-                        // Mise à jour du score immédiatement
-                        gameState.score += defeatedBossNumber * 1000;
+                        // Calculer le score nécessaire pour passer au niveau suivant
+                        // Exemple : niveau 10 → niveau 11, il faut 11 * 500 = 5500 points
+                        const targetLevel = gameState.level + 1;
+                        const targetScore = targetLevel * 500;
+                        
+                        // Donner juste assez de points pour passer au niveau suivant
+                        if (gameState.score < targetScore) {
+                            gameState.score = targetScore;
+                        } else {
+                            // Si on a déjà assez de points, ajouter juste un peu pour le boss
+                            gameState.score += defeatedBossNumber * 100;
+                        }
+                        
                         if (scoreElement) scoreElement.textContent = gameState.score;
                         
                         // Nettoyer le boss IMMÉDIATEMENT pour éviter les accès après
