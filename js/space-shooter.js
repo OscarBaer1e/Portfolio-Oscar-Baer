@@ -3245,8 +3245,19 @@ document.addEventListener('DOMContentLoaded', function() {
             const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
             if (distance < boss.size + shipSize) {
                 if (!ship.invincible) {
-                    createEnhancedExplosion(ship.x, ship.y, ship.color, 30);
-                    playSound('hit');
+                    // Si le bouclier est actif, le boss inflige quand même des dégâts (boss trop puissant)
+                    // mais avec une explosion visuelle réduite
+                    if (activePowerUps.shield && Date.now() < activePowerUps.shieldEndTime) {
+                        createSmallExplosion(ship.x, ship.y, ship.color);
+                        playSound('hit');
+                        // Le bouclier absorbe mais le boss est assez puissant pour infliger des dégâts réduits
+                        // Le boss consomme le bouclier plus rapidement (réduit de 2 secondes)
+                        activePowerUps.shieldEndTime = Math.max(Date.now(), activePowerUps.shieldEndTime - 2000);
+                    } else {
+                        // Pas de bouclier : dégâts normaux
+                        createEnhancedExplosion(ship.x, ship.y, ship.color, 30);
+                        playSound('hit');
+                    }
                     
                     gameState.lives--;
                     if (livesElement) livesElement.textContent = gameState.lives;
@@ -3255,11 +3266,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     if (gameState.lives <= 0) {
                         endGame();
                     } else {
-                        // Invincibilité temporaire avec clignotement (1-2 secondes)
+                        // Invincibilité temporaire avec clignotement (2 secondes)
                         ship.invincible = true;
                         setTimeout(() => {
                             ship.invincible = false;
-                        }, 2000); // 2 secondes exactement
+                        }, 2000);
                     }
                 }
             }
