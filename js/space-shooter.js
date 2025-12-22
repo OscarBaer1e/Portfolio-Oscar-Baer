@@ -892,12 +892,19 @@ document.addEventListener('DOMContentLoaded', function() {
             shrink: false,
             bigBullets: false,
             tripleShot: false,
+            timeSlow: false,
+            offensiveShield: false,
+            magnet: false,
             rapidFireEndTime: 0,
             shieldEndTime: 0,
             shrinkEndTime: 0,
             bigBulletsEndTime: 0,
-            tripleShotEndTime: 0
+            tripleShotEndTime: 0,
+            timeSlowEndTime: 0,
+            offensiveShieldEndTime: 0,
+            magnetEndTime: 0
         };
+        timeSlowMultiplier = 1.0;
         lastShotTime = 0;
         if (currentLevelDisplay) {
             currentLevelDisplay.textContent = gameState.level;
@@ -929,7 +936,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const activeBuffs = [];
         
         // Vérifier chaque type de buff
-        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot'];
+        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet'];
         buffTypes.forEach(buffType => {
             const isActive = activePowerUps[buffType] && now < activePowerUps[`${buffType}EndTime`];
             if (isActive) {
@@ -1510,6 +1517,56 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.moveTo(8, -8);
             ctx.lineTo(0, 8);
             ctx.stroke();
+        } else if (powerUp.type === 'timeSlow') {
+            // Ralentissement temporel - horloge
+            ctx.fillStyle = '#9b59b6';
+            ctx.strokeStyle = '#7d3c98';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            // Aiguilles de l'horloge
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(0, -5);
+            ctx.moveTo(0, 0);
+            ctx.lineTo(4, 0);
+            ctx.stroke();
+        } else if (powerUp.type === 'offensiveShield') {
+            // Bouclier offensif - bouclier avec épée
+            ctx.fillStyle = '#ff6b6b';
+            ctx.strokeStyle = '#ee5a52';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, 12, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            // Épée au centre
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, -8);
+            ctx.lineTo(0, 8);
+            ctx.moveTo(-3, -5);
+            ctx.lineTo(3, -5);
+            ctx.stroke();
+        } else if (powerUp.type === 'magnet') {
+            // Magnet - aimant
+            ctx.fillStyle = '#e74c3c';
+            ctx.strokeStyle = '#c0392b';
+            ctx.lineWidth = 2;
+            // Forme d'aimant en U
+            ctx.beginPath();
+            ctx.arc(-6, 0, 6, 0, Math.PI, false);
+            ctx.arc(6, 0, 6, 0, Math.PI, false);
+            ctx.lineTo(12, -8);
+            ctx.lineTo(-12, -8);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
         }
         
         ctx.restore();
@@ -1848,6 +1905,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else if (boostChance < 0.145) {
                         // 1.5% - Tir triple (fort impact, rare)
                         spawnPowerUp(asteroid.x, asteroid.y, 'tripleShot');
+                    } else if (boostChance < 0.16) {
+                        // 1.5% - Ralentissement temporel (fort impact)
+                        spawnPowerUp(asteroid.x, asteroid.y, 'timeSlow');
+                    } else if (boostChance < 0.175) {
+                        // 1.5% - Bouclier offensif (fort impact)
+                        spawnPowerUp(asteroid.x, asteroid.y, 'offensiveShield');
+                    } else if (boostChance < 0.19) {
+                        // 1.5% - Magnet (impact moyen, utile)
+                        spawnPowerUp(asteroid.x, asteroid.y, 'magnet');
                     }
                     
                     // Supprimer l'astéroïde
@@ -2286,6 +2352,9 @@ document.addEventListener('DOMContentLoaded', function() {
         else if (type === 'shrink') color = '#00ff00';
         else if (type === 'bigBullets') color = '#ff8800';
         else if (type === 'tripleShot') color = '#ff00ff';
+        else if (type === 'timeSlow') color = '#9b59b6';
+        else if (type === 'offensiveShield') color = '#ff6b6b';
+        else if (type === 'magnet') color = '#e74c3c';
         
         powerUps.push({
             x: x,
