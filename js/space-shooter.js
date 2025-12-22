@@ -3690,11 +3690,27 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!gameState.isPlaying || gameState.isPaused) return;
         
         const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
+        const shipHeight = ship.height / 2;
+        
+        // Mouvement horizontal (gauche/droite)
         if (keys['ArrowLeft'] || keys['KeyA']) {
             ship.x = Math.max(shipSize, ship.x - ship.speed * gameState.deltaTime);
         }
         if (keys['ArrowRight'] || keys['KeyD']) {
             ship.x = Math.min(canvas.width - shipSize, ship.x + ship.speed * gameState.deltaTime);
+        }
+        
+        // Mouvement vertical (avancer/reculer) - vitesse légèrement réduite pour l'équilibre
+        const verticalSpeed = ship.speed * 0.8; // 80% de la vitesse horizontale pour l'équilibre
+        if (keys['ArrowUp'] || keys['KeyW']) {
+            // Avancer (vers le haut) - limite à 20% du haut de l'écran
+            const minY = canvas.height * 0.2;
+            ship.y = Math.max(minY, ship.y - verticalSpeed * gameState.deltaTime);
+        }
+        if (keys['ArrowDown'] || keys['KeyS']) {
+            // Reculer (vers le bas) - limite à 90% du bas de l'écran
+            const maxY = canvas.height - 80;
+            ship.y = Math.min(maxY, ship.y + verticalSpeed * gameState.deltaTime);
         }
     }
     
