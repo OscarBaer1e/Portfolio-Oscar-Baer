@@ -2122,6 +2122,15 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (type === 'tripleShot') {
             text = '⚡ Tir Triple';
             glowColor = '#ff00ff';
+        } else if (type === 'timeSlow') {
+            text = '⏱️ Ralentissement';
+            glowColor = '#9b59b6';
+        } else if (type === 'offensiveShield') {
+            text = '🛡️ Bouclier Offensif';
+            glowColor = '#ff6b6b';
+        } else if (type === 'magnet') {
+            text = '🧲 Magnet';
+            glowColor = '#e74c3c';
         }
         
         // Position aléatoire pour le texte (à côté du vaisseau)
