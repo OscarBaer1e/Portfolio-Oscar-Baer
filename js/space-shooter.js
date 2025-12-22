@@ -3815,8 +3815,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.code === 'Space') {
             e.preventDefault();
             if (gameState.isPlaying) {
-                // Le tir automatique est maintenant géré dans update() avec delta time
-                shoot();
+                // Le tir automatique est géré dans update() avec delta time et cooldown
+                // On ne tire pas directement ici pour respecter le cooldown
             } else if (startScreen && !startScreen.classList.contains('hidden')) {
                 startGame();
             } else if (gameOver && !gameOver.classList.contains('hidden')) {
