@@ -2155,27 +2155,27 @@ document.addEventListener('DOMContentLoaded', function() {
         return asteroid.size > 25;
     }
     
-    // Calcule l'augmentation de vitesse de manière progressive (élevée au début, faible après)
+    // Calcule l'augmentation de vitesse de manière progressive
     function getSpeedIncrease(level) {
-        // Augmentation très progressive et ralentie sur tout le jeu
-        // Niveau 1-30 : 0.2 → 0.15
-        // Niveau 31-60 : 0.15 → 0.12
-        // Niveau 61-90 : 0.12 → 0.1
-        // Niveau 91+ : 0.1 → 0.08 (minimum)
+        // Augmentation progressive et équilibrée
+        // Niveau 1-30 : 0.25 → 0.2
+        // Niveau 31-60 : 0.2 → 0.18
+        // Niveau 61-90 : 0.18 → 0.15
+        // Niveau 91+ : 0.15 → 0.12 (minimum)
         
         if (level <= 30) {
-            // Niveaux 1-30 : de 0.2 à 0.15 (décroissance très lente)
-            return 0.2 - ((level - 1) / 30) * 0.05;
+            // Niveaux 1-30 : de 0.25 à 0.2
+            return 0.25 - ((level - 1) / 30) * 0.05;
         } else if (level <= 60) {
-            // Niveaux 31-60 : de 0.15 à 0.12
-            return 0.15 - ((level - 31) / 30) * 0.03;
+            // Niveaux 31-60 : de 0.2 à 0.18
+            return 0.2 - ((level - 31) / 30) * 0.02;
         } else if (level <= 90) {
-            // Niveaux 61-90 : de 0.12 à 0.1
-            return 0.12 - ((level - 61) / 30) * 0.02;
+            // Niveaux 61-90 : de 0.18 à 0.15
+            return 0.18 - ((level - 61) / 30) * 0.03;
         } else {
-            // Niveaux 91+ : de 0.1 à 0.08 (minimum)
+            // Niveaux 91+ : de 0.15 à 0.12 (minimum)
             const extraLevels = level - 91;
-            return Math.max(0.08, 0.1 - (extraLevels / 50) * 0.02);
+            return Math.max(0.12, 0.15 - (extraLevels / 50) * 0.03);
         }
     }
     
