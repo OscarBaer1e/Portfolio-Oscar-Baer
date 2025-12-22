@@ -2340,21 +2340,19 @@ document.addEventListener('DOMContentLoaded', function() {
     // Calcule l'augmentation de vitesse de manière progressive
     // Élevée au début (peu d'impact car vitesse faible) puis diminue (beaucoup d'impact car vitesse élevée)
     function getSpeedIncrease(level) {
-        // Augmentation élevée au début, puis diminue progressivement
-        // Niveau 1-30 : 0.3 → 0.2 (élevée au début)
-        // Niveau 31-60 : 0.2 → 0.15 (diminue)
-        // Niveau 61-90 : 0.15 → 0.1 (diminue encore)
-        // Niveau 91+ : 0.1 → 0.05 (minimum, très faible car impact élevé)
+        // Augmentation progressive et équilibrée
+        // Niveau 1 : très faible augmentation (0.1) pour éviter que le jeu soit trop rapide au début
+        // Puis augmentation progressive mais contrôlée
         
         if (level <= 30) {
-            // Niveaux 1-30 : de 0.3 à 0.2 (élevée au début car vitesse faible)
-            return 0.3 - ((level - 1) / 30) * 0.1;
+            // Niveaux 1-30 : de 0.1 à 0.15 (très progressive au début)
+            return 0.1 + ((level - 1) / 30) * 0.05;
         } else if (level <= 60) {
-            // Niveaux 31-60 : de 0.2 à 0.15 (diminue car vitesse augmente)
-            return 0.2 - ((level - 31) / 30) * 0.05;
+            // Niveaux 31-60 : de 0.15 à 0.12 (diminue car vitesse augmente)
+            return 0.15 - ((level - 31) / 30) * 0.03;
         } else if (level <= 90) {
-            // Niveaux 61-90 : de 0.15 à 0.1 (diminue encore)
-            return 0.15 - ((level - 61) / 30) * 0.05;
+            // Niveaux 61-90 : de 0.12 à 0.1 (diminue encore)
+            return 0.12 - ((level - 61) / 30) * 0.02;
         } else {
             // Niveaux 91+ : de 0.1 à 0.05 (minimum, très faible car impact élevé)
             const extraLevels = level - 91;
