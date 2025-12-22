@@ -32,7 +32,8 @@ document.addEventListener('DOMContentLoaded', function() {
         player2Vel: { x: 0, y: 0 },
         player1OnGround: true,
         player2OnGround: true,
-        isAI: true
+        isAI: true,
+        deltaTime: 1.0 // Multiplicateur de vitesse normalisé (1.0 = 60fps)
     };
     
     // Constantes physiques
@@ -80,16 +81,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function updateDisplay() {
-        // Ballon
-        basketball.style.left = gameState.ballPos.x + 'px';
-        basketball.style.top = gameState.ballPos.y + 'px';
+        // Ballon - Utilisation de transform pour meilleure performance
+        basketball.style.transform = `translate(${gameState.ballPos.x}px, ${gameState.ballPos.y}px)`;
         
-        // Joueur 1
-        player1.style.left = gameState.player1Pos.x + 'px';
+        // Joueur 1 - Utilisation de transform pour meilleure performance
+        player1.style.transform = `translateX(${gameState.player1Pos.x}px)`;
         player1.style.bottom = (500 - gameState.player1Pos.y) + 'px';
         
-        // Joueur 2
-        player2.style.left = gameState.player2Pos.x + 'px';
+        // Joueur 2 - Utilisation de transform pour meilleure performance
+        player2.style.transform = `translateX(${gameState.player2Pos.x}px)`;
         player2.style.bottom = (500 - gameState.player2Pos.y) + 'px';
         
         // Indicateur de possession
@@ -176,18 +176,18 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
-    // Physique des joueurs
+    // Physique des joueurs (normalisé par delta time)
     function updatePlayers() {
         const court = document.querySelector('.basketball-court');
         const rect = court.getBoundingClientRect();
         
         // Joueur 1
-        gameState.player1Pos.x += gameState.player1Vel.x;
-        gameState.player1Pos.y += gameState.player1Vel.y;
+        gameState.player1Pos.x += gameState.player1Vel.x * gameState.deltaTime;
+        gameState.player1Pos.y += gameState.player1Vel.y * gameState.deltaTime;
         
         // Gravité
         if (!gameState.player1OnGround) {
-            gameState.player1Vel.y += GRAVITY;
+            gameState.player1Vel.y += GRAVITY * gameState.deltaTime;
         }
         
         // Sol
@@ -201,11 +201,11 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.player1Pos.x = Math.max(0, Math.min(rect.width - PLAYER_SIZE, gameState.player1Pos.x));
         
         // Joueur 2
-        gameState.player2Pos.x += gameState.player2Vel.x;
-        gameState.player2Pos.y += gameState.player2Vel.y;
+        gameState.player2Pos.x += gameState.player2Vel.x * gameState.deltaTime;
+        gameState.player2Pos.y += gameState.player2Vel.y * gameState.deltaTime;
         
         if (!gameState.player2OnGround) {
-            gameState.player2Vel.y += GRAVITY;
+            gameState.player2Vel.y += GRAVITY * gameState.deltaTime;
         }
         
         if (gameState.player2Pos.y >= rect.height - 100) {
@@ -217,7 +217,7 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.player2Pos.x = Math.max(0, Math.min(rect.width - PLAYER_SIZE, gameState.player2Pos.x));
     }
     
-    // Physique du ballon
+    // Physique du ballon (normalisé par delta time)
     function updateBall() {
         const court = document.querySelector('.basketball-court');
         const rect = court.getBoundingClientRect();
@@ -233,12 +233,12 @@ document.addEventListener('DOMContentLoaded', function() {
             gameState.ballPos.y = playerPos.y - (onGround ? 40 : 60);
             gameState.ballVel = { x: 0, y: 0 };
         } else {
-            // Le ballon est libre
-            gameState.ballPos.x += gameState.ballVel.x;
-            gameState.ballPos.y += gameState.ballVel.y;
+            // Le ballon est libre (normalisé par delta time)
+            gameState.ballPos.x += gameState.ballVel.x * gameState.deltaTime;
+            gameState.ballPos.y += gameState.ballVel.y * gameState.deltaTime;
             
             // Gravité
-            gameState.ballVel.y += GRAVITY;
+            gameState.ballVel.y += GRAVITY * gameState.deltaTime;
             
             // Rebond sur le sol
             if (gameState.ballPos.y > rect.height - BALL_SIZE - 20) {
@@ -450,9 +450,29 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 2000);
     }
     
-    // Boucle principale
-    function gameUpdate() {
-        if (!gameState.isPlaying || gameState.isPaused) return;
+    // Système de delta time pour normaliser la vitesse
+    let lastFrameTime = performance.now();
+    const targetFPS = 60;
+    const frameTime = 1000 / targetFPS; // Temps par frame à 60fps (16.67ms)
+    gameState.deltaTime = 1.0; // Multiplicateur de vitesse normalisé (1.0 = 60fps)
+    
+    // Boucle principale avec requestAnimationFrame pour fluidité
+    let animationFrameId = null;
+    function gameUpdate(currentTime) {
+        if (!gameState.isPlaying || gameState.isPaused) {
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+            return;
+        }
+        
+        // Calcul du delta time normalisé (1.0 = 60fps, 2.0 = 30fps, 0.5 = 120fps)
+        const deltaTime = currentTime ? (currentTime - lastFrameTime) / frameTime : 1.0;
+        lastFrameTime = currentTime || performance.now();
+        
+        // Limiter le delta time pour éviter les sauts trop importants (cap à 2x la vitesse normale)
+        gameState.deltaTime = Math.min(deltaTime, 2.0);
         
         updatePlayers();
         updateBall();
@@ -463,6 +483,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         updateDisplay();
+        
+        animationFrameId = requestAnimationFrame(gameUpdate);
     }
     
     // Contrôles du jeu
@@ -488,7 +510,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }, 1000);
             
-            gameLoop = setInterval(gameUpdate, 16);
+            // Démarrer la boucle requestAnimationFrame (plus besoin de setInterval)
+            animationFrameId = requestAnimationFrame(gameUpdate);
         }
     });
     
@@ -496,6 +519,10 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.isPlaying = false;
         clearInterval(gameLoop);
         clearInterval(timeInterval);
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+        }
         
         let winner = '';
         if (gameState.score1 > gameState.score2) {
@@ -522,6 +549,10 @@ document.addEventListener('DOMContentLoaded', function() {
         startBtn.textContent = 'Commencer';
         clearInterval(gameLoop);
         clearInterval(timeInterval);
+        if (animationFrameId) {
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = null;
+        }
         resetBall();
         gameMessage.classList.remove('show');
         initGame();
