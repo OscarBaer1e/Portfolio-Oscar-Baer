@@ -2254,6 +2254,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log('Spawning boss', bossNumber, 'at level', gameState.level);
         
+        // Jouer le son d'arrivée du boss
+        playAudioFile('../ressources/Sons/Arrivée Boss.mp3', 0.6);
+        
         const baseHealth = 30 + (bossNumber * 15); // Réduit : était 50 + (bossNumber * 30)
         const baseSize = 60 + (bossNumber * 10);
         
