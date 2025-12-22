@@ -922,8 +922,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Liste des buffs actifs avec leurs temps restants
         const activeBuffs = [];
         
-        // Vérifier chaque type de buff
-        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot'];
+        // Vérifier chaque type de buff (incluant les nouveaux bonus)
+        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet'];
         buffTypes.forEach(buffType => {
             const isActive = activePowerUps[buffType] && now < activePowerUps[`${buffType}EndTime`];
             if (isActive) {
@@ -1738,6 +1738,15 @@ document.addEventListener('DOMContentLoaded', function() {
         if (activePowerUps.tripleShot && now > activePowerUps.tripleShotEndTime) {
             activePowerUps.tripleShot = false;
         }
+        if (activePowerUps.timeSlow && now > activePowerUps.timeSlowEndTime) {
+            activePowerUps.timeSlow = false;
+        }
+        if (activePowerUps.offensiveShield && now > activePowerUps.offensiveShieldEndTime) {
+            activePowerUps.offensiveShield = false;
+        }
+        if (activePowerUps.magnet && now > activePowerUps.magnetEndTime) {
+            activePowerUps.magnet = false;
+        }
         
         // Mettre à jour les icônes de buff
         updateBuffIcons();
@@ -1754,6 +1763,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Explosion améliorée
                     createEnhancedExplosion(asteroid.x, asteroid.y, asteroid.color, asteroid.size);
                     playSound('explosion');
+                    
+                    // Statistiques
+                    gameStats.asteroidsDestroyed++;
+                    gameStats.shotsHit++;
                     
                     // Score
                     // Ne pas ajouter de score si un boss est actif
@@ -2460,13 +2473,24 @@ document.addEventListener('DOMContentLoaded', function() {
         // Charger l'image du boss si disponible
         // Les images par défaut sont chargées au démarrage dans bossPhotos
         // Si une image uploadée existe, elle prend priorité
-        if (bossPhotos[bossNumber] && bossPhotos[bossNumber].complete && bossPhotos[bossNumber].naturalWidth > 0) {
-            boss.image = bossPhotos[bossNumber];
-            console.log(`✅ Image boss ${bossNumber} assignée: ${bossPhotos[bossNumber].src ? 'uploadée' : 'par défaut'}`);
-        } else {
-            // Pas d'image disponible - le boss s'affichera avec la forme par défaut
-            boss.image = null;
-            console.log(`ℹ️ Boss ${bossNumber} sans image - forme par défaut utilisée`);
+        // Vérifier immédiatement puis avec un petit délai pour les images en cours de chargement
+        const assignBossImage = () => {
+            if (bossPhotos[bossNumber] && bossPhotos[bossNumber].complete && bossPhotos[bossNumber].naturalWidth > 0) {
+                boss.image = bossPhotos[bossNumber];
+                console.log(`✅ Image boss ${bossNumber} assignée`);
+                return true;
+            }
+            return false;
+        };
+        
+        if (!assignBossImage()) {
+            // Attendre un peu pour que les images par défaut se chargent (chargement asynchrone)
+            setTimeout(() => {
+                if (!assignBossImage()) {
+                    boss.image = null;
+                    console.log(`ℹ️ Boss ${bossNumber} sans image - forme par défaut utilisée`);
+                }
+            }, 200);
         }
         
         gameState.bossActive = true;
@@ -2818,6 +2842,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     boss.size = boss.maxSize * (0.5 + healthPercent * 0.5); // Entre 50% et 100% de la taille
                     
                     if (boss.health <= 0) {
+                        // Statistiques
+                        gameStats.bossesDefeated++;
+                        
                         // Sauvegarder le numéro du boss pour le score
                         const defeatedBossNumber = boss.bossNumber;
                         
@@ -3415,6 +3442,8 @@ document.addEventListener('DOMContentLoaded', function() {
             startTime: Date.now(),
             endTime: 0
         };
+        
+        console.log('🎮 Statistiques réinitialisées:', gameStats);
         
         // SUPPRIMER TOUTES LES IMAGES UPLOADÉES PAR L'UTILISATEUR (y compris job_application)
         bossPhotos = {};
