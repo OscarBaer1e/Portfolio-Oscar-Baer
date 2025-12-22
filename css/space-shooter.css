@@ -113,6 +113,12 @@
     transition: all 0.3s ease;
 }
 
+.buff-icon svg {
+    width: 24px;
+    height: 24px;
+    filter: drop-shadow(0 0 3px #00ff00);
+}
+
 .buff-icon.warning {
     animation: buffWarning 0.5s ease-in-out infinite;
     border-color: var(--secondary-color);

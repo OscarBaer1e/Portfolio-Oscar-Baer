@@ -790,7 +790,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const buffIcon = document.createElement('div');
                 buffIcon.className = 'buff-icon';
                 buffIcon.id = `buff-${buff.type}`;
-                buffIcon.textContent = buff.emoji;
+                
+                // Pour le rétrécissement, créer une icône personnalisée (flèche verte)
+                if (buff.type === 'shrink') {
+                    buffIcon.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 4 L6 10 L9 10 L9 18 L15 18 L15 10 L18 10 Z" fill="#00ff00" stroke="#00aa00" stroke-width="2"/></svg>';
+                } else {
+                    buffIcon.textContent = buff.emoji;
+                }
                 
                 if (buff.isWarning) {
                     buffIcon.classList.add('warning');
