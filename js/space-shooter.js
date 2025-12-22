@@ -2952,6 +2952,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     boss.health--;
                     playSound('bossHit');
                     bullets.splice(bulletIndex, 1);
+                    gameStats.bulletsHit++;
+                    // Particules de score pour les dégâts au boss
+                    createScoreParticle(bullet.x, bullet.y, '+1');
                     updateHealthBars();
                     
                     // Le boss rétrécit quand il prend des dégâts
