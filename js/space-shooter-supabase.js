@@ -190,6 +190,8 @@ async function saveScoreToSupabase(name, score, level) {
                 
                 if (result && result.success === true) {
                     console.log('✅ Score enregistré via fonction SQL avec ID:', result.id);
+                    // Nettoyer les scores en dessous du top 10
+                    await cleanupOldScores(supabase);
                     return true;
                 } else {
                     console.error('❌ Fonction SQL a retourné success: false');
@@ -220,6 +222,8 @@ async function saveScoreToSupabase(name, score, level) {
             if (data && data.length > 0) {
                 console.log('✅ Score enregistré via insertion directe avec ID:', data[0]?.id);
                 console.log('✅ Données enregistrées:', data[0]);
+                // Nettoyer les scores en dessous du top 10
+                await cleanupOldScores(supabase);
                 return true;
             } else {
                 throw new Error('Aucune donnée retournée par l\'insertion');
