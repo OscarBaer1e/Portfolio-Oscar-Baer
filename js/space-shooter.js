@@ -2226,9 +2226,6 @@ document.addEventListener('DOMContentLoaded', function() {
             
             ctx.restore();
         });
-        
-        // Restaurer le contexte après le shake
-        ctx.restore();
     }
     
     // Fonction pour créer des particules de score
