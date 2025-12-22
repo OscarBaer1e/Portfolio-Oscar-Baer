@@ -357,6 +357,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Effet de shake de l'écran
     let screenShake = { x: 0, y: 0, intensity: 0 };
     
+    // Particules de score
+    let scoreParticles = [];
+    
     // Statistiques de partie
     let gameStats = {
         asteroidsDestroyed: 0,
