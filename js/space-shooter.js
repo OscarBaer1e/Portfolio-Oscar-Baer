@@ -460,7 +460,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Variables de tir (normalisées par delta time)
     let shootCooldown = 0; // Compteur de cooldown en secondes (normalisé)
-    let baseFireRate = 0.3; // Temps entre les tirs en secondes (300ms = 0.3s)
+    let baseFireRate = 0.5; // Temps entre les tirs en secondes (500ms = 0.5s) - vitesse équilibrée
     let currentFireRate = baseFireRate; // Temps de cooldown actuel en secondes
     
     // Vérifications de sécurité pour tous les éléments
@@ -2510,7 +2510,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (powerUp.type === 'rapidFire') {
             activePowerUps.rapidFire = true;
             activePowerUps.rapidFireEndTime = now + 10000; // 10 secondes
-            currentFireRate = baseFireRate / 3; // 3x plus rapide (0.1s au lieu de 0.3s)
+            currentFireRate = baseFireRate / 3; // 3x plus rapide (0.167s au lieu de 0.5s)
             createPowerUpVisualAnimation('rapidFire', ship.x, ship.y);
         } else if (powerUp.type === 'shield') {
             activePowerUps.shield = true;
