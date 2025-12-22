@@ -1007,6 +1007,11 @@ document.addEventListener('DOMContentLoaded', function() {
     // Dessin
     function draw() {
         if (!canvas || !ctx) return;
+        
+        // Appliquer le shake de l'écran
+        ctx.save();
+        ctx.translate(screenShake.x, screenShake.y);
+        
         // Fond avec gradient selon le thème
         const currentTheme = getCurrentTheme();
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -1014,6 +1019,15 @@ document.addEventListener('DOMContentLoaded', function() {
         gradient.addColorStop(1, currentTheme.background.bottom);
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Effet de ralentissement temporel (distorsion visuelle)
+        if (activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime) {
+            ctx.save();
+            ctx.globalAlpha = 0.1;
+            ctx.fillStyle = '#9b59b6';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();
+        }
         
         // Étoiles selon le thème
         stars.forEach(star => {
@@ -1023,9 +1037,47 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.fill();
         });
         
+        // Traînées de particules du vaisseau
+        shipTrail.forEach((trail, index) => {
+            ctx.save();
+            ctx.globalAlpha = trail.alpha;
+            ctx.fillStyle = ship.color;
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = ship.color;
+            ctx.beginPath();
+            ctx.arc(trail.x, trail.y, 3 - (index / shipTrail.length) * 2, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        });
+        
         // Vaisseau
         if (gameState.isPlaying || gameState.isPaused) {
             drawShip(ship.x, ship.y);
+        }
+        
+        // Bouclier offensif visuel
+        if (activePowerUps.offensiveShield && Date.now() < activePowerUps.offensiveShieldEndTime) {
+            ctx.save();
+            ctx.translate(ship.x, ship.y);
+            const pulse = Math.sin(Date.now() / 80) * 0.15 + 1;
+            ctx.globalAlpha = 0.6;
+            ctx.strokeStyle = '#ff6b6b';
+            ctx.lineWidth = 4;
+            ctx.shadowBlur = 25;
+            ctx.shadowColor = '#ff6b6b';
+            ctx.beginPath();
+            ctx.arc(0, 0, (ship.width / 2 + 12) * pulse, 0, Math.PI * 2);
+            ctx.stroke();
+            // Épée au centre
+            ctx.strokeStyle = '#ffffff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, -10);
+            ctx.lineTo(0, 10);
+            ctx.moveTo(-4, -6);
+            ctx.lineTo(4, -6);
+            ctx.stroke();
+            ctx.restore();
         }
         
         // Projectiles selon le thème
@@ -3428,6 +3480,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function endGame() {
         gameState.isPlaying = false;
         
+        // Calculer les statistiques finales
+        const accuracy = gameStats.bulletsFired > 0 ? ((gameStats.bulletsHit / gameStats.bulletsFired) * 100).toFixed(1) : 0;
+        const timeMinutes = Math.floor(gameStats.timePlayed / 60000);
+        const timeSeconds = Math.floor((gameStats.timePlayed % 60000) / 1000);
+        const timeFormatted = `${timeMinutes}m ${timeSeconds}s`;
+        
         // Sauvegarde du meilleur score
         if (gameState.score > gameState.highScore) {
             gameState.highScore = gameState.score;
@@ -3438,21 +3496,25 @@ document.addEventListener('DOMContentLoaded', function() {
         if (finalScore) finalScore.textContent = gameState.score;
         if (finalLevel) finalLevel.textContent = gameState.level;
         
-        // Message humoristique si le score est inférieur à 500
+        // Afficher les statistiques post-partie
         if (scoreMessage) {
+            let statsText = '';
             if (gameState.score < 500) {
-                scoreMessage.textContent = '😅 Tu es nul ! Moins de 500 points, vraiment ?';
-                scoreMessage.style.color = '#ff6b6b';
-                scoreMessage.style.fontWeight = 'bold';
-                scoreMessage.style.fontSize = '1.2em';
-                scoreMessage.style.marginTop = '15px';
-            } else {
-                scoreMessage.textContent = '';
-                scoreMessage.style.color = '';
-                scoreMessage.style.fontWeight = '';
-                scoreMessage.style.fontSize = '';
-                scoreMessage.style.marginTop = '';
+                statsText = '😅 Tu es nul ! Moins de 500 points, vraiment ?<br><br>';
             }
+            statsText += `<strong>📊 Statistiques de partie:</strong><br>`;
+            statsText += `🎯 Astéroïdes détruits: ${gameStats.asteroidsDestroyed}<br>`;
+            statsText += `💥 Projectiles tirés: ${gameStats.bulletsFired}<br>`;
+            statsText += `✅ Précision: ${accuracy}%<br>`;
+            statsText += `🎁 Bonus collectés: ${gameStats.powerUpsCollected}<br>`;
+            statsText += `⏱️ Temps de jeu: ${timeFormatted}`;
+            scoreMessage.innerHTML = statsText;
+            scoreMessage.style.color = '#00ffff';
+            scoreMessage.style.fontWeight = 'normal';
+            scoreMessage.style.fontSize = '0.9em';
+            scoreMessage.style.marginTop = '15px';
+            scoreMessage.style.textAlign = 'left';
+            scoreMessage.style.lineHeight = '1.6';
         }
         
         if (gameOver) gameOver.classList.remove('hidden');
