@@ -157,6 +157,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let audioContext = null;
     let audioContextInitialized = false;
     
+    // Cache pour les fichiers audio
+    const audioCache = {};
+    
     function initAudioContext() {
         if (!audioContextInitialized) {
             try {
@@ -175,6 +178,26 @@ document.addEventListener('DOMContentLoaded', function() {
             initAudioContext();
         }
     }, { once: true });
+    
+    // Fonction pour jouer un fichier audio
+    function playAudioFile(src, volume = 0.5) {
+        try {
+            // Vérifier si l'audio est déjà en cache
+            if (!audioCache[src]) {
+                const audio = new Audio(src);
+                audio.volume = volume;
+                audioCache[src] = audio;
+            }
+            
+            const audio = audioCache[src].cloneNode();
+            audio.volume = volume;
+            audio.play().catch(e => {
+                console.warn('Erreur lecture audio:', e);
+            });
+        } catch (e) {
+            console.warn('Erreur création audio:', e);
+        }
+    }
     
     // Sons du jeu
     function playSound(type, frequency = 440, duration = 0.1) {
