@@ -491,10 +491,11 @@
 
 /* Barre de vie du boss en haut à droite */
 #boss-health-container {
-    position: absolute;
-    top: 15px;
-    right: 15px;
+    position: absolute !important;
+    top: 15px !important;
+    right: 15px !important;
     bottom: auto !important;
+    left: auto !important;
     z-index: 10;
 }
 
@@ -1523,129 +1524,8 @@
     .score-register-content h3 {
         font-size: 1.5rem;
     }
-}
-
-/* Barre de vie du boss en haut à droite */
-#boss-health-container {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    bottom: auto !important;
-    z-index: 10;
-}
-
-/* Statistiques post-partie */
-.game-stats {
-    margin-top: 15px;
-    padding: 12px;
-    background: linear-gradient(135deg, rgba(0, 0, 0, 0.9) 0%, rgba(10, 10, 30, 0.95) 100%);
-    border: 2px solid var(--primary-color);
-    border-radius: 8px;
-    box-shadow: 
-        0 0 20px rgba(0, 255, 255, 0.4),
-        inset 0 0 15px rgba(0, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    animation: statsGlow 2s ease-in-out infinite alternate;
-}
-
-@keyframes statsGlow {
-    from {
-        box-shadow: 
-            0 0 20px rgba(0, 255, 255, 0.4),
-            inset 0 0 15px rgba(0, 255, 255, 0.1);
-    }
-    to {
-        box-shadow: 
-            0 0 30px rgba(0, 255, 255, 0.6),
-            inset 0 0 20px rgba(0, 255, 255, 0.15);
-    }
-}
-
-.game-stats h4 {
-    color: var(--primary-color);
-    font-family: 'Anta', sans-serif;
-    margin-bottom: 12px;
-    text-align: center;
-    font-size: 1.1rem;
-    text-shadow: 0 0 10px var(--primary-color);
-    letter-spacing: 1px;
-    position: relative;
-    padding-bottom: 8px;
-}
-
-.game-stats h4::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 50%;
-    height: 1.5px;
-    background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
-    box-shadow: 0 0 8px var(--primary-color);
-}
-
-.stats-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 8px;
-}
-
-.stat-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 8px 10px;
-    background: linear-gradient(135deg, rgba(0, 255, 255, 0.15) 0%, rgba(0, 200, 255, 0.1) 100%);
-    border-radius: 6px;
-    border: 1.5px solid rgba(0, 255, 255, 0.4);
-    box-shadow: 
-        0 0 8px rgba(0, 255, 255, 0.3),
-        inset 0 0 8px rgba(0, 255, 255, 0.1);
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-}
-
-.stat-item::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: -100%;
-    width: 100%;
-    height: 100%;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
-    transition: left 0.5s ease;
-}
-
-.stat-item:hover::before {
-    left: 100%;
-}
-
-.stat-item:hover {
-    transform: translateY(-1px);
-    border-color: var(--primary-color);
-    box-shadow: 
-        0 0 12px rgba(0, 255, 255, 0.5),
-        inset 0 0 12px rgba(0, 255, 255, 0.15);
-}
-
-.stat-item .stat-label {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.8rem;
-    font-weight: 500;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-}
-
-.stat-item .stat-value {
-    color: var(--primary-color);
-    font-weight: bold;
-    font-family: 'Anta', sans-serif;
-    font-size: 1.1rem;
-    text-shadow: 0 0 8px var(--primary-color);
-    min-width: 50px;
-    text-align: right;
+=======
+>>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
 }
 
 

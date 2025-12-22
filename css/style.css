@@ -1343,7 +1343,7 @@ footer .container {
 .social-links a {
     color: var(--dim-text-color);
     margin-left: 20px;
-    font-size: 2.5rem;
+    font-size: 2.5rem; 
     transition: all 0.3s ease;
 }
 

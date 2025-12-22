@@ -156,22 +156,6 @@ document.addEventListener('DOMContentLoaded', function() {
         bossActive: false
     };
     
-    // Delta time pour vitesse constante sur tous les navigateurs
-    let lastFrameTime = performance.now();
-    const TARGET_FPS = 60;
-    const FRAME_TIME = 1000 / TARGET_FPS; // ~16.67ms par frame à 60fps
-    
-    // Statistiques de la partie
-    let gameStats = {
-        asteroidsDestroyed: 0,
-        bossesDefeated: 0,
-        powerUpsCollected: 0,
-        shotsFired: 0,
-        shotsHit: 0,
-        startTime: 0,
-        endTime: 0
-    };
-    
     // Système de sons
     let audioContext = null;
     let audioContextInitialized = false;
@@ -329,8 +313,7 @@ document.addEventListener('DOMContentLoaded', function() {
         width: 40,
         height: 40,
         speed: 5,
-        color: '#00ffff',
-        invincible: false
+        color: '#00ffff'
     };
     
     // Projectiles
@@ -365,10 +348,24 @@ document.addEventListener('DOMContentLoaded', function() {
         magnetEndTime: 0
     };
     
-    // Variables pour effets visuels
+    // Multiplicateur de ralentissement temporel
+    let timeSlowMultiplier = 1.0;
+    
+    // Particules de traînée du vaisseau
+    let shipTrail = [];
+    
+    // Effet de shake de l'écran
     let screenShake = { x: 0, y: 0, intensity: 0 };
-    let shipTrail = []; // Traînées derrière le vaisseau
-    let scoreParticles = []; // Particules de score qui montent
+    
+    // Statistiques de partie
+    let gameStats = {
+        asteroidsDestroyed: 0,
+        bulletsFired: 0,
+        bulletsHit: 0,
+        powerUpsCollected: 0,
+        timePlayed: 0,
+        startTime: 0
+    };
     
     // Étoiles de fond
     let stars = [];
@@ -864,15 +861,21 @@ document.addEventListener('DOMContentLoaded', function() {
         powerUps = [];
         stars = [];
         backgroundEvents = [];
-        boss = null;
-        bossBullets = [];
         shipTrail = [];
         scoreParticles = [];
         screenShake = { x: 0, y: 0, intensity: 0 };
         
-        // SUPPRIMER TOUTES LES IMAGES UPLOADÉES PAR L'UTILISATEUR (y compris job_application)
-        bossPhotos = {};
-        
+        // Réinitialiser les statistiques
+        gameStats = {
+            asteroidsDestroyed: 0,
+            bulletsFired: 0,
+            bulletsHit: 0,
+            powerUpsCollected: 0,
+            timePlayed: 0,
+            startTime: Date.now()
+        };
+        boss = null;
+        bossBullets = [];
         gameState.score = 0;
         gameState.level = 1;
         gameState.lives = 3;
@@ -886,17 +889,11 @@ document.addEventListener('DOMContentLoaded', function() {
             shrink: false,
             bigBullets: false,
             tripleShot: false,
-            timeSlow: false,
-            offensiveShield: false,
-            magnet: false,
             rapidFireEndTime: 0,
             shieldEndTime: 0,
             shrinkEndTime: 0,
             bigBulletsEndTime: 0,
-            tripleShotEndTime: 0,
-            timeSlowEndTime: 0,
-            offensiveShieldEndTime: 0,
-            magnetEndTime: 0
+            tripleShotEndTime: 0
         };
         lastShotTime = 0;
         if (currentLevelDisplay) {
@@ -928,8 +925,8 @@ document.addEventListener('DOMContentLoaded', function() {
         // Liste des buffs actifs avec leurs temps restants
         const activeBuffs = [];
         
-        // Vérifier chaque type de buff (incluant les nouveaux bonus)
-        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet'];
+        // Vérifier chaque type de buff
+        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot'];
         buffTypes.forEach(buffType => {
             const isActive = activePowerUps[buffType] && now < activePowerUps[`${buffType}EndTime`];
             if (isActive) {
@@ -1010,18 +1007,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Dessin
     function draw() {
         if (!canvas || !ctx) return;
-        
-        // Effet de shake (écran qui tremble)
-        ctx.save();
-        if (screenShake.intensity > 0) {
-            ctx.translate(
-                (Math.random() - 0.5) * screenShake.intensity,
-                (Math.random() - 0.5) * screenShake.intensity
-            );
-            screenShake.intensity *= 0.9; // Diminue progressivement
-            if (screenShake.intensity < 0.1) screenShake.intensity = 0;
-        }
-        
         // Fond avec gradient selon le thème
         const currentTheme = getCurrentTheme();
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
@@ -1069,28 +1054,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (activePowerUps.shield && Date.now() < activePowerUps.shieldEndTime) {
             drawShield();
         }
-        
-        // Particules de score qui montent
-        scoreParticles.forEach((particle, index) => {
-            ctx.save();
-            ctx.globalAlpha = particle.alpha;
-            ctx.fillStyle = particle.color;
-            ctx.font = `bold ${particle.size}px 'Anta', sans-serif`;
-            ctx.textAlign = 'center';
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = particle.color;
-            ctx.fillText(particle.text, particle.x, particle.y);
-            ctx.restore();
-            
-            // Mise à jour
-            particle.y -= 2;
-            particle.alpha -= 0.02;
-            particle.size += 0.3;
-            
-            if (particle.alpha <= 0) {
-                scoreParticles.splice(index, 1);
-            }
-        });
         
         // Particules avec effets stylés selon le type
         particles.forEach(particle => {
@@ -1161,23 +1124,22 @@ document.addEventListener('DOMContentLoaded', function() {
             gameState.bossActive = false;
         }
         
-        // Projectiles du boss (avec effet visuel si renvoyés)
+        // Projectiles du boss
         bossBullets.forEach(bullet => {
-            ctx.fillStyle = bullet.color || '#ff0000';
+            ctx.fillStyle = bullet.color;
             ctx.shadowBlur = 10;
-            ctx.shadowColor = bullet.color || '#ff0000';
-            // Effet spécial pour projectiles renvoyés (vert)
-            if (bullet.color === '#00ff00') {
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = '#00ff00';
-            }
+            ctx.shadowColor = bullet.color;
             ctx.beginPath();
-            ctx.arc(bullet.x, bullet.y, bullet.size || 6, 0, Math.PI * 2);
+            ctx.arc(bullet.x, bullet.y, bullet.size, 0, Math.PI * 2);
             ctx.fill();
             ctx.shadowBlur = 0;
         });
         
-        ctx.restore(); // Restaurer le contexte après le shake
+        // Dessiner les particules de score
+        drawScoreParticles();
+        
+        // Restaurer le contexte après le shake
+        ctx.restore();
     }
     
     // Dessine les événements de fond
@@ -1493,56 +1455,6 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.moveTo(8, -8);
             ctx.lineTo(0, 8);
             ctx.stroke();
-        } else if (powerUp.type === 'timeSlow') {
-            // Ralentissement temporel - horloge
-            ctx.fillStyle = '#9b59b6';
-            ctx.strokeStyle = '#7d3c98';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(0, 0, 10, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-            // Aiguilles
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(0, -6);
-            ctx.moveTo(0, 0);
-            ctx.lineTo(4, 0);
-            ctx.stroke();
-        } else if (powerUp.type === 'offensiveShield') {
-            // Bouclier offensif - bouclier avec flèches
-            ctx.fillStyle = '#ff6b6b';
-            ctx.strokeStyle = '#ff4757';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(0, 0, 12, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-            // Flèches vers l'extérieur
-            for (let i = 0; i < 4; i++) {
-                const angle = (Math.PI / 2) * i;
-                ctx.beginPath();
-                ctx.moveTo(Math.cos(angle) * 8, Math.sin(angle) * 8);
-                ctx.lineTo(Math.cos(angle) * 15, Math.sin(angle) * 15);
-                ctx.stroke();
-            }
-        } else if (powerUp.type === 'magnet') {
-            // Magnet - aimant
-            ctx.fillStyle = '#e74c3c';
-            ctx.strokeStyle = '#c0392b';
-            ctx.lineWidth = 2;
-            // Forme d'aimant en U
-            ctx.beginPath();
-            ctx.arc(-6, 0, 4, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(6, 0, 4, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-            ctx.fillRect(-6, -4, 12, 8);
         }
         
         ctx.restore();
@@ -1626,13 +1538,13 @@ document.addEventListener('DOMContentLoaded', function() {
         // Mise à jour des événements de fond
         backgroundEvents.forEach((event, index) => {
             if (event.type === 'rocket') {
-                event.y -= event.speed * speedFactor;
+                event.y -= event.speed;
             } else if (event.type === 'shootingStar') {
-                event.x += event.speed * 0.5 * speedFactor;
-                event.y += event.speed * speedFactor;
+                event.x += event.speed * 0.5;
+                event.y += event.speed;
             }
-            event.life -= speedFactor;
-            event.alpha = Math.max(0, event.alpha - 0.01 * speedFactor);
+            event.life--;
+            event.alpha = Math.max(0, event.alpha - 0.01);
             
             if (event.life <= 0 || event.y < -50 || event.y > canvas.height + 50 || event.x > canvas.width + 50) {
                 backgroundEvents.splice(index, 1);
@@ -1642,18 +1554,27 @@ document.addEventListener('DOMContentLoaded', function() {
         // Mise à jour des animations visuelles des bonus
         updatePowerUpVisualAnimations();
         
+        // Mise à jour des particules de score
+        updateScoreParticles();
+        
         // Mise à jour du boss
-        updateBoss(speedFactor);
+        updateBoss();
+        
+        // Mise à jour des statistiques
+        if (gameState.isPlaying && !gameState.isPaused) {
+            gameStats.timePlayed = Date.now() - gameStats.startTime;
+        }
         
         // Mise à jour des projectiles
+        const slowMultiplierBullets = activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime ? timeSlowMultiplier : 1.0;
         bullets.forEach((bullet, index) => {
             if (bullet.vx !== undefined || bullet.vy !== undefined) {
                 // Projectile avec direction personnalisée
-                bullet.y += (bullet.vy !== undefined ? bullet.vy : -bullet.speed) * speedFactor;
-                bullet.x += (bullet.vx || 0) * speedFactor;
+                bullet.y += (bullet.vy !== undefined ? bullet.vy : -bullet.speed) * slowMultiplierBullets;
+                bullet.x += (bullet.vx || 0) * slowMultiplierBullets;
             } else {
                 // Projectile standard (vers le haut)
-                bullet.y -= bullet.speed * speedFactor;
+                bullet.y -= bullet.speed * slowMultiplierBullets;
             }
             // Supprimer si hors écran (haut ou bas)
             if (bullet.y < 0 || bullet.y > canvas.height) {
@@ -1661,10 +1582,44 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
+        // Traînées de particules du vaisseau
+        if (gameState.isPlaying && !gameState.isPaused) {
+            shipTrail.push({
+                x: ship.x,
+                y: ship.y,
+                alpha: 0.6,
+                life: 10
+            });
+            // Limiter le nombre de particules de traînée
+            if (shipTrail.length > 15) {
+                shipTrail.shift();
+            }
+        }
+        
+        // Mise à jour des traînées
+        shipTrail.forEach((trail, index) => {
+            trail.alpha -= 0.04;
+            trail.life--;
+            if (trail.alpha <= 0 || trail.life <= 0) {
+                shipTrail.splice(index, 1);
+            }
+        });
+        
+        // Réduction du shake de l'écran
+        screenShake.intensity *= 0.9;
+        screenShake.x = (Math.random() - 0.5) * screenShake.intensity;
+        screenShake.y = (Math.random() - 0.5) * screenShake.intensity;
+        if (screenShake.intensity < 0.1) {
+            screenShake.intensity = 0;
+            screenShake.x = 0;
+            screenShake.y = 0;
+        }
+        
         // Mise à jour des astéroïdes
+        const slowMultiplier = activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime ? timeSlowMultiplier : 1.0;
         asteroids.forEach((asteroid, index) => {
-            asteroid.y += asteroid.speed * speedFactor;
-            asteroid.rotation += asteroid.rotationSpeed * speedFactor;
+            asteroid.y += asteroid.speed * slowMultiplier;
+            asteroid.rotation += asteroid.rotationSpeed * slowMultiplier;
             
             if (asteroid.y > canvas.height + 50) {
                 asteroids.splice(index, 1);
@@ -1685,11 +1640,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             try {
-                particle.x += (particle.vx || 0) * speedFactor;
-                particle.y += (particle.vy || 0) * speedFactor;
-                particle.vy = (particle.vy || 0) + 0.1 * speedFactor; // Gravité
-                particle.alpha = (particle.alpha || 1) - 0.02 * speedFactor;
-                particle.size = (particle.size || 1) - 0.1 * speedFactor;
+                particle.x += particle.vx || 0;
+                particle.y += particle.vy || 0;
+                particle.vy = (particle.vy || 0) + 0.1; // Gravité
+                particle.alpha = (particle.alpha || 1) - 0.02;
+                particle.size = (particle.size || 1) - 0.1;
                 
                 if (particle.alpha <= 0 || particle.size <= 0 || isNaN(particle.x) || isNaN(particle.y)) {
                     particles.splice(index, 1);
@@ -1702,10 +1657,20 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Mise à jour des boosts
         powerUps.forEach((powerUp, index) => {
-            // Ralentissement temporel : ralentit la chute des bonus
-            const timeSlowMultiplier = (activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime) ? 0.5 : 1.0;
-            powerUp.y += powerUp.speed * timeSlowMultiplier * speedFactor;
-            powerUp.rotation += 0.05 * speedFactor;
+            // Effet magnet : attirer les bonus vers le vaisseau
+            if (activePowerUps.magnet && Date.now() < activePowerUps.magnetEndTime) {
+                const dx = ship.x - powerUp.x;
+                const dy = ship.y - powerUp.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                const magnetForce = 0.3;
+                if (distance > 0) {
+                    powerUp.x += (dx / distance) * magnetForce * 5;
+                    powerUp.y += (dy / distance) * magnetForce * 5;
+                }
+            } else {
+                powerUp.y += powerUp.speed;
+            }
+            powerUp.rotation += 0.05;
             
             if (powerUp.y > canvas.height + 20) {
                 powerUps.splice(index, 1);
@@ -1746,6 +1711,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         if (activePowerUps.timeSlow && now > activePowerUps.timeSlowEndTime) {
             activePowerUps.timeSlow = false;
+            timeSlowMultiplier = 1.0;
         }
         if (activePowerUps.offensiveShield && now > activePowerUps.offensiveShieldEndTime) {
             activePowerUps.offensiveShield = false;
@@ -1770,27 +1736,17 @@ document.addEventListener('DOMContentLoaded', function() {
                     createEnhancedExplosion(asteroid.x, asteroid.y, asteroid.color, asteroid.size);
                     playSound('explosion');
                     
-                    // Statistiques
-                    gameStats.asteroidsDestroyed++;
-                    gameStats.shotsHit++;
-                    
                     // Score
                     // Ne pas ajouter de score si un boss est actif
                     if (!gameState.bossActive) {
                         const points = Math.floor(asteroid.size / 5) * 10;
                         gameState.score += points;
                         if (scoreElement) scoreElement.textContent = gameState.score;
-                        
-                        // Particule de score qui monte
-                        scoreParticles.push({
-                            x: asteroid.x,
-                            y: asteroid.y,
-                            text: `+${points}`,
-                            color: '#00ff00',
-                            size: 16,
-                            alpha: 1.0
-                        });
+                        // Particules de score
+                        createScoreParticle(asteroid.x, asteroid.y, `+${points}`);
                     }
+                    gameStats.asteroidsDestroyed++;
+                    gameStats.bulletsHit++;
                     
                     // Supprimer le projectile
                     bullets.splice(bulletIndex, 1);
@@ -1835,15 +1791,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     } else if (boostChance < 0.145) {
                         // 1.5% - Tir triple (fort impact, rare)
                         spawnPowerUp(asteroid.x, asteroid.y, 'tripleShot');
-                    } else if (boostChance < 0.16) {
-                        // 1.5% - Ralentissement temporel (fort impact, rare)
-                        spawnPowerUp(asteroid.x, asteroid.y, 'timeSlow');
-                    } else if (boostChance < 0.17) {
-                        // 1% - Bouclier offensif (très fort impact, très rare)
-                        spawnPowerUp(asteroid.x, asteroid.y, 'offensiveShield');
-                    } else if (boostChance < 0.19) {
-                        // 2% - Magnet (impact moyen)
-                        spawnPowerUp(asteroid.x, asteroid.y, 'magnet');
                     }
                     
                     // Supprimer l'astéroïde
@@ -1873,9 +1820,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Explosion
                     createEnhancedExplosion(ship.x, ship.y, ship.color, 30);
                     playSound('hit');
-                
-                // Effet de shake
-                screenShake.intensity = 10;
                 
                 // Perdre une vie
                 gameState.lives--;
@@ -2150,6 +2094,49 @@ document.addEventListener('DOMContentLoaded', function() {
             
             ctx.restore();
         });
+        
+        // Restaurer le contexte après le shake
+        ctx.restore();
+    }
+    
+    // Fonction pour créer des particules de score
+    let scoreParticles = [];
+    function createScoreParticle(x, y, scoreText) {
+        scoreParticles.push({
+            x: x,
+            y: y,
+            text: scoreText,
+            alpha: 1,
+            life: 60,
+            vy: -2
+        });
+    }
+    
+    // Mise à jour des particules de score
+    function updateScoreParticles() {
+        scoreParticles.forEach((particle, index) => {
+            particle.y += particle.vy;
+            particle.alpha -= 0.02;
+            particle.life--;
+            if (particle.alpha <= 0 || particle.life <= 0) {
+                scoreParticles.splice(index, 1);
+            }
+        });
+    }
+    
+    // Dessin des particules de score
+    function drawScoreParticles() {
+        scoreParticles.forEach(particle => {
+            ctx.save();
+            ctx.globalAlpha = particle.alpha;
+            ctx.fillStyle = '#ffff00';
+            ctx.font = 'bold 20px Anta';
+            ctx.textAlign = 'center';
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = '#ffff00';
+            ctx.fillText(particle.text, particle.x, particle.y);
+            ctx.restore();
+        });
     }
     
     // Met à jour les animations visuelles des bonus
@@ -2293,6 +2280,7 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (powerUp.type === 'timeSlow') {
             activePowerUps.timeSlow = true;
             activePowerUps.timeSlowEndTime = now + 12000; // 12 secondes
+            timeSlowMultiplier = 0.5; // Ralentit à 50% de la vitesse
             createPowerUpVisualAnimation('timeSlow', ship.x, ship.y);
         } else if (powerUp.type === 'offensiveShield') {
             activePowerUps.offensiveShield = true;
@@ -2304,7 +2292,6 @@ document.addEventListener('DOMContentLoaded', function() {
             createPowerUpVisualAnimation('magnet', ship.x, ship.y);
         }
         
-        // Statistiques
         gameStats.powerUpsCollected++;
         
         // Effet visuel de collecte (discret)
@@ -2346,19 +2333,21 @@ document.addEventListener('DOMContentLoaded', function() {
     // Calcule l'augmentation de vitesse de manière progressive
     // Élevée au début (peu d'impact car vitesse faible) puis diminue (beaucoup d'impact car vitesse élevée)
     function getSpeedIncrease(level) {
-        // Augmentation progressive et équilibrée
-        // Niveau 1 : très faible augmentation (0.1) pour éviter que le jeu soit trop rapide au début
-        // Puis augmentation progressive mais contrôlée
+        // Augmentation élevée au début, puis diminue progressivement
+        // Niveau 1-30 : 0.3 → 0.2 (élevée au début)
+        // Niveau 31-60 : 0.2 → 0.15 (diminue)
+        // Niveau 61-90 : 0.15 → 0.1 (diminue encore)
+        // Niveau 91+ : 0.1 → 0.05 (minimum, très faible car impact élevé)
         
         if (level <= 30) {
-            // Niveaux 1-30 : de 0.1 à 0.15 (très progressive au début)
-            return 0.1 + ((level - 1) / 30) * 0.05;
+            // Niveaux 1-30 : de 0.3 à 0.2 (élevée au début car vitesse faible)
+            return 0.3 - ((level - 1) / 30) * 0.1;
         } else if (level <= 60) {
-            // Niveaux 31-60 : de 0.15 à 0.12 (diminue car vitesse augmente)
-            return 0.15 - ((level - 31) / 30) * 0.03;
+            // Niveaux 31-60 : de 0.2 à 0.15 (diminue car vitesse augmente)
+            return 0.2 - ((level - 31) / 30) * 0.05;
         } else if (level <= 90) {
-            // Niveaux 61-90 : de 0.12 à 0.1 (diminue encore)
-            return 0.12 - ((level - 61) / 30) * 0.02;
+            // Niveaux 61-90 : de 0.15 à 0.1 (diminue encore)
+            return 0.15 - ((level - 61) / 30) * 0.05;
         } else {
             // Niveaux 91+ : de 0.1 à 0.05 (minimum, très faible car impact élevé)
             const extraLevels = level - 91;
@@ -2479,32 +2468,18 @@ document.addEventListener('DOMContentLoaded', function() {
             patternPhase: 0, // Phase actuelle du pattern
             vy: 0, // Vitesse verticale pour certains patterns
             targetX: canvas.width / 2, // Position cible pour certains patterns
-            targetY: 100,
-            phaseChanged: false // Pour les phases à mi-vie
+            targetY: 100
         };
         
-        // Charger l'image du boss si disponible
-        // Les images par défaut sont chargées au démarrage dans bossPhotos
-        // Si une image uploadée existe, elle prend priorité
-        // Essayer plusieurs fois avec des délais croissants pour le chargement asynchrone
-        let attempts = 0;
-        const maxAttempts = 10;
-        const checkImage = () => {
-            attempts++;
-            if (bossPhotos[bossNumber] && bossPhotos[bossNumber].complete && bossPhotos[bossNumber].naturalWidth > 0) {
-                boss.image = bossPhotos[bossNumber];
-                console.log(`✅ Image boss ${bossNumber} assignée après ${attempts} tentative(s)`);
-                return true;
-            }
-            if (attempts < maxAttempts) {
-                setTimeout(checkImage, 100 * attempts); // Délai croissant : 100ms, 200ms, 300ms...
-            } else {
-                boss.image = null;
-                console.log(`ℹ️ Boss ${bossNumber} sans image après ${maxAttempts} tentatives - forme par défaut utilisée`);
-            }
-            return false;
-        };
-        checkImage();
+        // Charger l'image du boss si disponible (mais ne pas bloquer si elle n'est pas là)
+        if (bossPhotos[bossNumber] && bossPhotos[bossNumber].complete && bossPhotos[bossNumber].naturalWidth > 0) {
+            boss.image = bossPhotos[bossNumber];
+            console.log(`✅ Image boss ${bossNumber} assignée et chargée`);
+        } else {
+            // Pas d'image ou image non chargée - le boss s'affichera avec la forme par défaut
+            boss.image = null;
+            console.log(`ℹ️ Boss ${bossNumber} sans image - forme par défaut utilisée`);
+        }
         
         gameState.bossActive = true;
         
@@ -2777,7 +2752,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Met à jour le boss
-    function updateBoss(speedFactor = 1) {
+    function updateBoss() {
         if (!boss || !gameState.bossActive) return;
         
         // Le boss continue de bouger même si le jeu est en pause (pour éviter les bugs)
@@ -2795,10 +2770,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (typeof boss.patternTime !== 'number') {
             boss.patternTime = 0;
         }
-        boss.patternTime += 16 * speedFactor; // Ajusté selon le delta time
+        boss.patternTime += 16; // ~60fps
         
         // Appliquer le pattern de mouvement selon le numéro du boss
-        updateBossMovement(speedFactor);
+        updateBossMovement();
         
         // Tir du boss
         if (now - boss.lastShot > boss.shootInterval) {
@@ -2806,33 +2781,26 @@ document.addEventListener('DOMContentLoaded', function() {
             boss.lastShot = now;
         }
         
-        // Mise à jour des projectiles du boss (avec ralentissement temporel)
-        const timeSlowMultiplier = (activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime) ? 0.5 : 1.0;
+        // Mise à jour des projectiles du boss (ralentissement temporel)
+        const slowMultiplierBossBullets = activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime ? timeSlowMultiplier : 1.0;
         bossBullets.forEach((bullet, index) => {
-            // Vérifier si le projectile est renvoyé (bouclier offensif)
-            if (bullet.color === '#00ff00' && boss && gameState.bossActive) {
-                // Projectile renvoyé : collision avec le boss
-                const bossDx = bullet.x - boss.x;
-                const bossDy = bullet.y - boss.y;
-                const bossDist = Math.sqrt(bossDx * bossDx + bossDy * bossDy);
-                if (bossDist < boss.size + 5) {
-                    boss.health--;
-                    playSound('bossHit');
-                    bossBullets.splice(index, 1);
-                    updateHealthBars();
-                    const healthPercent = boss.health / boss.maxHealth;
-                    boss.size = boss.maxSize * (0.5 + healthPercent * 0.5);
-                    return;
-                }
-            }
-            bullet.y += (bullet.vy !== undefined ? bullet.vy : bullet.speed) * timeSlowMultiplier;
-            bullet.x += (bullet.vx || 0) * timeSlowMultiplier;
+            bullet.y += (bullet.vy !== undefined ? bullet.vy : bullet.speed) * slowMultiplierBossBullets;
+            bullet.x += (bullet.vx || 0) * slowMultiplierBossBullets;
             
             // Supprimer si hors écran
             if (bullet.y > canvas.height + 20 || bullet.y < -20 || bullet.x < -20 || bullet.x > canvas.width + 20) {
                 bossBullets.splice(index, 1);
             }
         });
+        
+        // Vérifier les phases des boss (changement de pattern à mi-vie)
+        if (boss && !boss.phaseChanged && boss.health <= boss.maxHealth / 2) {
+            boss.phaseChanged = true;
+            boss.phase = 2; // Phase 2 activée
+            // Augmenter la vitesse de tir et changer le pattern
+            boss.shootInterval = Math.max(300, boss.shootInterval * 0.7);
+            console.log(`Boss ${boss.bossNumber} entre en phase 2 !`);
+        }
         
         // Collision projectiles du joueur / boss
         if (boss && gameState.bossActive) {
@@ -2855,9 +2823,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     boss.size = boss.maxSize * (0.5 + healthPercent * 0.5); // Entre 50% et 100% de la taille
                     
                     if (boss.health <= 0) {
-                        // Statistiques
-                        gameStats.bossesDefeated++;
-                        
                         // Sauvegarder le numéro du boss pour le score
                         const defeatedBossNumber = boss.bossNumber;
                         
@@ -2937,23 +2902,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
                 if (distance < bullet.size + shipSize) {
-                    // Bouclier offensif : renvoie les projectiles vers le boss
                     if (activePowerUps.offensiveShield && Date.now() < activePowerUps.offensiveShieldEndTime) {
-                        playSound('hit');
-                        // Inverser la direction du projectile vers le boss
-                        if (boss && gameState.bossActive) {
-                            const bossDx = boss.x - bullet.x;
-                            const bossDy = boss.y - bullet.y;
-                            const bossDist = Math.sqrt(bossDx * bossDx + bossDy * bossDy);
-                            if (bossDist > 0) {
-                                bullet.vx = (bossDx / bossDist) * 4;
-                                bullet.vy = (bossDy / bossDist) * 4;
-                                bullet.speed = 0; // Utiliser vx/vy au lieu de speed
-                                bullet.color = '#00ff00'; // Vert pour indiquer qu'il est renvoyé
-                            }
-                        } else {
-                            bossBullets.splice(index, 1);
+                        // Bouclier offensif : renvoie le projectile vers le boss
+                        const bossDx = boss ? boss.x - bullet.x : 0;
+                        const bossDy = boss ? boss.y - bullet.y : 0;
+                        const bossDist = Math.sqrt(bossDx * bossDx + bossDy * bossDy);
+                        if (bossDist > 0 && boss) {
+                            // Transformer le projectile en projectile du joueur
+                            bullets.push({
+                                x: bullet.x,
+                                y: bullet.y,
+                                speed: 8,
+                                vx: (bossDx / bossDist) * 3,
+                                vy: (bossDy / bossDist) * 3,
+                                size: bullet.size,
+                                color: '#00ffff'
+                            });
                         }
+                        playSound('hit');
+                        bossBullets.splice(index, 1);
+                        createSmallExplosion(bullet.x, bullet.y, '#00ffff');
                     } else if (activePowerUps.shield && Date.now() < activePowerUps.shieldEndTime) {
                         playSound('hit');
                         bossBullets.splice(index, 1);
@@ -2993,9 +2961,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     createEnhancedExplosion(ship.x, ship.y, ship.color, 30);
                     playSound('hit');
                     
-                    // Effet de shake
-                    screenShake.intensity = 10;
-                    
                     gameState.lives--;
                     if (livesElement) livesElement.textContent = gameState.lives;
                     updateHealthBars();
@@ -3015,7 +2980,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Met à jour le mouvement du boss selon son pattern
-    function updateBossMovement(speedFactor = 1) {
+    function updateBossMovement() {
         if (!boss || !gameState.bossActive) return;
         
         const pattern = getBossPattern(boss.pattern);
@@ -3024,7 +2989,7 @@ document.addEventListener('DOMContentLoaded', function() {
         switch(pattern.type) {
             case 'horizontal':
                 // Boss 1 : Mouvement horizontal simple
-                boss.x += boss.speed * boss.direction * speedFactor;
+                boss.x += boss.speed * boss.direction;
                 if (boss.x <= boss.size || boss.x >= canvas.width - boss.size) {
                     boss.direction *= -1;
                 }
@@ -3032,7 +2997,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
             case 'zigzag':
                 // Boss 2 : Zigzag
-                boss.x += boss.speed * boss.direction * speedFactor;
+                boss.x += boss.speed * boss.direction;
                 boss.y = 100 + Math.sin(time * 2) * 30;
                 if (boss.x <= boss.size || boss.x >= canvas.width - boss.size) {
                     boss.direction *= -1;
@@ -3052,14 +3017,14 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Phase de charge
                     boss.targetX = ship.x;
                     const dx = boss.targetX - boss.x;
-                    boss.x += Math.sign(dx) * boss.speed * 1.5 * speedFactor;
+                    boss.x += Math.sign(dx) * boss.speed * 1.5;
                     if (Math.abs(dx) < 10) {
                         boss.patternPhase = 1;
                         boss.patternTime = 0;
                     }
                 } else {
                     // Phase de recul
-                    boss.x += (canvas.width / 2 - boss.x) * 0.1 * speedFactor;
+                    boss.x += (canvas.width / 2 - boss.x) * 0.1;
                     if (Math.abs(boss.x - canvas.width / 2) < 5) {
                         boss.patternPhase = 0;
                         boss.patternTime = 0;
@@ -3069,7 +3034,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
             case 'teleport':
                 // Boss 5 : Téléportation aléatoire
-                if (boss.patternTime % 2000 < 16 * speedFactor) {
+                if (boss.patternTime % 2000 < 16) {
                     boss.x = Math.random() * (canvas.width - boss.size * 2) + boss.size;
                     boss.y = 50 + Math.random() * 100;
                 }
@@ -3086,7 +3051,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Boss 7 : Suit le joueur agressivement
                 const targetX = ship.x;
                 const diffX = targetX - boss.x;
-                boss.x += Math.sign(diffX) * Math.min(Math.abs(diffX) * 0.1, boss.speed) * speedFactor;
+                boss.x += Math.sign(diffX) * Math.min(Math.abs(diffX) * 0.1, boss.speed);
                 boss.y = 80 + Math.sin(time * 3) * 20;
                 break;
                 
@@ -3314,6 +3279,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function shoot() {
+        gameStats.bulletsFired++;
         if (!gameState.isPlaying || gameState.isPaused) return;
         
         // Vérifie le cooldown de tir
@@ -3361,9 +3327,6 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        // Statistiques
-        gameStats.shotsFired += activePowerUps.tripleShot && Date.now() < activePowerUps.tripleShotEndTime ? 3 : 1;
-        
         playSound('shoot');
     }
     
@@ -3408,31 +3371,22 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Mouvement du vaisseau
-    function handleMovement(speedFactor = 1) {
+    function handleMovement() {
         if (!gameState.isPlaying || gameState.isPaused) return;
         
         const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
         if (keys['ArrowLeft'] || keys['KeyA']) {
-            ship.x = Math.max(shipSize, ship.x - ship.speed * speedFactor);
+            ship.x = Math.max(shipSize, ship.x - ship.speed);
         }
         if (keys['ArrowRight'] || keys['KeyD']) {
-            ship.x = Math.min(canvas.width - shipSize, ship.x + ship.speed * speedFactor);
+            ship.x = Math.min(canvas.width - shipSize, ship.x + ship.speed);
         }
     }
     
     // Boucle de jeu
-    function gameLoop(currentTime) {
-        // Calculer le delta time pour vitesse constante
-        const deltaTime = currentTime - lastFrameTime;
-        lastFrameTime = currentTime;
-        
-        // Normaliser pour 60fps (facteur de vitesse)
-        // Si on tourne à 30fps, deltaTime sera ~33ms, donc factor = 33/16.67 = ~2
-        // Si on tourne à 60fps, deltaTime sera ~16.67ms, donc factor = 1
-        const speedFactor = Math.min(deltaTime / FRAME_TIME, 2.0); // Limiter à 2x pour éviter les sauts
-        
-        handleMovement(speedFactor);
-        update(speedFactor);
+    function gameLoop() {
+        handleMovement();
+        update();
         draw();
         updateHealthBars(); // Mise à jour des barres de vie
         
@@ -3454,38 +3408,13 @@ document.addEventListener('DOMContentLoaded', function() {
             gameState.gameMode = gameModeSelect.value;
         }
         
-        // Réinitialiser les statistiques
-        gameStats = {
-            asteroidsDestroyed: 0,
-            bossesDefeated: 0,
-            powerUpsCollected: 0,
-            shotsFired: 0,
-            shotsHit: 0,
-            startTime: Date.now(),
-            endTime: 0
-        };
-        
-        console.log('🎮 Statistiques réinitialisées:', gameStats);
-        
-        // SUPPRIMER TOUTES LES IMAGES UPLOADÉES PAR L'UTILISATEUR (y compris job_application)
-        bossPhotos = {};
-        
-        // S'ASSURER QUE LA VITESSE EST RÉINITIALISÉE À 2 (vitesse de base)
-        // Important pour éviter que les nouveaux joueurs aient une vitesse trop élevée
-        gameState.gameSpeed = 2;
-        gameState.level = 1;
-        
-        console.log('🎮 Vitesse réinitialisée:', gameState.gameSpeed, 'Niveau:', gameState.level);
-        
         init();
         gameState.isPlaying = true;
         gameState.isPaused = false;
-        // Réinitialiser le delta time au démarrage
-        lastFrameTime = performance.now();
         if (gameOver) gameOver.classList.add('hidden');
         if (startScreen) startScreen.classList.add('hidden');
         if (startBtn) startBtn.textContent = 'Pause';
-        gameLoop(performance.now());
+        gameLoop();
     }
     
     function pauseGame() {
@@ -3498,7 +3427,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function endGame() {
         gameState.isPlaying = false;
-        gameStats.endTime = Date.now();
         
         // Sauvegarde du meilleur score
         if (gameState.score > gameState.highScore) {
@@ -3509,55 +3437,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (finalScore) finalScore.textContent = gameState.score;
         if (finalLevel) finalLevel.textContent = gameState.level;
-        
-        // Afficher les statistiques
-        const statAsteroids = document.getElementById('stat-asteroids');
-        const statBosses = document.getElementById('stat-bosses');
-        const statPowerups = document.getElementById('stat-powerups');
-        const statAccuracy = document.getElementById('stat-accuracy');
-        const statTime = document.getElementById('stat-time');
-        const gameStatsContainer = document.getElementById('game-stats');
-        
-        // S'assurer que le conteneur des stats est visible
-        if (gameStatsContainer) {
-            gameStatsContainer.style.display = 'block';
-            console.log('📊 Conteneur stats trouvé et affiché');
-        } else {
-            console.warn('⚠️ Conteneur game-stats non trouvé');
-        }
-        
-        if (statAsteroids) {
-            statAsteroids.textContent = gameStats.asteroidsDestroyed || 0;
-            console.log('📊 Astéroïdes détruits:', gameStats.asteroidsDestroyed);
-        }
-        if (statBosses) {
-            statBosses.textContent = gameStats.bossesDefeated || 0;
-            console.log('📊 Boss vaincus:', gameStats.bossesDefeated);
-        }
-        if (statPowerups) {
-            statPowerups.textContent = gameStats.powerUpsCollected || 0;
-            console.log('📊 Bonus collectés:', gameStats.powerUpsCollected);
-        }
-        
-        // Calculer la précision
-        const accuracy = gameStats.shotsFired > 0 
-            ? Math.round((gameStats.shotsHit / gameStats.shotsFired) * 100) 
-            : 0;
-        if (statAccuracy) {
-            statAccuracy.textContent = accuracy + '%';
-            console.log('📊 Précision:', accuracy + '%', `(${gameStats.shotsHit}/${gameStats.shotsFired})`);
-        }
-        
-        // Calculer le temps de jeu
-        const gameTime = gameStats.startTime > 0 
-            ? Math.round((gameStats.endTime - gameStats.startTime) / 1000) 
-            : 0;
-        if (statTime) {
-            statTime.textContent = gameTime + 's';
-            console.log('📊 Temps de jeu:', gameTime + 's');
-        }
-        
-        console.log('📊 Toutes les statistiques affichées');
         
         // Message humoristique si le score est inférieur à 500
         if (scoreMessage) {
@@ -3577,7 +3456,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (gameOver) gameOver.classList.remove('hidden');
-        if (startBtn) startBtn.textContent = 'Commencer';
+        startBtn.textContent = 'Commencer';
         
         // Vérifier si le score peut être enregistré dans le leaderboard
         // Utilisation du leaderboard local
@@ -3627,14 +3506,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const bossNum = parseInt(e.target.dataset.bossNum);
             
             if (file && file.type.startsWith('image/')) {
-                // Vérifier que le nom du fichier ne contient pas "job" ou "application"
-                const fileName = file.name.toLowerCase();
-                if (fileName.includes('job') || fileName.includes('application')) {
-                    alert('Cette image n\'est pas autorisée. Veuillez choisir une autre image.');
-                    e.target.value = ''; // Réinitialiser l'input
-                    return;
-                }
-                
                 const reader = new FileReader();
                 reader.onload = (event) => {
                     const img = new Image();
