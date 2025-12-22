@@ -2457,12 +2457,14 @@ document.addEventListener('DOMContentLoaded', function() {
             phaseChanged: false // Pour les phases à mi-vie
         };
         
-        // Charger l'image du boss si disponible (mais ne pas bloquer si elle n'est pas là)
+        // Charger l'image du boss si disponible
+        // Les images par défaut sont chargées au démarrage dans bossPhotos
+        // Si une image uploadée existe, elle prend priorité
         if (bossPhotos[bossNumber] && bossPhotos[bossNumber].complete && bossPhotos[bossNumber].naturalWidth > 0) {
             boss.image = bossPhotos[bossNumber];
-            console.log(`✅ Image boss ${bossNumber} assignée et chargée`);
+            console.log(`✅ Image boss ${bossNumber} assignée: ${bossPhotos[bossNumber].src ? 'uploadée' : 'par défaut'}`);
         } else {
-            // Pas d'image ou image non chargée - le boss s'affichera avec la forme par défaut
+            // Pas d'image disponible - le boss s'affichera avec la forme par défaut
             boss.image = null;
             console.log(`ℹ️ Boss ${bossNumber} sans image - forme par défaut utilisée`);
         }
@@ -3454,20 +3456,48 @@ document.addEventListener('DOMContentLoaded', function() {
         const statPowerups = document.getElementById('stat-powerups');
         const statAccuracy = document.getElementById('stat-accuracy');
         const statTime = document.getElementById('stat-time');
+        const gameStatsContainer = document.getElementById('game-stats');
         
-        if (statAsteroids) statAsteroids.textContent = gameStats.asteroidsDestroyed;
-        if (statBosses) statBosses.textContent = gameStats.bossesDefeated;
-        if (statPowerups) statPowerups.textContent = gameStats.powerUpsCollected;
+        // S'assurer que le conteneur des stats est visible
+        if (gameStatsContainer) {
+            gameStatsContainer.style.display = 'block';
+            console.log('📊 Conteneur stats trouvé et affiché');
+        } else {
+            console.warn('⚠️ Conteneur game-stats non trouvé');
+        }
+        
+        if (statAsteroids) {
+            statAsteroids.textContent = gameStats.asteroidsDestroyed || 0;
+            console.log('📊 Astéroïdes détruits:', gameStats.asteroidsDestroyed);
+        }
+        if (statBosses) {
+            statBosses.textContent = gameStats.bossesDefeated || 0;
+            console.log('📊 Boss vaincus:', gameStats.bossesDefeated);
+        }
+        if (statPowerups) {
+            statPowerups.textContent = gameStats.powerUpsCollected || 0;
+            console.log('📊 Bonus collectés:', gameStats.powerUpsCollected);
+        }
         
         // Calculer la précision
         const accuracy = gameStats.shotsFired > 0 
             ? Math.round((gameStats.shotsHit / gameStats.shotsFired) * 100) 
             : 0;
-        if (statAccuracy) statAccuracy.textContent = accuracy + '%';
+        if (statAccuracy) {
+            statAccuracy.textContent = accuracy + '%';
+            console.log('📊 Précision:', accuracy + '%', `(${gameStats.shotsHit}/${gameStats.shotsFired})`);
+        }
         
         // Calculer le temps de jeu
-        const gameTime = Math.round((gameStats.endTime - gameStats.startTime) / 1000);
-        if (statTime) statTime.textContent = gameTime + 's';
+        const gameTime = gameStats.startTime > 0 
+            ? Math.round((gameStats.endTime - gameStats.startTime) / 1000) 
+            : 0;
+        if (statTime) {
+            statTime.textContent = gameTime + 's';
+            console.log('📊 Temps de jeu:', gameTime + 's');
+        }
+        
+        console.log('📊 Toutes les statistiques affichées');
         
         // Message humoristique si le score est inférieur à 500
         if (scoreMessage) {
