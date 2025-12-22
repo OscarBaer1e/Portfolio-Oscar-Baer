@@ -2600,6 +2600,8 @@ document.addEventListener('DOMContentLoaded', function() {
             pattern: bossNumber,
             patternTime: 0, // Temps écoulé pour le pattern
             patternPhase: 0, // Phase actuelle du pattern
+            phase: 1, // Phase du boss (1 = normale, 2 = enragée)
+            phaseChanged: false, // Indique si la phase 2 a été activée
             vy: 0, // Vitesse verticale pour certains patterns
             targetX: canvas.width / 2, // Position cible pour certains patterns
             targetY: 100
@@ -2966,14 +2968,19 @@ document.addEventListener('DOMContentLoaded', function() {
                         const targetScore = targetLevel * 500;
                         
                         // Donner juste assez de points pour passer au niveau suivant
+                        let bossPoints = 0;
                         if (gameState.score < targetScore) {
+                            bossPoints = targetScore - gameState.score;
                             gameState.score = targetScore;
                         } else {
                             // Si on a déjà assez de points, ajouter juste un peu pour le boss
-                            gameState.score += defeatedBossNumber * 100;
+                            bossPoints = defeatedBossNumber * 100;
+                            gameState.score += bossPoints;
                         }
                         
                         if (scoreElement) scoreElement.textContent = gameState.score;
+                        // Particules de score pour la défaite du boss
+                        createScoreParticle(boss.x, boss.y, `+${bossPoints}`);
                         
                         // Nettoyer le boss IMMÉDIATEMENT pour éviter les accès après
                         boss = null;
