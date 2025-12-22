@@ -1712,6 +1712,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Mise à jour des boosts
+        const slowMultiplierPowerUps = activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime ? timeSlowMultiplier : 1.0;
         powerUps.forEach((powerUp, index) => {
             // Effet magnet : attirer les bonus vers le vaisseau
             if (activePowerUps.magnet && Date.now() < activePowerUps.magnetEndTime) {
@@ -1720,13 +1721,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 const magnetForce = 0.3;
                 if (distance > 0) {
-                    powerUp.x += (dx / distance) * magnetForce * 5;
-                    powerUp.y += (dy / distance) * magnetForce * 5;
+                    powerUp.x += (dx / distance) * magnetForce * 5 * slowMultiplierPowerUps;
+                    powerUp.y += (dy / distance) * magnetForce * 5 * slowMultiplierPowerUps;
                 }
             } else {
-                powerUp.y += powerUp.speed;
+                powerUp.y += (powerUp.speed || 2) * slowMultiplierPowerUps;
             }
-            powerUp.rotation += 0.05;
+            powerUp.rotation += 0.05 * slowMultiplierPowerUps;
             
             if (powerUp.y > canvas.height + 20) {
                 powerUps.splice(index, 1);
