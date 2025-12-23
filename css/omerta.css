@@ -140,6 +140,13 @@
     border-radius: 8px;
     animation: noteFloat 4s ease-in-out infinite;
     animation-delay: calc(var(--note-index, 0) * 0.2s);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.image-note {
+    min-height: 300px;
 }
 
 @keyframes noteFloat {
@@ -318,14 +325,17 @@
 .media-image {
     width: 100%;
     height: auto;
-    max-height: 250px;
-    object-fit: cover;
+    max-height: 400px;
+    min-height: 200px;
+    object-fit: contain;
     border-radius: 5px;
     border: 1px solid rgba(255, 0, 0, 0.3);
     display: block;
     box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
     position: relative;
     z-index: 1;
+    background: rgba(0, 0, 0, 0.3);
+    margin: 0 auto;
 }
 
 .return-note .btn {
