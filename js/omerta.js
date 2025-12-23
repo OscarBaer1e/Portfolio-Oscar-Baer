@@ -22,12 +22,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const baseX = col * zoneWidth;
         const baseY = row * zoneHeight;
         
-        // Ajouter un peu d'aléatoire dans la zone (30% de la zone)
-        const randomX = (Math.random() - 0.5) * zoneWidth * 0.3;
-        const randomY = (Math.random() - 0.5) * zoneHeight * 0.3;
+        // Ajouter un peu d'aléatoire dans la zone (70% de la zone pour plus d'espacement)
+        const randomX = (Math.random() - 0.5) * zoneWidth * 0.7;
+        const randomY = (Math.random() - 0.5) * zoneHeight * 0.7;
         
-        // Rotation aléatoire entre -8 et 8 degrés
-        const rotation = (Math.random() - 0.5) * 16;
+        // Rotation aléatoire entre -12 et 12 degrés (plus de rotation)
+        const rotation = (Math.random() - 0.5) * 24;
         
         return {
             left: Math.max(20, Math.min(containerWidth - 320, baseX + randomX)),
@@ -70,6 +70,31 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Positionner les notes au chargement
     positionNotes();
+    
+    // Bouton pour réorganiser les notes
+    const shuffleBtn = document.getElementById('shuffle-notes-btn');
+    if (shuffleBtn) {
+        shuffleBtn.addEventListener('click', function() {
+            // Mélanger l'ordre des notes pour un nouveau positionnement
+            const notesArray = Array.from(notes);
+            for (let i = notesArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [notesArray[i], notesArray[j]] = [notesArray[j], notesArray[i]];
+            }
+            
+            // Réappliquer l'ordre mélangé au DOM
+            notesArray.forEach(note => grid.appendChild(note));
+            
+            // Repositionner avec le nouvel ordre
+            positionNotes();
+            
+            // Animation du bouton
+            shuffleBtn.style.transform = 'rotate(360deg)';
+            setTimeout(() => {
+                shuffleBtn.style.transform = '';
+            }, 500);
+        });
+    }
     
     // Repositionner lors du redimensionnement de la fenêtre
     let resizeTimeout;
