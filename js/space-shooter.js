@@ -765,6 +765,19 @@ document.addEventListener('DOMContentLoaded', function() {
         return score > lastScore;
     }
     
+    function sanitizePlayerName(rawName) {
+        const base = (rawName || '').toString().trim();
+        // Autoriser uniquement lettres/chiffres/espace/underscore/tiret, et limiter la longueur
+        const cleaned = base.replace(/[^a-zA-Z0-9 _-]/g, '').substring(0, 20).trim();
+        return cleaned || 'Anonyme';
+    }
+    
+    function sanitizeNumeric(value, defaultValue = 0) {
+        const num = Number(value);
+        if (!Number.isFinite(num) || num < 0) return defaultValue;
+        return Math.floor(num);
+    }
+    
     async function registerScore(name, score, level) {
         // Vérification locale : le score doit dépasser le dernier du top 10
         
@@ -773,11 +786,15 @@ document.addEventListener('DOMContentLoaded', function() {
             throw new Error('Le score n\'est pas assez élevé pour entrer dans le top 10');
         }
         
+        const safeName = sanitizePlayerName(name);
+        const safeScore = sanitizeNumeric(score, 0);
+        const safeLevel = sanitizeNumeric(level, 1);
+        
         // Ajouter le score au leaderboard local
         leaderboard.push({ 
-            name: name.substring(0, 20), 
-            score: score, 
-            level: level, 
+            name: safeName, 
+            score: safeScore, 
+            level: safeLevel, 
             date: new Date().toISOString() 
         });
         leaderboard.sort((a, b) => b.score - a.score);

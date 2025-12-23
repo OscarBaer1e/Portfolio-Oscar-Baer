@@ -88,9 +88,9 @@ async function loadLeaderboardFromSupabase() {
         const leaderboardData = data.map(entry => {
             const formatted = {
                 id: entry.id,
-                name: entry.name || 'Anonyme',
-                score: Number(entry.score) || 0,
-                level: Number(entry.level) || 1,
+                name: sanitizePlayerName(entry.name),
+                score: sanitizeNumeric(entry.score, 0),
+                level: sanitizeNumeric(entry.level, 1),
                 date: entry.created_at || entry.date || new Date().toISOString()
             };
             console.log('📝 Entrée formatée:', formatted);
@@ -206,7 +206,20 @@ async function cleanupOldScores(supabase) {
     }
 }
 
-// Fonction pour sauvegarder un score dans Supabase
+function sanitizePlayerName(rawName) {
+    const base = (rawName || '').toString().trim();
+    // Autoriser uniquement lettres/chiffres/espace/underscore/tiret, et limiter la longueur
+    const cleaned = base.replace(/[^a-zA-Z0-9 _-]/g, '').substring(0, 20).trim();
+    return cleaned || 'Anonyme';
+}
+
+function sanitizeNumeric(value, defaultValue = 0) {
+    const num = Number(value);
+    if (!Number.isFinite(num) || num < 0) return defaultValue;
+    return Math.floor(num);
+}
+
+// Fonction pour sauvegarder un score dans Supabase (avec sanitisation stricte)
 async function saveScoreToSupabase(name, score, level) {
     const supabase = initSupabase();
     
@@ -215,6 +228,10 @@ async function saveScoreToSupabase(name, score, level) {
         return false;
     }
     
+    const safeName = sanitizePlayerName(name);
+    const safeScore = sanitizeNumeric(score, 0);
+    const safeLevel = sanitizeNumeric(level, 1);
+    
     try {
         console.log('💾 ============================================');
         console.log('💾 SAUVEGARDE DU SCORE DANS SUPABASE');
@@ -222,15 +239,15 @@ async function saveScoreToSupabase(name, score, level) {
         console.log('🔗 URL:', window.supabaseClient?.supabaseUrl || 'Non disponible');
         console.log('🔑 Client Supabase:', window.supabaseClient ? '✅ Disponible' : '❌ Non disponible');
         console.log('📝 Données à enregistrer:', { 
-            name: name.substring(0, 20), 
-            score: Number(score), 
-            level: Number(level) 
+            name: safeName, 
+            score: safeScore, 
+            level: safeLevel 
         });
         
         const scoreData = {
-            name: name.substring(0, 20).trim(),
-            score: Number(score),
-            level: Number(level)
+            name: safeName,
+            score: safeScore,
+            level: safeLevel
         };
         
         console.log('📦 Données formatées:', scoreData);
