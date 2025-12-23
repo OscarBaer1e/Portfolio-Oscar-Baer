@@ -117,11 +117,12 @@
 /* Grille pour éviter les superpositions */
 .sticky-notes-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(280px, max-content));
     gap: 40px;
     padding: 20px 0;
     position: relative;
     z-index: 1;
+    align-items: start;
 }
 
 /* Post-it avec animations */
@@ -129,7 +130,9 @@
     position: relative;
     padding: 20px;
     min-width: 280px;
+    width: fit-content;
     max-width: 100%;
+    height: auto;
     box-shadow: 
         0 4px 15px rgba(255, 0, 0, 0.3),
         0 0 0 1px rgba(255, 0, 0, 0.2),
@@ -142,16 +145,16 @@
     animation-delay: calc(var(--note-index, 0) * 0.2s);
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: visible;
 }
 
 .image-note {
     min-height: auto;
     max-height: none;
     height: auto;
-    width: auto;
+    width: fit-content;
     min-width: 280px;
-    max-width: 500px;
+    max-width: 600px;
 }
 
 .image-note .note-header {
@@ -191,6 +194,8 @@
     border: 2px solid rgba(255, 0, 0, 0.4);
     border-left: 5px solid #ff3333;
     --note-rotation: -2deg;
+    width: fit-content;
+    max-width: 600px;
 }
 
 .video-note::before {
@@ -210,6 +215,8 @@
     border: 2px solid rgba(255, 0, 0, 0.4);
     border-left: 5px solid #ff6666;
     --note-rotation: 2deg;
+    width: fit-content;
+    max-width: 400px;
 }
 
 .audio-note::before {
