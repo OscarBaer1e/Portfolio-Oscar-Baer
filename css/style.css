@@ -344,6 +344,9 @@ main, header, footer {
 main {
     flex: 1 0 auto;
     min-height: 0;
+    background-color: transparent;
+    position: relative;
+    z-index: 1;
 }
 
 footer {
@@ -1155,7 +1158,9 @@ nav .nav-list a.active::after {
 
 /* 7. ABOUT SECTION (Module d'Information) */
 #about {
-    background-color: var(--dark-bg-color);
+    background-color: transparent;
+    position: relative;
+    z-index: 1;
 }
 
 .about-content {
