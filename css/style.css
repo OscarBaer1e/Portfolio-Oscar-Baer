@@ -66,7 +66,7 @@ body {
     left: 0;
     width: 100%;
     min-height: 100vh;
-    height: 100%;
+    height: auto;
     z-index: 0;
     pointer-events: none;
     overflow: hidden;
@@ -76,6 +76,16 @@ body {
 html {
     height: auto;
     min-height: 100%;
+}
+
+/* Le background doit suivre la hauteur du body */
+body {
+    min-height: 100vh;
+}
+
+.animated-background {
+    bottom: 0;
+    height: 100%;
 }
 
 /* Grille animée - LÉGÈREMENT RÉDUITE */
