@@ -35,17 +35,20 @@
     box-sizing: border-box;
 }
 
-html { 
+html {
     scroll-behavior: smooth;
     height: 100%;
 }
 
 body {
     font-family: 'Open Sans', sans-serif;
-    line-height: 1.6; 
+    line-height: 1.6;
     color: var(--light-text-color);
-    background-color: var(--dark-bg-color); 
+    background-color: var(--dark-bg-color);
     overflow-x: hidden;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
     font-size: 1.05rem; 
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -331,6 +334,15 @@ body {
 main, header, footer {
     position: relative;
     z-index: 1;
+}
+
+main {
+    flex: 1 0 auto;
+    min-height: 0;
+}
+
+footer {
+    flex-shrink: 0;
 }
 
 h1, h2, h3, h4, h5, h6 {
