@@ -148,15 +148,23 @@
 .image-note {
     min-height: auto;
     max-height: none;
+    height: auto;
+    width: auto;
+    min-width: 280px;
+    max-width: 500px;
 }
 
 .image-note .note-header {
     flex-shrink: 0;
+    margin-bottom: 10px;
 }
 
 .image-note .media-image {
-    flex: 1;
+    width: 100%;
+    height: auto;
     max-width: 100%;
+    flex: 0 0 auto;
+    margin: 0;
 }
 
 @keyframes noteFloat {
@@ -340,7 +348,7 @@
 .media-image {
     width: 100%;
     height: auto;
-    max-height: 350px;
+    max-height: none;
     object-fit: contain;
     border-radius: 5px;
     border: 1px solid rgba(255, 0, 0, 0.3);
@@ -349,7 +357,7 @@
     position: relative;
     z-index: 1;
     background: rgba(0, 0, 0, 0.2);
-    margin: 10px auto 0;
+    margin: 0;
 }
 
 .return-note .btn {
