@@ -54,9 +54,6 @@ body {
     -moz-osx-font-smoothing: grayscale;
     padding-top: var(--header-height);
     position: relative;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
 }
 
 /* ================================================
@@ -64,14 +61,21 @@ body {
    ================================================ */
 
 .animated-background {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
     width: 100%;
+    min-height: 100vh;
     height: 100%;
     z-index: 0;
     pointer-events: none;
     overflow: hidden;
+}
+
+/* S'assurer que le background couvre toute la hauteur du document */
+html {
+    height: auto;
+    min-height: 100%;
 }
 
 /* Grille animée - LÉGÈREMENT RÉDUITE */
