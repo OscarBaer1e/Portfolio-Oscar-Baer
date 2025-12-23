@@ -114,24 +114,22 @@
     }
 }
 
-/* Grille pour éviter les superpositions */
+/* Grille pour éviter les superpositions - positionnement libre */
 .sticky-notes-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, max-content));
-    gap: 40px;
-    padding: 20px 0;
     position: relative;
+    min-height: 100vh;
+    padding: 40px 20px;
     z-index: 1;
-    align-items: start;
+    width: 100%;
 }
 
-/* Post-it avec animations */
+/* Post-it avec animations - positionnement libre */
 .sticky-note {
-    position: relative;
+    position: absolute;
     padding: 20px;
     min-width: 280px;
     width: fit-content;
-    max-width: 100%;
+    max-width: 500px;
     height: auto;
     box-shadow: 
         0 4px 15px rgba(255, 0, 0, 0.3),
@@ -180,12 +178,12 @@
 }
 
 .sticky-note:hover {
-    transform: translateY(-10px) scale(1.05) rotate(var(--note-rotation, 0deg)) !important;
     z-index: 100;
     box-shadow: 
         0 8px 30px rgba(255, 0, 0, 0.5),
         0 0 0 2px rgba(255, 0, 0, 0.4),
         inset 0 0 30px rgba(255, 0, 0, 0.2);
+    /* La transformation est gérée par JavaScript */
 }
 
 /* Couleurs des post-it avec accents rouges */
