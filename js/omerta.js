@@ -93,21 +93,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.style.zIndex = '10';
             }
         });
-        
-        // Raccourci clavier pour changer la taille (Ctrl/Cmd + +/-)
-        document.addEventListener('keydown', function(e) {
-            if ((e.ctrlKey || e.metaKey) && !e.shiftKey) {
-                if (e.key === '+' || e.key === '=') {
-                    e.preventDefault();
-                    const nextSize = Math.min(sizeClasses.length - 1, currentSize + 1);
-                    applySize(nextSize);
-                } else if (e.key === '-' || e.key === '_') {
-                    e.preventDefault();
-                    const prevSize = Math.max(0, currentSize - 1);
-                    applySize(prevSize);
-                }
+    });
+    
+    // Raccourci clavier pour changer la taille (Ctrl/Cmd + +/-)
+    document.addEventListener('keydown', function(e) {
+        if ((e.ctrlKey || e.metaKey) && !e.shiftKey) {
+            if (e.key === '+' || e.key === '=') {
+                e.preventDefault();
+                const nextSize = Math.min(sizeClasses.length - 1, currentSize + 1);
+                applySize(nextSize);
+            } else if (e.key === '-' || e.key === '_') {
+                e.preventDefault();
+                const prevSize = Math.max(0, currentSize - 1);
+                applySize(prevSize);
             }
-        });
+        }
     });
     
     // Sauvegarder la taille préférée dans localStorage
