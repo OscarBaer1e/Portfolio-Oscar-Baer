@@ -208,10 +208,12 @@ async function cleanupOldScores(supabase) {
 }
 
 function sanitizePlayerName(rawName) {
-    const base = (rawName || '').toString().trim();
-    // Autoriser uniquement lettres/chiffres/espace/underscore/tiret, et limiter la longueur
-    const cleaned = base.replace(/[^a-zA-Z0-9 _-]/g, '').substring(0, 20).trim();
-    return cleaned || 'Anonyme';
+    // Conserver les caractères saisis mais supprimer les contrôles, normaliser et limiter à 15 chars
+    const base = (rawName ?? '').toString().normalize('NFKC');
+    const withoutControl = base.replace(/[\u0000-\u001F\u007F-\u009F]/g, '');
+    const collapsed = withoutControl.replace(/\s+/g, ' ').trim();
+    const limited = collapsed.substring(0, 15);
+    return limited || 'Anonyme';
 }
 
 function sanitizeNumeric(value, defaultValue = 0) {
