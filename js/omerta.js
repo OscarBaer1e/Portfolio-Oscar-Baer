@@ -46,6 +46,87 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialiser avec la taille moyenne
     applySize(2);
     
+    // Système de filtres
+    let currentFilter = 'all';
+    const filterButtons = document.querySelectorAll('.filter-btn');
+    
+    function applyFilter(filterType) {
+        currentFilter = filterType;
+        
+        notes.forEach(note => {
+            // Retirer les classes de filtrage
+            note.classList.remove('filtered-out', 'hidden');
+            
+            // Déterminer le type de note
+            const isVideo = note.classList.contains('video-note');
+            const isAudio = note.classList.contains('audio-note');
+            const isImage = note.classList.contains('image-note');
+            const isYouTube = isVideo && note.querySelector('.youtube-container') !== null;
+            const isLocalVideo = isVideo && !isYouTube;
+            
+            // Appliquer le filtre
+            let shouldShow = false;
+            
+            switch(filterType) {
+                case 'all':
+                    shouldShow = true;
+                    break;
+                case 'video':
+                    shouldShow = isLocalVideo;
+                    break;
+                case 'youtube':
+                    shouldShow = isYouTube;
+                    break;
+                case 'audio':
+                    shouldShow = isAudio;
+                    break;
+                case 'image':
+                    shouldShow = isImage;
+                    break;
+                default:
+                    shouldShow = true;
+            }
+            
+            if (!shouldShow) {
+                note.classList.add('filtered-out');
+                setTimeout(() => {
+                    note.classList.add('hidden');
+                }, 300);
+            } else {
+                note.classList.remove('hidden');
+                setTimeout(() => {
+                    note.classList.remove('filtered-out');
+                }, 50);
+            }
+        });
+        
+        // Mettre à jour les boutons de filtre
+        filterButtons.forEach(btn => {
+            if (btn.dataset.filter === filterType) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        
+        // Sauvegarder le filtre
+        localStorage.setItem('omertaFilter', filterType);
+    }
+    
+    // Initialiser les filtres
+    filterButtons.forEach(btn => {
+        btn.addEventListener('click', function() {
+            const filterType = this.dataset.filter;
+            applyFilter(filterType);
+        });
+    });
+    
+    // Charger le filtre sauvegardé
+    const savedFilter = localStorage.getItem('omertaFilter');
+    if (savedFilter) {
+        applyFilter(savedFilter);
+    }
+    
     // Bouton pour changer la taille (comme l'explorateur de fichiers)
     const sizeBtn = document.getElementById('size-toggle-btn');
     if (sizeBtn) {

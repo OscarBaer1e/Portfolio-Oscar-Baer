@@ -39,9 +39,29 @@
                 <div class="board-container">
                     <h2 class="board-title glitch-text">🔒 Page Secrète 🔒</h2>
                     
-                    <button id="size-toggle-btn" class="shuffle-btn">
-                        <i class="fas fa-th-list"></i> <span id="size-label">Moyenne</span>
-                    </button>
+                    <div class="controls-bar">
+                        <div class="filters-container">
+                            <button class="filter-btn active" data-filter="all">
+                                <i class="fas fa-th"></i> Tous
+                            </button>
+                            <button class="filter-btn" data-filter="video">
+                                <i class="fas fa-video"></i> Vidéos
+                            </button>
+                            <button class="filter-btn" data-filter="youtube">
+                                <i class="fab fa-youtube"></i> YouTube
+                            </button>
+                            <button class="filter-btn" data-filter="audio">
+                                <i class="fas fa-music"></i> Audios
+                            </button>
+                            <button class="filter-btn" data-filter="image">
+                                <i class="fas fa-image"></i> Images
+                            </button>
+                        </div>
+                        
+                        <button id="size-toggle-btn" class="shuffle-btn">
+                            <i class="fas fa-th-list"></i> <span id="size-label">Moyenne</span>
+                        </button>
+                    </div>
                     
                     <div class="sticky-notes-grid">
                     <div class="sticky-note video-note" style="--note-index: 0;">
