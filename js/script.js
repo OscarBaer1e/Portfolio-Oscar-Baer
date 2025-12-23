@@ -4,6 +4,37 @@
  * (GSAP et tous ses plugins ont été retirés)
  */
 document.addEventListener('DOMContentLoaded', function() {
+    // Ajuster la hauteur du background animé pour qu'il suive le document
+    function updateBackgroundHeight() {
+        const animatedBg = document.querySelector('.animated-background');
+        if (animatedBg) {
+            const bodyHeight = document.body.scrollHeight;
+            const viewportHeight = window.innerHeight;
+            animatedBg.style.height = `${Math.max(bodyHeight, viewportHeight)}px`;
+        }
+    }
+    
+    // Ajuster au chargement
+    updateBackgroundHeight();
+    
+    // Ajuster lors du redimensionnement
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(updateBackgroundHeight, 100);
+    });
+    
+    // Observer les changements de hauteur du body
+    const observer = new MutationObserver(updateBackgroundHeight);
+    if (document.body) {
+        observer.observe(document.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['style', 'class']
+        });
+    }
+    
     const pageLoader = document.querySelector('.page-loader');
     
     if (pageLoader) {
@@ -13,6 +44,7 @@ document.addEventListener('DOMContentLoaded', function() {
             // Retire le loader du DOM après l'animation
             setTimeout(() => {
                 pageLoader.remove();
+                updateBackgroundHeight(); // Réajuster après le retrait du loader
             }, 500);
         }, 2000);
     }
