@@ -1809,8 +1809,11 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Tir automatique (basé sur delta time au lieu de setInterval)
-        if (gameState.isPlaying && !gameState.isPaused && keys['Space'] && shootCooldown <= 0) {
-            shoot();
+        // Ne tirer que si le cooldown est exactement à 0 (pas négatif)
+        if (gameState.isPlaying && !gameState.isPaused && keys['Space']) {
+            if (shootCooldown === 0) {
+                shoot();
+            }
         }
         
         // Mise à jour des projectiles (normalisé par delta time)
@@ -3724,11 +3727,13 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!gameState.isPlaying || gameState.isPaused) return;
         
         // Vérifie le cooldown de tir (normalisé par delta time)
+        // Double vérification pour éviter le spam
         if (shootCooldown > 0) {
             return;
         }
         
-        // Réinitialiser le cooldown
+        // Réinitialiser le cooldown IMMÉDIATEMENT avant de créer les projectiles
+        // pour éviter tout spam possible
         shootCooldown = currentFireRate;
         
         const bulletSize = activePowerUps.bigBullets ? 8 : 4;
