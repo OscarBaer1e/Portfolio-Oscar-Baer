@@ -682,10 +682,14 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-    if (window.location.pathname.includes('contact.html')) {
+    // Vérifier si on est sur la page contact (plusieurs méthodes pour être sûr)
+    const isContactPage = window.location.pathname.includes('contact.html') || 
+                         window.location.href.includes('contact.html') ||
+                         document.getElementById('omerta-easter-egg-trigger') !== null;
+    
+    if (isContactPage) {
         let omertaClickCount = 0;
         let omertaClickTimeout;
-        const omertaEasterEgg = document.getElementById('omerta-easter-egg-trigger');
         let omertaKeySequence = [];
         const omertaSequence = ['o', 'm', 'e', 'r', 't', 'a'];
         
@@ -719,8 +723,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 1500);
         }
         
+        // Attendre que le DOM soit complètement chargé avant d'attacher les événements
+        const omertaEasterEgg = document.getElementById('omerta-easter-egg-trigger');
+        
         if (omertaEasterEgg) {
-            omertaEasterEgg.addEventListener('click', () => {
+            omertaEasterEgg.addEventListener('click', (e) => {
+                e.preventDefault();
                 omertaClickCount++;
                 clearTimeout(omertaClickTimeout);
                 
@@ -733,20 +741,26 @@ document.addEventListener('DOMContentLoaded', function() {
                     }, 2000);
                 }
             });
+            
+            // Ajouter un style pour indiquer que c'est cliquable (optionnel)
+            omertaEasterEgg.style.cursor = 'pointer';
         }
         
         // Raccourci clavier : O + M + E + R + T + A
         document.addEventListener('keydown', (e) => {
-            if (window.location.pathname.includes('contact.html')) {
-                omertaKeySequence.push(e.key.toLowerCase());
-                if (omertaKeySequence.length > omertaSequence.length) {
-                    omertaKeySequence.shift();
-                }
-                
-                if (omertaKeySequence.join('') === omertaSequence.join('')) {
-                    triggerOmertaEasterEgg();
-                    omertaKeySequence = [];
-                }
+            // Ignorer si on est dans un input ou textarea
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+                return;
+            }
+            
+            omertaKeySequence.push(e.key.toLowerCase());
+            if (omertaKeySequence.length > omertaSequence.length) {
+                omertaKeySequence.shift();
+            }
+            
+            if (omertaKeySequence.join('') === omertaSequence.join('')) {
+                triggerOmertaEasterEgg();
+                omertaKeySequence = [];
             }
         });
     }
