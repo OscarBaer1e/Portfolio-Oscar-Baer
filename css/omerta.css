@@ -146,7 +146,17 @@
 }
 
 .image-note {
-    min-height: 300px;
+    min-height: auto;
+    max-height: none;
+}
+
+.image-note .note-header {
+    flex-shrink: 0;
+}
+
+.image-note .media-image {
+    flex: 1;
+    max-width: 100%;
 }
 
 @keyframes noteFloat {
@@ -255,6 +265,11 @@
     padding-bottom: 10px;
     position: relative;
     z-index: 1;
+    flex-shrink: 0;
+}
+
+.image-note .note-header {
+    margin-bottom: 10px;
 }
 
 .note-header h3 {
@@ -325,8 +340,7 @@
 .media-image {
     width: 100%;
     height: auto;
-    max-height: 400px;
-    min-height: 200px;
+    max-height: 350px;
     object-fit: contain;
     border-radius: 5px;
     border: 1px solid rgba(255, 0, 0, 0.3);
@@ -334,8 +348,8 @@
     box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
     position: relative;
     z-index: 1;
-    background: rgba(0, 0, 0, 0.3);
-    margin: 0 auto;
+    background: rgba(0, 0, 0, 0.2);
+    margin: 10px auto 0;
 }
 
 .return-note .btn {
