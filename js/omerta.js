@@ -4,9 +4,13 @@
 
 document.addEventListener('DOMContentLoaded', function() {
     const grid = document.querySelector('.sticky-notes-grid');
-    const notes = document.querySelectorAll('.sticky-note');
+    const allNotes = document.querySelectorAll('.sticky-note');
     
-    if (!grid || notes.length === 0) return;
+    if (!grid || allNotes.length === 0) return;
+    
+    // Séparer les notes normales du bouton retour
+    const returnNote = document.querySelector('.return-note');
+    const notes = Array.from(allNotes).filter(note => !note.classList.contains('return-note'));
     
     // Fonction pour générer une position aléatoire mais organisée
     function getRandomPosition(index, total, containerWidth, containerHeight) {
@@ -36,6 +40,16 @@ document.addEventListener('DOMContentLoaded', function() {
         };
     }
     
+    // Fonction pour mélanger un tableau (algorithme Fisher-Yates)
+    function shuffleArray(array) {
+        const shuffled = [...array];
+        for (let i = shuffled.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+        }
+        return shuffled;
+    }
+    
     // Fonction pour positionner toutes les notes
     function positionNotes() {
         const containerWidth = grid.offsetWidth || window.innerWidth - 40;
@@ -47,7 +61,9 @@ document.addEventListener('DOMContentLoaded', function() {
         // Mettre à jour la hauteur du conteneur
         grid.style.minHeight = `${containerHeight}px`;
         
-        notes.forEach((note, index) => {
+        // Positionner les notes normales (mélangées)
+        const shuffledNotes = shuffleArray(notes);
+        shuffledNotes.forEach((note, index) => {
             const position = getRandomPosition(index, notes.length, containerWidth, containerHeight);
             
             note.style.left = `${position.left}px`;
@@ -56,6 +72,15 @@ document.addEventListener('DOMContentLoaded', function() {
             note.style.position = 'absolute';
         });
         
+        // Positionner le bouton retour en bas au centre
+        if (returnNote) {
+            const returnNoteWidth = returnNote.offsetWidth || 300;
+            returnNote.style.position = 'absolute';
+            returnNote.style.left = `${(containerWidth - returnNoteWidth) / 2}px`;
+            returnNote.style.bottom = '40px';
+            returnNote.style.setProperty('--note-rotation', '0deg');
+        }
+        
         // Ajuster la hauteur du conteneur après positionnement
         let maxBottom = 0;
         notes.forEach(note => {
@@ -63,8 +88,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (bottom > maxBottom) maxBottom = bottom;
         });
         
-        if (maxBottom > 0) {
-            grid.style.minHeight = `${maxBottom + 100}px`;
+        // S'assurer que le conteneur est assez haut pour le bouton retour
+        const minHeight = returnNote ? (returnNote.offsetTop + returnNote.offsetHeight + 100) : maxBottom + 100;
+        if (minHeight > 0) {
+            grid.style.minHeight = `${minHeight}px`;
         }
     }
     
@@ -75,15 +102,17 @@ document.addEventListener('DOMContentLoaded', function() {
     const shuffleBtn = document.getElementById('shuffle-notes-btn');
     if (shuffleBtn) {
         shuffleBtn.addEventListener('click', function() {
-            // Mélanger l'ordre des notes pour un nouveau positionnement
-            const notesArray = Array.from(notes);
-            for (let i = notesArray.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [notesArray[i], notesArray[j]] = [notesArray[j], notesArray[i]];
-            }
+            // Mélanger l'ordre des notes dans le DOM (sauf le retour)
+            const shuffledNotes = shuffleArray(notes);
             
-            // Réappliquer l'ordre mélangé au DOM
-            notesArray.forEach(note => grid.appendChild(note));
+            // Réappliquer l'ordre mélangé au DOM (avant le bouton retour)
+            shuffledNotes.forEach(note => {
+                if (returnNote && returnNote.parentNode) {
+                    returnNote.parentNode.insertBefore(note, returnNote);
+                } else {
+                    grid.appendChild(note);
+                }
+            });
             
             // Repositionner avec le nouvel ordre
             positionNotes();
