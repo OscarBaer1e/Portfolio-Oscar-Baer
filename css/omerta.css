@@ -149,22 +149,25 @@
     }
 }
 
-/* Grille pour éviter les superpositions - positionnement libre */
+/* Liste verticale organisée */
 .sticky-notes-grid {
-    position: relative;
-    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
     padding: 40px 20px;
     z-index: 1;
     width: 100%;
+    max-width: 1200px;
+    margin: 0 auto;
+    align-items: center;
 }
 
-/* Post-it avec animations - positionnement libre */
+/* Post-it avec animations - liste verticale */
 .sticky-note {
-    position: absolute;
+    position: relative;
     padding: 20px;
-    min-width: 280px;
-    width: fit-content;
-    max-width: 500px;
+    width: 100%;
+    max-width: 800px;
     height: auto;
     box-shadow: 
         0 4px 15px rgba(255, 0, 0, 0.3),
@@ -179,6 +182,22 @@
     display: flex;
     flex-direction: column;
     overflow: visible;
+}
+
+/* Tailles compactes */
+.sticky-notes-grid.compact .sticky-note {
+    max-width: 400px;
+    padding: 15px;
+}
+
+.sticky-notes-grid.medium .sticky-note {
+    max-width: 600px;
+    padding: 18px;
+}
+
+.sticky-notes-grid.large .sticky-note {
+    max-width: 1000px;
+    padding: 25px;
 }
 
 .image-note {
@@ -290,9 +309,9 @@
     text-align: center;
     padding: 25px;
     --note-rotation: 0deg;
-    grid-column: 1 / -1;
     max-width: 300px;
-    margin: 0 auto;
+    margin: 40px auto 0;
+    align-self: center;
 }
 
 .return-note::before {
