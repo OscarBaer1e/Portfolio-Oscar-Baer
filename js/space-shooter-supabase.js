@@ -76,8 +76,9 @@ async function loadLeaderboardFromSupabase() {
         }
         
         if (data.length === 0) {
-            console.log('📭 Aucun score dans Supabase (table vide), chargement depuis localStorage');
-            return loadLeaderboardFromLocalStorage();
+            console.log('📭 Aucun score dans Supabase (table vide), nettoyage du cache local');
+            localStorage.removeItem('spaceShooterLeaderboard');
+            return [];
         }
         
         console.log('✅ Données reçues de Supabase:', data.length, 'scores');

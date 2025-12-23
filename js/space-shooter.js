@@ -696,6 +696,13 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.log('📊 Type de data:', typeof data);
                     console.log('📊 Est un array?', Array.isArray(data));
                     console.log('📊 Longueur:', data ? data.length : 'data est null/undefined');
+                    
+                    // Si pas de données côté Supabase, on nettoie le cache local
+                    leaderboard = [];
+                    localStorage.removeItem('spaceShooterLeaderboard');
+                    if (leaderboardModal && !leaderboardModal.classList.contains('hidden')) {
+                        updateLeaderboardDisplay();
+                    }
                 }
             } catch (error) {
                 console.error('❌ Erreur chargement Supabase:', error);
@@ -720,6 +727,7 @@ document.addEventListener('DOMContentLoaded', function() {
             } catch (e) {
                 console.error('Erreur parsing localStorage:', e);
                 leaderboard = [];
+                localStorage.removeItem('spaceShooterLeaderboard');
             }
         } else {
             leaderboard = [];
