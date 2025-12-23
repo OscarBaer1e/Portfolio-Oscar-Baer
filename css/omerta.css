@@ -149,25 +149,54 @@
     }
 }
 
-/* Liste verticale organisée */
+/* Grille avec plusieurs colonnes - style explorateur de fichiers */
 .sticky-notes-grid {
-    display: flex;
-    flex-direction: column;
-    gap: 30px;
+    display: grid;
+    gap: 20px;
     padding: 40px 20px;
     z-index: 1;
     width: 100%;
-    max-width: 1200px;
     margin: 0 auto;
-    align-items: center;
+    align-items: start;
 }
 
-/* Post-it avec animations - liste verticale */
+/* Taille très petite (6 colonnes) */
+.sticky-notes-grid.extra-small {
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 15px;
+}
+
+/* Taille petite (4 colonnes) */
+.sticky-notes-grid.small {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 18px;
+}
+
+/* Taille moyenne (3 colonnes) */
+.sticky-notes-grid.medium {
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 20px;
+}
+
+/* Taille grande (2 colonnes) */
+.sticky-notes-grid.large {
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 25px;
+}
+
+/* Taille très grande (1 colonne) */
+.sticky-notes-grid.extra-large {
+    grid-template-columns: 1fr;
+    gap: 30px;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Post-it avec animations - grille */
 .sticky-note {
     position: relative;
     padding: 20px;
     width: 100%;
-    max-width: 800px;
     height: auto;
     box-shadow: 
         0 4px 15px rgba(255, 0, 0, 0.3),
@@ -184,20 +213,34 @@
     overflow: visible;
 }
 
-/* Tailles compactes */
-.sticky-notes-grid.compact .sticky-note {
-    max-width: 400px;
-    padding: 15px;
+/* Tailles selon le mode explorateur */
+.sticky-notes-grid.extra-small .sticky-note {
+    padding: 10px;
+}
+
+.sticky-notes-grid.extra-small .note-header h3 {
+    font-size: 0.9rem;
+}
+
+.sticky-notes-grid.small .sticky-note {
+    padding: 12px;
+}
+
+.sticky-notes-grid.small .note-header h3 {
+    font-size: 1rem;
 }
 
 .sticky-notes-grid.medium .sticky-note {
-    max-width: 600px;
     padding: 18px;
 }
 
 .sticky-notes-grid.large .sticky-note {
-    max-width: 1000px;
+    padding: 22px;
+}
+
+.sticky-notes-grid.extra-large .sticky-note {
     padding: 25px;
+    max-width: 100%;
 }
 
 .image-note {
@@ -311,7 +354,8 @@
     --note-rotation: 0deg;
     max-width: 300px;
     margin: 40px auto 0;
-    align-self: center;
+    grid-column: 1 / -1;
+    justify-self: center;
 }
 
 .return-note::before {

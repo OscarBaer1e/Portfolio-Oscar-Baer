@@ -12,11 +12,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const returnNote = document.querySelector('.return-note');
     const notes = Array.from(allNotes).filter(note => !note.classList.contains('return-note'));
     
-    // État de la taille actuelle (0: compact, 1: moyen, 2: large)
-    let currentSize = 1; // Moyen par défaut
-    const sizeClasses = ['compact', 'medium', 'large'];
-    const sizeLabels = ['Compact', 'Moyen', 'Large'];
-    const sizeIcons = ['fa-compress-alt', 'fa-expand-alt', 'fa-expand-arrows-alt'];
+    // État de la taille actuelle (comme l'explorateur de fichiers)
+    // 0: très petite, 1: petite, 2: moyenne, 3: grande, 4: très grande
+    let currentSize = 2; // Moyenne par défaut
+    const sizeClasses = ['extra-small', 'small', 'medium', 'large', 'extra-large'];
+    const sizeLabels = ['Très petite', 'Petite', 'Moyenne', 'Grande', 'Très grande'];
+    const sizeIcons = ['fa-th', 'fa-th-large', 'fa-th-list', 'fa-list', 'fa-list-alt'];
     
     // Fonction pour appliquer la taille
     function applySize(sizeIndex) {
@@ -30,7 +31,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const sizeLabel = document.getElementById('size-label');
         const sizeBtn = document.getElementById('size-toggle-btn');
         if (sizeLabel) {
-            sizeLabel.textContent = `Taille: ${sizeLabels[sizeIndex]}`;
+            sizeLabel.textContent = sizeLabels[sizeIndex];
         }
         if (sizeBtn) {
             const icon = sizeBtn.querySelector('i');
@@ -43,9 +44,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Initialiser avec la taille moyenne
-    applySize(1);
+    applySize(2);
     
-    // Bouton pour changer la taille
+    // Bouton pour changer la taille (comme l'explorateur de fichiers)
     const sizeBtn = document.getElementById('size-toggle-btn');
     if (sizeBtn) {
         sizeBtn.addEventListener('click', function() {
