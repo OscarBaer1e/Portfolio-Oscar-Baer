@@ -67,16 +67,64 @@ document.addEventListener('DOMContentLoaded', function() {
         returnNote.parentNode.appendChild(returnNote);
     }
     
-    // Animation au survol avec effet de "levée"
-    notes.forEach(note => {
+    // Animation au survol améliorée
+    notes.forEach((note, index) => {
+        // Effet de focus au clic
+        note.addEventListener('click', function(e) {
+            // Retirer le focus des autres notes
+            notes.forEach(n => n.classList.remove('focused'));
+            // Ajouter le focus à cette note
+            this.classList.add('focused');
+            
+            // Animation de clic
+            this.style.transform = 'translateY(-2px) scale(0.98)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 150);
+        });
+        
+        // Effet au survol
         note.addEventListener('mouseenter', function() {
             this.style.zIndex = '100';
-            this.style.transform = 'translateY(-5px) scale(1.02)';
         });
         
         note.addEventListener('mouseleave', function() {
-            this.style.zIndex = '10';
-            this.style.transform = '';
+            if (!this.classList.contains('focused')) {
+                this.style.zIndex = '10';
+            }
+        });
+        
+        // Raccourci clavier pour changer la taille (Ctrl/Cmd + +/-)
+        document.addEventListener('keydown', function(e) {
+            if ((e.ctrlKey || e.metaKey) && !e.shiftKey) {
+                if (e.key === '+' || e.key === '=') {
+                    e.preventDefault();
+                    const nextSize = Math.min(sizeClasses.length - 1, currentSize + 1);
+                    applySize(nextSize);
+                } else if (e.key === '-' || e.key === '_') {
+                    e.preventDefault();
+                    const prevSize = Math.max(0, currentSize - 1);
+                    applySize(prevSize);
+                }
+            }
         });
     });
+    
+    // Sauvegarder la taille préférée dans localStorage
+    const savedSize = localStorage.getItem('omertaGridSize');
+    
+    // Wrapper pour sauvegarder à chaque changement
+    const originalApplySize = applySize;
+    applySize = function(sizeIndex) {
+        originalApplySize(sizeIndex);
+        localStorage.setItem('omertaGridSize', sizeIndex.toString());
+    };
+    
+    // Charger la taille sauvegardée au démarrage
+    if (savedSize !== null) {
+        const sizeIndex = parseInt(savedSize, 10);
+        if (sizeIndex >= 0 && sizeIndex < sizeClasses.length) {
+            applySize(sizeIndex);
+        }
+    }
 });

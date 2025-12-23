@@ -98,9 +98,12 @@
 }
 
 .shuffle-btn {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     margin: 0 auto 40px;
-    padding: 12px 30px;
+    padding: 14px 35px;
     background: linear-gradient(135deg, #1a1a1a 0%, #0a0a0a 100%);
     border: 2px solid rgba(255, 0, 0, 0.4);
     border-left: 5px solid #ff3333;
@@ -109,7 +112,7 @@
     font-weight: bold;
     cursor: pointer;
     border-radius: 8px;
-    transition: all 0.3s ease;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: 
         0 4px 15px rgba(255, 0, 0, 0.3),
         0 0 0 1px rgba(255, 0, 0, 0.2);
@@ -118,18 +121,52 @@
         0 0 5px rgba(255, 51, 51, 0.4);
     position: relative;
     z-index: 100;
+    overflow: hidden;
+}
+
+.shuffle-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 51, 51, 0.2);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s ease, height 0.6s ease;
+}
+
+.shuffle-btn:active::before {
+    width: 300px;
+    height: 300px;
 }
 
 .shuffle-btn:hover {
     transform: translateY(-3px) scale(1.05);
     box-shadow: 
         0 8px 30px rgba(255, 0, 0, 0.5),
-        0 0 0 2px rgba(255, 0, 0, 0.4);
+        0 0 0 2px rgba(255, 0, 0, 0.4),
+        inset 0 0 20px rgba(255, 0, 0, 0.1);
     background: linear-gradient(135deg, #2a1a1a 0%, #1a0a0a 100%);
+    border-left-color: #ff6666;
+}
+
+.shuffle-btn:active {
+    transform: translateY(-1px) scale(1.02);
 }
 
 .shuffle-btn i {
-    margin-right: 8px;
+    transition: transform 0.3s ease;
+}
+
+.shuffle-btn:hover i {
+    transform: rotate(15deg);
+}
+
+.shuffle-btn:active i {
+    transform: rotate(360deg);
+    transition: transform 0.5s ease;
 }
 
 @keyframes redTitleGlow {
@@ -149,7 +186,7 @@
     }
 }
 
-/* Grille avec plusieurs colonnes - style explorateur de fichiers */
+/* Grille avec plusieurs colonnes - style explorateur de fichiers amélioré */
 .sticky-notes-grid {
     display: grid;
     gap: 20px;
@@ -158,6 +195,8 @@
     width: 100%;
     margin: 0 auto;
     align-items: start;
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: grid-template-columns, gap;
 }
 
 /* Taille très petite (6 colonnes) */
@@ -192,7 +231,7 @@
     margin: 0 auto;
 }
 
-/* Post-it avec animations - grille */
+/* Post-it avec animations - grille améliorée */
 .sticky-note {
     position: relative;
     padding: 20px;
@@ -203,7 +242,7 @@
         0 0 0 1px rgba(255, 0, 0, 0.2),
         inset 0 0 20px rgba(255, 0, 0, 0.1);
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     z-index: 10;
     border-radius: 8px;
     animation: noteFloat 4s ease-in-out infinite;
@@ -211,36 +250,110 @@
     display: flex;
     flex-direction: column;
     overflow: visible;
+    will-change: transform, box-shadow, z-index;
+    backface-visibility: hidden;
+    transform-style: preserve-3d;
 }
 
-/* Tailles selon le mode explorateur */
+.sticky-note::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba(255, 51, 51, 0.1) 0%, transparent 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.sticky-note:hover::before {
+    opacity: 1;
+}
+
+/* Tailles selon le mode explorateur - améliorées */
 .sticky-notes-grid.extra-small .sticky-note {
     padding: 10px;
+    font-size: 0.85rem;
 }
 
 .sticky-notes-grid.extra-small .note-header h3 {
     font-size: 0.9rem;
+    margin-bottom: 8px;
+}
+
+.sticky-notes-grid.extra-small .media-image,
+.sticky-notes-grid.extra-small .media-video,
+.sticky-notes-grid.extra-small .youtube-container {
+    max-height: 120px;
 }
 
 .sticky-notes-grid.small .sticky-note {
     padding: 12px;
+    font-size: 0.9rem;
 }
 
 .sticky-notes-grid.small .note-header h3 {
     font-size: 1rem;
+    margin-bottom: 10px;
+}
+
+.sticky-notes-grid.small .media-image,
+.sticky-notes-grid.small .media-video,
+.sticky-notes-grid.small .youtube-container {
+    max-height: 180px;
 }
 
 .sticky-notes-grid.medium .sticky-note {
     padding: 18px;
+    font-size: 1rem;
+}
+
+.sticky-notes-grid.medium .note-header h3 {
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+}
+
+.sticky-notes-grid.medium .media-image,
+.sticky-notes-grid.medium .media-video,
+.sticky-notes-grid.medium .youtube-container {
+    max-height: 250px;
 }
 
 .sticky-notes-grid.large .sticky-note {
     padding: 22px;
+    font-size: 1.05rem;
+}
+
+.sticky-notes-grid.large .note-header h3 {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+}
+
+.sticky-notes-grid.large .media-image,
+.sticky-notes-grid.large .media-video,
+.sticky-notes-grid.large .youtube-container {
+    max-height: 350px;
 }
 
 .sticky-notes-grid.extra-large .sticky-note {
     padding: 25px;
     max-width: 100%;
+    font-size: 1.1rem;
+}
+
+.sticky-notes-grid.extra-large .note-header h3 {
+    font-size: 1.4rem;
+    margin-bottom: 18px;
+}
+
+.sticky-notes-grid.extra-large .media-image,
+.sticky-notes-grid.extra-large .media-video,
+.sticky-notes-grid.extra-large .youtube-container {
+    max-height: 500px;
 }
 
 .image-note {
@@ -416,6 +529,12 @@
     box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
     position: relative;
     z-index: 1;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.media-video:hover {
+    transform: scale(1.01);
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
 }
 
 .youtube-container {
@@ -429,6 +548,12 @@
     border: 1px solid rgba(255, 0, 0, 0.3);
     box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
     z-index: 1;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.youtube-container:hover {
+    transform: scale(1.01);
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
 }
 
 .youtube-video {
@@ -461,6 +586,13 @@
     z-index: 1;
     background: rgba(0, 0, 0, 0.2);
     margin: 0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+}
+
+.media-image:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.4);
 }
 
 .return-note .btn {
