@@ -147,7 +147,17 @@ document.addEventListener('DOMContentLoaded', function() {
         isPlaying: false,
         isPaused: false,
         score: 0,
-        highScore: parseInt(localStorage.getItem('spaceShooterHighScore')) || 0,
+        highScore: (() => {
+            try {
+                const stored = localStorage.getItem('spaceShooterHighScore');
+                if (stored === null || stored === undefined) return 0;
+                const parsed = parseInt(stored, 10);
+                return isNaN(parsed) ? 0 : parsed;
+            } catch (e) {
+                console.error('Erreur lors du chargement du high score:', e);
+                return 0;
+            }
+        })(),
         level: 1,
         lives: 3,
         maxLives: 3,
@@ -1073,8 +1083,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function updateHighScore() {
+        // S'assurer que highScore est un nombre
+        if (typeof gameState.highScore !== 'number' || isNaN(gameState.highScore)) {
+            gameState.highScore = 0;
+        }
+        
         if (highScoreElement) highScoreElement.textContent = gameState.highScore;
         if (finalHighScore) finalHighScore.textContent = gameState.highScore;
+    }
+    
+    // Fonction pour mettre à jour le high score en temps réel
+    function checkAndUpdateHighScore() {
+        // S'assurer que le score et le highScore sont des nombres
+        const currentScore = Number(gameState.score) || 0;
+        const currentHighScore = Number(gameState.highScore) || 0;
+        
+        if (currentScore > currentHighScore) {
+            gameState.highScore = currentScore;
+            // Sauvegarder immédiatement dans localStorage
+            try {
+                localStorage.setItem('spaceShooterHighScore', String(gameState.highScore));
+                updateHighScore();
+            } catch (e) {
+                console.error('Erreur lors de la sauvegarde du high score:', e);
+            }
+        }
     }
     
     // Dessin
@@ -1978,6 +2011,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         const points = Math.floor(asteroid.size / 5) * 10;
                         gameState.score += points;
                         if (scoreElement) scoreElement.textContent = gameState.score;
+                        // Vérifier et mettre à jour le high score en temps réel
+                        checkAndUpdateHighScore();
                         // Particules de score
                         createScoreParticle(asteroid.x, asteroid.y, `+${points}`);
                     }
@@ -3125,6 +3160,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                         
                         if (scoreElement) scoreElement.textContent = gameState.score;
+                        // Vérifier et mettre à jour le high score en temps réel
+                        checkAndUpdateHighScore();
                         // Particules de score pour la défaite du boss
                         createScoreParticle(boss.x, boss.y, `+${bossPoints}`);
                         
@@ -3859,11 +3896,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const timeSeconds = Math.floor((gameStats.timePlayed % 60000) / 1000);
         const timeFormatted = `${timeMinutes}m ${timeSeconds}s`;
         
-        // Sauvegarde du meilleur score
-        if (gameState.score > gameState.highScore) {
-            gameState.highScore = gameState.score;
-            localStorage.setItem('spaceShooterHighScore', gameState.highScore);
-            updateHighScore();
+        // Sauvegarde du meilleur score (vérification finale)
+        // S'assurer que les valeurs sont des nombres
+        const finalScoreValue = Number(gameState.score) || 0;
+        const currentHighScore = Number(gameState.highScore) || 0;
+        
+        if (finalScoreValue > currentHighScore) {
+            gameState.highScore = finalScoreValue;
+            try {
+                localStorage.setItem('spaceShooterHighScore', String(gameState.highScore));
+                updateHighScore();
+            } catch (e) {
+                console.error('Erreur lors de la sauvegarde finale du high score:', e);
+            }
         }
         
         if (finalScore) finalScore.textContent = gameState.score;
