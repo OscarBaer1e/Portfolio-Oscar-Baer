@@ -459,9 +459,8 @@ document.addEventListener('DOMContentLoaded', function() {
     let bossPhotos = {}; // Stocke les photos des boss (1-10)
     
     // Variables de tir (normalisées par delta time)
-    // Vitesse originale : 300ms = 0.3s (maintenant normalisée par delta time)
     let shootCooldown = 0; // Compteur de cooldown en secondes (normalisé)
-    let baseFireRate = 0.3; // Temps entre les tirs en secondes (300ms = 0.3s) - vitesse originale
+    let baseFireRate = 0.5; // Temps entre les tirs en secondes (500ms = 0.5s) - vitesse ajustée
     let currentFireRate = baseFireRate; // Temps de cooldown actuel en secondes
     
     // Vérifications de sécurité pour tous les éléments
@@ -1809,11 +1808,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Tir automatique (basé sur delta time au lieu de setInterval)
-        // Ne tirer que si le cooldown est exactement à 0 (pas négatif)
-        if (gameState.isPlaying && !gameState.isPaused && keys['Space']) {
-            if (shootCooldown === 0) {
-                shoot();
-            }
+        if (gameState.isPlaying && !gameState.isPaused && keys['Space'] && shootCooldown <= 0) {
+            shoot();
         }
         
         // Mise à jour des projectiles (normalisé par delta time)
@@ -2514,7 +2510,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (powerUp.type === 'rapidFire') {
             activePowerUps.rapidFire = true;
             activePowerUps.rapidFireEndTime = now + 10000; // 10 secondes
-            currentFireRate = baseFireRate / 3; // 3x plus rapide (0.1s au lieu de 0.3s) - boost original
+            currentFireRate = baseFireRate / 3; // 3x plus rapide (environ 0.167s au lieu de 0.5s)
             createPowerUpVisualAnimation('rapidFire', ship.x, ship.y);
         } else if (powerUp.type === 'shield') {
             activePowerUps.shield = true;
@@ -2695,10 +2691,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Calcul du numéro du boss : niveau 10 = boss 1, niveau 20 = boss 2, etc.
-        // Calcul du boss avec progression continue au-delà du niveau 100
-        const baseBossNumber = Math.floor(gameState.level / 10);
-        const bossNumber = Math.min(10, baseBossNumber);
-        const extraLevels = Math.max(0, baseBossNumber - 10); // Niveaux au-delà de 100
+        const bossNumber = Math.min(10, Math.floor(gameState.level / 10));
         
         // Vérifier que le bossNumber est valide
         if (bossNumber < 1 || bossNumber > 10) {
@@ -2717,19 +2710,11 @@ document.addEventListener('DOMContentLoaded', function() {
         // Jouer le son d'arrivée du boss
         playAudioFile('../ressources/Sons/Arrivée Boss.mp3', 0.6);
         
-        // Santé et taille augmentent avec le niveau (progression continue)
-        const baseHealth = 30 + (bossNumber * 15) + (extraLevels * 10);
-        const baseSize = 60 + (bossNumber * 10) + (extraLevels * 5);
+        const baseHealth = 30 + (bossNumber * 15); // Réduit : était 50 + (bossNumber * 30)
+        const baseSize = 60 + (bossNumber * 10);
         
         // Initialiser les propriétés spécifiques au pattern du boss
         let patternConfig = getBossPattern(bossNumber);
-        
-        // Ajuster la vitesse de tir selon la progression (plus rapide pour les niveaux élevés)
-        if (extraLevels > 0) {
-            // Réduire l'intervalle de tir de 10% par niveau supplémentaire (max 50% de réduction)
-            const reduction = Math.min(0.5, extraLevels * 0.1);
-            patternConfig.shootInterval = Math.max(0.15, patternConfig.shootInterval * (1 - reduction));
-        }
         
         // Vérifier que patternConfig est valide
         if (!patternConfig) {
@@ -3433,27 +3418,25 @@ document.addEventListener('DOMContentLoaded', function() {
         // Patterns de tir différents pour chaque boss
         switch(bossNumber) {
             case 1:
-                // Tir simple vers le bas (amélioré : 3 projectiles)
-                for (let i = -1; i <= 1; i++) {
-                    bossBullets.push({
-                        x: boss.x + i * 15,
-                        y: boss.y + boss.size,
-                        speed: 3,
-                        vx: i * 0.2,
-                        size: 7,
-                        color: '#ff0000'
-                    });
-                }
+                // Tir simple vers le bas
+                bossBullets.push({
+                    x: boss.x,
+                    y: boss.y + boss.size,
+                    speed: 3,
+                    vx: 0,
+                    size: 8,
+                    color: '#ff0000'
+                });
                 break;
                 
             case 2:
-                // Tir double amélioré (4 projectiles en éventail)
-                for (let i = -1.5; i <= 1.5; i += 1) {
+                // Tir double
+                for (let i = -1; i <= 1; i += 2) {
                     bossBullets.push({
-                        x: boss.x + i * 18,
+                        x: boss.x + i * 20,
                         y: boss.y + boss.size,
                         speed: 3.5,
-                        vx: i * 0.4,
+                        vx: i * 0.3,
                         size: 7,
                         color: '#ff3300'
                     });
@@ -3461,262 +3444,140 @@ document.addEventListener('DOMContentLoaded', function() {
                 break;
                 
             case 3:
-                // Tir triple amélioré (5 projectiles en éventail + 2 ciblés)
-                for (let i = -2; i <= 2; i++) {
+                // Tir triple en éventail
+                for (let i = -1; i <= 1; i++) {
                     bossBullets.push({
                         x: boss.x,
                         y: boss.y + boss.size,
                         speed: 3.5,
-                        vx: i * 0.6,
+                        vx: i * 0.8,
                         size: 7,
                         color: '#ff6600'
                     });
                 }
-                // Ajout de 2 tirs ciblés
-                const dx3 = ship.x - boss.x;
-                const dy3 = ship.y - boss.y;
-                const dist3 = Math.sqrt(dx3 * dx3 + dy3 * dy3);
-                if (dist3 > 0) {
-                    for (let i = -1; i <= 1; i += 2) {
-                        bossBullets.push({
-                            x: boss.x + i * 10,
-                            y: boss.y + boss.size,
-                            speed: 4,
-                            vx: (dx3 / dist3) * 2.5 + i * 0.3,
-                            size: 6,
-                            color: '#ff8800'
-                        });
-                    }
-                }
                 break;
                 
             case 4:
-                // Tir ciblé amélioré (3 projectiles ciblés + 2 en éventail)
+                // Tir ciblé vers le joueur
                 const dx = ship.x - boss.x;
                 const dy = ship.y - boss.y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist > 0) {
-                    // 3 projectiles ciblés
-                    for (let i = -1; i <= 1; i++) {
-                        bossBullets.push({
-                            x: boss.x + i * 12,
-                            y: boss.y + boss.size,
-                            speed: 4,
-                            vx: (dx / dist) * 2.5 + i * 0.2,
-                            size: 7,
-                            color: '#ff9900'
-                        });
-                    }
-                }
-                // 2 projectiles en éventail
-                for (let i = -1; i <= 1; i += 2) {
-                    bossBullets.push({
-                        x: boss.x,
-                        y: boss.y + boss.size,
-                        speed: 3.5,
-                        vx: i * 1.2,
-                        size: 6,
-                        color: '#ffaa00'
-                    });
-                }
+                bossBullets.push({
+                    x: boss.x,
+                    y: boss.y + boss.size,
+                    speed: 4,
+                    vx: (dx / dist) * 2,
+                    size: 7,
+                    color: '#ff9900'
+                });
                 break;
                 
             case 5:
-                // Tir en cercle amélioré (12 directions + 3 ciblés)
-                for (let i = 0; i < 12; i++) {
-                    const angle = (i / 12) * Math.PI * 2;
+                // Tir en cercle (8 directions)
+                for (let i = 0; i < 8; i++) {
+                    const angle = (i / 8) * Math.PI * 2;
                     bossBullets.push({
                         x: boss.x,
                         y: boss.y,
-                        speed: 0,
-                        vx: Math.cos(angle) * 2.5,
-                        vy: Math.sin(angle) * 2.5,
+                        speed: 0, // Pas de vitesse verticale directe
+                        vx: Math.cos(angle) * 2,
+                        vy: Math.sin(angle) * 2,
                         size: 6,
                         color: '#ffcc00'
                     });
                 }
-                // 3 projectiles ciblés
-                const dx5 = ship.x - boss.x;
-                const dy5 = ship.y - boss.y;
-                const dist5 = Math.sqrt(dx5 * dx5 + dy5 * dy5);
-                if (dist5 > 0) {
-                    for (let i = -1; i <= 1; i++) {
-                        bossBullets.push({
-                            x: boss.x + i * 8,
-                            y: boss.y + boss.size,
-                            speed: 4.5,
-                            vx: (dx5 / dist5) * 3,
-                            size: 7,
-                            color: '#ffdd00'
-                        });
-                    }
-                }
                 break;
                 
             case 6:
-                // Tir en spirale amélioré (5 projectiles + spirale double)
-                const spiralAngle = boss.patternTime * 0.015;
-                for (let i = 0; i < 5; i++) {
-                    const angle = spiralAngle + (i * Math.PI * 2 / 5);
-                    bossBullets.push({
-                        x: boss.x,
-                        y: boss.y,
-                        speed: 0,
-                        vx: Math.cos(angle) * 3,
-                        vy: Math.sin(angle) * 3,
-                        size: 6,
-                        color: '#ffff00'
-                    });
-                }
-                // Spirale inverse
-                const reverseAngle = -spiralAngle;
+                // Tir en spirale
+                const spiralAngle = boss.patternTime * 0.01;
                 for (let i = 0; i < 3; i++) {
-                    const angle = reverseAngle + (i * Math.PI * 2 / 3);
+                    const angle = spiralAngle + (i * Math.PI * 2 / 3);
                     bossBullets.push({
                         x: boss.x,
                         y: boss.y,
-                        speed: 0,
+                        speed: 0, // Pas de vitesse verticale directe
                         vx: Math.cos(angle) * 2.5,
                         vy: Math.sin(angle) * 2.5,
-                        size: 5,
-                        color: '#ffee00'
+                        size: 6,
+                        color: '#ffff00'
                     });
                 }
                 break;
                 
             case 7:
-                // Tir rapide amélioré (7 projectiles + 2 ciblés)
-                for (let i = -3; i <= 3; i++) {
+                // Tir rapide en éventail (5 projectiles)
+                for (let i = -2; i <= 2; i++) {
                     bossBullets.push({
-                        x: boss.x + i * 10,
+                        x: boss.x + i * 12,
                         y: boss.y + boss.size,
-                        speed: 4.5,
-                        vx: i * 0.7,
+                        speed: 4,
+                        vx: i * 0.6,
                         size: 6,
                         color: '#ff00ff'
                     });
                 }
-                // 2 projectiles ciblés rapides
-                const dx7 = ship.x - boss.x;
-                const dy7 = ship.y - boss.y;
-                const dist7 = Math.sqrt(dx7 * dx7 + dy7 * dy7);
-                if (dist7 > 0) {
-                    for (let i = -1; i <= 1; i += 2) {
-                        bossBullets.push({
-                            x: boss.x + i * 15,
-                            y: boss.y + boss.size,
-                            speed: 5,
-                            vx: (dx7 / dist7) * 3.5,
-                            size: 7,
-                            color: '#ff22ff'
-                        });
-                    }
-                }
                 break;
                 
             case 8:
-                // Tir en vague amélioré (7 projectiles + vague double)
-                for (let i = -3; i <= 3; i++) {
-                    const waveOffset = Math.sin(boss.patternTime * 0.015 + i) * 12;
+                // Tir en vague
+                for (let i = -2; i <= 2; i++) {
+                    const waveOffset = Math.sin(boss.patternTime * 0.01 + i) * 10;
                     bossBullets.push({
-                        x: boss.x + i * 12 + waveOffset,
+                        x: boss.x + i * 15 + waveOffset,
                         y: boss.y + boss.size,
                         speed: 4.5,
-                        vx: i * 0.8,
+                        vx: i * 0.7,
                         size: 6,
                         color: '#ff33ff'
-                    });
-                }
-                // Vague inverse
-                for (let i = -2; i <= 2; i++) {
-                    const waveOffset2 = Math.sin(-boss.patternTime * 0.015 + i) * 10;
-                    bossBullets.push({
-                        x: boss.x + i * 14 + waveOffset2,
-                        y: boss.y + boss.size + 20,
-                        speed: 4,
-                        vx: i * 0.6,
-                        size: 5,
-                        color: '#ff44ff'
                     });
                 }
                 break;
                 
             case 9:
-                // Tir chaotique amélioré (8 directions aléatoires + 3 ciblés)
-                for (let i = 0; i < 8; i++) {
+                // Tir chaotique (multiple directions aléatoires)
+                for (let i = 0; i < 5; i++) {
                     const randomAngle = Math.random() * Math.PI * 2;
                     bossBullets.push({
                         x: boss.x,
                         y: boss.y,
-                        speed: 0,
-                        vx: Math.cos(randomAngle) * 3.5,
-                        vy: Math.sin(randomAngle) * 3.5,
+                        speed: 0, // Pas de vitesse verticale directe
+                        vx: Math.cos(randomAngle) * 3,
+                        vy: Math.sin(randomAngle) * 3,
                         size: 5,
                         color: '#ff66ff'
                     });
                 }
-                // 3 projectiles ciblés rapides
-                const dx9 = ship.x - boss.x;
-                const dy9 = ship.y - boss.y;
-                const dist9 = Math.sqrt(dx9 * dx9 + dy9 * dy9);
-                if (dist9 > 0) {
-                    for (let i = -1; i <= 1; i++) {
-                        bossBullets.push({
-                            x: boss.x + i * 10,
-                            y: boss.y + boss.size,
-                            speed: 5.5,
-                            vx: (dx9 / dist9) * 4 + i * 0.4,
-                            size: 6,
-                            color: '#ff77ff'
-                        });
-                    }
-                }
                 break;
                 
             case 10:
-                // Boss final amélioré : Tir en étoile (16 directions) + spirale + 5 ciblés
-                // Étoile principale (16 directions)
-                for (let i = 0; i < 16; i++) {
-                    const angle = (i / 16) * Math.PI * 2;
+                // Boss final : Tir en étoile (12 directions) + tir ciblé
+                for (let i = 0; i < 12; i++) {
+                    const angle = (i / 12) * Math.PI * 2;
                     bossBullets.push({
                         x: boss.x,
                         y: boss.y,
-                        speed: 0,
-                        vx: Math.cos(angle) * 3.5,
-                        vy: Math.sin(angle) * 3.5,
+                        speed: 0, // Pas de vitesse verticale directe
+                        vx: Math.cos(angle) * 3,
+                        vy: Math.sin(angle) * 3,
                         size: 6,
                         color: '#ffffff'
                     });
                 }
-                // Spirale supplémentaire
-                const spiralAngle10 = boss.patternTime * 0.02;
-                for (let i = 0; i < 4; i++) {
-                    const angle = spiralAngle10 + (i * Math.PI * 2 / 4);
-                    bossBullets.push({
-                        x: boss.x,
-                        y: boss.y,
-                        speed: 0,
-                        vx: Math.cos(angle) * 3,
-                        vy: Math.sin(angle) * 3,
-                        size: 5,
-                        color: '#ffeeee'
-                    });
-                }
-                // 5 projectiles ciblés puissants
+                // Tir ciblé supplémentaire
                 const dx2 = ship.x - boss.x;
                 const dy2 = ship.y - boss.y;
                 const dist2 = Math.sqrt(dx2 * dx2 + dy2 * dy2);
                 if (dist2 > 0) {
-                    for (let i = -2; i <= 2; i++) {
-                        bossBullets.push({
-                            x: boss.x + i * 12,
-                            y: boss.y + boss.size,
-                            speed: 5.5,
-                            vx: (dx2 / dist2) * 4 + i * 0.3,
-                            size: 8,
-                            color: '#ff0000'
-                        });
-                    }
+                    bossBullets.push({
+                        x: boss.x,
+                        y: boss.y + boss.size,
+                        speed: 5,
+                        vx: (dx2 / dist2) * 3,
+                        vy: undefined, // Pas de vy pour ce projectile
+                        size: 8,
+                        color: '#ff0000'
+                    });
                 }
                 break;
         }
@@ -3727,13 +3588,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!gameState.isPlaying || gameState.isPaused) return;
         
         // Vérifie le cooldown de tir (normalisé par delta time)
-        // Double vérification pour éviter le spam
         if (shootCooldown > 0) {
             return;
         }
         
-        // Réinitialiser le cooldown IMMÉDIATEMENT avant de créer les projectiles
-        // pour éviter tout spam possible
+        // Réinitialiser le cooldown
         shootCooldown = currentFireRate;
         
         const bulletSize = activePowerUps.bigBullets ? 8 : 4;
@@ -3820,8 +3679,8 @@ document.addEventListener('DOMContentLoaded', function() {
         if (e.code === 'Space') {
             e.preventDefault();
             if (gameState.isPlaying) {
-                // Le tir automatique est géré dans update() avec delta time et cooldown
-                // On ne tire pas directement ici pour respecter le cooldown
+                // Le tir automatique est maintenant géré dans update() avec delta time
+                shoot();
             } else if (startScreen && !startScreen.classList.contains('hidden')) {
                 startGame();
             } else if (gameOver && !gameOver.classList.contains('hidden')) {
