@@ -4,37 +4,6 @@
  * (GSAP et tous ses plugins ont été retirés)
  */
 document.addEventListener('DOMContentLoaded', function() {
-    // Ajuster la hauteur du background animé pour qu'il suive le document
-    function updateBackgroundHeight() {
-        const animatedBg = document.querySelector('.animated-background');
-        if (animatedBg) {
-            const bodyHeight = document.body.scrollHeight;
-            const viewportHeight = window.innerHeight;
-            animatedBg.style.height = `${Math.max(bodyHeight, viewportHeight)}px`;
-        }
-    }
-    
-    // Ajuster au chargement
-    updateBackgroundHeight();
-    
-    // Ajuster lors du redimensionnement
-    let resizeTimeout;
-    window.addEventListener('resize', function() {
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(updateBackgroundHeight, 100);
-    });
-    
-    // Observer les changements de hauteur du body
-    const observer = new MutationObserver(updateBackgroundHeight);
-    if (document.body) {
-        observer.observe(document.body, {
-            childList: true,
-            subtree: true,
-            attributes: true,
-            attributeFilter: ['style', 'class']
-        });
-    }
-    
     const pageLoader = document.querySelector('.page-loader');
     
     if (pageLoader) {
@@ -44,7 +13,6 @@ document.addEventListener('DOMContentLoaded', function() {
             // Retire le loader du DOM après l'animation
             setTimeout(() => {
                 pageLoader.remove();
-                updateBackgroundHeight(); // Réajuster après le retrait du loader
             }, 500);
         }, 2000);
     }
@@ -275,25 +243,29 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 600);
         });
     });
+    // Curseur personnalisé - directement sur la souris
     const cursor = document.createElement('div');
     cursor.classList.add('custom-cursor');
     document.body.appendChild(cursor);
     
-    let cursorX = 0, cursorY = 0;
-    let mouseX = 0, mouseY = 0;
+    // Cacher le curseur système et utiliser la bulle
+    document.body.style.cursor = 'none';
     
+    // Positionner directement sur la souris (pas de lag)
     document.addEventListener('mousemove', (e) => {
-        mouseX = e.clientX;
-        mouseY = e.clientY;
+        cursor.style.left = e.clientX + 'px';
+        cursor.style.top = e.clientY + 'px';
+        cursor.style.transform = 'translate(-50%, -50%)';
     });
     
-    function animateCursor() {
-        cursorX += (mouseX - cursorX) * 0.1;
-        cursorY += (mouseY - cursorY) * 0.1;
-        cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0)`;
-        requestAnimationFrame(animateCursor);
-    }
-    animateCursor();
+    // Masquer le curseur quand la souris quitte la page
+    document.addEventListener('mouseleave', () => {
+        cursor.style.opacity = '0';
+    });
+    
+    document.addEventListener('mouseenter', () => {
+        cursor.style.opacity = '1';
+    });
     
     // Agrandit le curseur au survol des éléments interactifs
     const interactiveElements = document.querySelectorAll('a, button, .portfolio-item, .graphisme-card');
