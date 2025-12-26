@@ -418,13 +418,20 @@ document.addEventListener('DOMContentLoaded', function() {
     function createHitEffect(chicken) {
         const rect = chicken.getBoundingClientRect();
         const arena = document.getElementById('chicken-arena');
+        const arenaRect = arena.getBoundingClientRect();
         
         for (let i = 0; i < 5; i++) {
             const particle = document.createElement('div');
             particle.className = 'hit-particle';
-            particle.style.left = (rect.left - arena.getBoundingClientRect().left + rect.width / 2) + 'px';
-            particle.style.top = (rect.top - arena.getBoundingClientRect().top + rect.height / 2) + 'px';
-            particle.style.setProperty('--angle', (Math.PI * 2 * i / 5) + 'rad');
+            const angle = (Math.PI * 2 * i) / 5;
+            const distance = 50;
+            const tx = Math.cos(angle) * distance;
+            const ty = Math.sin(angle) * distance;
+            
+            particle.style.left = (rect.left - arenaRect.left + rect.width / 2) + 'px';
+            particle.style.top = (rect.top - arenaRect.top + rect.height / 2) + 'px';
+            particle.style.setProperty('--tx', tx + 'px');
+            particle.style.setProperty('--ty', ty + 'px');
             arena.appendChild(particle);
             
             setTimeout(() => {
