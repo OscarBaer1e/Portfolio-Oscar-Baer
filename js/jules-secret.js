@@ -1,5 +1,5 @@
 /**
- * Script pour la page secrète Jules - Mini-jeux améliorés
+ * Script pour la page secrète Jules - Mini-jeux optimisés
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ============================================
-    // MINI-JEU 1 : STAND DE GLACE - STACK GAME
+    // MINI-JEU 1 : STAND DE GLACE - STACK GAME (OPTIMISÉ)
     // ============================================
     let iceCreamGame = {
         score: 0,
@@ -21,16 +21,26 @@ document.addEventListener('DOMContentLoaded', function() {
         scoopSize: 60,
         baseWidth: 100,
         currentWidth: 100,
-        direction: 1, // 1 = droite, -1 = gauche
-        gameInterval: null,
-        fallInterval: null
+        direction: 1,
+        position: 0,
+        maxPosition: 0,
+        animationFrame: null,
+        // Cache DOM
+        stackEl: null,
+        scoreEl: null,
+        levelEl: null
     };
 
     window.openIceCreamGame = function() {
         const overlay = document.getElementById('ice-cream-game-overlay');
         overlay.classList.add('active');
-        // Restaurer le curseur normal dans le jeu
         restoreCursorInGame(overlay);
+        
+        // Cache des éléments DOM
+        iceCreamGame.stackEl = document.getElementById('ice-cream-stack');
+        iceCreamGame.scoreEl = document.getElementById('ice-cream-score');
+        iceCreamGame.levelEl = document.getElementById('ice-cream-level');
+        
         resetIceCreamGame();
         startIceCreamGame();
     };
@@ -41,28 +51,30 @@ document.addEventListener('DOMContentLoaded', function() {
         iceCreamGame.speed = 2;
         iceCreamGame.currentWidth = iceCreamGame.baseWidth;
         iceCreamGame.direction = 1;
+        iceCreamGame.position = 0;
         iceCreamGame.gameRunning = true;
         
-        const stack = document.getElementById('ice-cream-stack');
-        stack.innerHTML = '';
-        document.getElementById('ice-cream-score').textContent = '0';
-        document.getElementById('ice-cream-level').textContent = '1';
+        if (iceCreamGame.stackEl) {
+            iceCreamGame.stackEl.innerHTML = '';
+            iceCreamGame.maxPosition = (iceCreamGame.stackEl.offsetWidth - iceCreamGame.currentWidth) / 2;
+        }
+        if (iceCreamGame.scoreEl) iceCreamGame.scoreEl.textContent = '0';
+        if (iceCreamGame.levelEl) iceCreamGame.levelEl.textContent = '1';
     }
 
     function startIceCreamGame() {
-        const stack = document.getElementById('ice-cream-stack');
+        if (!iceCreamGame.stackEl) return;
+        
+        // Détection du clic pour placer la boule
+        iceCreamGame.stackEl.addEventListener('click', placeScoop, { once: false });
         
         // Créer la première boule qui bouge
         createFallingScoop();
-        
-        // Détection du clic pour placer la boule
-        stack.addEventListener('click', placeScoop);
     }
 
     function createFallingScoop() {
-        if (!iceCreamGame.gameRunning) return;
+        if (!iceCreamGame.gameRunning || !iceCreamGame.stackEl) return;
         
-        const stack = document.getElementById('ice-cream-stack');
         const flavors = ['vanilla', 'chocolate', 'strawberry', 'mint'];
         const flavor = flavors[Math.floor(Math.random() * flavors.length)];
         
@@ -75,62 +87,66 @@ document.addEventListener('DOMContentLoaded', function() {
         iceCreamGame.fallingScoop.style.left = '50%';
         iceCreamGame.fallingScoop.style.transform = 'translateX(-50%)';
         iceCreamGame.fallingScoop.style.transition = 'none';
+        iceCreamGame.fallingScoop.style.willChange = 'transform';
         
-        stack.appendChild(iceCreamGame.fallingScoop);
+        iceCreamGame.stackEl.appendChild(iceCreamGame.fallingScoop);
         
-        // Animation de mouvement horizontal
-        let position = 0;
-        const maxPosition = (stack.offsetWidth - iceCreamGame.currentWidth) / 2;
+        // Réinitialiser la position
+        iceCreamGame.position = 0;
         
-        iceCreamGame.fallInterval = setInterval(() => {
-            if (!iceCreamGame.gameRunning) {
-                clearInterval(iceCreamGame.fallInterval);
-                return;
-            }
+        // Animation avec requestAnimationFrame (plus fluide)
+        function animate() {
+            if (!iceCreamGame.gameRunning || !iceCreamGame.fallingScoop) return;
             
-            position += iceCreamGame.speed * iceCreamGame.direction;
+            iceCreamGame.position += iceCreamGame.speed * iceCreamGame.direction;
             
-            if (position >= maxPosition || position <= -maxPosition) {
+            if (iceCreamGame.position >= iceCreamGame.maxPosition || iceCreamGame.position <= -iceCreamGame.maxPosition) {
                 iceCreamGame.direction *= -1;
             }
             
             if (iceCreamGame.fallingScoop) {
-                iceCreamGame.fallingScoop.style.left = `calc(50% + ${position}px)`;
+                iceCreamGame.fallingScoop.style.transform = `translateX(calc(-50% + ${iceCreamGame.position}px))`;
             }
-        }, 16);
+            
+            iceCreamGame.animationFrame = requestAnimationFrame(animate);
+        }
+        
+        iceCreamGame.animationFrame = requestAnimationFrame(animate);
     }
 
     function placeScoop() {
-        if (!iceCreamGame.gameRunning || !iceCreamGame.fallingScoop) return;
+        if (!iceCreamGame.gameRunning || !iceCreamGame.fallingScoop || !iceCreamGame.stackEl) return;
         
-        const stack = document.getElementById('ice-cream-stack');
+        // Annuler l'animation
+        if (iceCreamGame.animationFrame) {
+            cancelAnimationFrame(iceCreamGame.animationFrame);
+            iceCreamGame.animationFrame = null;
+        }
+        
         const falling = iceCreamGame.fallingScoop;
-        const rect = falling.getBoundingClientRect();
-        const stackRect = stack.getBoundingClientRect();
-        const leftOffset = rect.left - stackRect.left;
-        const scoopWidth = rect.width;
+        const scoopWidth = iceCreamGame.currentWidth;
         
         // Vérifier si la boule est bien placée (tolérance de 20px)
         const lastScoop = iceCreamGame.stack[iceCreamGame.stack.length - 1];
         let isValid = true;
         
         if (lastScoop) {
-            const lastRect = lastScoop.getBoundingClientRect();
-            const lastLeft = lastRect.left - stackRect.left;
-            const diff = Math.abs(leftOffset - lastLeft);
+            // Utiliser la position calculée au lieu de getBoundingClientRect (plus rapide)
+            const lastPosition = iceCreamGame.position;
+            const currentPosition = iceCreamGame.position;
+            const diff = Math.abs(currentPosition - lastPosition);
             
             if (diff > 20) {
-                // Game Over
                 endIceCreamGame();
                 return;
             }
             
             // Réduire la largeur pour le prochain niveau
             iceCreamGame.currentWidth = Math.max(40, iceCreamGame.currentWidth - 2);
+            iceCreamGame.maxPosition = (iceCreamGame.stackEl.offsetWidth - iceCreamGame.currentWidth) / 2;
         }
         
         // Placer la boule
-        clearInterval(iceCreamGame.fallInterval);
         falling.classList.remove('falling-scoop');
         falling.style.position = 'relative';
         falling.style.bottom = 'auto';
@@ -139,48 +155,54 @@ document.addEventListener('DOMContentLoaded', function() {
         falling.style.width = scoopWidth + 'px';
         falling.style.height = scoopWidth + 'px';
         falling.style.margin = '0 auto';
+        falling.style.willChange = 'auto';
         
         iceCreamGame.stack.push(falling);
         iceCreamGame.score += 10;
-        document.getElementById('ice-cream-score').textContent = iceCreamGame.score;
+        if (iceCreamGame.scoreEl) iceCreamGame.scoreEl.textContent = iceCreamGame.score;
         
         // Augmenter la difficulté
         if (iceCreamGame.stack.length % 5 === 0) {
             iceCreamGame.speed += 0.5;
-            document.getElementById('ice-cream-level').textContent = Math.floor(iceCreamGame.stack.length / 5) + 1;
+            if (iceCreamGame.levelEl) {
+                iceCreamGame.levelEl.textContent = Math.floor(iceCreamGame.stack.length / 5) + 1;
+            }
         }
         
-        // Créer la prochaine boule
-        setTimeout(() => {
+        // Créer la prochaine boule immédiatement (pas de setTimeout)
+        requestAnimationFrame(() => {
             if (iceCreamGame.gameRunning) {
                 createFallingScoop();
             }
-        }, 300);
+        });
     }
 
     function endIceCreamGame() {
         iceCreamGame.gameRunning = false;
-        clearInterval(iceCreamGame.fallInterval);
+        if (iceCreamGame.animationFrame) {
+            cancelAnimationFrame(iceCreamGame.animationFrame);
+        }
         
-        const stack = document.getElementById('ice-cream-stack');
-        stack.removeEventListener('click', placeScoop);
+        if (iceCreamGame.stackEl) {
+            iceCreamGame.stackEl.removeEventListener('click', placeScoop);
+        }
         
         if (iceCreamGame.fallingScoop) {
-            iceCreamGame.fallingScoop.style.animation = 'shake 0.5s';
+            iceCreamGame.fallingScoop.style.animation = 'shake 0.3s';
             setTimeout(() => {
                 if (iceCreamGame.fallingScoop) {
                     iceCreamGame.fallingScoop.remove();
                 }
-            }, 500);
+            }, 300);
         }
         
         setTimeout(() => {
             alert(`🎉 Game Over !\nScore: ${iceCreamGame.score}\nHauteur: ${iceCreamGame.stack.length} boules`);
-        }, 600);
+        }, 350);
     }
 
     // ============================================
-    // MINI-JEU 2 : STAND DE MANGAS - MEMORY GAME
+    // MINI-JEU 2 : STAND DE MANGAS - MEMORY GAME (OPTIMISÉ)
     // ============================================
     let mangaGame = {
         cards: [],
@@ -188,7 +210,11 @@ document.addEventListener('DOMContentLoaded', function() {
         matchedPairs: 0,
         totalPairs: 8,
         canFlip: true,
-        moves: 0
+        moves: 0,
+        // Cache DOM
+        shelfEl: null,
+        scoreEl: null,
+        movesEl: null
     };
 
     const mangaEmojis = ['📖', '📕', '📗', '📘', '📙', '📓', '📔', '📒'];
@@ -196,8 +222,13 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openMangaGame = function() {
         const overlay = document.getElementById('manga-game-overlay');
         overlay.classList.add('active');
-        // Restaurer le curseur normal dans le jeu
         restoreCursorInGame(overlay);
+        
+        // Cache des éléments DOM
+        mangaGame.shelfEl = document.getElementById('manga-shelf');
+        mangaGame.scoreEl = document.getElementById('manga-score');
+        mangaGame.movesEl = document.getElementById('manga-moves');
+        
         resetMangaGame();
         generateMangaCards();
     };
@@ -209,13 +240,16 @@ document.addEventListener('DOMContentLoaded', function() {
         mangaGame.canFlip = true;
         mangaGame.moves = 0;
         
-        document.getElementById('manga-score').textContent = '0';
-        document.getElementById('manga-moves').textContent = '0';
+        if (mangaGame.scoreEl) mangaGame.scoreEl.textContent = '0';
+        if (mangaGame.movesEl) mangaGame.movesEl.textContent = '0';
     }
 
     function generateMangaCards() {
-        const shelf = document.getElementById('manga-shelf');
-        shelf.innerHTML = '';
+        if (!mangaGame.shelfEl) return;
+        
+        // Utiliser DocumentFragment pour réduire les reflows
+        const fragment = document.createDocumentFragment();
+        mangaGame.shelfEl.innerHTML = '';
         
         // Créer des paires
         let cardPairs = [];
@@ -224,8 +258,11 @@ document.addEventListener('DOMContentLoaded', function() {
             cardPairs.push({ id: index, emoji: emoji });
         });
         
-        // Mélanger
-        cardPairs.sort(() => Math.random() - 0.5);
+        // Mélanger (Fisher-Yates pour meilleure performance)
+        for (let i = cardPairs.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [cardPairs[i], cardPairs[j]] = [cardPairs[j], cardPairs[i]];
+        }
         
         // Créer les cartes
         cardPairs.forEach((pair, index) => {
@@ -234,11 +271,14 @@ document.addEventListener('DOMContentLoaded', function() {
             card.dataset.id = pair.id;
             card.dataset.index = index;
             card.innerHTML = '<div class="manga-card-back">?</div><div class="manga-card-front">' + pair.emoji + '</div>';
+            card.style.willChange = 'transform';
             
-            card.addEventListener('click', () => flipCard(card));
-            shelf.appendChild(card);
+            card.addEventListener('click', () => flipCard(card), { passive: true });
+            fragment.appendChild(card);
             mangaGame.cards.push(card);
         });
+        
+        mangaGame.shelfEl.appendChild(fragment);
     }
 
     function flipCard(card) {
@@ -252,11 +292,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (mangaGame.flippedCards.length === 2) {
             mangaGame.canFlip = false;
             mangaGame.moves++;
-            document.getElementById('manga-moves').textContent = mangaGame.moves;
+            if (mangaGame.movesEl) mangaGame.movesEl.textContent = mangaGame.moves;
             
+            // Réduire le délai de vérification (600ms au lieu de 1000ms)
             setTimeout(() => {
                 checkMatch();
-            }, 1000);
+            }, 600);
         }
     }
 
@@ -267,13 +308,15 @@ document.addEventListener('DOMContentLoaded', function() {
             // Match !
             card1.classList.add('matched');
             card2.classList.add('matched');
+            card1.style.willChange = 'auto';
+            card2.style.willChange = 'auto';
             mangaGame.matchedPairs++;
-            document.getElementById('manga-score').textContent = mangaGame.matchedPairs;
+            if (mangaGame.scoreEl) mangaGame.scoreEl.textContent = mangaGame.matchedPairs;
             
             if (mangaGame.matchedPairs === mangaGame.totalPairs) {
                 setTimeout(() => {
                     alert(`🎉 Félicitations !\nVous avez trouvé toutes les paires en ${mangaGame.moves} coups !`);
-                }, 500);
+                }, 300);
             }
         } else {
             // Pas de match
@@ -291,7 +334,7 @@ document.addEventListener('DOMContentLoaded', function() {
     };
 
     // ============================================
-    // MINI-JEU 3 : STAND DE POULET - WHACK-A-MOLE
+    // MINI-JEU 3 : STAND DE POULET - WHACK-A-MOLE (OPTIMISÉ)
     // ============================================
     let chickenGame = {
         score: 0,
@@ -300,14 +343,23 @@ document.addEventListener('DOMContentLoaded', function() {
         timer: null,
         spawnInterval: null,
         activeChickens: [],
-        holes: []
+        holes: [],
+        // Cache DOM
+        arenaEl: null,
+        scoreEl: null,
+        timeEl: null
     };
 
     window.openChickenGame = function() {
         const overlay = document.getElementById('chicken-game-overlay');
         overlay.classList.add('active');
-        // Restaurer le curseur normal dans le jeu
         restoreCursorInGame(overlay);
+        
+        // Cache des éléments DOM
+        chickenGame.arenaEl = document.getElementById('chicken-arena');
+        chickenGame.scoreEl = document.getElementById('chicken-score');
+        chickenGame.timeEl = document.getElementById('chicken-time');
+        
         resetChickenGame();
         createChickenHoles();
         startChickenGame();
@@ -319,13 +371,16 @@ document.addEventListener('DOMContentLoaded', function() {
         chickenGame.gameRunning = false;
         chickenGame.activeChickens = [];
         
-        document.getElementById('chicken-score').textContent = '0';
-        document.getElementById('chicken-time').textContent = '30';
+        if (chickenGame.scoreEl) chickenGame.scoreEl.textContent = '0';
+        if (chickenGame.timeEl) chickenGame.timeEl.textContent = '30';
     }
 
     function createChickenHoles() {
-        const arena = document.getElementById('chicken-arena');
-        arena.innerHTML = '';
+        if (!chickenGame.arenaEl) return;
+        
+        // Utiliser DocumentFragment
+        const fragment = document.createDocumentFragment();
+        chickenGame.arenaEl.innerHTML = '';
         chickenGame.holes = [];
         
         // Créer une grille 3x3 de trous
@@ -333,40 +388,45 @@ document.addEventListener('DOMContentLoaded', function() {
             const hole = document.createElement('div');
             hole.className = 'chicken-hole';
             hole.dataset.index = i;
-            arena.appendChild(hole);
+            fragment.appendChild(hole);
             chickenGame.holes.push(hole);
         }
+        
+        chickenGame.arenaEl.appendChild(fragment);
     }
 
     function startChickenGame() {
         chickenGame.gameRunning = true;
         
-        // Timer
+        // Timer optimisé
         chickenGame.timer = setInterval(() => {
             chickenGame.time--;
-            document.getElementById('chicken-time').textContent = chickenGame.time;
+            if (chickenGame.timeEl) chickenGame.timeEl.textContent = chickenGame.time;
             
             if (chickenGame.time <= 0) {
                 endChickenGame();
             }
         }, 1000);
         
-        // Spawn poulets
+        // Spawn poulets (intervalle réduit : 1200ms au lieu de 1500ms)
         spawnChicken();
         chickenGame.spawnInterval = setInterval(() => {
             if (chickenGame.gameRunning && chickenGame.activeChickens.length < 3) {
                 spawnChicken();
             }
-        }, 1500);
+        }, 1200);
     }
 
     function spawnChicken() {
-        if (!chickenGame.gameRunning) return;
+        if (!chickenGame.gameRunning || !chickenGame.arenaEl) return;
         
-        // Trouver un trou libre
-        const availableHoles = chickenGame.holes.filter(hole => {
-            return !hole.querySelector('.chicken');
-        });
+        // Trouver un trou libre (optimisé)
+        const availableHoles = [];
+        for (let i = 0; i < chickenGame.holes.length; i++) {
+            if (!chickenGame.holes[i].querySelector('.chicken')) {
+                availableHoles.push(chickenGame.holes[i]);
+            }
+        }
         
         if (availableHoles.length === 0) return;
         
@@ -374,23 +434,26 @@ document.addEventListener('DOMContentLoaded', function() {
         const chicken = document.createElement('div');
         chicken.className = 'chicken';
         chicken.textContent = '🍗';
+        chicken.style.willChange = 'transform, opacity';
         
-        chicken.addEventListener('click', () => {
+        // Utiliser une fonction optimisée pour le clic
+        const hitHandler = () => {
             if (chickenGame.gameRunning) {
                 hitChicken(chicken);
             }
-        });
+        };
+        chicken.addEventListener('click', hitHandler, { passive: true });
         
         randomHole.appendChild(chicken);
-        chickenGame.activeChickens.push({ element: chicken, hole: randomHole });
+        chickenGame.activeChickens.push({ element: chicken, hole: randomHole, hitHandler: hitHandler });
         
-        // Animation d'apparition
-        setTimeout(() => {
+        // Animation d'apparition immédiate (requestAnimationFrame)
+        requestAnimationFrame(() => {
             chicken.classList.add('appear');
-        }, 10);
+        });
         
-        // Le poulet disparaît après 2-4 secondes
-        const disappearTime = 2000 + Math.random() * 2000;
+        // Le poulet disparaît après 1.5-3 secondes (réduit)
+        const disappearTime = 1500 + Math.random() * 1500;
         setTimeout(() => {
             if (chicken.parentNode && chickenGame.gameRunning) {
                 removeChicken(chicken);
@@ -401,36 +464,43 @@ document.addEventListener('DOMContentLoaded', function() {
     function hitChicken(chicken) {
         chicken.classList.add('hit');
         chickenGame.score += 10;
-        document.getElementById('chicken-score').textContent = chickenGame.score;
+        if (chickenGame.scoreEl) chickenGame.scoreEl.textContent = chickenGame.score;
         
-        // Effet de particules
+        // Effet de particules (réduit à 3 au lieu de 5)
         createHitEffect(chicken);
         
-        setTimeout(() => {
-            removeChicken(chicken);
-        }, 300);
+        // Retirer immédiatement
+        removeChicken(chicken);
     }
 
     function removeChicken(chicken) {
         chicken.classList.add('disappear');
+        // Retirer l'event listener
+        const chickenData = chickenGame.activeChickens.find(c => c.element === chicken);
+        if (chickenData && chickenData.hitHandler) {
+            chicken.removeEventListener('click', chickenData.hitHandler);
+        }
+        
         setTimeout(() => {
             if (chicken.parentNode) {
                 chicken.remove();
             }
             chickenGame.activeChickens = chickenGame.activeChickens.filter(c => c.element !== chicken);
-        }, 300);
+        }, 200); // Réduit de 300ms à 200ms
     }
 
     function createHitEffect(chicken) {
-        const rect = chicken.getBoundingClientRect();
-        const arena = document.getElementById('chicken-arena');
-        const arenaRect = arena.getBoundingClientRect();
+        if (!chickenGame.arenaEl) return;
         
-        for (let i = 0; i < 5; i++) {
+        const rect = chicken.getBoundingClientRect();
+        const arenaRect = chickenGame.arenaEl.getBoundingClientRect();
+        
+        // Réduire à 3 particules
+        for (let i = 0; i < 3; i++) {
             const particle = document.createElement('div');
             particle.className = 'hit-particle';
-            const angle = (Math.PI * 2 * i) / 5;
-            const distance = 50;
+            const angle = (Math.PI * 2 * i) / 3;
+            const distance = 40;
             const tx = Math.cos(angle) * distance;
             const ty = Math.sin(angle) * distance;
             
@@ -438,48 +508,48 @@ document.addEventListener('DOMContentLoaded', function() {
             particle.style.top = (rect.top - arenaRect.top + rect.height / 2) + 'px';
             particle.style.setProperty('--tx', tx + 'px');
             particle.style.setProperty('--ty', ty + 'px');
-            arena.appendChild(particle);
+            particle.style.willChange = 'transform, opacity';
+            chickenGame.arenaEl.appendChild(particle);
             
             setTimeout(() => {
                 particle.remove();
-            }, 500);
+            }, 400); // Réduit de 500ms à 400ms
         }
     }
 
     function endChickenGame() {
         chickenGame.gameRunning = false;
-        clearInterval(chickenGame.timer);
-        clearInterval(chickenGame.spawnInterval);
+        if (chickenGame.timer) clearInterval(chickenGame.timer);
+        if (chickenGame.spawnInterval) clearInterval(chickenGame.spawnInterval);
         
         // Retirer tous les poulets
-        chickenGame.activeChickens.forEach(({ element }) => {
+        chickenGame.activeChickens.forEach(({ element, hitHandler }) => {
+            if (hitHandler) element.removeEventListener('click', hitHandler);
             removeChicken(element);
         });
         
         setTimeout(() => {
-            const arena = document.getElementById('chicken-arena');
-            arena.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 2rem; color: var(--primary-color); flex-direction: column; gap: 20px;">
-                <div>🎉 Temps écoulé !</div>
-                <div>Score final: ${chickenGame.score}</div>
-            </div>`;
-        }, 500);
+            if (chickenGame.arenaEl) {
+                chickenGame.arenaEl.innerHTML = `<div style="display: flex; align-items: center; justify-content: center; height: 100%; font-size: 2rem; color: var(--primary-color); flex-direction: column; gap: 20px;">
+                    <div>🎉 Temps écoulé !</div>
+                    <div>Score final: ${chickenGame.score}</div>
+                </div>`;
+            }
+        }, 300); // Réduit de 500ms à 300ms
     }
 
     // ============================================
     // GESTION DU CURSEUR DANS LES JEUX
     // ============================================
     function restoreCursorInGame(overlay) {
-        // Cacher le curseur personnalisé
         const customCursor = document.querySelector('.custom-cursor');
         if (customCursor) {
             customCursor.style.display = 'none';
         }
         
-        // Restaurer le curseur normal sur le body et l'overlay
         document.body.style.cursor = 'auto';
         overlay.style.cursor = 'auto';
         
-        // S'assurer que tous les éléments interactifs dans l'overlay ont le bon curseur
         const interactiveElements = overlay.querySelectorAll('button, .chicken, .manga-card, .ice-cream-scoop, .chicken-hole');
         interactiveElements.forEach(el => {
             if (el.tagName === 'BUTTON' || el.classList.contains('chicken') || el.classList.contains('manga-card')) {
@@ -491,7 +561,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function restoreCustomCursor() {
-        // Restaurer le curseur personnalisé
         const customCursor = document.querySelector('.custom-cursor');
         if (customCursor) {
             customCursor.style.display = 'block';
@@ -506,16 +575,18 @@ document.addEventListener('DOMContentLoaded', function() {
         const overlay = document.getElementById(`${gameType}-game-overlay`);
         if (overlay) {
             overlay.classList.remove('active');
-            // Restaurer le curseur personnalisé
             restoreCustomCursor();
         }
         
         // Reset games
         if (gameType === 'ice-cream') {
             iceCreamGame.gameRunning = false;
-            clearInterval(iceCreamGame.fallInterval);
-            const stack = document.getElementById('ice-cream-stack');
-            stack.removeEventListener('click', placeScoop);
+            if (iceCreamGame.animationFrame) {
+                cancelAnimationFrame(iceCreamGame.animationFrame);
+            }
+            if (iceCreamGame.stackEl) {
+                iceCreamGame.stackEl.removeEventListener('click', placeScoop);
+            }
         } else if (gameType === 'chicken') {
             chickenGame.gameRunning = false;
             if (chickenGame.timer) clearInterval(chickenGame.timer);
