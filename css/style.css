@@ -2767,6 +2767,155 @@ img[loading="lazy"].loaded {
     margin-right: 5px;
 }
 
+/* ================================================
+   BOUTON JULES AVEC EXPLOSIONS
+   ================================================ */
+.jules-explosion-btn {
+    position: relative;
+    background: linear-gradient(135deg, rgba(255, 0, 255, 0.2), rgba(0, 255, 255, 0.2));
+    border: 3px solid var(--secondary-color);
+    color: var(--light-text-color);
+    font-size: 1.5rem;
+    font-weight: 700;
+    padding: 20px 40px;
+    border-radius: 50px;
+    cursor: pointer;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    box-shadow: 
+        0 0 20px rgba(255, 0, 255, 0.5),
+        0 0 40px rgba(0, 255, 255, 0.3),
+        inset 0 0 20px rgba(255, 0, 255, 0.1);
+    z-index: 10;
+}
+
+.jules-explosion-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 
+        0 0 30px rgba(255, 0, 255, 0.8),
+        0 0 60px rgba(0, 255, 255, 0.5),
+        inset 0 0 30px rgba(255, 0, 255, 0.2);
+    border-color: var(--primary-color);
+}
+
+.jules-explosion-btn:active {
+    transform: scale(0.95);
+}
+
+.jules-text {
+    position: relative;
+    z-index: 2;
+    text-shadow: 
+        0 0 10px var(--secondary-color),
+        0 0 20px var(--primary-color),
+        0 0 30px var(--secondary-color);
+    animation: textPulse 2s ease-in-out infinite;
+}
+
+@keyframes textPulse {
+    0%, 100% {
+        text-shadow: 
+            0 0 10px var(--secondary-color),
+            0 0 20px var(--primary-color),
+            0 0 30px var(--secondary-color);
+    }
+    50% {
+        text-shadow: 
+            0 0 20px var(--secondary-color),
+            0 0 40px var(--primary-color),
+            0 0 60px var(--secondary-color);
+    }
+}
+
+.explosion-particles {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    pointer-events: none;
+}
+
+.explosion-particles::before,
+.explosion-particles::after {
+    content: '';
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    box-shadow: 
+        0 0 10px var(--primary-color),
+        0 0 20px var(--secondary-color);
+    opacity: 0;
+}
+
+.jules-explosion-btn.exploding .explosion-particles::before {
+    animation: explode1 0.8s ease-out forwards;
+}
+
+.jules-explosion-btn.exploding .explosion-particles::after {
+    animation: explode2 0.8s ease-out forwards;
+}
+
+@keyframes explode1 {
+    0% {
+        transform: translate(-50%, -50%) scale(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) translate(100px, -100px) scale(1.5) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+@keyframes explode2 {
+    0% {
+        transform: translate(-50%, -50%) scale(0) rotate(0deg);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) translate(-100px, 100px) scale(1.5) rotate(-360deg);
+        opacity: 0;
+    }
+}
+
+/* Création de particules d'explosion dynamiques */
+.explosion-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+}
+
+.explosion-particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: var(--primary-color);
+    border-radius: 50%;
+    box-shadow: 
+        0 0 8px var(--primary-color),
+        0 0 16px var(--secondary-color);
+    animation: particleExplode 1s ease-out forwards;
+}
+
+@keyframes particleExplode {
+    0% {
+        transform: scale(0) translate(0, 0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) translate(var(--tx, 0), var(--ty, 0));
+        opacity: 0;
+    }
+}
+
 /* Responsive pour le modal */
 @media (max-width: 768px) {
     .zoom-modal-content {

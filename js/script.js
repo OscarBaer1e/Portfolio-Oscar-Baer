@@ -22,6 +22,65 @@ document.addEventListener('DOMContentLoaded', function() {
         el.textContent = new Date().getFullYear();
     });
 
+    // ===============================================
+    // BOUTON JULES AVEC EXPLOSIONS
+    // ===============================================
+    const julesButton = document.getElementById('jules-button');
+    if (julesButton) {
+        julesButton.addEventListener('click', function(e) {
+            const rect = this.getBoundingClientRect();
+            const centerX = rect.left + rect.width / 2;
+            const centerY = rect.top + rect.height / 2;
+            
+            // Ajouter la classe d'explosion
+            this.classList.add('exploding');
+            
+            // Créer un conteneur pour les particules
+            let explosionContainer = document.querySelector('.explosion-container');
+            if (!explosionContainer) {
+                explosionContainer = document.createElement('div');
+                explosionContainer.classList.add('explosion-container');
+                document.body.appendChild(explosionContainer);
+            }
+            
+            // Créer 20 particules d'explosion
+            for (let i = 0; i < 20; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('explosion-particle');
+                
+                // Position initiale au centre du bouton
+                particle.style.left = centerX + 'px';
+                particle.style.top = centerY + 'px';
+                
+                // Direction aléatoire pour chaque particule
+                const angle = (Math.PI * 2 * i) / 20;
+                const distance = 100 + Math.random() * 150;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                
+                particle.style.setProperty('--tx', tx + 'px');
+                particle.style.setProperty('--ty', ty + 'px');
+                
+                // Couleur aléatoire (cyan ou magenta)
+                const color = Math.random() > 0.5 ? 'var(--primary-color)' : 'var(--secondary-color)';
+                particle.style.background = color;
+                particle.style.boxShadow = `0 0 8px ${color}, 0 0 16px ${color === 'var(--primary-color)' ? 'var(--secondary-color)' : 'var(--primary-color)'}`;
+                
+                explosionContainer.appendChild(particle);
+                
+                // Retirer la particule après l'animation
+                setTimeout(() => {
+                    particle.remove();
+                }, 1000);
+            }
+            
+            // Retirer la classe d'explosion après l'animation
+            setTimeout(() => {
+                this.classList.remove('exploding');
+            }, 800);
+        });
+    }
+
     const menuToggle = document.querySelector('.menu-toggle');
     const navList = document.querySelector('.nav-list');
 
