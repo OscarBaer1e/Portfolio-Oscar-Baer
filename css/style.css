@@ -409,6 +409,7 @@ p {
     font-weight: 700;
     color: var(--light-text-color);
     text-align: left !important; /* Titres non justifiés */
+    text-shadow: 0 0 20px var(--primary-color), 0 0 40px rgba(0, 255, 255, 0.5); /* Contraste amélioré */
 }
 
 .section-title::after {
@@ -531,8 +532,8 @@ header .container {
     font-size: 2.5rem; /* Légèrement plus grand */
     font-weight: 800;
     letter-spacing: 3px;
-    /* Ombre néon plus forte */
-    text-shadow: 0 0 8px var(--primary-color), 0 0 15px var(--primary-color);
+    /* Ombre néon plus forte - Contraste amélioré */
+    text-shadow: 0 0 10px var(--primary-color), 0 0 20px var(--primary-color), 0 0 30px rgba(0, 255, 255, 0.5);
 }
 
 .logo a {
@@ -1793,6 +1794,7 @@ footer .container {
 }
 
 .article-card h3 {
+    text-shadow: 0 0 10px var(--primary-color); /* Contraste amélioré */
     color: var(--primary-color);
     font-size: 1.4rem;
     margin-bottom: 10px;
@@ -1801,6 +1803,9 @@ footer .container {
 }
 
 .article-card .category {
+    color: var(--primary-color); /* Contraste amélioré */
+    font-weight: 600;
+    text-shadow: 0 0 8px var(--primary-color);
     font-size: 0.85rem;
     color: var(--dim-text-color);
     margin-bottom: 15px;
