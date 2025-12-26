@@ -8,118 +8,6 @@
     <link rel="stylesheet" href="../css/détail-projet.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        .page-container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        
-        .description-section {
-            background: rgba(0, 255, 255, 0.05);
-            border: 1px solid var(--primary-color);
-            border-radius: 10px;
-            padding: 30px;
-            margin-bottom: 40px;
-        }
-        
-        .images-section {
-            display: flex;
-            gap: 30px;
-            justify-content: center;
-            flex-wrap: wrap;
-            margin: 40px 0;
-        }
-        
-        .image-wrapper {
-            text-align: center;
-        }
-        
-        .image-wrapper img {
-            max-width: 300px;
-            height: auto;
-            border-radius: 10px;
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        .image-wrapper p {
-            margin-top: 15px;
-            color: var(--dim-text-color);
-            font-size: 0.95rem;
-        }
-        
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin: 40px 0;
-        }
-        
-        .info-card {
-            background: rgba(0, 0, 0, 0.2);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            padding: 20px;
-        }
-        
-        .info-card h4 {
-            color: var(--primary-color);
-            font-size: 1.1rem;
-            margin-bottom: 10px;
-        }
-        
-        .info-card p {
-            color: var(--light-text-color);
-            font-size: 0.95rem;
-            line-height: 1.6;
-        }
-        
-        .nouvelle-section {
-            background: rgba(10, 10, 10, 0.5);
-            border: 2px solid var(--primary-color);
-            border-radius: 10px;
-            padding: 40px;
-            margin: 50px 0;
-        }
-        
-        .nouvelle-section h3 {
-            color: var(--primary-color);
-            font-size: 2rem;
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid var(--primary-color);
-            padding-bottom: 15px;
-        }
-        
-        .author-info {
-            text-align: right;
-            padding: 15px;
-            background: rgba(0, 255, 255, 0.05);
-            border-left: 3px solid var(--primary-color);
-            border-radius: 5px;
-            margin-bottom: 30px;
-            font-style: italic;
-            color: var(--primary-color);
-        }
-        
-        .nouvelle-text {
-            font-family: 'Georgia', serif;
-            font-size: 1.1rem;
-            line-height: 1.9;
-            color: var(--light-text-color);
-            text-align: justify;
-        }
-        
-        .nouvelle-text p {
-            margin-bottom: 20px;
-            text-indent: 2em;
-        }
-        
-        .divider {
-            height: 1px;
-            background: linear-gradient(90deg, transparent, var(--border-color), transparent);
-            margin: 40px 0;
-        }
-    </style>
 </head>
 <body>
     <div class="animated-background">
@@ -148,71 +36,46 @@
     <main>
         <section id="project-detail" class="section-padding">
             <div class="container">
-                <div class="page-container">
-                    <h2 class="section-title" style="text-align: center; margin-bottom: 30px;">
-                        Nouvelle - Stage d'écriture avec Anne Plantagenet
-                    </h2>
+                <h2 class="section-title">Nouvelle - Stage d'écriture avec Anne Plantagenet</h2>
+                
+                <div class="project-meta" style="background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1)); padding: 20px; border-radius: 10px; border: 2px solid var(--primary-color); margin-bottom: 40px; box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);">
+                    <p style="color: var(--primary-color); font-weight: 600; font-size: 1.1rem; margin-bottom: 10px; text-shadow: 0 0 10px var(--primary-color);">Écriture créative · Nouvelle · Classe de Seconde</p>
+                    <p style="color: var(--light-text-color); font-size: 1rem;">Lycée Pablo Picasso</p>
+                </div>
+
+                <div class="project-hero-image" style="text-align: center; margin-bottom: 40px;">
+                    <div style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; margin-bottom: 30px;">
+                        <div style="text-align: center;">
+                            <img src="../ressources/images/Anne_plantagenet.jpg" alt="Couverture du livre Appelez-moi Lorca Horowitz d'Anne Plantagenet" style="max-width: 250px; height: auto; border-radius: 10px; box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);">
+                            <p style="margin-top: 15px; font-size: 1rem; color: var(--dim-text-color);">Couverture du livre</p>
+                        </div>
+                        <div style="text-align: center;">
+                            <img src="../ressources/images/Anne_plantagenet_dédicace.jpg" alt="Dédicace d'Anne Plantagenet" style="max-width: 350px; height: auto; border-radius: 10px; box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);">
+                            <p style="margin-top: 15px; font-size: 1rem; color: var(--dim-text-color);">Dédicace de l'autrice</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="project-description">
+                    <div style="background: linear-gradient(135deg, rgba(0, 255, 255, 0.15), rgba(255, 0, 255, 0.15)); padding: 30px; border-radius: 10px; margin-bottom: 40px; border: 2px solid var(--primary-color); box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);">
+                        <p style="text-align: justify; font-size: 1.15rem; line-height: 1.9; margin-bottom: 0; color: var(--light-text-color);">
+                            En classe de seconde au Lycée Pablo Picasso, notre professeur de français nous a fait suivre un stage d'écriture de nouvelles avec l'écrivaine <a href="https://fr.wikipedia.org/wiki/Anne_Plantagenet" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color); text-decoration: underline; font-weight: 600; text-shadow: 0 0 8px var(--primary-color);">Anne Plantagenet</a>, à cette occasion j'ai écrit cette nouvelle. Elle a été <strong style="color: var(--secondary-color); text-shadow: 0 0 8px var(--secondary-color);">remarquée parmi les deux meilleures nouvelles</strong>, aussi, l'autrice m'a offert son livre et me l'a dédicacé.
+                        </p>
+                    </div>
+
+                    <h3 style="color: var(--primary-color); text-shadow: 0 0 15px var(--primary-color); border-bottom: 3px solid var(--primary-color); padding-bottom: 15px; margin-bottom: 30px;">La Nouvelle</h3>
                     
-                    <!-- Description principale -->
-                    <div class="description-section">
-                        <p style="text-align: justify; font-size: 1.1rem; line-height: 1.8; color: var(--light-text-color); margin-bottom: 15px;">
-                            En classe de seconde au <strong>Lycée Pablo Picasso</strong>, notre professeur de français nous a fait suivre un stage d'écriture de nouvelles avec l'écrivaine <a href="https://fr.wikipedia.org/wiki/Anne_Plantagenet" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color); text-decoration: underline; font-weight: 600;">Anne Plantagenet</a>. À cette occasion, j'ai écrit cette nouvelle.
-                        </p>
-                        <p style="text-align: center; font-size: 1rem; color: var(--secondary-color); font-weight: 600; margin-top: 20px;">
-                            Elle a été sélectionnée parmi les deux meilleures nouvelles. En récompense, l'autrice m'a offert son livre "Appelez-moi Lorca Horowitz" et me l'a dédicacé.
-                        </p>
-                    </div>
-
-                    <!-- Images -->
-                    <div class="images-section">
-                        <div class="image-wrapper">
-                            <img src="../ressources/images/Anne_plantagenet.jpg" alt="Couverture du livre Appelez-moi Lorca Horowitz d'Anne Plantagenet">
-                            <p>Couverture du livre</p>
-                        </div>
-                        <div class="image-wrapper">
-                            <img src="../ressources/images/Anne_plantagenet_d%C3%A9dicace.jpg" alt="Dédicace d'Anne Plantagenet">
-                            <p>Dédicace de l'autrice</p>
-                        </div>
-                    </div>
-
-                    <div class="divider"></div>
-
-                    <!-- Informations complémentaires -->
-                    <div class="info-grid">
-                        <div class="info-card">
-                            <h4>Contexte Scolaire</h4>
-                            <p>
-                                <strong>Classe :</strong> Seconde 3<br>
-                                <strong>Matière :</strong> Français<br>
-                                <strong>Établissement :</strong> Lycée Pablo Picasso
-                            </p>
-                        </div>
-                        
-                        <div class="info-card">
-                            <h4>À Propos d'Anne Plantagenet</h4>
-                            <p>
-                                Autrice française, traductrice et chargée de cours à Sciences-Po. Prix Printemps du roman 2016 pour "Appelez-moi Lorca Horowitz".
-                            </p>
-                            <a href="https://fr.wikipedia.org/wiki/Anne_Plantagenet" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color); text-decoration: underline; font-size: 0.9rem;">
-                                En savoir plus →
-                            </a>
-                        </div>
-                    </div>
-
-                    <div class="divider"></div>
-
-                    <!-- La Nouvelle -->
-                    <div class="nouvelle-section">
-                        <h3>La Nouvelle</h3>
-                        
-                        <div class="author-info">
-                            Baer<br>
-                            Français<br>
-                            Oscar<br>
-                            2nde 3
-                        </div>
-                        
-                        <div class="nouvelle-text">
+                    <div style="background: linear-gradient(135deg, rgba(10, 10, 10, 0.95), rgba(20, 20, 20, 0.95)); padding: 50px; border-radius: 15px; margin: 30px 0; border: 3px solid var(--primary-color); box-shadow: 0 0 30px rgba(0, 255, 255, 0.5), inset 0 0 20px rgba(0, 255, 255, 0.1);">
+                        <div style="text-align: justify; line-height: 2; color: var(--light-text-color);">
+                            <div style="text-align: right; margin-bottom: 40px; padding: 20px; background: rgba(0, 255, 255, 0.1); border-left: 4px solid var(--primary-color); border-radius: 5px;">
+                                <p style="font-style: italic; color: var(--primary-color); font-size: 1.1rem; font-weight: 600; text-shadow: 0 0 8px var(--primary-color); margin: 0;">
+                                    Baer<br>
+                                    Français<br>
+                                    Oscar<br>
+                                    2nde 3
+                                </p>
+                            </div>
+                            
                             <p>
                                 Le camion s'arrête, nous sortons, je claque la portière, les fusils dans les mains nous partons à la chasse. Nous cherchons un emplacement pour pouvoir attendre qu'un animal se pointe.
                             </p>
@@ -250,12 +113,10 @@
                             </p>
                         </div>
                     </div>
+                </div>
 
-                    <div class="text-center" style="margin-top: 50px;">
-                        <a href="./documents.html" class="btn secondary-btn">
-                            <i class="fas fa-arrow-left"></i> Retour aux Rédactions
-                        </a>
-                    </div>
+                <div class="text-center mt-5">
+                    <a href="./documents.html" class="btn secondary-btn"><i class="fas fa-arrow-left"></i> Retour aux Rédactions</a>
                 </div>
             </div>
         </section>
