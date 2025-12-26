@@ -43,8 +43,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 document.body.appendChild(explosionContainer);
             }
             
-            // Créer 20 particules d'explosion
-            for (let i = 0; i < 20; i++) {
+            // Créer 30 particules d'explosion pour un effet plus impressionnant
+            for (let i = 0; i < 30; i++) {
                 const particle = document.createElement('div');
                 particle.classList.add('explosion-particle');
                 
@@ -53,25 +53,34 @@ document.addEventListener('DOMContentLoaded', function() {
                 particle.style.top = centerY + 'px';
                 
                 // Direction aléatoire pour chaque particule
-                const angle = (Math.PI * 2 * i) / 20;
-                const distance = 100 + Math.random() * 150;
+                const angle = (Math.PI * 2 * i) / 30 + (Math.random() - 0.5) * 0.5;
+                const distance = 120 + Math.random() * 180;
                 const tx = Math.cos(angle) * distance;
                 const ty = Math.sin(angle) * distance;
                 
                 particle.style.setProperty('--tx', tx + 'px');
                 particle.style.setProperty('--ty', ty + 'px');
                 
+                // Taille aléatoire
+                const size = 4 + Math.random() * 8;
+                particle.style.width = size + 'px';
+                particle.style.height = size + 'px';
+                
                 // Couleur aléatoire (cyan ou magenta)
                 const color = Math.random() > 0.5 ? 'var(--primary-color)' : 'var(--secondary-color)';
                 particle.style.background = color;
-                particle.style.boxShadow = `0 0 8px ${color}, 0 0 16px ${color === 'var(--primary-color)' ? 'var(--secondary-color)' : 'var(--primary-color)'}`;
+                particle.style.boxShadow = `0 0 ${8 + Math.random() * 8}px ${color}, 0 0 ${16 + Math.random() * 16}px ${color === 'var(--primary-color)' ? 'var(--secondary-color)' : 'var(--primary-color)'}`;
+                
+                // Durée d'animation aléatoire
+                const duration = 0.8 + Math.random() * 0.4;
+                particle.style.animationDuration = duration + 's';
                 
                 explosionContainer.appendChild(particle);
                 
                 // Retirer la particule après l'animation
                 setTimeout(() => {
                     particle.remove();
-                }, 1000);
+                }, duration * 1000);
             }
             
             // Retirer la classe d'explosion après l'animation

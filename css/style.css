@@ -2903,6 +2903,7 @@ img[loading="lazy"].loaded {
         0 0 8px var(--primary-color),
         0 0 16px var(--secondary-color);
     animation: particleExplode 1s ease-out forwards;
+    will-change: transform, opacity;
 }
 
 @keyframes particleExplode {
