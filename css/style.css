@@ -479,6 +479,7 @@ header {
     width: 100%;
     z-index: 10000;
     height: var(--header-height);
+    min-height: var(--header-height);
     display: flex;
     align-items: center;
     
