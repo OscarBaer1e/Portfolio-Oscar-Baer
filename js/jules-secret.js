@@ -29,6 +29,8 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openIceCreamGame = function() {
         const overlay = document.getElementById('ice-cream-game-overlay');
         overlay.classList.add('active');
+        // Restaurer le curseur normal dans le jeu
+        restoreCursorInGame(overlay);
         resetIceCreamGame();
         startIceCreamGame();
     };
@@ -194,6 +196,8 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openMangaGame = function() {
         const overlay = document.getElementById('manga-game-overlay');
         overlay.classList.add('active');
+        // Restaurer le curseur normal dans le jeu
+        restoreCursorInGame(overlay);
         resetMangaGame();
         generateMangaCards();
     };
@@ -302,6 +306,8 @@ document.addEventListener('DOMContentLoaded', function() {
     window.openChickenGame = function() {
         const overlay = document.getElementById('chicken-game-overlay');
         overlay.classList.add('active');
+        // Restaurer le curseur normal dans le jeu
+        restoreCursorInGame(overlay);
         resetChickenGame();
         createChickenHoles();
         startChickenGame();
@@ -460,12 +466,48 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // ============================================
+    // GESTION DU CURSEUR DANS LES JEUX
+    // ============================================
+    function restoreCursorInGame(overlay) {
+        // Cacher le curseur personnalisé
+        const customCursor = document.querySelector('.custom-cursor');
+        if (customCursor) {
+            customCursor.style.display = 'none';
+        }
+        
+        // Restaurer le curseur normal sur le body et l'overlay
+        document.body.style.cursor = 'auto';
+        overlay.style.cursor = 'auto';
+        
+        // S'assurer que tous les éléments interactifs dans l'overlay ont le bon curseur
+        const interactiveElements = overlay.querySelectorAll('button, .chicken, .manga-card, .ice-cream-scoop, .chicken-hole');
+        interactiveElements.forEach(el => {
+            if (el.tagName === 'BUTTON' || el.classList.contains('chicken') || el.classList.contains('manga-card')) {
+                el.style.cursor = 'pointer';
+            } else {
+                el.style.cursor = 'auto';
+            }
+        });
+    }
+    
+    function restoreCustomCursor() {
+        // Restaurer le curseur personnalisé
+        const customCursor = document.querySelector('.custom-cursor');
+        if (customCursor) {
+            customCursor.style.display = 'block';
+        }
+        document.body.style.cursor = 'none';
+    }
+
+    // ============================================
     // FONCTION GÉNÉRALE DE FERMETURE
     // ============================================
     window.closeGame = function(gameType) {
         const overlay = document.getElementById(`${gameType}-game-overlay`);
         if (overlay) {
             overlay.classList.remove('active');
+            // Restaurer le curseur personnalisé
+            restoreCustomCursor();
         }
         
         // Reset games
