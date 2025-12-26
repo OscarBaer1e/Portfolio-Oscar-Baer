@@ -600,48 +600,75 @@ nav .nav-list a.active::after {
 /* Media Queries (pour la barre de navigation) */
 @media (max-width: 768px) {
     /* Header et logo adaptés */
+    header {
+        height: var(--header-height);
+        min-height: var(--header-height);
+    }
+    
     header .container {
         padding: 0 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        width: 100%;
+        height: 100%;
     }
     
     .logo {
         font-size: 1.8rem;
         letter-spacing: 2px;
+        margin: 0;
+        flex-shrink: 0;
     }
     
-    /* Maintient la logique du menu mobile */
+    /* Menu toggle visible et bien positionné */
     .menu-toggle { 
-        display: block;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
         position: relative;
         z-index: 10001;
-        padding: 5px;
+        padding: 8px;
         font-size: 1.5rem;
+        min-width: 40px;
+        min-height: 40px;
+        background: transparent;
+        border: none;
+        color: var(--primary-color);
+        cursor: pointer;
+        text-shadow: 0 0 10px var(--primary-color);
     }
     
     nav {
         position: relative;
+        z-index: 10000;
     }
     
+    /* Navigation cachée par défaut */
     nav .nav-list { 
-        display: none;
+        display: none !important;
         position: fixed;
         top: var(--header-height);
         left: 0;
         right: 0;
-        width: 100%;
+        width: 100vw;
         max-height: calc(100vh - var(--header-height));
         overflow-y: auto;
         z-index: 10000;
-    } 
-    
-    nav .nav-list.active { 
-        display: flex;
-        flex-direction: column;
+        margin: 0;
+        padding: 0;
+        list-style: none;
         background-color: rgba(10, 10, 10, 0.98);
         backdrop-filter: blur(10px);
         -webkit-backdrop-filter: blur(10px);
         border-top: 2px solid var(--secondary-color);
         box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
+    } 
+    
+    /* Navigation visible quand active */
+    nav .nav-list.active { 
+        display: flex !important;
+        flex-direction: column;
     }
 
     nav .nav-list li { 
@@ -649,6 +676,7 @@ nav .nav-list a.active::after {
         padding: 15px 20px; 
         text-align: left;
         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        list-style: none;
     }
     
     nav .nav-list a {
@@ -656,12 +684,21 @@ nav .nav-list a.active::after {
         padding: 10px 0;
         display: block;
         width: 100%;
+        text-transform: uppercase;
+        color: var(--dim-text-color);
+        text-decoration: none;
     }
     
-    /* Supprime la ligne custom sur mobile pour un menu en liste plus lisible */
+    nav .nav-list a:hover,
+    nav .nav-list a.active {
+        color: var(--primary-color);
+    }
+    
+    /* Supprime la ligne custom sur mobile */
     nav .nav-list a::after,
-    nav .nav-list a.active::after {
-        display: none;
+    nav .nav-list a.active::after,
+    nav .nav-list a:hover::after {
+        display: none !important;
     }
 }
 
@@ -677,6 +714,9 @@ nav .nav-list a.active::after {
     
     .menu-toggle {
         font-size: 1.3rem;
+        padding: 6px;
+        min-width: 36px;
+        min-height: 36px;
     }
     
     nav .nav-list li {
@@ -1540,26 +1580,6 @@ footer .container {
 }
 
 @media (max-width: 768px) {
-    /* CORRECTION DU MENU MOBILE */
-    .menu-toggle { display: block; }
-    
-    nav .nav-list { display: none; } 
-    
-    nav .nav-list.active { 
-        display: flex;
-        flex-direction: column;
-        position: absolute;
-        top: var(--header-height);
-        left: 0;
-        width: 100%;
-        background-color: var(--dark-bg-color); 
-        border-top: 1px solid var(--border-color);
-        padding: 10px 0;
-        z-index: 999;
-    }
-
-    nav .nav-list li { margin: 0; padding: 10px 0; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
-
     .container {
         padding: 0 15px;
     }
