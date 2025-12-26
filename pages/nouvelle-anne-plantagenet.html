@@ -8,6 +8,141 @@
     <link rel="stylesheet" href="../css/détail-projet.css">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700&family=Open+Sans:wght@300;400&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .nouvelle-hero {
+            position: relative;
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.05), rgba(255, 0, 255, 0.05));
+            border: 3px solid var(--primary-color);
+            border-radius: 20px;
+            padding: 60px 50px;
+            margin: 50px 0;
+            box-shadow: 
+                0 0 40px rgba(0, 255, 255, 0.6),
+                inset 0 0 30px rgba(0, 255, 255, 0.1);
+            animation: pulse-glow 3s ease-in-out infinite;
+        }
+        
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 
+                    0 0 40px rgba(0, 255, 255, 0.6),
+                    inset 0 0 30px rgba(0, 255, 255, 0.1);
+            }
+            50% {
+                box-shadow: 
+                    0 0 60px rgba(0, 255, 255, 0.8),
+                    inset 0 0 40px rgba(0, 255, 255, 0.2);
+            }
+        }
+        
+        .nouvelle-content {
+            font-family: 'Georgia', 'Times New Roman', serif;
+            font-size: 1.2rem;
+            line-height: 2.2;
+            color: var(--light-text-color);
+            text-align: justify;
+        }
+        
+        .nouvelle-content p {
+            margin-bottom: 25px;
+            text-indent: 2em;
+            transition: all 0.3s ease;
+        }
+        
+        .nouvelle-content p:hover {
+            color: var(--primary-color);
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.3);
+        }
+        
+        .info-box {
+            background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1));
+            border: 2px solid var(--primary-color);
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .info-box:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        }
+        
+        .images-gallery {
+            display: flex;
+            gap: 40px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 40px 0;
+            padding: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 15px;
+            border: 2px solid var(--border-color);
+        }
+        
+        .image-card {
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+        
+        .image-card:hover {
+            transform: scale(1.05);
+        }
+        
+        .image-card img {
+            border-radius: 15px;
+            box-shadow: 0 15px 40px rgba(0, 255, 255, 0.4);
+            transition: box-shadow 0.3s ease;
+        }
+        
+        .image-card:hover img {
+            box-shadow: 0 20px 50px rgba(0, 255, 255, 0.6);
+        }
+        
+        .highlight-badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: #000;
+            padding: 8px 20px;
+            border-radius: 25px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin: 10px 0;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            animation: badge-pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes badge-pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+            }
+        }
+        
+        .author-header {
+            text-align: right;
+            padding: 25px;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.15), transparent);
+            border-right: 5px solid var(--primary-color);
+            border-radius: 10px;
+            margin-bottom: 50px;
+            font-style: italic;
+        }
+        
+        .section-divider {
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--primary-color), transparent);
+            margin: 60px 0;
+            box-shadow: 0 0 20px var(--primary-color);
+        }
+    </style>
 </head>
 <body>
     <div class="animated-background">
@@ -36,87 +171,125 @@
     <main>
         <section id="project-detail" class="section-padding">
             <div class="container">
-                <h2 class="section-title">Nouvelle - Stage d'écriture avec Anne Plantagenet</h2>
+                <h2 class="section-title" style="text-align: center; margin-bottom: 20px;">Nouvelle - Stage d'écriture avec Anne Plantagenet</h2>
                 
-                <div class="project-meta" style="background: linear-gradient(135deg, rgba(0, 255, 255, 0.1), rgba(255, 0, 255, 0.1)); padding: 20px; border-radius: 10px; border: 2px solid var(--primary-color); margin-bottom: 40px; box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);">
-                    <p style="color: var(--primary-color); font-weight: 600; font-size: 1.1rem; margin-bottom: 10px; text-shadow: 0 0 10px var(--primary-color);">Écriture créative · Nouvelle · Classe de Seconde</p>
-                    <p style="color: var(--light-text-color); font-size: 1rem;">Lycée Pablo Picasso</p>
+                <!-- Description principale en premier -->
+                <div class="info-box" style="max-width: 1000px; margin: 0 auto 50px;">
+                    <h3 style="color: var(--primary-color); font-size: 1.8rem; margin-bottom: 20px; text-align: center; text-shadow: 0 0 15px var(--primary-color);">
+                        <i class="fas fa-book-reader"></i> Contexte du Stage
+                    </h3>
+                    <p style="text-align: justify; font-size: 1.2rem; line-height: 1.9; color: var(--light-text-color); margin-bottom: 20px;">
+                        En classe de seconde au <strong style="color: var(--primary-color);">Lycée Pablo Picasso</strong>, notre professeur de français nous a fait suivre un stage d'écriture de nouvelles avec l'écrivaine <a href="https://fr.wikipedia.org/wiki/Anne_Plantagenet" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color); text-decoration: underline; font-weight: 700; text-shadow: 0 0 10px var(--primary-color);">Anne Plantagenet</a>. À cette occasion, j'ai écrit cette nouvelle qui a été <span class="highlight-badge">sélectionnée parmi les deux meilleures nouvelles</span> du stage.
+                    </p>
+                    <p style="text-align: center; font-size: 1.1rem; color: var(--secondary-color); font-weight: 600; margin-top: 25px; text-shadow: 0 0 10px var(--secondary-color);">
+                        <i class="fas fa-trophy"></i> En récompense, l'autrice m'a offert son livre "Appelez-moi Lorca Horowitz" et me l'a dédicacé.
+                    </p>
                 </div>
 
-                <div class="project-hero-image" style="text-align: center; margin-bottom: 40px;">
-                    <div style="display: flex; gap: 30px; justify-content: center; flex-wrap: wrap; margin-bottom: 30px;">
-                        <div style="text-align: center;">
-                            <img src="../ressources/images/Anne_plantagenet.jpg" alt="Couverture du livre Appelez-moi Lorca Horowitz d'Anne Plantagenet" style="max-width: 250px; height: auto; border-radius: 10px; box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);">
-                            <p style="margin-top: 15px; font-size: 1rem; color: var(--dim-text-color);">Couverture du livre</p>
-                        </div>
-                        <div style="text-align: center;">
-                            <img src="../ressources/images/Anne_plantagenet_d%C3%A9dicace.jpg" alt="Dédicace d'Anne Plantagenet" style="max-width: 350px; height: auto; border-radius: 10px; box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);">
-                            <p style="margin-top: 15px; font-size: 1rem; color: var(--dim-text-color);">Dédicace de l'autrice</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="project-description">
-                    <div style="background: linear-gradient(135deg, rgba(0, 255, 255, 0.15), rgba(255, 0, 255, 0.15)); padding: 30px; border-radius: 10px; margin-bottom: 40px; border: 2px solid var(--primary-color); box-shadow: 0 0 25px rgba(0, 255, 255, 0.4);">
-                        <p style="text-align: justify; font-size: 1.15rem; line-height: 1.9; margin-bottom: 0; color: var(--light-text-color);">
-                            En classe de seconde au Lycée Pablo Picasso, notre professeur de français nous a fait suivre un stage d'écriture de nouvelles avec l'écrivaine <a href="https://fr.wikipedia.org/wiki/Anne_Plantagenet" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color); text-decoration: underline; font-weight: 600; text-shadow: 0 0 8px var(--primary-color);">Anne Plantagenet</a>, à cette occasion j'ai écrit cette nouvelle. Elle a été <strong style="color: var(--secondary-color); text-shadow: 0 0 8px var(--secondary-color);">remarquée parmi les deux meilleures nouvelles</strong>, aussi, l'autrice m'a offert son livre et me l'a dédicacé.
+                <!-- Images -->
+                <div class="images-gallery">
+                    <div class="image-card">
+                        <img src="../ressources/images/Anne_plantagenet.jpg" alt="Couverture du livre Appelez-moi Lorca Horowitz d'Anne Plantagenet" style="max-width: 280px; height: auto;">
+                        <p style="margin-top: 20px; font-size: 1.1rem; color: var(--primary-color); font-weight: 600;">
+                            <i class="fas fa-book"></i> Couverture du livre
                         </p>
                     </div>
-
-                    <h3 style="color: var(--primary-color); text-shadow: 0 0 15px var(--primary-color); border-bottom: 3px solid var(--primary-color); padding-bottom: 15px; margin-bottom: 30px;">La Nouvelle</h3>
-                    
-                    <div style="background: linear-gradient(135deg, rgba(10, 10, 10, 0.95), rgba(20, 20, 20, 0.95)); padding: 50px; border-radius: 15px; margin: 30px 0; border: 3px solid var(--primary-color); box-shadow: 0 0 30px rgba(0, 255, 255, 0.5), inset 0 0 20px rgba(0, 255, 255, 0.1);">
-                        <div style="text-align: justify; line-height: 2; color: var(--light-text-color);">
-                            <div style="text-align: right; margin-bottom: 40px; padding: 20px; background: rgba(0, 255, 255, 0.1); border-left: 4px solid var(--primary-color); border-radius: 5px;">
-                                <p style="font-style: italic; color: var(--primary-color); font-size: 1.1rem; font-weight: 600; text-shadow: 0 0 8px var(--primary-color); margin: 0;">
-                                    Baer<br>
-                                    Français<br>
-                                    Oscar<br>
-                                    2nde 3
-                                </p>
-                            </div>
-                            
-                            <p>
-                                Le camion s'arrête, nous sortons, je claque la portière, les fusils dans les mains nous partons à la chasse. Nous cherchons un emplacement pour pouvoir attendre qu'un animal se pointe.
-                            </p>
-                            
-                            <p>
-                                Quand soudain nous entendons des gémissement d'ours, on l'entend se rapprocher pas à pas, nous nous éloignons du danger doucement en braquant nos fusils vers le bruit.
-                            </p>
-                            
-                            <p>
-                                Quand nous entendons le bruit sourd du piège que nous avions placé précédemment au pied d'un arbre caché sous des feuilles de chênes, après ce claquement, nous nous dirigeons vers le bruit calmement. Je vis l'ours, Pierre s'étant trop approché se prit le coup de patte de la bête, je tire sur l'ours au moins trois fois, tout d'un coup je ressens quelque chose, je commence à voir flou, je me sens mal, je me saisis de mon couteau à une seule main et je le plante une dizaine de fois de suite dans l'animal, j'entends une résonance qui me dit d'arrêter, j'arrête, je me calme et je vois quelqu'un à côté de moi, c'est Pierre, ma vue redevient normale, j'ai oublié ce que j'avais fait, mon collègue me dit qu'il m'a vu en train de me déchaîner sur l'animal.
-                            </p>
-                            
-                            <p>
-                                Je le supplie de ne pas le dire au chef et il me le promet. Il me dit que nous ne pouvons donc pas prendre l'ours avec nous parce que dans l'état qu'il est les autres collègues se douteront de quelque chose. Je commence à désamorcer le piège tandis que Pierre prend les pelles toutes neuves qui étaient au fond du camion. Nous trouvons un endroit pour enterrer l'ours. Il est déjà 18h, nous nous saisissons des pelles, nous commençons à creuser et nous finissons 1 heure plus tard.
-                            </p>
-                            
-                            <p>
-                                Nous devons désormais porter l'ours, c'était un mâle, il doit faire dans les six cent kilos.
-                            </p>
-                            
-                            <p>
-                                Malgré son poids, à deux nous arrivons doucement à le traîner vers le trou. A dix centimètres de la cavité, nous le poussons de toutes nos forces pour pouvoir ensuite le recouvrir de terre et de cailloux. Une fois l'animal enterré, je commence à remettre les pelles au fond du véhicule et Pierre se prépare à démarrer. Je me mets sur le siège à côté de lui, je pose mon fusil, je mets ma ceinture et le camion démarre. Nous nous dirigeons rapidement vers l'entrepôt pour pouvoir ranger le camion et enfin rentrer chez nous. Nous arrivons trente minutes en retard et au loin, au fond de l'allée, nous pouvons déjà voir le directeur qui nous attend avec impatience pour fermer le hangar où est censé se trouver notre véhicule de chasse. Nous nous excusons du retard mais Pierre se fait convoquer dans son bureau et le directeur me dit de rentrer chez moi. Je pense que Pierre a été invité dans l'office du chef à cause du peu d'animaux que nous avions rapporté. Au lieu de rentrer chez moi, calmement, je me cache dehors, sous la fenêtre ouverte pour entendre leur discussion en espérant fortement que Pierre ne parlera pas de l'incident d'aujourd'hui.
-                            </p>
-                            
-                            <p>
-                                Mais soudain, en entendant mon collègue me dénoncer au chef, je commence à avoir des vertiges, je sens des pulsions impossibles à contrôler de plus en plus fortes et rapides. Je vois mon bras se diriger vers le fusil, ma vue se trouble. J'ai l'impression d'être endormi, de rêver, je ne sais pas où je suis, je vois l'animal au loin, l'ours que j'avais tué encore vivant qui me fonce dessus à l'horizon, il a toujours les impacts de mes munitions et les coups de couteau que je lui avais infligé, pourtant il me fonce dessus avec une rage que je n'avais jamais vue, sentie auparavant, une rage de vengeance. Il se rapproche, il est environ à 40 mètres de moi, à 30 mètres maintenant, à 20 mètres, je saisis mon fusil à deux mains, à 10 mètres, je m'empresse de recharger, il est désormais à 5 mètres de moi, je vise et je lui tire huit fois dans son corps déjà endommagé par la première chasse, à 3 mètres, il est juste en train de boiter, à 2 mètres, je lâche mon fusil, je prends mon couteau et lui enfonce dans son corps déjà endommagé. La bête arrive quand même à me sauter dessus. Je me réveille en sursaut, je regarde dehors, il fait nuit, je vois trois heures sur ma montre. Soudain, je sens une migraine effroyable. En me retournant je vois mon collègue criblé de balles de fusils et mon patron avec mon couteau dans sa tête.
-                            </p>
-                            
-                            <p>
-                                J'entends des sirènes de police retentir au loin, je panique, je venais de tuer mon patron et un de mes collègues. Je prends mes jambes à mon cou, je me cache derrière un des hangars, j'escalade la grille de derrière et je fuis dans la forêt. Deux minutes après je me rend compte que mes chaussures sont plainent de sang et en entendant des pas à dix mètres de moi, je double de vitesse, je lâche mon fusil pour aller plus vite, j'aperçois au loin une route avec une lumière rouge et bleu qui clignote.
-                            </p>
-                            
-                            <p>
-                                La police est partout, ils ont complètement entourés l'entrepôt et une partie de la forêt, il se rapprochent de tous les côtés en même temps. J'essaye de monter à un arbre mais un des policiers me voie. Il sort sont taser, je ressent une décharge dans mon dos. Je tombe violemment sur le sol et la police me menotte. Tout d'un coup, je sens la même chose que la fois où j'ai tué l'animal je le revoie, cette fois, je ne peut pas me défendre, de toute façon c'est terminé, il arrive et me plaque contre le sol, je sens une douleur abominable dans mon dos. Je ne sens plus rien après une petite minute, mais l'animal continu, il se déchaîne, pourtant je suis mort depuis un moment.
-                            </p>
-                        </div>
+                    <div class="image-card">
+                        <img src="../ressources/images/Anne_plantagenet_d%C3%A9dicace.jpg" alt="Dédicace d'Anne Plantagenet" style="max-width: 400px; height: auto;">
+                        <p style="margin-top: 20px; font-size: 1.1rem; color: var(--secondary-color); font-weight: 600;">
+                            <i class="fas fa-pen-fancy"></i> Dédicace de l'autrice
+                        </p>
                     </div>
                 </div>
 
-                <div class="text-center mt-5">
-                    <a href="./documents.html" class="btn secondary-btn"><i class="fas fa-arrow-left"></i> Retour aux Rédactions</a>
+                <div class="section-divider"></div>
+
+                <!-- Informations complémentaires -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin: 50px 0; max-width: 1000px; margin-left: auto; margin-right: auto;">
+                    <div class="info-box">
+                        <h4 style="color: var(--primary-color); font-size: 1.3rem; margin-bottom: 15px; text-shadow: 0 0 10px var(--primary-color);">
+                            <i class="fas fa-graduation-cap"></i> Contexte Scolaire
+                        </h4>
+                        <p style="color: var(--light-text-color); line-height: 1.8;">
+                            <strong>Classe :</strong> Seconde 3<br>
+                            <strong>Matière :</strong> Français<br>
+                            <strong>Établissement :</strong> Lycée Pablo Picasso
+                        </p>
+                    </div>
+                    
+                    <div class="info-box">
+                        <h4 style="color: var(--secondary-color); font-size: 1.3rem; margin-bottom: 15px; text-shadow: 0 0 10px var(--secondary-color);">
+                            <i class="fas fa-user-edit"></i> À Propos d'Anne Plantagenet
+                        </h4>
+                        <p style="color: var(--light-text-color); line-height: 1.8;">
+                            Autrice française, traductrice et chargée de cours à Sciences-Po. Prix Printemps du roman 2016 pour "Appelez-moi Lorca Horowitz".
+                        </p>
+                        <a href="https://fr.wikipedia.org/wiki/Anne_Plantagenet" target="_blank" rel="noopener noreferrer" style="color: var(--primary-color); text-decoration: underline; font-weight: 600; display: inline-block; margin-top: 10px;">
+                            En savoir plus <i class="fas fa-external-link-alt"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="section-divider"></div>
+
+                <!-- La Nouvelle - Mise en avant -->
+                <div class="nouvelle-hero">
+                    <h3 style="color: var(--primary-color); text-align: center; font-size: 2.5rem; margin-bottom: 40px; text-shadow: 0 0 20px var(--primary-color), 0 0 40px rgba(0, 255, 255, 0.5);">
+                        <i class="fas fa-scroll"></i> La Nouvelle
+                    </h3>
+                    
+                    <div class="author-header">
+                        <p style="color: var(--primary-color); font-size: 1.3rem; font-weight: 700; text-shadow: 0 0 10px var(--primary-color); margin: 0;">
+                            Baer<br>
+                            Français<br>
+                            Oscar<br>
+                            2nde 3
+                        </p>
+                    </div>
+                    
+                    <div class="nouvelle-content">
+                        <p>
+                            Le camion s'arrête, nous sortons, je claque la portière, les fusils dans les mains nous partons à la chasse. Nous cherchons un emplacement pour pouvoir attendre qu'un animal se pointe.
+                        </p>
+                        
+                        <p>
+                            Quand soudain nous entendons des gémissement d'ours, on l'entend se rapprocher pas à pas, nous nous éloignons du danger doucement en braquant nos fusils vers le bruit.
+                        </p>
+                        
+                        <p>
+                            Quand nous entendons le bruit sourd du piège que nous avions placé précédemment au pied d'un arbre caché sous des feuilles de chênes, après ce claquement, nous nous dirigeons vers le bruit calmement. Je vis l'ours, Pierre s'étant trop approché se prit le coup de patte de la bête, je tire sur l'ours au moins trois fois, tout d'un coup je ressens quelque chose, je commence à voir flou, je me sens mal, je me saisis de mon couteau à une seule main et je le plante une dizaine de fois de suite dans l'animal, j'entends une résonance qui me dit d'arrêter, j'arrête, je me calme et je vois quelqu'un à côté de moi, c'est Pierre, ma vue redevient normale, j'ai oublié ce que j'avais fait, mon collègue me dit qu'il m'a vu en train de me déchaîner sur l'animal.
+                        </p>
+                        
+                        <p>
+                            Je le supplie de ne pas le dire au chef et il me le promet. Il me dit que nous ne pouvons donc pas prendre l'ours avec nous parce que dans l'état qu'il est les autres collègues se douteront de quelque chose. Je commence à désamorcer le piège tandis que Pierre prend les pelles toutes neuves qui étaient au fond du camion. Nous trouvons un endroit pour enterrer l'ours. Il est déjà 18h, nous nous saisissons des pelles, nous commençons à creuser et nous finissons 1 heure plus tard.
+                        </p>
+                        
+                        <p>
+                            Nous devons désormais porter l'ours, c'était un mâle, il doit faire dans les six cent kilos.
+                        </p>
+                        
+                        <p>
+                            Malgré son poids, à deux nous arrivons doucement à le traîner vers le trou. A dix centimètres de la cavité, nous le poussons de toutes nos forces pour pouvoir ensuite le recouvrir de terre et de cailloux. Une fois l'animal enterré, je commence à remettre les pelles au fond du véhicule et Pierre se prépare à démarrer. Je me mets sur le siège à côté de lui, je pose mon fusil, je mets ma ceinture et le camion démarre. Nous nous dirigeons rapidement vers l'entrepôt pour pouvoir ranger le camion et enfin rentrer chez nous. Nous arrivons trente minutes en retard et au loin, au fond de l'allée, nous pouvons déjà voir le directeur qui nous attend avec impatience pour fermer le hangar où est censé se trouver notre véhicule de chasse. Nous nous excusons du retard mais Pierre se fait convoquer dans son bureau et le directeur me dit de rentrer chez moi. Je pense que Pierre a été invité dans l'office du chef à cause du peu d'animaux que nous avions rapporté. Au lieu de rentrer chez moi, calmement, je me cache dehors, sous la fenêtre ouverte pour entendre leur discussion en espérant fortement que Pierre ne parlera pas de l'incident d'aujourd'hui.
+                        </p>
+                        
+                        <p>
+                            Mais soudain, en entendant mon collègue me dénoncer au chef, je commence à avoir des vertiges, je sens des pulsions impossibles à contrôler de plus en plus fortes et rapides. Je vois mon bras se diriger vers le fusil, ma vue se trouble. J'ai l'impression d'être endormi, de rêver, je ne sais pas où je suis, je vois l'animal au loin, l'ours que j'avais tué encore vivant qui me fonce dessus à l'horizon, il a toujours les impacts de mes munitions et les coups de couteau que je lui avais infligé, pourtant il me fonce dessus avec une rage que je n'avais jamais vue, sentie auparavant, une rage de vengeance. Il se rapproche, il est environ à 40 mètres de moi, à 30 mètres maintenant, à 20 mètres, je saisis mon fusil à deux mains, à 10 mètres, je m'empresse de recharger, il est désormais à 5 mètres de moi, je vise et je lui tire huit fois dans son corps déjà endommagé par la première chasse, à 3 mètres, il est juste en train de boiter, à 2 mètres, je lâche mon fusil, je prends mon couteau et lui enfonce dans son corps déjà endommagé. La bête arrive quand même à me sauter dessus. Je me réveille en sursaut, je regarde dehors, il fait nuit, je vois trois heures sur ma montre. Soudain, je sens une migraine effroyable. En me retournant je vois mon collègue criblé de balles de fusils et mon patron avec mon couteau dans sa tête.
+                        </p>
+                        
+                        <p>
+                            J'entends des sirènes de police retentir au loin, je panique, je venais de tuer mon patron et un de mes collègues. Je prends mes jambes à mon cou, je me cache derrière un des hangars, j'escalade la grille de derrière et je fuis dans la forêt. Deux minutes après je me rend compte que mes chaussures sont plainent de sang et en entendant des pas à dix mètres de moi, je double de vitesse, je lâche mon fusil pour aller plus vite, j'aperçois au loin une route avec une lumière rouge et bleu qui clignote.
+                        </p>
+                        
+                        <p>
+                            La police est partout, ils ont complètement entourés l'entrepôt et une partie de la forêt, il se rapprochent de tous les côtés en même temps. J'essaye de monter à un arbre mais un des policiers me voie. Il sort sont taser, je ressent une décharge dans mon dos. Je tombe violemment sur le sol et la police me menotte. Tout d'un coup, je sens la même chose que la fois où j'ai tué l'animal je le revoie, cette fois, je ne peut pas me défendre, de toute façon c'est terminé, il arrive et me plaque contre le sol, je sens une douleur abominable dans mon dos. Je ne sens plus rien après une petite minute, mais l'animal continu, il se déchaîne, pourtant je suis mort depuis un moment.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="text-center mt-5" style="margin-top: 60px;">
+                    <a href="./documents.html" class="btn secondary-btn" style="font-size: 1.1rem; padding: 15px 30px;">
+                        <i class="fas fa-arrow-left"></i> Retour aux Rédactions
+                    </a>
                 </div>
             </div>
         </section>
@@ -136,6 +309,28 @@
     <script src="../js/script.js"></script>
     <script>
         document.getElementById('current-year-article').textContent = new Date().getFullYear();
+        
+        // Animation au scroll pour les paragraphes
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.nouvelle-content p').forEach((p, index) => {
+            p.style.opacity = '0';
+            p.style.transform = 'translateY(20px)';
+            p.style.transition = `opacity 0.6s ease ${index * 0.1}s, transform 0.6s ease ${index * 0.1}s`;
+            observer.observe(p);
+        });
     </script>
 </body>
 </html>
