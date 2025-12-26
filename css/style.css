@@ -1371,7 +1371,8 @@ nav .nav-list a.active::after {
     border-bottom: 2px solid var(--secondary-color); 
     display: inline-block;
     padding-bottom: 8px;
-    font-size: 1.6rem; 
+    font-size: 1.6rem;
+    text-align: left !important; /* Titres non justifiés */ 
 }
 
 .skill-category li {
