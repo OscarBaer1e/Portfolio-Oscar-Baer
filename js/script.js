@@ -26,7 +26,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const navList = document.querySelector('.nav-list');
 
     if (menuToggle && navList) {
-        menuToggle.addEventListener('click', function() {
+        menuToggle.addEventListener('click', function(e) {
+            e.stopPropagation();
             navList.classList.toggle('active');
             const icon = menuToggle.querySelector('i');
             // Logique de changement d'icône (fa-bars <-> fa-times)
@@ -45,6 +46,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     menuToggle.querySelector('i').classList.replace('fa-times', 'fa-bars');
                 }
             });
+        });
+        
+        // Ferme le menu quand on clique en dehors (pour mobile)
+        document.addEventListener('click', (e) => {
+            if (navList.classList.contains('active') && 
+                !navList.contains(e.target) && 
+                !menuToggle.contains(e.target)) {
+                navList.classList.remove('active');
+                menuToggle.querySelector('i').classList.replace('fa-times', 'fa-bars');
+            }
         });
     }
 

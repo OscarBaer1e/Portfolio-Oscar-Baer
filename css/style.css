@@ -599,27 +599,92 @@ nav .nav-list a.active::after {
 
 /* Media Queries (pour la barre de navigation) */
 @media (max-width: 768px) {
-    /* Maintient la logique du menu mobile */
-    .menu-toggle { display: block; }
+    /* Header et logo adaptés */
+    header .container {
+        padding: 0 15px;
+    }
     
-    nav .nav-list { display: none; } 
+    .logo {
+        font-size: 1.8rem;
+        letter-spacing: 2px;
+    }
+    
+    /* Maintient la logique du menu mobile */
+    .menu-toggle { 
+        display: block;
+        position: relative;
+        z-index: 10001;
+        padding: 5px;
+        font-size: 1.5rem;
+    }
+    
+    nav {
+        position: relative;
+    }
+    
+    nav .nav-list { 
+        display: none;
+        position: fixed;
+        top: var(--header-height);
+        left: 0;
+        right: 0;
+        width: 100%;
+        max-height: calc(100vh - var(--header-height));
+        overflow-y: auto;
+        z-index: 10000;
+    } 
     
     nav .nav-list.active { 
         display: flex;
         flex-direction: column;
-        top: var(--header-height);
-        /* ⚠️ Très important pour la consistance : toujours 100% de largeur */
-        width: 100vw; 
-        background-color: var(--dark-bg-color); 
-        border-top: 1px solid var(--border-color);
+        background-color: rgba(10, 10, 10, 0.98);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        border-top: 2px solid var(--secondary-color);
+        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
     }
 
-    nav .nav-list li { margin: 0; padding: 15px 20px; text-align: left;}
+    nav .nav-list li { 
+        margin: 0; 
+        padding: 15px 20px; 
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    nav .nav-list a {
+        font-size: 1rem;
+        padding: 10px 0;
+        display: block;
+        width: 100%;
+    }
     
     /* Supprime la ligne custom sur mobile pour un menu en liste plus lisible */
     nav .nav-list a::after,
     nav .nav-list a.active::after {
         display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    header .container {
+        padding: 0 12px;
+    }
+    
+    .logo {
+        font-size: 1.5rem;
+        letter-spacing: 1px;
+    }
+    
+    .menu-toggle {
+        font-size: 1.3rem;
+    }
+    
+    nav .nav-list li {
+        padding: 12px 15px;
+    }
+    
+    nav .nav-list a {
+        font-size: 0.95rem;
     }
 }
 
@@ -1175,6 +1240,8 @@ nav .nav-list a.active::after {
 .profile-pic {
     flex: 0 0 300px; 
     height: 300px; 
+    width: 300px;
+    max-width: 100%;
     border: 3px solid var(--secondary-color);
     border-radius: 50%; 
     margin: 0 auto 30px;
@@ -1199,6 +1266,13 @@ nav .nav-list a.active::after {
     flex: 1;
     min-width: 350px; 
     padding-top: 20px;
+}
+
+@media (max-width: 768px) {
+    .bio {
+        min-width: auto;
+        width: 100%;
+    }
 }
 
 .skills-section {
@@ -1513,11 +1587,20 @@ footer .container {
     
     .about-content { 
         padding: 20px; 
+        gap: 30px;
     }
     
-    .profile-pic, .profile-pic img { 
-        height: 180px; 
-        width: 180px; 
+    .profile-pic { 
+        flex: 0 0 auto;
+        height: 200px; 
+        width: 200px;
+        max-width: 80%;
+        margin: 0 auto 20px;
+    }
+    
+    .profile-pic img {
+        height: 100%;
+        width: 100%;
     } 
     
     .bio { 
@@ -1605,9 +1688,21 @@ footer .container {
         padding: 40px 0;
     }
     
-    .profile-pic, .profile-pic img {
-        height: 150px;
-        width: 150px;
+    .profile-pic {
+        height: 180px;
+        width: 180px;
+        max-width: 70%;
+        margin: 0 auto 15px;
+    }
+    
+    .profile-pic img {
+        height: 100%;
+        width: 100%;
+    }
+    
+    .about-content {
+        padding: 15px;
+        gap: 20px;
     }
     
     .bio {
