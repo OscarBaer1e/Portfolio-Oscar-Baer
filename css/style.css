@@ -379,6 +379,19 @@ p {
     hyphens: auto; /* Césures automatiques si nécessaire */
 }
 
+/* Amélioration contraste pour informations importantes */
+strong, b {
+    color: var(--light-text-color);
+    font-weight: 700;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.3);
+}
+
+/* Contraste amélioré pour les liens importants */
+a[href*="wikipedia"], a[href*="linkedin"], a[href*="github"] {
+    font-weight: 600;
+    text-shadow: 0 0 8px currentColor;
+}
+
 /* Amélioration responsive pour les images */
 @media (max-width: 768px) {
     img {
