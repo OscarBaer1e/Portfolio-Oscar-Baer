@@ -342,9 +342,21 @@ h1, h2, h3, h4, h5, h6 {
     text-shadow: 0 0 5px rgba(0, 255, 255, 0.5); 
 }
 
-h1 { font-size: 4rem; }
-h2 { font-size: 3rem; } 
-h3 { font-size: 2rem; }
+h1 { 
+    font-size: 4rem; 
+    text-align: left; /* Titres non justifiés */
+}
+h2 { 
+    font-size: 3rem; 
+    text-align: left; /* Titres non justifiés */
+} 
+h3 { 
+    font-size: 2rem; 
+    text-align: left; /* Titres non justifiés */
+}
+h4, h5, h6 {
+    text-align: left; /* Titres non justifiés */
+}
 
 a {
     color: var(--secondary-color); 
@@ -359,7 +371,13 @@ a:hover {
 
 ul, ol { list-style: none; padding: 0; }
 img { max-width: 100%; height: auto; display: block; }
-p { margin-bottom: 1.5rem; color: var(--dim-text-color); }
+p { 
+    margin-bottom: 1.5rem; 
+    color: var(--dim-text-color);
+    text-align: justify; /* Paragraphes justifiés */
+    text-justify: inter-word; /* Meilleure justification pour le français */
+    hyphens: auto; /* Césures automatiques si nécessaire */
+}
 
 /* Amélioration responsive pour les images */
 @media (max-width: 768px) {
@@ -389,7 +407,8 @@ p { margin-bottom: 1.5rem; color: var(--dim-text-color); }
     position: relative;
     padding-bottom: 20px;
     font-weight: 700;
-    color: var(--light-text-color); 
+    color: var(--light-text-color);
+    text-align: left !important; /* Titres non justifiés */
 }
 
 .section-title::after {
@@ -1323,6 +1342,7 @@ nav .nav-list a.active::after {
 }
 
 .skills-section h3 {
+    text-align: left !important; /* Titres non justifiés */
     color: var(--primary-color); 
     text-align: center;
     margin-bottom: 3rem;
