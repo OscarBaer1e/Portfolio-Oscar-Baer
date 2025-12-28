@@ -3,6 +3,25 @@
  * Contient toutes les fonctionnalités JavaScript natives (Vanilla JS)
  * (GSAP et tous ses plugins ont été retirés)
  */
+
+// Détection mobile pour optimisations
+const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+const isLowEndDevice = isMobile && (navigator.hardwareConcurrency <= 4 || /Android.*Chrome/i.test(navigator.userAgent));
+
+// Réduire les animations sur mobile
+if (isMobile) {
+    document.documentElement.style.setProperty('--animation-duration', '0.3s');
+    // Désactiver les animations complexes sur appareils bas de gamme
+    if (isLowEndDevice) {
+        document.documentElement.style.setProperty('--animation-duration', '0.1s');
+        // Préférence pour réduire les animations
+        const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+        if (prefersReducedMotion.matches) {
+            document.documentElement.classList.add('reduce-motion');
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const pageLoader = document.querySelector('.page-loader');
     
@@ -21,74 +40,6 @@ document.addEventListener('DOMContentLoaded', function() {
     currentYearElements.forEach(el => {
         el.textContent = new Date().getFullYear();
     });
-
-    // ===============================================
-    // BOUTON JULES AVEC EXPLOSIONS
-    // ===============================================
-    const julesButton = document.getElementById('jules-button');
-    if (julesButton) {
-        julesButton.addEventListener('click', function(e) {
-            const rect = this.getBoundingClientRect();
-            const centerX = rect.left + rect.width / 2;
-            const centerY = rect.top + rect.height / 2;
-            
-            // Ajouter la classe d'explosion
-            this.classList.add('exploding');
-            
-            // Créer un conteneur pour les particules
-            let explosionContainer = document.querySelector('.explosion-container');
-            if (!explosionContainer) {
-                explosionContainer = document.createElement('div');
-                explosionContainer.classList.add('explosion-container');
-                document.body.appendChild(explosionContainer);
-            }
-            
-            // Créer 30 particules d'explosion pour un effet plus impressionnant
-            for (let i = 0; i < 30; i++) {
-                const particle = document.createElement('div');
-                particle.classList.add('explosion-particle');
-                
-                // Position initiale au centre du bouton
-                particle.style.left = centerX + 'px';
-                particle.style.top = centerY + 'px';
-                
-                // Direction aléatoire pour chaque particule
-                const angle = (Math.PI * 2 * i) / 30 + (Math.random() - 0.5) * 0.5;
-                const distance = 120 + Math.random() * 180;
-                const tx = Math.cos(angle) * distance;
-                const ty = Math.sin(angle) * distance;
-                
-                particle.style.setProperty('--tx', tx + 'px');
-                particle.style.setProperty('--ty', ty + 'px');
-                
-                // Taille aléatoire
-                const size = 4 + Math.random() * 8;
-                particle.style.width = size + 'px';
-                particle.style.height = size + 'px';
-                
-                // Couleur aléatoire (cyan ou magenta)
-                const color = Math.random() > 0.5 ? 'var(--primary-color)' : 'var(--secondary-color)';
-                particle.style.background = color;
-                particle.style.boxShadow = `0 0 ${8 + Math.random() * 8}px ${color}, 0 0 ${16 + Math.random() * 16}px ${color === 'var(--primary-color)' ? 'var(--secondary-color)' : 'var(--primary-color)'}`;
-                
-                // Durée d'animation aléatoire
-                const duration = 0.8 + Math.random() * 0.4;
-                particle.style.animationDuration = duration + 's';
-                
-                explosionContainer.appendChild(particle);
-                
-                // Retirer la particule après l'animation
-                setTimeout(() => {
-                    particle.remove();
-                }, duration * 1000);
-            }
-            
-            // Retirer la classe d'explosion après l'animation
-            setTimeout(() => {
-                this.classList.remove('exploding');
-            }, 800);
-        });
-    }
 
     const menuToggle = document.querySelector('.menu-toggle');
     const navList = document.querySelector('.nav-list');
@@ -322,36 +273,52 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 600);
         });
     });
-    // Curseur personnalisé - directement sur la souris
-    const cursor = document.createElement('div');
-    cursor.classList.add('custom-cursor');
-    document.body.appendChild(cursor);
-    
-    // Cacher le curseur système et utiliser la bulle
-    document.body.style.cursor = 'none';
-    
-    // Positionner directement sur la souris (pas de lag)
-    document.addEventListener('mousemove', (e) => {
-        cursor.style.left = e.clientX + 'px';
-        cursor.style.top = e.clientY + 'px';
-        cursor.style.transform = 'translate(-50%, -50%)';
-    });
-    
-    // Masquer le curseur quand la souris quitte la page
-    document.addEventListener('mouseleave', () => {
-        cursor.style.opacity = '0';
-    });
-    
-    document.addEventListener('mouseenter', () => {
-        cursor.style.opacity = '1';
-    });
-    
-    // Agrandit le curseur au survol des éléments interactifs
-    const interactiveElements = document.querySelectorAll('a, button, .portfolio-item, .graphisme-card');
-    interactiveElements.forEach(el => {
-        el.addEventListener('mouseenter', () => cursor.classList.add('cursor-hover'));
-        el.addEventListener('mouseleave', () => cursor.classList.remove('cursor-hover'));
-    });
+    // Curseur personnalisé - directement sur la souris (désactivé sur mobile)
+    if (!isMobile) {
+        const cursor = document.createElement('div');
+        cursor.classList.add('custom-cursor');
+        document.body.appendChild(cursor);
+        
+        // Cacher le curseur système et utiliser la bulle
+        document.body.style.cursor = 'none';
+        
+        // Utiliser requestAnimationFrame pour des performances optimales
+        let rafId = null;
+        let mouseX = 0;
+        let mouseY = 0;
+        
+        // Positionner directement sur la souris (pas de lag)
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Utiliser RAF pour limiter les mises à jour
+            if (!rafId) {
+                rafId = requestAnimationFrame(() => {
+                    cursor.style.left = mouseX + 'px';
+                    cursor.style.top = mouseY + 'px';
+                    cursor.style.transform = 'translate(-50%, -50%)';
+                    rafId = null;
+                });
+            }
+        }, { passive: true });
+        
+        // Masquer le curseur quand la souris quitte la page
+        document.addEventListener('mouseleave', () => {
+            cursor.style.opacity = '0';
+        });
+        
+        document.addEventListener('mouseenter', () => {
+            cursor.style.opacity = '1';
+        });
+        
+        // Agrandit le curseur au survol des éléments interactifs
+        const interactiveElements = document.querySelectorAll('a, button, .portfolio-item, .graphisme-card');
+        interactiveElements.forEach(el => {
+            el.addEventListener('mouseenter', () => cursor.classList.add('cursor-hover'));
+            el.addEventListener('mouseleave', () => cursor.classList.remove('cursor-hover'));
+        });
+    }
     const counters = document.querySelectorAll('[data-count]');
     const countObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -379,58 +346,88 @@ document.addEventListener('DOMContentLoaded', function() {
     }, { threshold: 0.5 });
     
     counters.forEach(counter => countObserver.observe(counter));
-    const tiltCards = document.querySelectorAll('.portfolio-item, .graphisme-card');
-    tiltCards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
+    // Effet de tilt sur les cartes (désactivé sur mobile pour les performances)
+    if (!isMobile) {
+        const tiltCards = document.querySelectorAll('.portfolio-item, .graphisme-card');
+        tiltCards.forEach(card => {
+            let rafId = null;
+            let currentX = 0;
+            let currentY = 0;
             
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                currentX = (y - centerY) / 10;
+                currentY = (centerX - x) / 10;
+                
+                if (!rafId) {
+                    rafId = requestAnimationFrame(() => {
+                        card.style.transform = `perspective(1000px) rotateX(${currentX}deg) rotateY(${currentY}deg) translateY(-10px)`;
+                        rafId = null;
+                    });
+                }
+            }, { passive: true });
             
-            const rotateX = (y - centerY) / 10;
-            const rotateY = (centerX - x) / 10;
-            
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-10px)`;
-        });
-        
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = '';
-        });
-    });
-    const animatedTitles = document.querySelectorAll('.section-title');
-    animatedTitles.forEach(title => {
-        if (!title.querySelector('.letter-animation')) {
-            const text = title.textContent;
-            title.innerHTML = '';
-            text.split('').forEach((char, index) => {
-                const span = document.createElement('span');
-                span.textContent = char === ' ' ? '\u00A0' : char;
-                span.style.animationDelay = `${index * 0.05}s`;
-                span.classList.add('letter-animation');
-                title.appendChild(span);
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = '';
             });
-        }
-    });
+        });
+    }
+    // Animation des titres (simplifiée sur mobile)
+    if (!isLowEndDevice) {
+        const animatedTitles = document.querySelectorAll('.section-title');
+        animatedTitles.forEach(title => {
+            if (!title.querySelector('.letter-animation')) {
+                const text = title.textContent;
+                title.innerHTML = '';
+                const delayMultiplier = isMobile ? 0.02 : 0.05; // Plus rapide sur mobile
+                text.split('').forEach((char, index) => {
+                    const span = document.createElement('span');
+                    span.textContent = char === ' ' ? '\u00A0' : char;
+                    span.style.animationDelay = `${index * delayMultiplier}s`;
+                    span.classList.add('letter-animation');
+                    title.appendChild(span);
+                });
+            }
+        });
+    }
+    // Lazy loading des images optimisé pour mobile
     const images = document.querySelectorAll('img[loading="lazy"], img:not([loading])');
+    const imageObserverOptions = {
+        rootMargin: isMobile ? '50px' : '100px', // Charger plus tôt sur mobile
+        threshold: isMobile ? 0.1 : 0.2
+    };
+    
     const imageObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
                 const img = entry.target;
+                // Ajouter loading="lazy" si pas déjà présent
+                if (!img.hasAttribute('loading')) {
+                    img.setAttribute('loading', 'lazy');
+                }
                 if (img.complete) {
                     img.classList.add('loaded');
                 } else {
                     img.addEventListener('load', () => {
                         img.classList.add('loaded');
-                    });
+                    }, { once: true });
                 }
                 imageObserver.unobserve(img);
             }
         });
-    });
+    }, imageObserverOptions);
     
     images.forEach(img => {
+        // Ajouter loading="lazy" par défaut si pas déjà présent
+        if (!img.hasAttribute('loading')) {
+            img.setAttribute('loading', 'lazy');
+        }
         if (img.complete) {
             img.classList.add('loaded');
         }

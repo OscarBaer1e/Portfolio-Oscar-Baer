@@ -86,6 +86,32 @@ body {
     background-size: 80px 80px, 80px 80px, 40px 40px, 40px 40px;
     animation: gridMove 15s linear infinite, gridPulse 4s ease-in-out infinite;
     opacity: 0.5;
+    will-change: transform, opacity;
+}
+
+/* Désactiver les animations de fond sur mobile pour les performances */
+@media (max-width: 768px) {
+    .grid-lines {
+        animation: none;
+        opacity: 0.3;
+    }
+    
+    .floating-particles::before,
+    .floating-particles::after {
+        animation: none;
+        opacity: 0.4;
+    }
+    
+    .animated-lines {
+        animation: none;
+        opacity: 0.3;
+    }
+    
+    .animated-lines::before,
+    .animated-lines::after {
+        animation: none;
+        opacity: 0.2;
+    }
 }
 
 @keyframes gridMove {
@@ -409,7 +435,20 @@ a[href*="wikipedia"], a[href*="linkedin"], a[href*="github"] {
 }
 
 .section-padding {
-    padding: 120px 0; 
+    padding: 120px 0;
+}
+
+/* Réduire le padding sur mobile */
+@media (max-width: 768px) {
+    .section-padding {
+        padding: 60px 0;
+    }
+}
+
+@media (max-width: 480px) {
+    .section-padding {
+        padding: 40px 0;
+    }
 }
 
 /* Séparateur de section type "glitch" */
@@ -417,6 +456,7 @@ a[href*="wikipedia"], a[href*="linkedin"], a[href*="github"] {
     font-size: 3rem; 
     text-align: center;
     margin-bottom: 5rem;
+    will-change: transform;
     position: relative;
     padding-bottom: 20px;
     font-weight: 700;
@@ -2529,20 +2569,7 @@ a, button, .btn, .portfolio-item, .graphisme-card, input, textarea, select {
     cursor: none !important;
 }
 
-/* Sur mobile/tablette, réafficher le curseur système */
-@media (max-width: 1024px) {
-    .custom-cursor {
-        display: none;
-    }
-    
-    body {
-        cursor: auto !important;
-    }
-    
-    a, button, .btn, .portfolio-item, .graphisme-card, input, textarea, select {
-        cursor: pointer !important;
-    }
-}
+/* Sur mobile/tablette, réafficher le curseur système (déjà géré plus haut) */
 
 /* Effet ripple pour les boutons */
 .btn {
