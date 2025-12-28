@@ -2530,9 +2530,10 @@ document.addEventListener('DOMContentLoaded', function() {
     // Explosion améliorée avec plus de particules et effets
     function createEnhancedExplosion(x, y, color, size) {
         try {
-            // Limiter le nombre de particules pour éviter les crashes
-            const maxParticleCount = Math.min(Math.floor(size / 2) + 20, 50); // Max 50 particules
-            const particleCount = Math.min(maxParticleCount, 50);
+            // Limiter le nombre de particules pour éviter les crashes (réduit sur mobile)
+            const maxParticles = gameState.isMobile ? (gameState.isLowEndDevice ? 15 : 25) : 50;
+            const maxParticleCount = Math.min(Math.floor(size / 2) + 20, maxParticles);
+            const particleCount = Math.min(maxParticleCount, maxParticles);
             
             for (let i = 0; i < particleCount; i++) {
                 const angle = (Math.PI * 2 / particleCount) * i;
