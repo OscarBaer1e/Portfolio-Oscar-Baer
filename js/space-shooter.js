@@ -164,7 +164,8 @@ document.addEventListener('DOMContentLoaded', function() {
         gameSpeed: 2,
         gameMode: 'normal', // 'normal' ou 'infinite'
         bossActive: false,
-        deltaTime: 1.0 // Multiplicateur de vitesse normalisé (1.0 = 60fps)
+        deltaTime: 1.0, // Multiplicateur de vitesse normalisé (1.0 = 60fps)
+        isSavingScore: false // Flag pour empêcher le démarrage pendant l'enregistrement
     };
     
     // Système de sons
