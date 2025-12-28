@@ -1302,9 +1302,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 ctx.arc(particle.x, particle.y, particle.size * 2, 0, Math.PI * 2);
                 ctx.fill();
             } else {
-                // Particule normale avec effet de lueur amélioré
+                // Particule normale avec effet de lueur amélioré (réduit sur mobile)
                 ctx.fillStyle = particle.color;
-                ctx.shadowBlur = particle.size * 2.5;
+                ctx.shadowBlur = gameState.isMobile ? particle.size * 1.5 : particle.size * 2.5;
                 ctx.shadowColor = particle.color;
                 ctx.beginPath();
                 ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
@@ -2204,7 +2204,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function createExplosion(x, y, color) {
-        for (let i = 0; i < 15; i++) {
+        // Réduire le nombre de particules sur mobile
+        const particleCount = gameState.isMobile ? (gameState.isLowEndDevice ? 5 : 10) : 15;
+        for (let i = 0; i < particleCount; i++) {
             particles.push({
                 x: x,
                 y: y,
@@ -2220,8 +2222,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Explosion stylée pour les bonus avec effets visuels améliorés
     function createSmallExplosion(x, y, color) {
         try {
-            // Particules principales en étoile (8 directions)
-            const starParticles = 8;
+            // Particules principales en étoile (réduites sur mobile)
+            const starParticles = gameState.isMobile ? (gameState.isLowEndDevice ? 4 : 6) : 8;
             for (let i = 0; i < starParticles; i++) {
                 const angle = (Math.PI * 2 / starParticles) * i;
                 const speed = Math.random() * 3 + 2;
@@ -2238,8 +2240,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
             
-            // Particules secondaires aléatoires avec couleurs variées
-            const randomParticles = 6;
+            // Particules secondaires aléatoires avec couleurs variées (réduites sur mobile)
+            const randomParticles = gameState.isMobile ? (gameState.isLowEndDevice ? 2 : 4) : 6;
             const colorVariations = [
                 color,
                 lightenColor(color, 0.3),
@@ -2266,8 +2268,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
             
-            // Particules de brillance (petites et rapides)
-            const sparkleParticles = 4;
+            // Particules de brillance (petites et rapides) - réduites sur mobile
+            const sparkleParticles = gameState.isMobile ? (gameState.isLowEndDevice ? 1 : 2) : 4;
             for (let i = 0; i < sparkleParticles; i++) {
                 const angle = Math.random() * Math.PI * 2;
                 const speed = Math.random() * 4 + 3;
@@ -2550,7 +2552,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             // Ajoute des particules plus petites pour l'effet de fumée (limitées)
-            const smokeCount = Math.min(Math.floor(particleCount / 2), 25); // Max 25 particules de fumée
+            // Réduire les particules de fumée sur mobile
+            const maxSmoke = gameState.isMobile ? (gameState.isLowEndDevice ? 5 : 10) : 25;
+            const smokeCount = Math.min(Math.floor(particleCount / 2), maxSmoke);
             for (let i = 0; i < smokeCount; i++) {
                 particles.push({
                     x: x + (Math.random() - 0.5) * size,
