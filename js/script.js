@@ -380,6 +380,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     // Animation des titres (simplifiée sur mobile)
     if (!isLowEndDevice) {
+    // Animation des titres (simplifiée sur mobile)
+    if (!isLowEndDevice) {
         const animatedTitles = document.querySelectorAll('.section-title');
         animatedTitles.forEach(title => {
             if (!title.querySelector('.letter-animation')) {
@@ -395,6 +397,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
+    }
     }
     // Lazy loading des images optimisé pour mobile
     const images = document.querySelectorAll('img[loading="lazy"], img:not([loading])');

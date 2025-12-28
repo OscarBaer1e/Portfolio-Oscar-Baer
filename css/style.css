@@ -92,25 +92,31 @@ body {
 /* Désactiver les animations de fond sur mobile pour les performances */
 @media (max-width: 768px) {
     .grid-lines {
-        animation: none;
+        animation: none !important;
         opacity: 0.3;
     }
     
     .floating-particles::before,
     .floating-particles::after {
-        animation: none;
+        animation: none !important;
         opacity: 0.4;
     }
     
     .animated-lines {
-        animation: none;
+        animation: none !important;
         opacity: 0.3;
     }
     
     .animated-lines::before,
     .animated-lines::after {
-        animation: none;
+        animation: none !important;
         opacity: 0.2;
+    }
+    
+    /* Réduire la complexité des animations de particules */
+    .floating-particles::before,
+    .floating-particles::after {
+        box-shadow: 0 0 8px currentColor !important;
     }
 }
 
