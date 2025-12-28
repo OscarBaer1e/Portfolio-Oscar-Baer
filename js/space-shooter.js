@@ -3732,6 +3732,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (e.code === 'Space') {
+            // Vérifier si le formulaire d'enregistrement est ouvert
+            const isRegisterFormOpen = scoreRegister && !scoreRegister.classList.contains('hidden');
+            
+            // Si le formulaire est ouvert ou qu'un enregistrement est en cours, ne pas démarrer le jeu
+            if (isRegisterFormOpen || gameState.isSavingScore) {
+                // Permettre seulement le tir si le jeu est déjà en cours
+                if (gameState.isPlaying) {
+                    e.preventDefault();
+                    shoot();
+                    // Démarrer le tir automatique
+                    if (!autoShootInterval) {
+                        const startAutoShoot = () => {
+                            autoShootInterval = setInterval(() => {
+                                if (gameState.isPlaying && !gameState.isPaused && keys['Space']) {
+                                    shoot();
+                                }
+                            }, currentFireRate);
+                        };
+                        startAutoShoot();
+                    }
+                }
+                // Sinon, empêcher le démarrage du jeu
+                return;
+            }
+            
             e.preventDefault();
             if (gameState.isPlaying) {
                 shoot();
