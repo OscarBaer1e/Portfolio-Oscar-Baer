@@ -143,6 +143,10 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // État du jeu
+    // Détection mobile pour optimisations
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
+    const isLowEndDevice = isMobile && (navigator.hardwareConcurrency <= 4 || /Android.*Chrome/i.test(navigator.userAgent));
+    
     let gameState = {
         isPlaying: false,
         isPaused: false,
@@ -165,7 +169,9 @@ document.addEventListener('DOMContentLoaded', function() {
         gameMode: 'normal', // 'normal' ou 'infinite'
         bossActive: false,
         deltaTime: 1.0, // Multiplicateur de vitesse normalisé (1.0 = 60fps)
-        isSavingScore: false // Flag pour empêcher le démarrage pendant l'enregistrement
+        isSavingScore: false, // Flag pour empêcher le démarrage pendant l'enregistrement
+        isMobile: isMobile, // Flag pour optimisations mobile
+        isLowEndDevice: isLowEndDevice // Flag pour optimisations appareils bas de gamme
     };
     
     // Système de sons
@@ -1021,8 +1027,9 @@ document.addEventListener('DOMContentLoaded', function() {
             currentLevelDisplay.textContent = gameState.level;
         }
         
-        // Créer les étoiles
-        for (let i = 0; i < 100; i++) {
+        // Créer les étoiles (moins sur mobile pour les performances)
+        const maxStars = gameState.isMobile ? (gameState.isLowEndDevice ? 30 : 50) : 100;
+        for (let i = 0; i < maxStars; i++) {
             stars.push({
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
@@ -1163,26 +1170,42 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.restore();
         }
         
-        // Étoiles selon le thème
-        stars.forEach(star => {
-            ctx.fillStyle = currentTheme.stars;
-            ctx.beginPath();
-            ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
-            ctx.fill();
-        });
+        // Étoiles selon le thème (optimisé pour mobile)
+        if (gameState.isLowEndDevice) {
+            // Sur appareils bas de gamme, dessiner seulement une étoile sur deux
+            for (let i = 0; i < stars.length; i += 2) {
+                const star = stars[i];
+                ctx.fillStyle = currentTheme.stars;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        } else {
+            stars.forEach(star => {
+                ctx.fillStyle = currentTheme.stars;
+                ctx.beginPath();
+                ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
         
-        // Traînées de particules du vaisseau
-        shipTrail.forEach((trail, index) => {
-            ctx.save();
-            ctx.globalAlpha = trail.alpha;
-            ctx.fillStyle = ship.color;
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = ship.color;
-            ctx.beginPath();
-            ctx.arc(trail.x, trail.y, 3 - (index / shipTrail.length) * 2, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.restore();
-        });
+        // Traînées de particules du vaisseau (réduites sur mobile)
+        if (!gameState.isLowEndDevice) {
+            const trailStep = gameState.isMobile ? 2 : 1; // Dessiner une traînée sur deux sur mobile
+            shipTrail.forEach((trail, index) => {
+                if (index % trailStep === 0) {
+                    ctx.save();
+                    ctx.globalAlpha = trail.alpha;
+                    ctx.fillStyle = ship.color;
+                    ctx.shadowBlur = gameState.isMobile ? 5 : 10;
+                    ctx.shadowColor = ship.color;
+                    ctx.beginPath();
+                    ctx.arc(trail.x, trail.y, 3 - (index / shipTrail.length) * 2, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.restore();
+                }
+            });
+        }
         
         // Vaisseau
         if (gameState.isPlaying || gameState.isPaused) {
@@ -1214,10 +1237,10 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.restore();
         }
         
-        // Projectiles selon le thème
+        // Projectiles selon le thème (optimisé pour mobile)
         bullets.forEach(bullet => {
             ctx.fillStyle = currentTheme.bullets;
-            ctx.shadowBlur = 10;
+            ctx.shadowBlur = gameState.isMobile ? 5 : 10;
             ctx.shadowColor = currentTheme.bullets;
             const bulletSize = bullet.size || 4;
             ctx.beginPath();
@@ -1241,9 +1264,11 @@ document.addEventListener('DOMContentLoaded', function() {
             drawShield();
         }
         
-        // Particules avec effets stylés selon le type
-        particles.forEach(particle => {
+        // Particules avec effets stylés selon le type (optimisé pour mobile)
+        const particleStep = gameState.isLowEndDevice ? 2 : 1; // Dessiner une particule sur deux sur appareils bas de gamme
+        particles.forEach((particle, index) => {
             if (!particle) return;
+            if (gameState.isLowEndDevice && index % particleStep !== 0) return; // Skip certaines particules
             
             ctx.save();
             ctx.globalAlpha = particle.alpha || 1;
@@ -1251,7 +1276,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (particle.type === 'star') {
                 // Étoile stylée avec 4 branches
             ctx.fillStyle = particle.color;
-                ctx.shadowBlur = particle.size * 3;
+                ctx.shadowBlur = gameState.isMobile ? particle.size * 1.5 : particle.size * 3;
                 ctx.shadowColor = particle.color;
                 ctx.translate(particle.x, particle.y);
                 ctx.rotate(Math.atan2(particle.vy || 0, particle.vx || 0));
@@ -1264,9 +1289,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 ctx.closePath();
                 ctx.fill();
             } else if (particle.type === 'sparkle') {
-                // Étincelle brillante avec effet de lueur
+                // Étincelle brillante avec effet de lueur (réduit sur mobile)
                 ctx.fillStyle = particle.color;
-                ctx.shadowBlur = particle.size * 4;
+                ctx.shadowBlur = gameState.isMobile ? particle.size * 2 : particle.size * 4;
                 ctx.shadowColor = particle.color;
             ctx.beginPath();
             ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
@@ -1923,10 +1948,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         
         // Mise à jour des particules (normalisé par delta time)
-        // Limiter le nombre de particules pour éviter les crashes
-        if (particles.length > 200) {
+        // Limiter le nombre de particules pour éviter les crashes (moins sur mobile)
+        const maxParticles = gameState.isMobile ? (gameState.isLowEndDevice ? 50 : 100) : 200;
+        const particleLimit = gameState.isMobile ? (gameState.isLowEndDevice ? 30 : 75) : 150;
+        if (particles.length > maxParticles) {
             // Supprimer les particules les plus anciennes
-            particles = particles.slice(-150);
+            particles = particles.slice(-particleLimit);
         }
         
         particles.forEach((particle, index) => {
@@ -3849,7 +3876,9 @@ document.addEventListener('DOMContentLoaded', function() {
         lastFrameTime = now;
         
         // Limiter le delta time pour éviter les sauts trop importants (cap à 2x la vitesse normale)
-        const normalizedDelta = Math.min(Math.max(deltaTime, 0.1), 2.0); // Min 0.1, Max 2.0
+        // Sur mobile, limiter plus strictement pour éviter les lag
+        const maxDelta = gameState.isMobile ? 1.5 : 2.0;
+        const normalizedDelta = Math.min(Math.max(deltaTime, 0.1), maxDelta);
         
         // Stocker le delta normalisé globalement pour l'utiliser dans update()
         gameState.deltaTime = normalizedDelta;

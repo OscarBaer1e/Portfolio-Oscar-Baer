@@ -1675,8 +1675,186 @@
     .score-register-content h3 {
         font-size: 1.5rem;
     }
-=======
->>>>>>> eab8007aa50321829166e9ae61cc17c91804efef
+    
+    .space-shooter-container {
+        padding: 20px 15px;
+    }
+    
+    .game-title {
+        font-size: 1.8rem;
+    }
+    
+    .game-wrapper {
+        padding: 10px;
+        border-width: 2px;
+    }
+    
+    .volume-control {
+        position: relative;
+        top: auto;
+        right: auto;
+        margin: 10px auto;
+        min-width: 150px;
+        opacity: 0.8;
+    }
+    
+    .level-display {
+        bottom: 10px;
+        left: 10px;
+        padding: 8px 12px;
+        min-width: 80px;
+        font-size: 0.7rem;
+    }
+    
+    .level-value {
+        font-size: 1.5rem;
+    }
+    
+    .active-buffs {
+        top: 5px;
+        left: 5px;
+        gap: 5px;
+    }
+    
+    .buff-icon {
+        width: 32px;
+        height: 32px;
+        font-size: 1.2rem;
+    }
+    
+    .game-message {
+        font-size: 1.2rem;
+        padding: 15px 25px;
+    }
+    
+    .game-message.powerup {
+        font-size: 0.8rem;
+        padding: 6px 12px;
+    }
+    
+    .game-controls-header {
+        gap: 10px;
+    }
+    
+    .game-controls-header .btn {
+        padding: 10px 15px;
+        font-size: 0.85rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .space-shooter-container {
+        padding: 15px 10px;
+    }
+    
+    .game-title {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+    }
+    
+    .game-stats {
+        gap: 10px;
+    }
+    
+    .stat-value {
+        font-size: 1.2rem;
+    }
+    
+    .stat-label {
+        font-size: 0.75rem;
+    }
+    
+    .game-wrapper {
+        padding: 5px;
+    }
+    
+    .health-bars {
+        min-width: 120px;
+        bottom: 5px;
+        right: 5px;
+        gap: 5px;
+    }
+    
+    .health-bar-container {
+        padding: 4px 6px;
+        gap: 5px;
+    }
+    
+    .health-bar-label,
+    .shield-bar-label,
+    .boss-bar-label {
+        font-size: 0.65rem;
+        min-width: 40px;
+    }
+    
+    .health-bar,
+    .shield-bar,
+    .boss-bar {
+        height: 12px;
+    }
+    
+    .level-display {
+        padding: 6px 10px;
+        min-width: 70px;
+    }
+    
+    .level-value {
+        font-size: 1.3rem;
+    }
+    
+    .level-label {
+        font-size: 0.65rem;
+    }
+    
+    .buff-icon {
+        width: 28px;
+        height: 28px;
+        font-size: 1rem;
+    }
+    
+    .volume-control {
+        min-width: 120px;
+        padding: 6px 8px;
+        gap: 5px;
+    }
+    
+    .volume-value {
+        font-size: 0.75rem;
+        min-width: 30px;
+    }
+    
+    .score-register-content {
+        padding: 20px 15px;
+        width: 95%;
+    }
+    
+    .score-register-content h3 {
+        font-size: 1.3rem;
+        margin-bottom: 15px;
+    }
+    
+    .score-register-stats {
+        gap: 10px;
+        padding: 15px;
+    }
+    
+    .stat-item .stat-value {
+        font-size: 1.2rem;
+    }
+    
+    .score-register-form input[type="text"] {
+        padding: 12px 15px;
+        font-size: 1rem;
+    }
+    
+    .score-register-buttons {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .score-register-buttons .btn {
+        max-width: 100%;
+    }
 }
 
 
