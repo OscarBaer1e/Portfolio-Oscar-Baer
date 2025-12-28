@@ -3745,9 +3745,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     };
                     startAutoShoot();
                 }
-            } else if (startScreen && !startScreen.classList.contains('hidden')) {
+            } else if (startScreen && !startScreen.classList.contains('hidden') && !gameState.isSavingScore) {
                 startGame();
-            } else if (gameOver && !gameOver.classList.contains('hidden')) {
+            } else if (gameOver && !gameOver.classList.contains('hidden') && !gameState.isSavingScore) {
                 startGame();
             }
         }
@@ -3889,6 +3889,12 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function startGame() {
+        // Empêcher le démarrage si un score est en cours d'enregistrement
+        if (gameState.isSavingScore) {
+            console.log('⏸️ Démarrage du jeu bloqué : enregistrement de score en cours');
+            return;
+        }
+        
         // Récupérer le mode de jeu sélectionné
         if (gameModeSelect) {
             gameState.gameMode = gameModeSelect.value;
@@ -4086,12 +4092,19 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             const name = playerNameInput.value.trim();
             if (name && name.length > 0) {
+                // Activer le flag d'enregistrement pour bloquer le démarrage du jeu
+                gameState.isSavingScore = true;
+                
                 // Désactiver le bouton pendant l'enregistrement
                 const submitBtn = scoreRegisterForm.querySelector('button[type="submit"]');
                 if (submitBtn) {
                     submitBtn.disabled = true;
                     submitBtn.textContent = 'Enregistrement...';
                 }
+                
+                // Désactiver les boutons de démarrage du jeu
+                if (startBtn) startBtn.disabled = true;
+                if (restartBtn) restartBtn.disabled = true;
                 
                 try {
                     await registerScore(name, gameState.score, gameState.level);
@@ -4123,10 +4136,16 @@ document.addEventListener('DOMContentLoaded', function() {
                     console.error('Erreur lors de l\'enregistrement:', error);
                     showMessage('Erreur lors de l\'enregistrement. Réessayez plus tard.', 'hit');
                 } finally {
+                    // Réactiver les boutons et le flag après l'enregistrement
+                    gameState.isSavingScore = false;
+                    
                     if (submitBtn) {
                         submitBtn.disabled = false;
                         submitBtn.innerHTML = '<span class="btn-icon">💾</span> Enregistrer dans le Leaderboard';
                     }
+                    
+                    if (startBtn) startBtn.disabled = false;
+                    if (restartBtn) restartBtn.disabled = false;
                 }
             }
         });
