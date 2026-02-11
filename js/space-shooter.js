@@ -199,6 +199,10 @@ document.addEventListener('DOMContentLoaded', function() {
             previousVolume = globalVolume;
         }
         
+        // Adapter le volume des musiques secrètes (Broly, Beerus)
+        if (brolyAudio) brolyAudio.volume = 0.7 * globalVolume;
+        if (beerusAudio) beerusAudio.volume = 0.7 * globalVolume;
+        
         // Mettre à jour l'affichage
         updateVolumeUI();
     }
@@ -1243,47 +1247,13 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        // Aura secrète Broly (vert) / Beerus (rouge)
+        // Aura style Super Saiyan (Broly = vert, Beerus/Goku = doré)
         if (gameState.isPlaying || gameState.isPaused) {
             if (brolyAudio && !brolyAudio.paused) {
-                ctx.save();
-                ctx.translate(ship.x, ship.y);
-                const pulse = Math.sin(Date.now() / 120) * 0.2 + 1;
-                const r = (ship.width / 2 + 25) * pulse;
-                const g = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
-                g.addColorStop(0, 'rgba(0, 255, 100, 0.35)');
-                g.addColorStop(0.5, 'rgba(0, 220, 80, 0.2)');
-                g.addColorStop(1, 'rgba(0, 180, 60, 0)');
-                ctx.fillStyle = g;
-                ctx.beginPath();
-                ctx.arc(0, 0, r, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(0, 255, 120, 0.6)';
-                ctx.lineWidth = 3;
-                ctx.shadowBlur = 20;
-                ctx.shadowColor = '#00ff88';
-                ctx.stroke();
-                ctx.restore();
+                drawSaiyanAura(ship.x, ship.y, ['#00ff88', '#00cc66', '#009944'], '#00ff88', 28);
             }
             if (beerusAudio && !beerusAudio.paused) {
-                ctx.save();
-                ctx.translate(ship.x, ship.y);
-                const pulse = Math.sin(Date.now() / 100) * 0.2 + 1;
-                const r = (ship.width / 2 + 25) * pulse;
-                const g = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
-                g.addColorStop(0, 'rgba(255, 50, 50, 0.4)');
-                g.addColorStop(0.5, 'rgba(220, 30, 30, 0.25)');
-                g.addColorStop(1, 'rgba(180, 20, 20, 0)');
-                ctx.fillStyle = g;
-                ctx.beginPath();
-                ctx.arc(0, 0, r, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.strokeStyle = 'rgba(255, 80, 80, 0.7)';
-                ctx.lineWidth = 3;
-                ctx.shadowBlur = 22;
-                ctx.shadowColor = '#ff4444';
-                ctx.stroke();
-                ctx.restore();
+                drawSaiyanAuraDivin(ship.x, ship.y);
             }
         }
         
@@ -1317,8 +1287,10 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.restore();
         }
         
-        // Projectiles selon le thème — arc-en-ciel = missile en barre tournante (licorne)
+        // Projectiles selon le thème — arc-en-ciel = barres, aura Broly = vert, aura Beerus = rouge
         const rainbowActive = activePowerUps.rainbow && Date.now() < activePowerUps.rainbowEndTime;
+        const brolyAuraActive = brolyAudio && !brolyAudio.paused;
+        const beerusAuraActive = beerusAudio && !beerusAudio.paused;
         bullets.forEach((bullet, bulletIndex) => {
             const bulletSize = bullet.size || 4;
             if (rainbowActive) {
@@ -1334,6 +1306,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 const barH = bulletSize * 8;
                 ctx.fillRect(-barW / 2, -barH / 2, barW, barH);
                 ctx.restore();
+                ctx.shadowBlur = 0;
+            } else if (brolyAuraActive) {
+                ctx.fillStyle = '#00ff88';
+                ctx.shadowBlur = gameState.isMobile ? 8 : 14;
+                ctx.shadowColor = '#00ff88';
+                ctx.beginPath();
+                ctx.arc(bullet.x, bullet.y, bulletSize, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            } else if (beerusAuraActive) {
+                ctx.fillStyle = '#ff4466';
+                ctx.shadowBlur = gameState.isMobile ? 8 : 14;
+                ctx.shadowColor = '#ff4466';
+                ctx.beginPath();
+                ctx.arc(bullet.x, bullet.y, bulletSize, 0, Math.PI * 2);
+                ctx.fill();
                 ctx.shadowBlur = 0;
             } else {
                 ctx.fillStyle = currentTheme.bullets;
@@ -1671,6 +1659,86 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.shadowBlur = 0;
     }
     
+    function drawSaiyanAura(x, y, colorStops, glowColor, baseRadius) {
+        ctx.save();
+        ctx.translate(x, y);
+        const t = Date.now() * 0.002;
+        const pulse = Math.sin(t) * 0.12 + 1;
+        const h = baseRadius * 1.4 * pulse;
+        const w = baseRadius * 1.1 * (0.9 + Math.sin(t * 2) * 0.1);
+        const tipY = -h;
+        const leftX = -w;
+        const rightX = w;
+        const baseY = h * 0.5;
+        const grad = ctx.createLinearGradient(0, tipY, 0, baseY);
+        grad.addColorStop(0, colorStops[0] + '00');
+        grad.addColorStop(0.2, colorStops[0] + '66');
+        grad.addColorStop(0.5, colorStops[1] + '99');
+        grad.addColorStop(0.85, colorStops[2] + 'cc');
+        grad.addColorStop(1, colorStops[2] + '44');
+        ctx.shadowBlur = 35;
+        ctx.shadowColor = glowColor;
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.moveTo(0, tipY);
+        ctx.lineTo(leftX, baseY);
+        ctx.lineTo(0, baseY * 0.7);
+        ctx.lineTo(rightX, baseY);
+        ctx.closePath();
+        ctx.fill();
+        ctx.shadowBlur = 18;
+        ctx.strokeStyle = glowColor + 'ee';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, tipY * 0.3);
+        ctx.lineTo(0, baseY);
+        ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.restore();
+    }
+    
+    function drawSaiyanAuraDivin(x, y) {
+        ctx.save();
+        ctx.translate(x, y);
+        const t = Date.now() * 0.0018;
+        const pulse = Math.sin(t) * 0.1 + 1;
+        const h = 38 * pulse;
+        const w = 32 * (0.92 + Math.sin(t * 2.5) * 0.08);
+        const tipY = -h;
+        const baseY = h * 0.55;
+        const grad = ctx.createLinearGradient(0, tipY, 0, baseY);
+        grad.addColorStop(0, 'rgba(255, 240, 255, 0.5)');
+        grad.addColorStop(0.15, 'rgba(255, 150, 180, 0.6)');
+        grad.addColorStop(0.45, 'rgba(255, 60, 100, 0.7)');
+        grad.addColorStop(0.8, 'rgba(200, 20, 50, 0.5)');
+        grad.addColorStop(1, 'rgba(160, 10, 40, 0.3)');
+        ctx.shadowBlur = 40;
+        ctx.shadowColor = '#ff3366';
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.moveTo(0, tipY);
+        ctx.lineTo(-w, baseY);
+        ctx.lineTo(0, baseY * 0.65);
+        ctx.lineTo(w, baseY);
+        ctx.closePath();
+        ctx.fill();
+        ctx.shadowBlur = 20;
+        ctx.strokeStyle = 'rgba(255, 100, 140, 0.9)';
+        ctx.lineWidth = 2.5;
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(0, tipY * 0.2);
+        ctx.lineTo(0, baseY);
+        ctx.strokeStyle = 'rgba(255, 220, 240, 0.5)';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+        ctx.shadowBlur = 0;
+        ctx.restore();
+    }
+    
     function drawShip(x, y) {
         // Clignotement si invincible (1-2 secondes)
         if (ship.invincible) {
@@ -1689,10 +1757,20 @@ document.addEventListener('DOMContentLoaded', function() {
         const shrinkScale = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? 0.6 : 1.0;
         ctx.scale(shrinkScale, shrinkScale);
         
+        let shipColor = ship.color;
+        let detailColor = '#00ffff';
+        if (brolyAudio && !brolyAudio.paused) {
+            shipColor = '#00ff88';
+            detailColor = '#00ffcc';
+        } else if (beerusAudio && !beerusAudio.paused) {
+            shipColor = '#ff4466';
+            detailColor = '#ffaacc';
+        }
+        
         // Corps du vaisseau
-        ctx.fillStyle = ship.color;
+        ctx.fillStyle = shipColor;
         ctx.shadowBlur = 15;
-        ctx.shadowColor = ship.color;
+        ctx.shadowColor = shipColor;
         
         // Forme du vaisseau (triangle)
         ctx.beginPath();
@@ -1704,7 +1782,7 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.fill();
         
         // Détails
-        ctx.fillStyle = '#00ffff';
+        ctx.fillStyle = detailColor;
         ctx.beginPath();
         ctx.arc(0, 5, 5, 0, Math.PI * 2);
         ctx.fill();
