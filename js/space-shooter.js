@@ -444,6 +444,8 @@ document.addEventListener('DOMContentLoaded', function() {
         shockwaveCharges: 0,
         homing: false,
         kaioken: false,
+        kamehameha: false,
+        kienzan: false,
         rapidFireEndTime: 0,
         shieldEndTime: 0,
         shrinkEndTime: 0,
@@ -454,13 +456,10 @@ document.addEventListener('DOMContentLoaded', function() {
         magnetEndTime: 0,
         rainbowEndTime: 0,
         homingEndTime: 0,
-        kaiokenEndTime: 0
+        kaiokenEndTime: 0,
+        kamehamehaEndTime: 0,
+        kienzanEndTime: 0
     };
-    let kamehamehaCharges = 0;
-    let kienzanCharges = 0;
-    let genkiDamaCharges = 0;
-    let kamehamehaBeams = [];
-    let kienzanDiscs = [];
     let genkiDamaEffect = null;
     
     // Multiplicateur de ralentissement temporel
@@ -1045,6 +1044,8 @@ document.addEventListener('DOMContentLoaded', function() {
             shockwaveCharges: 0,
             homing: false,
             kaioken: false,
+            kamehameha: false,
+            kienzan: false,
             rapidFireEndTime: 0,
             shieldEndTime: 0,
             shrinkEndTime: 0,
@@ -1055,16 +1056,13 @@ document.addEventListener('DOMContentLoaded', function() {
             magnetEndTime: 0,
             rainbowEndTime: 0,
             homingEndTime: 0,
-            kaiokenEndTime: 0
+            kaiokenEndTime: 0,
+            kamehamehaEndTime: 0,
+            kienzanEndTime: 0
         };
         timeSlowMultiplier = 1.0;
         lastShotTime = 0;
         shockwaveEffect = null;
-        kamehamehaCharges = 0;
-        kienzanCharges = 0;
-        genkiDamaCharges = 0;
-        kamehamehaBeams = [];
-        kienzanDiscs = [];
         genkiDamaEffect = null;
         if (currentLevelDisplay) {
             currentLevelDisplay.textContent = gameState.level;
@@ -1097,7 +1095,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const activeBuffs = [];
         
         // Vérifier chaque type de buff
-        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet', 'rainbow', 'homing', 'kaioken'];
+        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet', 'rainbow', 'homing', 'kaioken', 'kamehameha', 'kienzan'];
         buffTypes.forEach(buffType => {
             const isActive = activePowerUps[buffType] && now < activePowerUps[`${buffType}EndTime`];
             if (isActive) {
@@ -1113,15 +1111,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         if ((activePowerUps.shockwaveCharges || 0) > 0) {
             activeBuffs.push({ type: 'shockwave', emoji: buffEmojis.shockwave, timeLeft: null, charges: activePowerUps.shockwaveCharges });
-        }
-        if ((kamehamehaCharges || 0) > 0) {
-            activeBuffs.push({ type: 'kamehameha', emoji: buffEmojis.kamehameha, timeLeft: null, charges: kamehamehaCharges });
-        }
-        if ((kienzanCharges || 0) > 0) {
-            activeBuffs.push({ type: 'kienzan', emoji: buffEmojis.kienzan, timeLeft: null, charges: kienzanCharges });
-        }
-        if ((genkiDamaCharges || 0) > 0) {
-            activeBuffs.push({ type: 'genkiDama', emoji: buffEmojis.genkiDama, timeLeft: null, charges: genkiDamaCharges });
         }
         
         // Vider le conteneur
@@ -1316,6 +1305,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const brolyAuraActive = brolyAudio && !brolyAudio.paused;
         const beerusAuraActive = beerusAudio && !beerusAudio.paused;
         const kaiokenActive = activePowerUps.kaioken && Date.now() < activePowerUps.kaiokenEndTime;
+        const kamehamehaActive = activePowerUps.kamehameha && Date.now() < activePowerUps.kamehamehaEndTime;
+        const kienzanActive = activePowerUps.kienzan && Date.now() < activePowerUps.kienzanEndTime;
         bullets.forEach((bullet, bulletIndex) => {
             const bulletSize = bullet.size || 4;
             if (rainbowActive) {
@@ -1356,6 +1347,35 @@ document.addEventListener('DOMContentLoaded', function() {
                 ctx.arc(bullet.x, bullet.y, bulletSize, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.shadowBlur = 0;
+            } else if (kamehamehaActive) {
+                ctx.save();
+                const beamH = 40;
+                const beamW = bulletSize * 3;
+                const grad = ctx.createLinearGradient(bullet.x, bullet.y - beamH, bullet.x, bullet.y + 4);
+                grad.addColorStop(0, 'rgba(0, 200, 255, 0.4)');
+                grad.addColorStop(0.5, 'rgba(0, 180, 255, 0.8)');
+                grad.addColorStop(1, 'rgba(0, 120, 255, 0.95)');
+                ctx.fillStyle = grad;
+                ctx.shadowBlur = 18;
+                ctx.shadowColor = '#00aaff';
+                ctx.fillRect(bullet.x - beamW / 2, bullet.y - beamH, beamW, beamH + 4);
+                ctx.shadowBlur = 0;
+                ctx.restore();
+            } else if (kienzanActive) {
+                ctx.save();
+                ctx.translate(bullet.x, bullet.y);
+                ctx.rotate((Date.now() * 0.01 + bulletIndex) % (Math.PI * 2));
+                ctx.strokeStyle = '#ffcc00';
+                ctx.fillStyle = 'rgba(255, 220, 0, 0.5)';
+                ctx.lineWidth = 2;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#ffaa00';
+                ctx.beginPath();
+                ctx.arc(0, 0, bulletSize * 1.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                ctx.shadowBlur = 0;
+                ctx.restore();
             } else {
                 ctx.fillStyle = currentTheme.bullets;
                 ctx.shadowBlur = gameState.isMobile ? 5 : 10;
@@ -1396,39 +1416,6 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.shadowBlur = 0;
             ctx.restore();
         }
-        
-        // Kamehameha (beam bleu)
-        kamehamehaBeams.forEach(beam => {
-            ctx.save();
-            const grad = ctx.createLinearGradient(beam.x, beam.topY, beam.x, beam.y + 20);
-            grad.addColorStop(0, 'rgba(0, 200, 255, 0.3)');
-            grad.addColorStop(0.5, 'rgba(0, 180, 255, 0.7)');
-            grad.addColorStop(1, 'rgba(0, 120, 255, 0.9)');
-            ctx.fillStyle = grad;
-            ctx.shadowBlur = 25;
-            ctx.shadowColor = '#00aaff';
-            ctx.fillRect(beam.x - beam.width / 2, beam.topY, beam.width, beam.y + 20 - beam.topY);
-            ctx.shadowBlur = 0;
-            ctx.restore();
-        });
-        
-        // Kienzan (disques dorés)
-        kienzanDiscs.forEach(disc => {
-            ctx.save();
-            ctx.translate(disc.x, disc.y);
-            ctx.rotate(disc.rotation);
-            ctx.strokeStyle = '#ffcc00';
-            ctx.fillStyle = 'rgba(255, 220, 0, 0.4)';
-            ctx.lineWidth = 2;
-            ctx.shadowBlur = 12;
-            ctx.shadowColor = '#ffaa00';
-            ctx.beginPath();
-            ctx.arc(0, 0, disc.radius, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-            ctx.shadowBlur = 0;
-            ctx.restore();
-        });
         
         // Genki Dama (sphère bleue)
         if (genkiDamaEffect) {
@@ -2356,56 +2343,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        // Kamehameha : beam très rapide vers le haut
-        for (let bi = kamehamehaBeams.length - 1; bi >= 0; bi--) {
-            const beam = kamehamehaBeams[bi];
-            beam.topY -= beam.growthSpeed * gameState.deltaTime;
-            const left = beam.x - beam.width / 2;
-            const right = beam.x + beam.width / 2;
-            for (let i = asteroids.length - 1; i >= 0; i--) {
-                const a = asteroids[i];
-                if (a.x >= left - a.size && a.x <= right + a.size && a.y <= beam.y + 30 && a.y >= beam.topY - a.size) {
-                    createEnhancedExplosion(a.x, a.y, a.color, a.size);
-                    if (!gameState.bossActive) {
-                        const points = Math.floor(a.size / 5) * 10;
-                        gameState.score += points;
-                        if (scoreElement) scoreElement.textContent = gameState.score;
-                        checkAndUpdateHighScore();
-                        createScoreParticle(a.x, a.y, `+${points}`);
-                    }
-                    gameStats.asteroidsDestroyed++;
-                    asteroids.splice(i, 1);
-                }
-            }
-            if (beam.topY < -100) kamehamehaBeams.splice(bi, 1);
-        }
-        
-        // Kienzan : disques perçants
-        for (let di = kienzanDiscs.length - 1; di >= 0; di--) {
-            const disc = kienzanDiscs[di];
-            disc.y += disc.vy * gameState.deltaTime;
-            disc.rotation += 0.2 * gameState.deltaTime;
-            for (let i = asteroids.length - 1; i >= 0; i--) {
-                const a = asteroids[i];
-                const dx = disc.x - a.x;
-                const dy = disc.y - a.y;
-                if (Math.sqrt(dx * dx + dy * dy) < disc.radius + a.size) {
-                    createEnhancedExplosion(a.x, a.y, a.color, a.size);
-                    if (!gameState.bossActive) {
-                        const points = Math.floor(a.size / 5) * 10;
-                        gameState.score += points;
-                        if (scoreElement) scoreElement.textContent = gameState.score;
-                        checkAndUpdateHighScore();
-                        createScoreParticle(a.x, a.y, `+${points}`);
-                    }
-                    gameStats.asteroidsDestroyed++;
-                    asteroids.splice(i, 1);
-                }
-            }
-            if (disc.y < -30) kienzanDiscs.splice(di, 1);
-        }
-        
-        // Genki Dama : grosse explosion
+        // Genki Dama (déclenché à la collecte)
         if (genkiDamaEffect) {
             genkiDamaEffect.radius += genkiDamaEffect.speed * gameState.deltaTime;
             screenShake.intensity = Math.max(screenShake.intensity, 6);
@@ -2544,6 +2482,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (activePowerUps.kaioken && now > activePowerUps.kaiokenEndTime) {
             activePowerUps.kaioken = false;
         }
+        if (activePowerUps.kamehameha && now > activePowerUps.kamehamehaEndTime) {
+            activePowerUps.kamehameha = false;
+        }
+        if (activePowerUps.kienzan && now > activePowerUps.kienzanEndTime) {
+            activePowerUps.kienzan = false;
+        }
         
         // Mettre à jour les icônes de buff
         updateBuffIcons();
@@ -2575,8 +2519,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     gameStats.asteroidsDestroyed++;
                     gameStats.bulletsHit++;
                     
-                    // Supprimer le projectile
-                    bullets.splice(bulletIndex, 1);
+                    // Supprimer le projectile sauf si Kienzan (perçant)
+                    if (!activePowerUps.kienzan) bullets.splice(bulletIndex, 1);
                     
                     // Vérifier si l'astéroïde doit se séparer
                     const isBigType = asteroid.size >= 48;  // Gros type : toujours se divise en gros morceaux
@@ -3117,23 +3061,35 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Collecte un boost
+    // Durées de base pour le stack (stack = durée uniquement)
+    const BONUS_DURATIONS = { rapidFire: 10000, shield: 8000, shrink: 12000, bigBullets: 15000, tripleShot: 10000, timeSlow: 12000, offensiveShield: 15000, magnet: 20000, rainbow: 12000, homing: 10000, kaioken: 10000, kamehameha: 10000, kienzan: 10000 };
+    
+    function applyTimedBonus(type, endTimeKey) {
+        const now = Date.now();
+        const duration = BONUS_DURATIONS[type] || 10000;
+        if (activePowerUps[type] && now < activePowerUps[endTimeKey]) {
+            activePowerUps[endTimeKey] += duration; // Stack = durée seulement
+        } else {
+            activePowerUps[type] = true;
+            activePowerUps[endTimeKey] = now + duration;
+            if (type === 'rapidFire') currentFireRate = baseFireRate / 3;
+            if (type === 'timeSlow') timeSlowMultiplier = 0.5;
+        }
+        createPowerUpVisualAnimation(type, ship.x, ship.y);
+    }
+    
+    // Collecte un boost (tous compatibles en combo, stack = durée uniquement)
     function collectPowerUp(powerUp) {
         const now = Date.now();
         
         playSound('powerup');
         
         if (powerUp.type === 'rapidFire') {
-            activePowerUps.rapidFire = true;
-            activePowerUps.rapidFireEndTime = now + 10000; // 10 secondes
-            currentFireRate = baseFireRate / 3; // 3x plus rapide
-            createPowerUpVisualAnimation('rapidFire', ship.x, ship.y);
+            applyTimedBonus('rapidFire', 'rapidFireEndTime');
         } else if (powerUp.type === 'shield') {
-            activePowerUps.shield = true;
-            activePowerUps.shieldEndTime = now + 8000; // 8 secondes
-            createPowerUpVisualAnimation('shield', ship.x, ship.y);
+            applyTimedBonus('shield', 'shieldEndTime');
         } else if (powerUp.type === 'life') {
-            if (gameState.lives < 5) { // Maximum 5 vies
+            if (gameState.lives < 5) {
                 gameState.lives++;
                 gameState.maxLives = Math.max(gameState.maxLives, gameState.lives);
                 if (livesElement) livesElement.textContent = gameState.lives;
@@ -3142,53 +3098,36 @@ document.addEventListener('DOMContentLoaded', function() {
                 createPowerUpVisualAnimation('lifeMax', ship.x, ship.y);
             }
         } else if (powerUp.type === 'shrink') {
-            activePowerUps.shrink = true;
-            activePowerUps.shrinkEndTime = now + 12000; // 12 secondes
-            createPowerUpVisualAnimation('shrink', ship.x, ship.y);
+            applyTimedBonus('shrink', 'shrinkEndTime');
         } else if (powerUp.type === 'bigBullets') {
-            activePowerUps.bigBullets = true;
-            activePowerUps.bigBulletsEndTime = now + 15000; // 15 secondes
-            createPowerUpVisualAnimation('bigBullets', ship.x, ship.y);
+            applyTimedBonus('bigBullets', 'bigBulletsEndTime');
         } else if (powerUp.type === 'tripleShot') {
-            activePowerUps.tripleShot = true;
-            activePowerUps.tripleShotEndTime = now + 10000; // 10 secondes
-            createPowerUpVisualAnimation('tripleShot', ship.x, ship.y);
+            applyTimedBonus('tripleShot', 'tripleShotEndTime');
         } else if (powerUp.type === 'timeSlow') {
-            activePowerUps.timeSlow = true;
-            activePowerUps.timeSlowEndTime = now + 12000; // 12 secondes
-            timeSlowMultiplier = 0.5; // Ralentit à 50% de la vitesse
-            createPowerUpVisualAnimation('timeSlow', ship.x, ship.y);
+            applyTimedBonus('timeSlow', 'timeSlowEndTime');
         } else if (powerUp.type === 'offensiveShield') {
-            activePowerUps.offensiveShield = true;
-            activePowerUps.offensiveShieldEndTime = now + 15000; // 15 secondes
-            createPowerUpVisualAnimation('offensiveShield', ship.x, ship.y);
+            applyTimedBonus('offensiveShield', 'offensiveShieldEndTime');
         } else if (powerUp.type === 'magnet') {
-            activePowerUps.magnet = true;
-            activePowerUps.magnetEndTime = now + 20000; // 20 secondes
-            createPowerUpVisualAnimation('magnet', ship.x, ship.y);
+            applyTimedBonus('magnet', 'magnetEndTime');
         } else if (powerUp.type === 'rainbow') {
-            activePowerUps.rainbow = true;
-            activePowerUps.rainbowEndTime = now + 12000; // 12 secondes
-            createPowerUpVisualAnimation('rainbow', ship.x, ship.y);
+            applyTimedBonus('rainbow', 'rainbowEndTime');
         } else if (powerUp.type === 'shockwave') {
             activePowerUps.shockwaveCharges = Math.min(2, (activePowerUps.shockwaveCharges || 0) + 1);
             createPowerUpVisualAnimation('shockwave', ship.x, ship.y);
         } else if (powerUp.type === 'homing') {
-            activePowerUps.homing = true;
-            activePowerUps.homingEndTime = now + 10000; // 10 secondes
-            createPowerUpVisualAnimation('homing', ship.x, ship.y);
+            applyTimedBonus('homing', 'homingEndTime');
         } else if (powerUp.type === 'kamehameha') {
-            kamehamehaCharges = Math.min(3, kamehamehaCharges + 1);
-            createPowerUpVisualAnimation('kamehameha', ship.x, ship.y);
+            applyTimedBonus('kamehameha', 'kamehamehaEndTime');
         } else if (powerUp.type === 'kienzan') {
-            kienzanCharges = Math.min(3, kienzanCharges + 2);
-            createPowerUpVisualAnimation('kienzan', ship.x, ship.y);
+            applyTimedBonus('kienzan', 'kienzanEndTime');
         } else if (powerUp.type === 'kaioken') {
-            activePowerUps.kaioken = true;
-            activePowerUps.kaiokenEndTime = now + 10000; // 10 secondes
-            createPowerUpVisualAnimation('kaioken', ship.x, ship.y);
+            applyTimedBonus('kaioken', 'kaiokenEndTime');
         } else if (powerUp.type === 'genkiDama') {
-            genkiDamaCharges = Math.min(2, genkiDamaCharges + 1);
+            if (!genkiDamaEffect) {
+                genkiDamaEffect = { x: ship.x, y: ship.y, radius: 0, maxRadius: Math.max(canvas.width, canvas.height) * 0.7, speed: 32 };
+                playSound('explosion');
+                screenShake.intensity = Math.max(screenShake.intensity, 12);
+            }
             createPowerUpVisualAnimation('genkiDama', ship.x, ship.y);
         }
         
@@ -4353,42 +4292,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 beerusAudio.currentTime = 0;
                 beerusAudio.volume = 0.7 * globalVolume;
                 beerusAudio.play().catch(e => console.warn('Beerus audio:', e));
-            }
-            if (e.code === 'KeyQ' && kamehamehaCharges > 0) {
-                e.preventDefault();
-                kamehamehaCharges--;
-                kamehamehaBeams.push({
-                    x: ship.x,
-                    y: ship.y,
-                    topY: ship.y,
-                    width: 28,
-                    growthSpeed: 1200
-                });
-                playSound('explosion');
-            }
-            if (e.code === 'KeyW' && kienzanCharges > 0) {
-                e.preventDefault();
-                kienzanCharges--;
-                kienzanDiscs.push({
-                    x: ship.x,
-                    y: ship.y - ship.height / 2,
-                    vy: -14,
-                    radius: 8,
-                    rotation: 0
-                });
-            }
-            if (e.code === 'KeyR' && genkiDamaCharges > 0 && !genkiDamaEffect) {
-                e.preventDefault();
-                genkiDamaCharges--;
-                genkiDamaEffect = {
-                    x: ship.x,
-                    y: ship.y,
-                    radius: 0,
-                    maxRadius: Math.max(canvas.width, canvas.height) * 0.75,
-                    speed: 35
-                };
-                playSound('explosion');
-                screenShake.intensity = Math.max(screenShake.intensity, 15);
             }
         }
         
