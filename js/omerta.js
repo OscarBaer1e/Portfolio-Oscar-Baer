@@ -61,7 +61,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const isVideo = note.classList.contains('video-note');
             const isAudio = note.classList.contains('audio-note');
             const isImage = note.classList.contains('image-note');
-            const isSpecial = note.classList.contains('special-note');
             const isYouTube = isVideo && note.querySelector('.youtube-container') !== null;
             const isLocalVideo = isVideo && !isYouTube;
             
@@ -86,13 +85,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     break;
                 default:
                     shouldShow = true;
-            }
-            
-            // Les notes spéciales sont toujours visibles avec le filtre "all"
-            if (isSpecial && filterType === 'all') {
-                shouldShow = true;
-            } else if (isSpecial && filterType !== 'all') {
-                shouldShow = false;
             }
             
             if (!shouldShow) {
@@ -148,14 +140,6 @@ document.addEventListener('DOMContentLoaded', function() {
             setTimeout(() => {
                 sizeBtn.style.transform = '';
             }, 150);
-        });
-    }
-    
-    // Bouton portal vers Jules
-    const julesPortalButton = document.getElementById('jules-portal-button');
-    if (julesPortalButton) {
-        julesPortalButton.addEventListener('click', function() {
-            window.location.href = './jules-secret.html';
         });
     }
     

@@ -1606,14 +1606,15 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.rotate(asteroid.rotation);
         
         ctx.fillStyle = asteroid.color;
-        ctx.shadowBlur = 5;
+        ctx.shadowBlur = asteroid.size >= 48 ? 12 : 5;
         ctx.shadowColor = asteroid.color;
         
-        // Forme irrégulière d'astéroïde
+        const sides = asteroid.size >= 48 ? 12 : 8;
+        const irregularity = asteroid.size >= 48 ? 8 : 5;
         ctx.beginPath();
-        for (let i = 0; i < 8; i++) {
-            const angle = (i / 8) * Math.PI * 2;
-            const radius = asteroid.size + Math.sin(angle * 3) * 5;
+        for (let i = 0; i < sides; i++) {
+            const angle = (i / sides) * Math.PI * 2;
+            const radius = asteroid.size + Math.sin(angle * 3) * irregularity;
             const x = Math.cos(angle) * radius;
             const y = Math.sin(angle) * radius;
             if (i === 0) {
@@ -2078,18 +2079,40 @@ document.addEventListener('DOMContentLoaded', function() {
                     bullets.splice(bulletIndex, 1);
                     
                     // Vérifier si l'astéroïde doit se séparer
-                    const isLarge = asteroid.size > 25;
-                    if (isLarge && Math.random() < 0.45) {
-                        // 45% de chance de se séparer en 2-3 petits astéroïdes (réduit de 60% pour équilibrer)
-                        const numPieces = Math.floor(Math.random() * 2) + 2; // 2 ou 3 pièces
+                    const isBigType = asteroid.size >= 48;  // Gros type : toujours se divise en gros morceaux
+                    const isLargeNormal = asteroid.size > 25 && asteroid.size < 48;
+                    const baseSpeedFromParent = asteroid.speed * asteroid.size / ASTEROID_SIZE_REF;
+                    
+                    if (isBigType) {
+                        // Gros astéroïde : se divise en 2–3 gros morceaux (plus gros = plus lents)
+                        const numPieces = Math.floor(Math.random() * 2) + 2;
+                        const sizeRatio = 0.5 + Math.random() * 0.15;
                         for (let i = 0; i < numPieces; i++) {
-                            const angle = (Math.PI * 2 / numPieces) * i;
-                            const newSize = asteroid.size * 0.4;
+                            const angle = (Math.PI * 2 / numPieces) * i + Math.random() * 0.5;
+                            const newSize = asteroid.size * sizeRatio;
+                            const childSpeed = getAsteroidSpeedForSize(baseSpeedFromParent, newSize);
                             asteroids.push({
                                 x: asteroid.x + Math.cos(angle) * (asteroid.size / 2),
                                 y: asteroid.y + Math.sin(angle) * (asteroid.size / 2),
                                 size: newSize,
-                                speed: asteroid.speed * 1.2,
+                                speed: childSpeed,
+                                rotation: 0,
+                                rotationSpeed: (Math.random() - 0.5) * 0.12,
+                                color: asteroid.color
+                            });
+                        }
+                    } else if (isLargeNormal && Math.random() < 0.45) {
+                        // Astéroïde normal gros : 45% de chance de se séparer en 2–3 morceaux
+                        const numPieces = Math.floor(Math.random() * 2) + 2;
+                        for (let i = 0; i < numPieces; i++) {
+                            const angle = (Math.PI * 2 / numPieces) * i;
+                            const newSize = asteroid.size * 0.4;
+                            const childSpeed = getAsteroidSpeedForSize(baseSpeedFromParent, newSize);
+                            asteroids.push({
+                                x: asteroid.x + Math.cos(angle) * (asteroid.size / 2),
+                                y: asteroid.y + Math.sin(angle) * (asteroid.size / 2),
+                                size: newSize,
+                                speed: childSpeed,
                                 rotation: 0,
                                 rotationSpeed: (Math.random() - 0.5) * 0.15,
                                 color: asteroid.color
@@ -2662,17 +2685,31 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Vitesse inversement proportionnelle à la taille : plus gros = plus lent
+    const ASTEROID_SIZE_REF = 25;
+    function getAsteroidSpeedForSize(baseSpeed, size) {
+        return baseSpeed * ASTEROID_SIZE_REF / Math.max(size, 12);
+    }
+    
     function spawnAsteroid() {
-        const size = Math.random() * 30 + 15;
         const currentTheme = getCurrentTheme();
         const asteroidColors = currentTheme.asteroids;
         const randomColor = asteroidColors[Math.floor(Math.random() * asteroidColors.length)];
+        const baseSpeed = Math.random() * 2 + gameState.gameSpeed;
+        
+        // ~15% de chance de faire apparaître un gros astéroïde (se divise en gros morceaux)
+        const isBigType = Math.random() < 0.15;
+        const size = isBigType
+            ? Math.random() * 22 + 50   // 50–72 : gros
+            : Math.random() * 30 + 15;  // 15–45 : normal
+        
+        const speed = getAsteroidSpeedForSize(baseSpeed, size);
         
         asteroids.push({
             x: Math.random() * (canvas.width - size * 2) + size,
             y: -size,
             size: size,
-            speed: Math.random() * 2 + gameState.gameSpeed,
+            speed: speed,
             rotation: 0,
             rotationSpeed: (Math.random() - 0.5) * 0.1,
             color: randomColor
