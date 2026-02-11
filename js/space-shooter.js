@@ -39,7 +39,8 @@ document.addEventListener('DOMContentLoaded', function() {
         tripleShot: '🎯',
         timeSlow: '⏱️',
         offensiveShield: '🛡️',
-        magnet: '🧲'
+        magnet: '🧲',
+        rainbow: '🌈'
     };
     
     // Système de thèmes qui change tous les 10 niveaux
@@ -429,6 +430,7 @@ document.addEventListener('DOMContentLoaded', function() {
         timeSlow: false,
         offensiveShield: false,
         magnet: false,
+        rainbow: false,
         rapidFireEndTime: 0,
         shieldEndTime: 0,
         shrinkEndTime: 0,
@@ -436,7 +438,8 @@ document.addEventListener('DOMContentLoaded', function() {
         tripleShotEndTime: 0,
         timeSlowEndTime: 0,
         offensiveShieldEndTime: 0,
-        magnetEndTime: 0
+        magnetEndTime: 0,
+        rainbowEndTime: 0
     };
     
     // Multiplicateur de ralentissement temporel
@@ -1012,6 +1015,7 @@ document.addEventListener('DOMContentLoaded', function() {
             timeSlow: false,
             offensiveShield: false,
             magnet: false,
+            rainbow: false,
             rapidFireEndTime: 0,
             shieldEndTime: 0,
             shrinkEndTime: 0,
@@ -1019,7 +1023,8 @@ document.addEventListener('DOMContentLoaded', function() {
             tripleShotEndTime: 0,
             timeSlowEndTime: 0,
             offensiveShieldEndTime: 0,
-            magnetEndTime: 0
+            magnetEndTime: 0,
+            rainbowEndTime: 0
         };
         timeSlowMultiplier = 1.0;
         lastShotTime = 0;
@@ -1054,7 +1059,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const activeBuffs = [];
         
         // Vérifier chaque type de buff
-        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet'];
+        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet', 'rainbow'];
         buffTypes.forEach(buffType => {
             const isActive = activePowerUps[buffType] && now < activePowerUps[`${buffType}EndTime`];
             if (isActive) {
@@ -1189,16 +1194,23 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        // Traînées de particules du vaisseau (réduites sur mobile)
+        // Traînées de particules du vaisseau (réduites sur mobile) — arc-en-ciel si bonus actif
         if (!gameState.isLowEndDevice) {
-            const trailStep = gameState.isMobile ? 2 : 1; // Dessiner une traînée sur deux sur mobile
+            const trailStep = gameState.isMobile ? 2 : 1;
+            const trailRainbow = activePowerUps.rainbow && Date.now() < activePowerUps.rainbowEndTime;
             shipTrail.forEach((trail, index) => {
                 if (index % trailStep === 0) {
                     ctx.save();
                     ctx.globalAlpha = trail.alpha;
-                    ctx.fillStyle = ship.color;
-                    ctx.shadowBlur = gameState.isMobile ? 5 : 10;
-                    ctx.shadowColor = ship.color;
+                    if (trailRainbow) {
+                        const hue = (Date.now() / 40 + index * 35) % 360;
+                        ctx.fillStyle = `hsl(${hue}, 100%, 65%)`;
+                        ctx.shadowBlur = gameState.isMobile ? 8 : 12;
+                    } else {
+                        ctx.fillStyle = ship.color;
+                        ctx.shadowBlur = gameState.isMobile ? 5 : 10;
+                    }
+                    ctx.shadowColor = ctx.fillStyle;
                     ctx.beginPath();
                     ctx.arc(trail.x, trail.y, 3 - (index / shipTrail.length) * 2, 0, Math.PI * 2);
                     ctx.fill();
@@ -1237,15 +1249,27 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.restore();
         }
         
-        // Projectiles selon le thème (optimisé pour mobile)
-        bullets.forEach(bullet => {
-            ctx.fillStyle = currentTheme.bullets;
-            ctx.shadowBlur = gameState.isMobile ? 5 : 10;
-            ctx.shadowColor = currentTheme.bullets;
+        // Projectiles selon le thème (optimisé pour mobile) — arc-en-ciel = barres + couleurs
+        const rainbowActive = activePowerUps.rainbow && Date.now() < activePowerUps.rainbowEndTime;
+        bullets.forEach((bullet, bulletIndex) => {
             const bulletSize = bullet.size || 4;
-            ctx.beginPath();
-            ctx.arc(bullet.x, bullet.y, bulletSize, 0, Math.PI * 2);
-            ctx.fill();
+            if (rainbowActive) {
+                const hue = (Date.now() / 25 + bulletIndex * 50) % 360;
+                ctx.fillStyle = `hsl(${hue}, 100%, 60%)`;
+                ctx.shadowBlur = gameState.isMobile ? 8 : 14;
+                ctx.shadowColor = ctx.fillStyle;
+                // Barre verticale (laser) au lieu d'un cercle
+                const barW = bulletSize * 1.5;
+                const barH = bulletSize * 6;
+                ctx.fillRect(bullet.x - barW / 2, bullet.y - barH / 2, barW, barH);
+            } else {
+                ctx.fillStyle = currentTheme.bullets;
+                ctx.shadowBlur = gameState.isMobile ? 5 : 10;
+                ctx.shadowColor = currentTheme.bullets;
+                ctx.beginPath();
+                ctx.arc(bullet.x, bullet.y, bulletSize, 0, Math.PI * 2);
+                ctx.fill();
+            }
             ctx.shadowBlur = 0;
         });
         
@@ -1776,6 +1800,24 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
+        } else if (powerUp.type === 'rainbow') {
+            // Arc-en-ciel - demi-cercle dégradé arc-en-ciel
+            const gradient = ctx.createLinearGradient(-14, 0, 14, 0);
+            gradient.addColorStop(0, '#ff0000');
+            gradient.addColorStop(0.17, '#ff8800');
+            gradient.addColorStop(0.33, '#ffff00');
+            gradient.addColorStop(0.5, '#00ff00');
+            gradient.addColorStop(0.67, '#00ffff');
+            gradient.addColorStop(0.83, '#0088ff');
+            gradient.addColorStop(1, '#ff00ff');
+            ctx.strokeStyle = gradient;
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.arc(0, 2, 10, Math.PI, 0, false);
+            ctx.stroke();
+            ctx.lineWidth = 2;
+            ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+            ctx.stroke();
         }
         
         ctx.restore();
@@ -2044,6 +2086,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (activePowerUps.magnet && now > activePowerUps.magnetEndTime) {
             activePowerUps.magnet = false;
         }
+        if (activePowerUps.rainbow && now > activePowerUps.rainbowEndTime) {
+            activePowerUps.rainbow = false;
+        }
         
         // Mettre à jour les icônes de buff
         updateBuffIcons();
@@ -2148,12 +2193,15 @@ document.addEventListener('DOMContentLoaded', function() {
                         } else if (powerUpType < 0.93) {
                             // 5% des drops = 0.6% total - Ralentissement temporel (rare, puissant)
                             spawnPowerUp(asteroid.x, asteroid.y, 'timeSlow');
-                        } else if (powerUpType < 0.97) {
+                        } else if (powerUpType < 0.95) {
                             // 4% des drops = 0.48% total - Bouclier offensif (très rare, puissant)
                             spawnPowerUp(asteroid.x, asteroid.y, 'offensiveShield');
-                        } else {
+                        } else if (powerUpType < 0.98) {
                             // 3% des drops = 0.36% total - Vie (très rare, très puissant)
                             spawnPowerUp(asteroid.x, asteroid.y, 'life');
+                        } else {
+                            // 2% des drops = 0.24% total - Arc-en-ciel (rare, visuel)
+                            spawnPowerUp(asteroid.x, asteroid.y, 'rainbow');
                         }
                     }
                     
@@ -2374,6 +2422,9 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (type === 'magnet') {
             text = '🧲 Magnet';
             glowColor = '#e74c3c';
+        } else if (type === 'rainbow') {
+            text = '🌈 Arc-en-ciel';
+            glowColor = '#ff0080';
         }
         
         // Position aléatoire pour le texte (à côté du vaisseau)
@@ -2607,6 +2658,7 @@ document.addEventListener('DOMContentLoaded', function() {
         else if (type === 'timeSlow') color = '#9b59b6';
         else if (type === 'offensiveShield') color = '#ff6b6b';
         else if (type === 'magnet') color = '#e74c3c';
+        else if (type === 'rainbow') color = '#ff0080';
         
         powerUps.push({
             x: x,
@@ -2667,6 +2719,10 @@ document.addEventListener('DOMContentLoaded', function() {
             activePowerUps.magnet = true;
             activePowerUps.magnetEndTime = now + 20000; // 20 secondes
             createPowerUpVisualAnimation('magnet', ship.x, ship.y);
+        } else if (powerUp.type === 'rainbow') {
+            activePowerUps.rainbow = true;
+            activePowerUps.rainbowEndTime = now + 12000; // 12 secondes
+            createPowerUpVisualAnimation('rainbow', ship.x, ship.y);
         }
         
         gameStats.powerUpsCollected++;
@@ -3712,7 +3768,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Vérifie le cooldown de tir
         const now = Date.now();
-        if (now - lastShotTime < currentFireRate) {
+        const rainbowActive = activePowerUps.rainbow && now < activePowerUps.rainbowEndTime;
+        const effectiveFireRate = rainbowActive ? currentFireRate * 2 : currentFireRate;
+        if (now - lastShotTime < effectiveFireRate) {
             return;
         }
         
