@@ -40,7 +40,9 @@ document.addEventListener('DOMContentLoaded', function() {
         timeSlow: '⏱️',
         offensiveShield: '🛡️',
         magnet: '🧲',
-        rainbow: '🌈'
+        rainbow: '🌈',
+        shockwave: '🌀',
+        homing: '➰'
     };
     
     // Système de thèmes qui change tous les 10 niveaux
@@ -431,6 +433,8 @@ document.addEventListener('DOMContentLoaded', function() {
         offensiveShield: false,
         magnet: false,
         rainbow: false,
+        shockwaveCharges: 0,
+        homing: false,
         rapidFireEndTime: 0,
         shieldEndTime: 0,
         shrinkEndTime: 0,
@@ -439,7 +443,8 @@ document.addEventListener('DOMContentLoaded', function() {
         timeSlowEndTime: 0,
         offensiveShieldEndTime: 0,
         magnetEndTime: 0,
-        rainbowEndTime: 0
+        rainbowEndTime: 0,
+        homingEndTime: 0
     };
     
     // Multiplicateur de ralentissement temporel
@@ -450,6 +455,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Effet de shake de l'écran
     let screenShake = { x: 0, y: 0, intensity: 0 };
+    let shockwaveEffect = null;
     
     // Particules de score
     let scoreParticles = [];
@@ -1016,6 +1022,8 @@ document.addEventListener('DOMContentLoaded', function() {
             offensiveShield: false,
             magnet: false,
             rainbow: false,
+            shockwaveCharges: 0,
+            homing: false,
             rapidFireEndTime: 0,
             shieldEndTime: 0,
             shrinkEndTime: 0,
@@ -1024,10 +1032,12 @@ document.addEventListener('DOMContentLoaded', function() {
             timeSlowEndTime: 0,
             offensiveShieldEndTime: 0,
             magnetEndTime: 0,
-            rainbowEndTime: 0
+            rainbowEndTime: 0,
+            homingEndTime: 0
         };
         timeSlowMultiplier = 1.0;
         lastShotTime = 0;
+        shockwaveEffect = null;
         if (currentLevelDisplay) {
             currentLevelDisplay.textContent = gameState.level;
         }
@@ -1059,7 +1069,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const activeBuffs = [];
         
         // Vérifier chaque type de buff
-        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet', 'rainbow'];
+        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet', 'rainbow', 'homing'];
         buffTypes.forEach(buffType => {
             const isActive = activePowerUps[buffType] && now < activePowerUps[`${buffType}EndTime`];
             if (isActive) {
@@ -1073,6 +1083,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
+        if ((activePowerUps.shockwaveCharges || 0) > 0) {
+            activeBuffs.push({
+                type: 'shockwave',
+                emoji: buffEmojis.shockwave,
+                timeLeft: null,
+                charges: activePowerUps.shockwaveCharges
+            });
+        }
         
         // Vider le conteneur
         activeBuffsContainer.innerHTML = '';
@@ -1092,6 +1110,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (buff.type === 'shrink') {
                     // Flèche vers le bas verte : forme identique à drawPowerUp
                     buffIcon.innerHTML = '<svg width="24" height="24" viewBox="-8 -8 16 16" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M 0 -8 L -6 0 L -3 0 L -3 8 L 3 8 L 3 0 L 6 0 Z" fill="#00ff00" stroke="#00aa00" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+                } else if (buff.charges != null) {
+                    buffIcon.textContent = buff.emoji + '×' + buff.charges;
                 } else {
                     buffIcon.textContent = buff.emoji;
                 }
@@ -1249,19 +1269,24 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.restore();
         }
         
-        // Projectiles selon le thème (optimisé pour mobile) — arc-en-ciel = barres + couleurs
+        // Projectiles selon le thème — arc-en-ciel = missile en barre tournante (licorne)
         const rainbowActive = activePowerUps.rainbow && Date.now() < activePowerUps.rainbowEndTime;
         bullets.forEach((bullet, bulletIndex) => {
             const bulletSize = bullet.size || 4;
             if (rainbowActive) {
+                ctx.save();
+                ctx.translate(bullet.x, bullet.y);
+                const spin = Date.now() * 0.015 + bulletIndex * 1.2;
+                ctx.rotate(spin);
                 const hue = (Date.now() / 25 + bulletIndex * 50) % 360;
                 ctx.fillStyle = `hsl(${hue}, 100%, 60%)`;
-                ctx.shadowBlur = gameState.isMobile ? 8 : 14;
+                ctx.shadowBlur = gameState.isMobile ? 12 : 18;
                 ctx.shadowColor = ctx.fillStyle;
-                // Barre verticale (laser) au lieu d'un cercle
-                const barW = bulletSize * 1.5;
-                const barH = bulletSize * 6;
-                ctx.fillRect(bullet.x - barW / 2, bullet.y - barH / 2, barW, barH);
+                const barW = bulletSize * 1.2;
+                const barH = bulletSize * 8;
+                ctx.fillRect(-barW / 2, -barH / 2, barW, barH);
+                ctx.restore();
+                ctx.shadowBlur = 0;
             } else {
                 ctx.fillStyle = currentTheme.bullets;
                 ctx.shadowBlur = gameState.isMobile ? 5 : 10;
@@ -1269,8 +1294,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 ctx.beginPath();
                 ctx.arc(bullet.x, bullet.y, bulletSize, 0, Math.PI * 2);
                 ctx.fill();
+                ctx.shadowBlur = 0;
             }
-            ctx.shadowBlur = 0;
         });
         
         // Astéroïdes
@@ -1286,6 +1311,21 @@ document.addEventListener('DOMContentLoaded', function() {
         // Bouclier actif
         if (activePowerUps.shield && Date.now() < activePowerUps.shieldEndTime) {
             drawShield();
+        }
+        
+        // Onde de choc (cercle qui s'étend)
+        if (shockwaveEffect) {
+            ctx.save();
+            const alpha = 0.7 - (shockwaveEffect.radius / shockwaveEffect.maxRadius) * 0.5;
+            ctx.strokeStyle = `rgba(0, 220, 255, ${alpha})`;
+            ctx.lineWidth = 4;
+            ctx.shadowBlur = 15;
+            ctx.shadowColor = 'rgba(0, 200, 255, 0.8)';
+            ctx.beginPath();
+            ctx.arc(shockwaveEffect.x, shockwaveEffect.y, shockwaveEffect.radius, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+            ctx.restore();
         }
         
         // Particules avec effets stylés selon le type (optimisé pour mobile)
@@ -1818,6 +1858,28 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.lineWidth = 2;
             ctx.strokeStyle = 'rgba(255,255,255,0.6)';
             ctx.stroke();
+        } else if (powerUp.type === 'shockwave') {
+            ctx.fillStyle = '#00ccff';
+            ctx.strokeStyle = '#0088ff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, 10, 0, Math.PI * 2);
+            ctx.stroke();
+            for (let r = 4; r <= 8; r += 2) {
+                ctx.beginPath();
+                ctx.arc(0, 0, r, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+        } else if (powerUp.type === 'homing') {
+            ctx.fillStyle = '#00ff88';
+            ctx.strokeStyle = '#00aa55';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(0, -10);
+            ctx.quadraticCurveTo(8, 0, 0, 10);
+            ctx.quadraticCurveTo(-8, 0, 0, -10);
+            ctx.fill();
+            ctx.stroke();
         }
         
         ctx.restore();
@@ -1929,19 +1991,47 @@ document.addEventListener('DOMContentLoaded', function() {
             gameStats.timePlayed = Date.now() - gameStats.startTime;
         }
         
-        // Mise à jour des projectiles (normalisé par delta time)
+        // Mise à jour des projectiles (normalisé par delta time) — tir homing si actif
         const slowMultiplierBullets = activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime ? timeSlowMultiplier : 1.0;
+        const homingActive = activePowerUps.homing && Date.now() < activePowerUps.homingEndTime;
         bullets.forEach((bullet, index) => {
-            if (bullet.vx !== undefined || bullet.vy !== undefined) {
-                // Projectile avec direction personnalisée
+            if (homingActive && asteroids.length > 0) {
+                bullet.vx = bullet.vx ?? 0;
+                bullet.vy = bullet.vy ?? -bullet.speed;
+                let nearest = null;
+                let nearestDist = Infinity;
+                asteroids.forEach(a => {
+                    if (a.y > bullet.y + 150) return;
+                    const dx = a.x - bullet.x;
+                    const dy = a.y - bullet.y;
+                    const d = Math.sqrt(dx * dx + dy * dy);
+                    if (d < nearestDist) {
+                        nearestDist = d;
+                        nearest = a;
+                    }
+                });
+                if (nearest && nearestDist > 0) {
+                    const dx = (nearest.x - bullet.x) / nearestDist;
+                    const dy = (nearest.y - bullet.y) / nearestDist;
+                    const pull = 4 * gameState.deltaTime;
+                    bullet.vx += dx * pull;
+                    bullet.vy += dy * pull;
+                    const len = Math.sqrt(bullet.vx * bullet.vx + bullet.vy * bullet.vy);
+                    if (len > 0.01) {
+                        const s = bullet.speed || 8;
+                        bullet.vx = (bullet.vx / len) * s;
+                        bullet.vy = (bullet.vy / len) * s;
+                    }
+                }
+                bullet.x += bullet.vx * slowMultiplierBullets * gameState.deltaTime;
+                bullet.y += bullet.vy * slowMultiplierBullets * gameState.deltaTime;
+            } else if (bullet.vx !== undefined || bullet.vy !== undefined) {
                 bullet.y += (bullet.vy !== undefined ? bullet.vy : -bullet.speed) * slowMultiplierBullets * gameState.deltaTime;
                 bullet.x += (bullet.vx || 0) * slowMultiplierBullets * gameState.deltaTime;
             } else {
-                // Projectile standard (vers le haut)
                 bullet.y -= bullet.speed * slowMultiplierBullets * gameState.deltaTime;
             }
-            // Supprimer si hors écran (haut ou bas)
-            if (bullet.y < 0 || bullet.y > canvas.height) {
+            if (bullet.y < 0 || bullet.y > canvas.height || bullet.x < -20 || bullet.x > canvas.width + 20) {
                 bullets.splice(index, 1);
             }
         });
@@ -1977,6 +2067,31 @@ document.addEventListener('DOMContentLoaded', function() {
             screenShake.intensity = 0;
             screenShake.x = 0;
             screenShake.y = 0;
+        }
+        
+        // Onde de choc : expansion et destruction des astéroïdes touchés
+        if (shockwaveEffect) {
+            shockwaveEffect.radius += shockwaveEffect.speed * gameState.deltaTime;
+            screenShake.intensity = Math.max(screenShake.intensity, 5);
+            for (let i = asteroids.length - 1; i >= 0; i--) {
+                const a = asteroids[i];
+                const d = Math.sqrt((shockwaveEffect.x - a.x) ** 2 + (shockwaveEffect.y - a.y) ** 2);
+                if (d < shockwaveEffect.radius + a.size) {
+                    createEnhancedExplosion(a.x, a.y, a.color, a.size);
+                    if (!gameState.bossActive) {
+                        const points = Math.floor(a.size / 5) * 10;
+                        gameState.score += points;
+                        if (scoreElement) scoreElement.textContent = gameState.score;
+                        checkAndUpdateHighScore();
+                        createScoreParticle(a.x, a.y, `+${points}`);
+                    }
+                    gameStats.asteroidsDestroyed++;
+                    asteroids.splice(i, 1);
+                }
+            }
+            if (shockwaveEffect.radius >= shockwaveEffect.maxRadius) {
+                shockwaveEffect = null;
+            }
         }
         
         // Mise à jour des astéroïdes (normalisé par delta time)
@@ -2089,6 +2204,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (activePowerUps.rainbow && now > activePowerUps.rainbowEndTime) {
             activePowerUps.rainbow = false;
         }
+        if (activePowerUps.homing && now > activePowerUps.homingEndTime) {
+            activePowerUps.homing = false;
+        }
         
         // Mettre à jour les icônes de buff
         updateBuffIcons();
@@ -2196,12 +2314,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         } else if (powerUpType < 0.95) {
                             // 4% des drops = 0.48% total - Bouclier offensif (très rare, puissant)
                             spawnPowerUp(asteroid.x, asteroid.y, 'offensiveShield');
-                        } else if (powerUpType < 0.98) {
-                            // 3% des drops = 0.36% total - Vie (très rare, très puissant)
+                        } else if (powerUpType < 0.96) {
+                            // 2% des drops = 0.24% total - Vie (très rare, très puissant)
                             spawnPowerUp(asteroid.x, asteroid.y, 'life');
-                        } else {
+                        } else if (powerUpType < 0.98) {
                             // 2% des drops = 0.24% total - Arc-en-ciel (rare, visuel)
                             spawnPowerUp(asteroid.x, asteroid.y, 'rainbow');
+                        } else if (powerUpType < 0.99) {
+                            // 1% des drops = 0.12% total - Onde de choc (très rare)
+                            spawnPowerUp(asteroid.x, asteroid.y, 'shockwave');
+                        } else {
+                            // 1% des drops = 0.12% total - Tir homing (très rare)
+                            spawnPowerUp(asteroid.x, asteroid.y, 'homing');
                         }
                     }
                     
@@ -2425,6 +2549,12 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (type === 'rainbow') {
             text = '🌈 Arc-en-ciel';
             glowColor = '#ff0080';
+        } else if (type === 'shockwave') {
+            text = '🌀 Onde de choc';
+            glowColor = '#00ccff';
+        } else if (type === 'homing') {
+            text = '➰ Tir homing';
+            glowColor = '#00ff88';
         }
         
         // Position aléatoire pour le texte (à côté du vaisseau)
@@ -2659,6 +2789,8 @@ document.addEventListener('DOMContentLoaded', function() {
         else if (type === 'offensiveShield') color = '#ff6b6b';
         else if (type === 'magnet') color = '#e74c3c';
         else if (type === 'rainbow') color = '#ff0080';
+        else if (type === 'shockwave') color = '#00ccff';
+        else if (type === 'homing') color = '#00ff88';
         
         powerUps.push({
             x: x,
@@ -2723,6 +2855,13 @@ document.addEventListener('DOMContentLoaded', function() {
             activePowerUps.rainbow = true;
             activePowerUps.rainbowEndTime = now + 12000; // 12 secondes
             createPowerUpVisualAnimation('rainbow', ship.x, ship.y);
+        } else if (powerUp.type === 'shockwave') {
+            activePowerUps.shockwaveCharges = Math.min(2, (activePowerUps.shockwaveCharges || 0) + 1);
+            createPowerUpVisualAnimation('shockwave', ship.x, ship.y);
+        } else if (powerUp.type === 'homing') {
+            activePowerUps.homing = true;
+            activePowerUps.homingEndTime = now + 10000; // 10 secondes
+            createPowerUpVisualAnimation('homing', ship.x, ship.y);
         }
         
         gameStats.powerUpsCollected++;
@@ -3855,6 +3994,19 @@ document.addEventListener('DOMContentLoaded', function() {
         if (gameState.isPlaying && !gameState.isPaused) {
             if ((e.code === 'ArrowUp' || e.code === 'ArrowDown') && !(e.ctrlKey || e.metaKey)) {
                 e.preventDefault();
+            }
+            if (e.code === 'KeyE' && (activePowerUps.shockwaveCharges || 0) > 0 && !shockwaveEffect) {
+                e.preventDefault();
+                activePowerUps.shockwaveCharges--;
+                shockwaveEffect = {
+                    x: ship.x,
+                    y: ship.y,
+                    radius: 0,
+                    maxRadius: Math.max(canvas.width, canvas.height) * 0.65,
+                    speed: 26
+                };
+                playSound('explosion');
+                screenShake.intensity = Math.max(screenShake.intensity, 12);
             }
         }
         
