@@ -456,6 +456,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // Effet de shake de l'écran
     let screenShake = { x: 0, y: 0, intensity: 0 };
     let shockwaveEffect = null;
+    const SCORE_ABILITY_COST = 300;
+    const SCORE_ABILITY_COOLDOWN = 8000;
+    let lastScoreAbilityTime = 0;
     
     // Particules de score
     let scoreParticles = [];
@@ -1038,6 +1041,7 @@ document.addEventListener('DOMContentLoaded', function() {
         timeSlowMultiplier = 1.0;
         lastShotTime = 0;
         shockwaveEffect = null;
+        lastScoreAbilityTime = 0;
         if (currentLevelDisplay) {
             currentLevelDisplay.textContent = gameState.level;
         }
@@ -2283,50 +2287,12 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                     
-                    // Chance de faire apparaître un boost (équilibré selon l'impact et la rareté)
-                    // Taux global réduit à ~12% pour équilibrer le gameplay
-                    const boostChance = Math.random();
-                    if (boostChance < 0.12) {
-                        // 12% de chance totale de drop
-                        const powerUpType = Math.random();
-                        
-                        if (powerUpType < 0.25) {
-                            // 25% des drops = 3% total - Tir rapide (commun, utile)
-                            spawnPowerUp(asteroid.x, asteroid.y, 'rapidFire');
-                        } else if (powerUpType < 0.45) {
-                            // 20% des drops = 2.4% total - Bouclier (commun, très utile)
-                            spawnPowerUp(asteroid.x, asteroid.y, 'shield');
-                        } else if (powerUpType < 0.60) {
-                            // 15% des drops = 1.8% total - Rétrécissement (commun, utile)
-                            spawnPowerUp(asteroid.x, asteroid.y, 'shrink');
-                        } else if (powerUpType < 0.72) {
-                            // 12% des drops = 1.44% total - Magnet (commun, pratique)
-                            spawnPowerUp(asteroid.x, asteroid.y, 'magnet');
-                        } else if (powerUpType < 0.82) {
-                            // 10% des drops = 1.2% total - Munitions XL (rare, utile)
-                            spawnPowerUp(asteroid.x, asteroid.y, 'bigBullets');
-                        } else if (powerUpType < 0.88) {
-                            // 6% des drops = 0.72% total - Tir triple (rare, puissant)
-                            spawnPowerUp(asteroid.x, asteroid.y, 'tripleShot');
-                        } else if (powerUpType < 0.93) {
-                            // 5% des drops = 0.6% total - Ralentissement temporel (rare, puissant)
-                            spawnPowerUp(asteroid.x, asteroid.y, 'timeSlow');
-                        } else if (powerUpType < 0.95) {
-                            // 4% des drops = 0.48% total - Bouclier offensif (très rare, puissant)
-                            spawnPowerUp(asteroid.x, asteroid.y, 'offensiveShield');
-                        } else if (powerUpType < 0.96) {
-                            // 2% des drops = 0.24% total - Vie (très rare, très puissant)
-                            spawnPowerUp(asteroid.x, asteroid.y, 'life');
-                        } else if (powerUpType < 0.98) {
-                            // 2% des drops = 0.24% total - Arc-en-ciel (rare, visuel)
-                            spawnPowerUp(asteroid.x, asteroid.y, 'rainbow');
-                        } else if (powerUpType < 0.99) {
-                            // 1% des drops = 0.12% total - Onde de choc (très rare)
-                            spawnPowerUp(asteroid.x, asteroid.y, 'shockwave');
-                        } else {
-                            // 1% des drops = 0.12% total - Tir homing (très rare)
-                            spawnPowerUp(asteroid.x, asteroid.y, 'homing');
-                        }
+                    // Chance de faire apparaître un boost — tous les bonus à égalité (1% chacun)
+                    const DROP_RATE = 0.12;
+                    const DROPPABLE_POWERUPS = ['rapidFire', 'shield', 'shrink', 'magnet', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'life', 'rainbow', 'shockwave', 'homing'];
+                    if (Math.random() < DROP_RATE) {
+                        const type = DROPPABLE_POWERUPS[Math.floor(Math.random() * DROPPABLE_POWERUPS.length)];
+                        spawnPowerUp(asteroid.x, asteroid.y, type);
                     }
                     
                     // Supprimer l'astéroïde
@@ -4007,6 +3973,22 @@ document.addEventListener('DOMContentLoaded', function() {
                 };
                 playSound('explosion');
                 screenShake.intensity = Math.max(screenShake.intensity, 12);
+            }
+            if (e.code === 'KeyF' && !shockwaveEffect && gameState.score >= SCORE_ABILITY_COST && (Date.now() - lastScoreAbilityTime >= SCORE_ABILITY_COOLDOWN)) {
+                e.preventDefault();
+                gameState.score -= SCORE_ABILITY_COST;
+                if (scoreElement) scoreElement.textContent = gameState.score;
+                lastScoreAbilityTime = Date.now();
+                shockwaveEffect = {
+                    x: ship.x,
+                    y: ship.y,
+                    radius: 0,
+                    maxRadius: Math.max(canvas.width, canvas.height) * 0.65,
+                    speed: 26
+                };
+                playSound('explosion');
+                screenShake.intensity = Math.max(screenShake.intensity, 10);
+                playAudioFile('../ressources/Sons/Broly-Transformation.mp3', 0.7);
             }
         }
         

@@ -222,6 +222,13 @@
     margin-top: 20px;
 }
 
+.game-ability-hint {
+    font-size: 0.85rem;
+    color: var(--dim-text-color, #888);
+    margin-top: 10px;
+    margin-bottom: 0;
+}
+
 .game-wrapper {
     position: relative;
     width: 100%;
