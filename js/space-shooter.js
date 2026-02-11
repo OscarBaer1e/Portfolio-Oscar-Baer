@@ -456,6 +456,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // Effet de shake de l'écran
     let screenShake = { x: 0, y: 0, intensity: 0 };
     let shockwaveEffect = null;
+    const BROLY_MUSIC_SRC = '../ressources/Sons/Broly-Transformation.mp3';
+    let brolyAudio = null;
     
     // Particules de score
     let scoreParticles = [];
@@ -3959,7 +3961,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             if (e.code === 'KeyF') {
                 e.preventDefault();
-                playAudioFile('../ressources/Sons/Broly-Transformation.mp3', 0.7);
+                if (!brolyAudio) {
+                    brolyAudio = new Audio(BROLY_MUSIC_SRC);
+                }
+                brolyAudio.pause();
+                brolyAudio.currentTime = 0;
+                brolyAudio.volume = 0.7 * globalVolume;
+                brolyAudio.play().catch(e => console.warn('Broly audio:', e));
             }
         }
         
@@ -4182,6 +4190,10 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function endGame() {
         gameState.isPlaying = false;
+        if (brolyAudio) {
+            brolyAudio.pause();
+            brolyAudio.currentTime = 0;
+        }
         
         // Calculer les statistiques finales
         const accuracy = gameStats.bulletsFired > 0 ? ((gameStats.bulletsHit / gameStats.bulletsFired) * 100).toFixed(1) : 0;
@@ -4249,6 +4261,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function resetGame() {
         gameState.isPlaying = false;
         gameState.isPaused = false;
+        if (brolyAudio) {
+            brolyAudio.pause();
+            brolyAudio.currentTime = 0;
+        }
         init();
         if (gameOver) gameOver.classList.add('hidden');
         if (startScreen) startScreen.classList.remove('hidden');
