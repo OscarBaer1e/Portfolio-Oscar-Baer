@@ -42,7 +42,11 @@ document.addEventListener('DOMContentLoaded', function() {
         magnet: '🧲',
         rainbow: '🌈',
         shockwave: '🌀',
-        homing: '➰'
+        homing: '➰',
+        kamehameha: '💥',
+        kienzan: '⭕',
+        kaioken: '🔴',
+        genkiDama: '🔵'
     };
     
     // Système de thèmes qui change tous les 10 niveaux
@@ -439,6 +443,7 @@ document.addEventListener('DOMContentLoaded', function() {
         rainbow: false,
         shockwaveCharges: 0,
         homing: false,
+        kaioken: false,
         rapidFireEndTime: 0,
         shieldEndTime: 0,
         shrinkEndTime: 0,
@@ -448,8 +453,15 @@ document.addEventListener('DOMContentLoaded', function() {
         offensiveShieldEndTime: 0,
         magnetEndTime: 0,
         rainbowEndTime: 0,
-        homingEndTime: 0
+        homingEndTime: 0,
+        kaiokenEndTime: 0
     };
+    let kamehamehaCharges = 0;
+    let kienzanCharges = 0;
+    let genkiDamaCharges = 0;
+    let kamehamehaBeams = [];
+    let kienzanDiscs = [];
+    let genkiDamaEffect = null;
     
     // Multiplicateur de ralentissement temporel
     let timeSlowMultiplier = 1.0;
@@ -1032,6 +1044,7 @@ document.addEventListener('DOMContentLoaded', function() {
             rainbow: false,
             shockwaveCharges: 0,
             homing: false,
+            kaioken: false,
             rapidFireEndTime: 0,
             shieldEndTime: 0,
             shrinkEndTime: 0,
@@ -1041,11 +1054,18 @@ document.addEventListener('DOMContentLoaded', function() {
             offensiveShieldEndTime: 0,
             magnetEndTime: 0,
             rainbowEndTime: 0,
-            homingEndTime: 0
+            homingEndTime: 0,
+            kaiokenEndTime: 0
         };
         timeSlowMultiplier = 1.0;
         lastShotTime = 0;
         shockwaveEffect = null;
+        kamehamehaCharges = 0;
+        kienzanCharges = 0;
+        genkiDamaCharges = 0;
+        kamehamehaBeams = [];
+        kienzanDiscs = [];
+        genkiDamaEffect = null;
         if (currentLevelDisplay) {
             currentLevelDisplay.textContent = gameState.level;
         }
@@ -1077,7 +1097,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const activeBuffs = [];
         
         // Vérifier chaque type de buff
-        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet', 'rainbow', 'homing'];
+        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet', 'rainbow', 'homing', 'kaioken'];
         buffTypes.forEach(buffType => {
             const isActive = activePowerUps[buffType] && now < activePowerUps[`${buffType}EndTime`];
             if (isActive) {
@@ -1092,12 +1112,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         if ((activePowerUps.shockwaveCharges || 0) > 0) {
-            activeBuffs.push({
-                type: 'shockwave',
-                emoji: buffEmojis.shockwave,
-                timeLeft: null,
-                charges: activePowerUps.shockwaveCharges
-            });
+            activeBuffs.push({ type: 'shockwave', emoji: buffEmojis.shockwave, timeLeft: null, charges: activePowerUps.shockwaveCharges });
+        }
+        if ((kamehamehaCharges || 0) > 0) {
+            activeBuffs.push({ type: 'kamehameha', emoji: buffEmojis.kamehameha, timeLeft: null, charges: kamehamehaCharges });
+        }
+        if ((kienzanCharges || 0) > 0) {
+            activeBuffs.push({ type: 'kienzan', emoji: buffEmojis.kienzan, timeLeft: null, charges: kienzanCharges });
+        }
+        if ((genkiDamaCharges || 0) > 0) {
+            activeBuffs.push({ type: 'genkiDama', emoji: buffEmojis.genkiDama, timeLeft: null, charges: genkiDamaCharges });
         }
         
         // Vider le conteneur
@@ -1291,6 +1315,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const rainbowActive = activePowerUps.rainbow && Date.now() < activePowerUps.rainbowEndTime;
         const brolyAuraActive = brolyAudio && !brolyAudio.paused;
         const beerusAuraActive = beerusAudio && !beerusAudio.paused;
+        const kaiokenActive = activePowerUps.kaioken && Date.now() < activePowerUps.kaiokenEndTime;
         bullets.forEach((bullet, bulletIndex) => {
             const bulletSize = bullet.size || 4;
             if (rainbowActive) {
@@ -1319,6 +1344,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 ctx.fillStyle = '#ff4466';
                 ctx.shadowBlur = gameState.isMobile ? 8 : 14;
                 ctx.shadowColor = '#ff4466';
+                ctx.beginPath();
+                ctx.arc(bullet.x, bullet.y, bulletSize, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            } else if (kaiokenActive) {
+                ctx.fillStyle = '#ff3333';
+                ctx.shadowBlur = gameState.isMobile ? 8 : 12;
+                ctx.shadowColor = '#ff3333';
                 ctx.beginPath();
                 ctx.arc(bullet.x, bullet.y, bulletSize, 0, Math.PI * 2);
                 ctx.fill();
@@ -1359,6 +1392,63 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.shadowColor = 'rgba(0, 200, 255, 0.8)';
             ctx.beginPath();
             ctx.arc(shockwaveEffect.x, shockwaveEffect.y, shockwaveEffect.radius, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+            ctx.restore();
+        }
+        
+        // Kamehameha (beam bleu)
+        kamehamehaBeams.forEach(beam => {
+            ctx.save();
+            const grad = ctx.createLinearGradient(beam.x, beam.topY, beam.x, beam.y + 20);
+            grad.addColorStop(0, 'rgba(0, 200, 255, 0.3)');
+            grad.addColorStop(0.5, 'rgba(0, 180, 255, 0.7)');
+            grad.addColorStop(1, 'rgba(0, 120, 255, 0.9)');
+            ctx.fillStyle = grad;
+            ctx.shadowBlur = 25;
+            ctx.shadowColor = '#00aaff';
+            ctx.fillRect(beam.x - beam.width / 2, beam.topY, beam.width, beam.y + 20 - beam.topY);
+            ctx.shadowBlur = 0;
+            ctx.restore();
+        });
+        
+        // Kienzan (disques dorés)
+        kienzanDiscs.forEach(disc => {
+            ctx.save();
+            ctx.translate(disc.x, disc.y);
+            ctx.rotate(disc.rotation);
+            ctx.strokeStyle = '#ffcc00';
+            ctx.fillStyle = 'rgba(255, 220, 0, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.shadowBlur = 12;
+            ctx.shadowColor = '#ffaa00';
+            ctx.beginPath();
+            ctx.arc(0, 0, disc.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            ctx.shadowBlur = 0;
+            ctx.restore();
+        });
+        
+        // Genki Dama (sphère bleue)
+        if (genkiDamaEffect) {
+            ctx.save();
+            const alpha = 0.8 - (genkiDamaEffect.radius / genkiDamaEffect.maxRadius) * 0.5;
+            const grad = ctx.createRadialGradient(
+                genkiDamaEffect.x, genkiDamaEffect.y, 0,
+                genkiDamaEffect.x, genkiDamaEffect.y, genkiDamaEffect.radius
+            );
+            grad.addColorStop(0, 'rgba(200, 230, 255, 0.6)');
+            grad.addColorStop(0.4, `rgba(100, 180, 255, ${alpha * 0.5})`);
+            grad.addColorStop(1, 'rgba(50, 100, 200, 0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(genkiDamaEffect.x, genkiDamaEffect.y, genkiDamaEffect.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = `rgba(150, 200, 255, ${alpha})`;
+            ctx.lineWidth = 3;
+            ctx.shadowBlur = 30;
+            ctx.shadowColor = '#4488ff';
             ctx.stroke();
             ctx.shadowBlur = 0;
             ctx.restore();
@@ -1765,6 +1855,9 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (beerusAudio && !beerusAudio.paused) {
             shipColor = '#ff4466';
             detailColor = '#ffaacc';
+        } else if (activePowerUps.kaioken && Date.now() < activePowerUps.kaiokenEndTime) {
+            shipColor = '#ff3333';
+            detailColor = '#ff6666';
         }
         
         // Corps du vaisseau
@@ -2006,6 +2099,49 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.quadraticCurveTo(-8, 0, 0, -10);
             ctx.fill();
             ctx.stroke();
+        } else if (powerUp.type === 'kamehameha') {
+            const g = ctx.createLinearGradient(-12, -12, 12, 12);
+            g.addColorStop(0, '#00ddff');
+            g.addColorStop(0.5, '#0088ff');
+            g.addColorStop(1, '#0044aa');
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.moveTo(0, -12);
+            ctx.lineTo(-4, 12);
+            ctx.lineTo(0, 8);
+            ctx.lineTo(4, 12);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = '#00aaff';
+            ctx.stroke();
+        } else if (powerUp.type === 'kienzan') {
+            ctx.strokeStyle = '#ffcc00';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, 10, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(0, 0, 6, 0, Math.PI * 2);
+            ctx.stroke();
+        } else if (powerUp.type === 'kaioken') {
+            ctx.fillStyle = '#ff2222';
+            ctx.strokeStyle = '#aa0000';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+        } else if (powerUp.type === 'genkiDama') {
+            const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 12);
+            g.addColorStop(0, '#aaccff');
+            g.addColorStop(0.6, '#4488ff');
+            g.addColorStop(1, '#2244aa');
+            ctx.fillStyle = g;
+            ctx.beginPath();
+            ctx.arc(0, 0, 11, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#88aaff';
+            ctx.stroke();
         }
         
         ctx.restore();
@@ -2220,6 +2356,78 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
+        // Kamehameha : beam très rapide vers le haut
+        for (let bi = kamehamehaBeams.length - 1; bi >= 0; bi--) {
+            const beam = kamehamehaBeams[bi];
+            beam.topY -= beam.growthSpeed * gameState.deltaTime;
+            const left = beam.x - beam.width / 2;
+            const right = beam.x + beam.width / 2;
+            for (let i = asteroids.length - 1; i >= 0; i--) {
+                const a = asteroids[i];
+                if (a.x >= left - a.size && a.x <= right + a.size && a.y <= beam.y + 30 && a.y >= beam.topY - a.size) {
+                    createEnhancedExplosion(a.x, a.y, a.color, a.size);
+                    if (!gameState.bossActive) {
+                        const points = Math.floor(a.size / 5) * 10;
+                        gameState.score += points;
+                        if (scoreElement) scoreElement.textContent = gameState.score;
+                        checkAndUpdateHighScore();
+                        createScoreParticle(a.x, a.y, `+${points}`);
+                    }
+                    gameStats.asteroidsDestroyed++;
+                    asteroids.splice(i, 1);
+                }
+            }
+            if (beam.topY < -100) kamehamehaBeams.splice(bi, 1);
+        }
+        
+        // Kienzan : disques perçants
+        for (let di = kienzanDiscs.length - 1; di >= 0; di--) {
+            const disc = kienzanDiscs[di];
+            disc.y += disc.vy * gameState.deltaTime;
+            disc.rotation += 0.2 * gameState.deltaTime;
+            for (let i = asteroids.length - 1; i >= 0; i--) {
+                const a = asteroids[i];
+                const dx = disc.x - a.x;
+                const dy = disc.y - a.y;
+                if (Math.sqrt(dx * dx + dy * dy) < disc.radius + a.size) {
+                    createEnhancedExplosion(a.x, a.y, a.color, a.size);
+                    if (!gameState.bossActive) {
+                        const points = Math.floor(a.size / 5) * 10;
+                        gameState.score += points;
+                        if (scoreElement) scoreElement.textContent = gameState.score;
+                        checkAndUpdateHighScore();
+                        createScoreParticle(a.x, a.y, `+${points}`);
+                    }
+                    gameStats.asteroidsDestroyed++;
+                    asteroids.splice(i, 1);
+                }
+            }
+            if (disc.y < -30) kienzanDiscs.splice(di, 1);
+        }
+        
+        // Genki Dama : grosse explosion
+        if (genkiDamaEffect) {
+            genkiDamaEffect.radius += genkiDamaEffect.speed * gameState.deltaTime;
+            screenShake.intensity = Math.max(screenShake.intensity, 6);
+            for (let i = asteroids.length - 1; i >= 0; i--) {
+                const a = asteroids[i];
+                const d = Math.sqrt((genkiDamaEffect.x - a.x) ** 2 + (genkiDamaEffect.y - a.y) ** 2);
+                if (d < genkiDamaEffect.radius + a.size) {
+                    createEnhancedExplosion(a.x, a.y, a.color, a.size);
+                    if (!gameState.bossActive) {
+                        const points = Math.floor(a.size / 5) * 10;
+                        gameState.score += points;
+                        if (scoreElement) scoreElement.textContent = gameState.score;
+                        checkAndUpdateHighScore();
+                        createScoreParticle(a.x, a.y, `+${points}`);
+                    }
+                    gameStats.asteroidsDestroyed++;
+                    asteroids.splice(i, 1);
+                }
+            }
+            if (genkiDamaEffect.radius >= genkiDamaEffect.maxRadius) genkiDamaEffect = null;
+        }
+        
         // Mise à jour des astéroïdes (normalisé par delta time)
         const slowMultiplier = activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime ? timeSlowMultiplier : 1.0;
         asteroids.forEach((asteroid, index) => {
@@ -2333,6 +2541,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (activePowerUps.homing && now > activePowerUps.homingEndTime) {
             activePowerUps.homing = false;
         }
+        if (activePowerUps.kaioken && now > activePowerUps.kaiokenEndTime) {
+            activePowerUps.kaioken = false;
+        }
         
         // Mettre à jour les icônes de buff
         updateBuffIcons();
@@ -2411,7 +2622,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Chance de faire apparaître un boost — tous les bonus à égalité (1% chacun)
                     const DROP_RATE = 0.12;
-                    const DROPPABLE_POWERUPS = ['rapidFire', 'shield', 'shrink', 'magnet', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'life', 'rainbow', 'homing'];
+                    const DROPPABLE_POWERUPS = ['rapidFire', 'shield', 'shrink', 'magnet', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'life', 'rainbow', 'homing', 'kamehameha', 'kienzan', 'kaioken', 'genkiDama'];
                     if (Math.random() < DROP_RATE) {
                         const type = DROPPABLE_POWERUPS[Math.floor(Math.random() * DROPPABLE_POWERUPS.length)];
                         spawnPowerUp(asteroid.x, asteroid.y, type);
@@ -2643,6 +2854,18 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (type === 'homing') {
             text = '➰ Tir homing';
             glowColor = '#00ff88';
+        } else if (type === 'kamehameha') {
+            text = '💥 Kamehameha';
+            glowColor = '#00aaff';
+        } else if (type === 'kienzan') {
+            text = '⭕ Kienzan';
+            glowColor = '#ffcc00';
+        } else if (type === 'kaioken') {
+            text = '🔴 Kaioken';
+            glowColor = '#ff2222';
+        } else if (type === 'genkiDama') {
+            text = '🔵 Genki Dama';
+            glowColor = '#4488ff';
         }
         
         // Position aléatoire pour le texte (à côté du vaisseau)
@@ -2879,6 +3102,10 @@ document.addEventListener('DOMContentLoaded', function() {
         else if (type === 'rainbow') color = '#ff0080';
         else if (type === 'shockwave') color = '#00ccff';
         else if (type === 'homing') color = '#00ff88';
+        else if (type === 'kamehameha') color = '#00aaff';
+        else if (type === 'kienzan') color = '#ffcc00';
+        else if (type === 'kaioken') color = '#ff2222';
+        else if (type === 'genkiDama') color = '#4488ff';
         
         powerUps.push({
             x: x,
@@ -2950,6 +3177,19 @@ document.addEventListener('DOMContentLoaded', function() {
             activePowerUps.homing = true;
             activePowerUps.homingEndTime = now + 10000; // 10 secondes
             createPowerUpVisualAnimation('homing', ship.x, ship.y);
+        } else if (powerUp.type === 'kamehameha') {
+            kamehamehaCharges = Math.min(3, kamehamehaCharges + 1);
+            createPowerUpVisualAnimation('kamehameha', ship.x, ship.y);
+        } else if (powerUp.type === 'kienzan') {
+            kienzanCharges = Math.min(3, kienzanCharges + 2);
+            createPowerUpVisualAnimation('kienzan', ship.x, ship.y);
+        } else if (powerUp.type === 'kaioken') {
+            activePowerUps.kaioken = true;
+            activePowerUps.kaiokenEndTime = now + 10000; // 10 secondes
+            createPowerUpVisualAnimation('kaioken', ship.x, ship.y);
+        } else if (powerUp.type === 'genkiDama') {
+            genkiDamaCharges = Math.min(2, genkiDamaCharges + 1);
+            createPowerUpVisualAnimation('genkiDama', ship.x, ship.y);
         }
         
         gameStats.powerUpsCollected++;
@@ -3996,7 +4236,10 @@ document.addEventListener('DOMContentLoaded', function() {
         // Vérifie le cooldown de tir
         const now = Date.now();
         const rainbowActive = activePowerUps.rainbow && now < activePowerUps.rainbowEndTime;
-        const effectiveFireRate = rainbowActive ? currentFireRate * 2 : currentFireRate;
+        const kaiokenActive = activePowerUps.kaioken && now < activePowerUps.kaiokenEndTime;
+        let effectiveFireRate = currentFireRate;
+        if (rainbowActive) effectiveFireRate *= 2;
+        else if (kaiokenActive) effectiveFireRate *= 0.45;
         if (now - lastShotTime < effectiveFireRate) {
             return;
         }
@@ -4110,6 +4353,42 @@ document.addEventListener('DOMContentLoaded', function() {
                 beerusAudio.currentTime = 0;
                 beerusAudio.volume = 0.7 * globalVolume;
                 beerusAudio.play().catch(e => console.warn('Beerus audio:', e));
+            }
+            if (e.code === 'KeyQ' && kamehamehaCharges > 0) {
+                e.preventDefault();
+                kamehamehaCharges--;
+                kamehamehaBeams.push({
+                    x: ship.x,
+                    y: ship.y,
+                    topY: ship.y,
+                    width: 28,
+                    growthSpeed: 1200
+                });
+                playSound('explosion');
+            }
+            if (e.code === 'KeyW' && kienzanCharges > 0) {
+                e.preventDefault();
+                kienzanCharges--;
+                kienzanDiscs.push({
+                    x: ship.x,
+                    y: ship.y - ship.height / 2,
+                    vy: -14,
+                    radius: 8,
+                    rotation: 0
+                });
+            }
+            if (e.code === 'KeyR' && genkiDamaCharges > 0 && !genkiDamaEffect) {
+                e.preventDefault();
+                genkiDamaCharges--;
+                genkiDamaEffect = {
+                    x: ship.x,
+                    y: ship.y,
+                    radius: 0,
+                    maxRadius: Math.max(canvas.width, canvas.height) * 0.75,
+                    speed: 35
+                };
+                playSound('explosion');
+                screenShake.intensity = Math.max(screenShake.intensity, 15);
             }
         }
         
