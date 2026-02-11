@@ -457,7 +457,9 @@ document.addEventListener('DOMContentLoaded', function() {
     let screenShake = { x: 0, y: 0, intensity: 0 };
     let shockwaveEffect = null;
     const BROLY_MUSIC_SRC = '../ressources/Sons/Broly-Transformation.mp3';
+    const BEERUS_MUSIC_SRC = '../ressources/Sons/Beerus-Goku.mp3';
     let brolyAudio = null;
+    let beerusAudio = null;
     
     // Particules de score
     let scoreParticles = [];
@@ -1239,6 +1241,50 @@ document.addEventListener('DOMContentLoaded', function() {
                     ctx.restore();
                 }
             });
+        }
+        
+        // Aura secrète Broly (vert) / Beerus (rouge)
+        if (gameState.isPlaying || gameState.isPaused) {
+            if (brolyAudio && !brolyAudio.paused) {
+                ctx.save();
+                ctx.translate(ship.x, ship.y);
+                const pulse = Math.sin(Date.now() / 120) * 0.2 + 1;
+                const r = (ship.width / 2 + 25) * pulse;
+                const g = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
+                g.addColorStop(0, 'rgba(0, 255, 100, 0.35)');
+                g.addColorStop(0.5, 'rgba(0, 220, 80, 0.2)');
+                g.addColorStop(1, 'rgba(0, 180, 60, 0)');
+                ctx.fillStyle = g;
+                ctx.beginPath();
+                ctx.arc(0, 0, r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(0, 255, 120, 0.6)';
+                ctx.lineWidth = 3;
+                ctx.shadowBlur = 20;
+                ctx.shadowColor = '#00ff88';
+                ctx.stroke();
+                ctx.restore();
+            }
+            if (beerusAudio && !beerusAudio.paused) {
+                ctx.save();
+                ctx.translate(ship.x, ship.y);
+                const pulse = Math.sin(Date.now() / 100) * 0.2 + 1;
+                const r = (ship.width / 2 + 25) * pulse;
+                const g = ctx.createRadialGradient(0, 0, 0, 0, 0, r);
+                g.addColorStop(0, 'rgba(255, 50, 50, 0.4)');
+                g.addColorStop(0.5, 'rgba(220, 30, 30, 0.25)');
+                g.addColorStop(1, 'rgba(180, 20, 20, 0)');
+                ctx.fillStyle = g;
+                ctx.beginPath();
+                ctx.arc(0, 0, r, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255, 80, 80, 0.7)';
+                ctx.lineWidth = 3;
+                ctx.shadowBlur = 22;
+                ctx.shadowColor = '#ff4444';
+                ctx.stroke();
+                ctx.restore();
+            }
         }
         
         // Vaisseau
@@ -3963,11 +4009,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 e.preventDefault();
                 if (!brolyAudio) {
                     brolyAudio = new Audio(BROLY_MUSIC_SRC);
+                    brolyAudio.addEventListener('ended', () => {
+                        brolyAudio.pause();
+                        brolyAudio.currentTime = 0;
+                    });
                 }
                 brolyAudio.pause();
                 brolyAudio.currentTime = 0;
                 brolyAudio.volume = 0.7 * globalVolume;
                 brolyAudio.play().catch(e => console.warn('Broly audio:', e));
+            }
+            if (e.code === 'KeyG') {
+                e.preventDefault();
+                if (!beerusAudio) {
+                    beerusAudio = new Audio(BEERUS_MUSIC_SRC);
+                    beerusAudio.addEventListener('ended', () => {
+                        beerusAudio.pause();
+                        beerusAudio.currentTime = 0;
+                    });
+                }
+                beerusAudio.pause();
+                beerusAudio.currentTime = 0;
+                beerusAudio.volume = 0.7 * globalVolume;
+                beerusAudio.play().catch(e => console.warn('Beerus audio:', e));
             }
         }
         
@@ -4194,6 +4258,10 @@ document.addEventListener('DOMContentLoaded', function() {
             brolyAudio.pause();
             brolyAudio.currentTime = 0;
         }
+        if (beerusAudio) {
+            beerusAudio.pause();
+            beerusAudio.currentTime = 0;
+        }
         
         // Calculer les statistiques finales
         const accuracy = gameStats.bulletsFired > 0 ? ((gameStats.bulletsHit / gameStats.bulletsFired) * 100).toFixed(1) : 0;
@@ -4264,6 +4332,10 @@ document.addEventListener('DOMContentLoaded', function() {
         if (brolyAudio) {
             brolyAudio.pause();
             brolyAudio.currentTime = 0;
+        }
+        if (beerusAudio) {
+            beerusAudio.pause();
+            beerusAudio.currentTime = 0;
         }
         init();
         if (gameOver) gameOver.classList.add('hidden');
