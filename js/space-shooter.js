@@ -456,9 +456,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Effet de shake de l'écran
     let screenShake = { x: 0, y: 0, intensity: 0 };
     let shockwaveEffect = null;
-    const SCORE_ABILITY_COST = 300;
-    const SCORE_ABILITY_COOLDOWN = 8000;
-    let lastScoreAbilityTime = 0;
     
     // Particules de score
     let scoreParticles = [];
@@ -1041,7 +1038,6 @@ document.addEventListener('DOMContentLoaded', function() {
         timeSlowMultiplier = 1.0;
         lastShotTime = 0;
         shockwaveEffect = null;
-        lastScoreAbilityTime = 0;
         if (currentLevelDisplay) {
             currentLevelDisplay.textContent = gameState.level;
         }
@@ -2289,7 +2285,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Chance de faire apparaître un boost — tous les bonus à égalité (1% chacun)
                     const DROP_RATE = 0.12;
-                    const DROPPABLE_POWERUPS = ['rapidFire', 'shield', 'shrink', 'magnet', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'life', 'rainbow', 'shockwave', 'homing'];
+                    const DROPPABLE_POWERUPS = ['rapidFire', 'shield', 'shrink', 'magnet', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'life', 'rainbow', 'homing'];
                     if (Math.random() < DROP_RATE) {
                         const type = DROPPABLE_POWERUPS[Math.floor(Math.random() * DROPPABLE_POWERUPS.length)];
                         spawnPowerUp(asteroid.x, asteroid.y, type);
@@ -3961,33 +3957,8 @@ document.addEventListener('DOMContentLoaded', function() {
             if ((e.code === 'ArrowUp' || e.code === 'ArrowDown') && !(e.ctrlKey || e.metaKey)) {
                 e.preventDefault();
             }
-            if (e.code === 'KeyE' && (activePowerUps.shockwaveCharges || 0) > 0 && !shockwaveEffect) {
+            if (e.code === 'KeyF') {
                 e.preventDefault();
-                activePowerUps.shockwaveCharges--;
-                shockwaveEffect = {
-                    x: ship.x,
-                    y: ship.y,
-                    radius: 0,
-                    maxRadius: Math.max(canvas.width, canvas.height) * 0.65,
-                    speed: 26
-                };
-                playSound('explosion');
-                screenShake.intensity = Math.max(screenShake.intensity, 12);
-            }
-            if (e.code === 'KeyF' && !shockwaveEffect && gameState.score >= SCORE_ABILITY_COST && (Date.now() - lastScoreAbilityTime >= SCORE_ABILITY_COOLDOWN)) {
-                e.preventDefault();
-                gameState.score -= SCORE_ABILITY_COST;
-                if (scoreElement) scoreElement.textContent = gameState.score;
-                lastScoreAbilityTime = Date.now();
-                shockwaveEffect = {
-                    x: ship.x,
-                    y: ship.y,
-                    radius: 0,
-                    maxRadius: Math.max(canvas.width, canvas.height) * 0.65,
-                    speed: 26
-                };
-                playSound('explosion');
-                screenShake.intensity = Math.max(screenShake.intensity, 10);
                 playAudioFile('../ressources/Sons/Broly-Transformation.mp3', 0.7);
             }
         }
