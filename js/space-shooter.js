@@ -315,23 +315,76 @@ document.addEventListener('DOMContentLoaded', function() {
             gainNode.connect(ctx.destination);
             
             switch(type) {
-                case 'shoot':
-                    oscillator.frequency.setValueAtTime(800, ctx.currentTime);
-                    oscillator.type = 'square';
-                    gainNode.gain.setValueAtTime(0.1 * globalVolume, ctx.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01 * globalVolume, ctx.currentTime + 0.05);
-                    oscillator.start();
-                    oscillator.stop(ctx.currentTime + 0.05);
+                case 'shoot': {
+                    // Tir type blaster : attaque nette + chute de fréquence
+                    const t0 = ctx.currentTime;
+                    const osc1 = ctx.createOscillator();
+                    const osc2 = ctx.createOscillator();
+                    const g1 = ctx.createGain();
+                    const g2 = ctx.createGain();
+                    osc1.type = 'square';
+                    osc2.type = 'triangle';
+                    osc1.frequency.setValueAtTime(1100, t0);
+                    osc1.frequency.exponentialRampToValueAtTime(400, t0 + 0.06);
+                    osc2.frequency.setValueAtTime(2200, t0);
+                    osc2.frequency.exponentialRampToValueAtTime(800, t0 + 0.04);
+                    g1.gain.setValueAtTime(0, t0);
+                    g1.gain.linearRampToValueAtTime(0.14 * globalVolume, t0 + 0.008);
+                    g1.gain.exponentialRampToValueAtTime(0.001 * globalVolume, t0 + 0.07);
+                    g2.gain.setValueAtTime(0.06 * globalVolume, t0);
+                    g2.gain.exponentialRampToValueAtTime(0.001 * globalVolume, t0 + 0.045);
+                    osc1.connect(g1);
+                    osc2.connect(g2);
+                    g1.connect(ctx.destination);
+                    g2.connect(ctx.destination);
+                    osc1.start(t0);
+                    osc2.start(t0);
+                    osc1.stop(t0 + 0.07);
+                    osc2.stop(t0 + 0.045);
                     break;
-                case 'explosion':
-                    oscillator.frequency.setValueAtTime(150, ctx.currentTime);
-                    oscillator.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.3);
-                    oscillator.type = 'sawtooth';
-                    gainNode.gain.setValueAtTime(0.2 * globalVolume, ctx.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01 * globalVolume, ctx.currentTime + 0.3);
-                    oscillator.start();
-                    oscillator.stop(ctx.currentTime + 0.3);
+                }
+                case 'explosion': {
+                    // Explosion astéroïde : basse + crunch + décroissance
+                    const t0 = ctx.currentTime;
+                    const dur = 0.38;
+                    // Basse (rumble)
+                    const oscLow = ctx.createOscillator();
+                    const gLow = ctx.createGain();
+                    oscLow.type = 'sawtooth';
+                    oscLow.frequency.setValueAtTime(140, t0);
+                    oscLow.frequency.exponentialRampToValueAtTime(35, t0 + dur);
+                    gLow.gain.setValueAtTime(0.22 * globalVolume, t0);
+                    gLow.gain.exponentialRampToValueAtTime(0.001 * globalVolume, t0 + dur);
+                    oscLow.connect(gLow);
+                    gLow.connect(ctx.destination);
+                    oscLow.start(t0);
+                    oscLow.stop(t0 + dur);
+                    // Crunch (attaque médium)
+                    const oscMid = ctx.createOscillator();
+                    const gMid = ctx.createGain();
+                    oscMid.type = 'square';
+                    oscMid.frequency.setValueAtTime(180, t0);
+                    oscMid.frequency.exponentialRampToValueAtTime(60, t0 + 0.18);
+                    gMid.gain.setValueAtTime(0.12 * globalVolume, t0);
+                    gMid.gain.exponentialRampToValueAtTime(0.001 * globalVolume, t0 + 0.18);
+                    oscMid.connect(gMid);
+                    gMid.connect(ctx.destination);
+                    oscMid.start(t0);
+                    oscMid.stop(t0 + 0.18);
+                    // Haut (crack initial)
+                    const oscHigh = ctx.createOscillator();
+                    const gHigh = ctx.createGain();
+                    oscHigh.type = 'sawtooth';
+                    oscHigh.frequency.setValueAtTime(400, t0);
+                    oscHigh.frequency.exponentialRampToValueAtTime(100, t0 + 0.08);
+                    gHigh.gain.setValueAtTime(0.08 * globalVolume, t0);
+                    gHigh.gain.exponentialRampToValueAtTime(0.001 * globalVolume, t0 + 0.08);
+                    oscHigh.connect(gHigh);
+                    gHigh.connect(ctx.destination);
+                    oscHigh.start(t0);
+                    oscHigh.stop(t0 + 0.08);
                     break;
+                }
                 case 'powerup':
                     oscillator.frequency.setValueAtTime(600, ctx.currentTime);
                     oscillator.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.2);
