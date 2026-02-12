@@ -2471,11 +2471,23 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                     
-                    // Chance de faire apparaître un boost — tous les bonus à égalité (1% chacun)
-                    const DROP_RATE = 0.12;
-                    const DROPPABLE_POWERUPS = ['rapidFire', 'shield', 'shrink', 'magnet', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'life', 'prism', 'seeker', 'overdrive', 'slowTarget', 'mirrorShield'];
+                    // Chance de faire apparaître un boost — raretés pour équilibrer le jeu
+                    const DROP_RATE = 0.14;
+                    const BONUS_RARITY = {
+                        common:   { chance: 0.52, types: ['rapidFire', 'shield', 'shrink', 'bigBullets', 'tripleShot'] },
+                        uncommon: { chance: 0.28, types: ['timeSlow', 'magnet', 'seeker'] },
+                        rare:     { chance: 0.15, types: ['offensiveShield', 'prism', 'overdrive', 'slowTarget'] },
+                        epic:     { chance: 0.05, types: ['life', 'mirrorShield'] }
+                    };
                     if (Math.random() < DROP_RATE) {
-                        const type = DROPPABLE_POWERUPS[Math.floor(Math.random() * DROPPABLE_POWERUPS.length)];
+                        const r = Math.random();
+                        let tier = 'common';
+                        if (r < BONUS_RARITY.common.chance) tier = 'common';
+                        else if (r < BONUS_RARITY.common.chance + BONUS_RARITY.uncommon.chance) tier = 'uncommon';
+                        else if (r < BONUS_RARITY.common.chance + BONUS_RARITY.uncommon.chance + BONUS_RARITY.rare.chance) tier = 'rare';
+                        else tier = 'epic';
+                        const list = BONUS_RARITY[tier].types;
+                        const type = list[Math.floor(Math.random() * list.length)];
                         spawnPowerUp(asteroid.x, asteroid.y, type);
                     }
                     
