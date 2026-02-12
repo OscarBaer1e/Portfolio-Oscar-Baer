@@ -170,7 +170,9 @@ document.addEventListener('DOMContentLoaded', function() {
         level: 1,
         lives: 3,
         maxLives: 3,
-        gameSpeed: 2,
+        gameSpeed: 2, // conservé pour rétrocompat (étoiles, etc.)
+        asteroidBaseSpeed: 2.2, // vitesse de base des astéroïdes (stable, ils avancent sans devenir fous)
+        shipSpeedMultiplier: 1,  // le vaisseau accélère avec le niveau → difficulté = pilotage
         gameMode: 'normal', // 'normal' ou 'infinite'
         bossActive: false,
         deltaTime: 1.0, // Multiplicateur de vitesse normalisé (1.0 = 60fps)
@@ -552,6 +554,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const BEERUS_MUSIC_SRC = '../ressources/Sons/Beerus-Goku.mp3';
     let brolyAudio = null;
     let beerusAudio = null;
+    let bossIntroAudio = null; // musique d'intro du boss en cours (laissée en entier sauf si le boss meurt)
     
     // Particules de score
     let scoreParticles = [];
@@ -1110,6 +1113,8 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.lives = 3;
         gameState.maxLives = 3;
         gameState.gameSpeed = 2;
+        gameState.asteroidBaseSpeed = 2.2;
+        gameState.shipSpeedMultiplier = 1;
         gameState.bossActive = false;
         currentFireRate = baseFireRate;
         activePowerUps = {
@@ -2226,7 +2231,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (gameState.isPaused) {
             // Continuer les animations de fond même en pause
             stars.forEach(star => {
-                star.y += (star.speed + gameState.gameSpeed * 0.3) * gameState.deltaTime;
+                star.y += (star.speed + gameState.shipSpeedMultiplier * 0.3) * gameState.deltaTime;
                 if (star.y > canvas.height) {
                     star.y = 0;
                     star.x = Math.random() * canvas.width;
@@ -2237,7 +2242,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Mise à jour des étoiles (normalisé par delta time)
         stars.forEach(star => {
-            star.y += (star.speed + gameState.gameSpeed * 0.3) * gameState.deltaTime;
+            star.y += (star.speed + gameState.shipSpeedMultiplier * 0.3) * gameState.deltaTime;
             if (star.y > canvas.height) {
                 star.y = 0;
                 star.x = Math.random() * canvas.width;
@@ -3237,7 +3242,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const currentTheme = getCurrentTheme();
         const asteroidColors = currentTheme.asteroids;
         const randomColor = asteroidColors[Math.floor(Math.random() * asteroidColors.length)];
-        const baseSpeed = Math.random() * 2 + gameState.gameSpeed;
+        const baseSpeed = Math.random() * 1.5 + gameState.asteroidBaseSpeed;
         
         // ~15% de chance de faire apparaître un gros astéroïde (se divise en gros morceaux)
         const isBigType = Math.random() < 0.15;
@@ -3303,9 +3308,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const prevTheme = Math.floor((previousLevel - 1) / 10);
             const newTheme = Math.floor((gameState.level - 1) / 10);
             if (newTheme > prevTheme) playThemeTransitionJingle(newTheme);
-            // Augmentation progressive de la vitesse
-            const speedIncrease = getSpeedIncrease(gameState.level) * 0.6; // Un peu moins en mode infini
-            gameState.gameSpeed += speedIncrease;
+            // Le vaisseau accélère (pas les astéroïdes) → difficulté = pilotage
+            const speedIncrease = getSpeedIncrease(gameState.level) * 0.6;
+            gameState.shipSpeedMultiplier += speedIncrease;
             if (levelElement) levelElement.textContent = gameState.level;
             if (currentLevelDisplay) currentLevelDisplay.textContent = gameState.level;
                 // Animation de niveau supprimée
@@ -3322,9 +3327,9 @@ document.addEventListener('DOMContentLoaded', function() {
             const prevTheme = Math.floor((previousLevel - 1) / 10);
             const newTheme = Math.floor((gameState.level - 1) / 10);
             if (newTheme > prevTheme) playThemeTransitionJingle(newTheme);
-            // Augmentation progressive de la vitesse
+            // Le vaisseau accélère (pas les astéroïdes) → difficulté = pilotage
             const speedIncrease = getSpeedIncrease(gameState.level);
-            gameState.gameSpeed += speedIncrease;
+            gameState.shipSpeedMultiplier += speedIncrease;
             if (levelElement) levelElement.textContent = gameState.level;
             if (currentLevelDisplay) currentLevelDisplay.textContent = gameState.level;
             
@@ -3387,7 +3392,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log(`✅ Spawning boss ${bossNumber} (${getBossName(bossNumber)}) at level ${gameState.level}`);
         
-        // Jouer le son d'arrivée du boss (chaque boss a sa musique)
+        // Musique d'intro du boss : jouée en entier sauf si le boss meurt avant la fin (on coupe alors à sa mort)
+        if (bossIntroAudio) {
+            bossIntroAudio.pause();
+            bossIntroAudio.currentTime = 0;
+            bossIntroAudio = null;
+        }
         const bossMusicPaths = [
             '../ressources/Sons/Boss1.mp3',  // Locked in alien
             '../ressources/Sons/Boss2.mp3',  // Goku SSJ3
@@ -3401,7 +3411,11 @@ document.addEventListener('DOMContentLoaded', function() {
             '../ressources/Sons/Boss10.mp3'  // IUT GUSTAVE EIFFEL
         ];
         const bossTrack = bossMusicPaths[bossNumber - 1];
-        if (bossTrack) playAudioFile(bossTrack, 0.6);
+        if (bossTrack) {
+            bossIntroAudio = new Audio(bossTrack);
+            bossIntroAudio.volume = 0.6 * globalVolume;
+            bossIntroAudio.play().catch(e => console.warn('Boss intro audio:', e));
+        }
         
         const baseHealth = 30 + (bossNumber * 15); // Réduit : était 50 + (bossNumber * 30)
         const baseSize = 60 + (bossNumber * 10);
@@ -3799,6 +3813,12 @@ document.addEventListener('DOMContentLoaded', function() {
                     boss.size = boss.maxSize * (0.5 + healthPercent * 0.5); // Entre 50% et 100% de la taille
                     
                     if (boss.health <= 0) {
+                        // Couper la musique d'intro du boss à sa mort (si elle joue encore)
+                        if (bossIntroAudio) {
+                            bossIntroAudio.pause();
+                            bossIntroAudio.currentTime = 0;
+                            bossIntroAudio = null;
+                        }
                         // Sauvegarder le numéro du boss pour le score
                         const defeatedBossNumber = boss.bossNumber;
                         
@@ -3847,7 +3867,7 @@ document.addEventListener('DOMContentLoaded', function() {
                         gameState.level += 1;
                         // Augmentation progressive de la vitesse
                         const speedIncrease = getSpeedIncrease(gameState.level);
-                        gameState.gameSpeed += speedIncrease;
+                        gameState.shipSpeedMultiplier += speedIncrease;
                         if (levelElement) levelElement.textContent = gameState.level;
                         if (currentLevelDisplay) currentLevelDisplay.textContent = gameState.level;
                         
@@ -4462,25 +4482,22 @@ document.addEventListener('DOMContentLoaded', function() {
         const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
         const shipHeight = ship.height / 2;
         
-        // Mouvement horizontal (gauche/droite)
+        const effectiveShipSpeed = ship.speed * gameState.shipSpeedMultiplier * gameState.deltaTime;
+        const verticalSpeed = effectiveShipSpeed * 0.8; // 80% pour l'équilibre
+        // Mouvement horizontal (gauche/droite) — le vaisseau accélère avec le niveau
         if (keys['ArrowLeft'] || keys['KeyA']) {
-            ship.x = Math.max(shipSize, ship.x - ship.speed * gameState.deltaTime);
+            ship.x = Math.max(shipSize, ship.x - effectiveShipSpeed);
         }
         if (keys['ArrowRight'] || keys['KeyD']) {
-            ship.x = Math.min(canvas.width - shipSize, ship.x + ship.speed * gameState.deltaTime);
+            ship.x = Math.min(canvas.width - shipSize, ship.x + effectiveShipSpeed);
         }
-        
-        // Mouvement vertical (avancer/reculer) - vitesse légèrement réduite pour l'équilibre
-        const verticalSpeed = ship.speed * 0.8; // 80% de la vitesse horizontale pour l'équilibre
         if (keys['ArrowUp'] || keys['KeyW']) {
-            // Avancer (vers le haut) - limite à 20% du haut de l'écran
             const minY = canvas.height * 0.2;
-            ship.y = Math.max(minY, ship.y - verticalSpeed * gameState.deltaTime);
+            ship.y = Math.max(minY, ship.y - verticalSpeed);
         }
         if (keys['ArrowDown'] || keys['KeyS']) {
-            // Reculer (vers le bas) - limite à 90% du bas de l'écran
             const maxY = canvas.height - 80;
-            ship.y = Math.min(maxY, ship.y + verticalSpeed * gameState.deltaTime);
+            ship.y = Math.min(maxY, ship.y + verticalSpeed);
         }
     }
     
@@ -4639,6 +4656,11 @@ document.addEventListener('DOMContentLoaded', function() {
             beerusAudio.pause();
             beerusAudio.currentTime = 0;
         }
+        if (bossIntroAudio) {
+            bossIntroAudio.pause();
+            bossIntroAudio.currentTime = 0;
+            bossIntroAudio = null;
+        }
         
         // Calculer les statistiques finales
         const accuracyNum = gameStats.bulletsFired > 0 ? (gameStats.bulletsHit / gameStats.bulletsFired) * 100 : 0;
@@ -4721,6 +4743,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if (beerusAudio) {
             beerusAudio.pause();
             beerusAudio.currentTime = 0;
+        }
+        if (bossIntroAudio) {
+            bossIntroAudio.pause();
+            bossIntroAudio.currentTime = 0;
+            bossIntroAudio = null;
         }
         init();
         if (gameOver) gameOver.classList.add('hidden');
@@ -4981,6 +5008,7 @@ document.addEventListener('DOMContentLoaded', function() {
         function stopOtherMusics() {
             if (brolyAudio) { brolyAudio.pause(); brolyAudio.currentTime = 0; }
             if (beerusAudio) { beerusAudio.pause(); beerusAudio.currentTime = 0; }
+            if (bossIntroAudio) { bossIntroAudio.pause(); bossIntroAudio.currentTime = 0; bossIntroAudio = null; }
         }
         
         function clearEmbed() {
