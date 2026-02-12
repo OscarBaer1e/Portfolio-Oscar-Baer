@@ -4849,7 +4849,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 if (!type || !id) return null;
-                return 'https://open.spotify.com/embed/' + type + '/' + id + '?utm_source=generator';
+                return 'https://open.spotify.com/embed/' + type + '/' + id + '?utm_source=generator&theme=0';
             } catch (_) {}
             return null;
         }
@@ -4937,7 +4937,7 @@ document.addEventListener('DOMContentLoaded', function() {
             radioMode = 'spotify';
             if (!embedContainer) return;
             embedContainer.classList.remove('radio-embed-audio-only');
-            embedContainer.innerHTML = '<iframe src="' + embedUrl + '" width="100%" height="152" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>';
+            embedContainer.innerHTML = '<iframe src="' + embedUrl + '" width="100%" height="152" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" title="Spotify"></iframe>';
             embedContainer.classList.remove('hidden');
             radioPlaying = true;
             radioPlayIcon.className = 'fas fa-pause';

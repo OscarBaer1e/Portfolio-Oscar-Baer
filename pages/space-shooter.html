@@ -146,26 +146,22 @@
                         </div>
                     </div>
                     
-                    <!-- Radio musique de fond (style rétro) -->
+                    <!-- Radio musique de fond -->
                     <div class="game-radio-widget" id="game-radio-widget">
                         <div class="radio-case">
-                            <div class="radio-antenna"></div>
-                            <div class="radio-speaker-grill"></div>
-                            <div class="radio-label">SPACE RADIO</div>
-                            <div class="radio-dial">
-                                <input type="text" id="radio-search" class="radio-search" placeholder="Colle une URL (stream, YouTube ou Spotify) puis Entrée ou Play" autocomplete="off">
+                            <div class="radio-row">
+                                <span class="radio-label">SPACE RADIO</span>
+                                <input type="text" id="radio-search" class="radio-search" placeholder="URL stream, YouTube ou Spotify…" autocomplete="off">
                                 <div class="radio-presets" id="radio-presets"></div>
-                            </div>
-                            <div class="radio-controls">
                                 <button type="button" id="radio-play" class="radio-btn radio-play" aria-label="Play / Pause">
                                     <i class="fas fa-play" id="radio-play-icon"></i>
                                 </button>
                                 <div class="radio-volume-wrap">
-                                    <label for="radio-volume" class="radio-volume-label"><i class="fas fa-volume-up"></i></label>
+                                    <i class="fas fa-volume-up radio-volume-icon"></i>
                                     <input type="range" id="radio-volume" class="radio-volume" min="0" max="1" step="0.05" value="0.5" aria-label="Volume radio">
                                 </div>
                             </div>
-                            <p class="radio-hint">Stream, YouTube ou Spotify : colle l’URL pour la mettre en fond.</p>
+                            <p class="radio-hint">Connecte-toi à Spotify dans ce navigateur pour écouter les titres en entier.</p>
                             <div id="radio-embed-container" class="radio-embed-container hidden"></div>
                         </div>
                     </div>
