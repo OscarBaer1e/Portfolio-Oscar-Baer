@@ -316,13 +316,11 @@ document.addEventListener('DOMContentLoaded', function() {
             
             switch(type) {
                 case 'shoot':
-                    oscillator.frequency.setValueAtTime(800, ctx.currentTime);
-                    oscillator.type = 'square';
-                    gainNode.gain.setValueAtTime(0.1 * globalVolume, ctx.currentTime);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01 * globalVolume, ctx.currentTime + 0.05);
-                    oscillator.start();
-                    oscillator.stop(ctx.currentTime + 0.05);
-                    break;
+                    if (SHOOT_SOUNDS && SHOOT_SOUNDS.length) {
+                        const src = SHOOT_SOUNDS[Math.floor(Math.random() * SHOOT_SOUNDS.length)];
+                        playAudioFile(src, 0.35);
+                    }
+                    return;
                 case 'explosion':
                     oscillator.frequency.setValueAtTime(150, ctx.currentTime);
                     oscillator.frequency.exponentialRampToValueAtTime(50, ctx.currentTime + 0.3);
@@ -471,6 +469,15 @@ document.addEventListener('DOMContentLoaded', function() {
     let screenShake = { x: 0, y: 0, intensity: 0 };
     const BROLY_MUSIC_SRC = '../ressources/Sons/Broly-Transformation.mp3';
     const BEERUS_MUSIC_SRC = '../ressources/Sons/Beerus-Goku.mp3';
+    const SHOOT_SOUNDS = [
+        '../ressources/Sons/Shoot.wav',
+        '../ressources/Sons/Shoot1.wav',
+        '../ressources/Sons/Shoot2.wav',
+        '../ressources/Sons/Shoot5.wav',
+        '../ressources/Sons/Shoot7.wav',
+        '../ressources/Sons/Shoot8.wav',
+        '../ressources/Sons/Shoot30.wav'
+    ];
     let brolyAudio = null;
     let beerusAudio = null;
     
