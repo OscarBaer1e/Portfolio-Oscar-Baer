@@ -4812,10 +4812,20 @@ document.addEventListener('DOMContentLoaded', function() {
         function getYouTubeVideoId(url) {
             if (!url || !/^https?:\/\//i.test(url)) return null;
             try {
-                const u = new URL(url);
-                if (/youtube\.com|youtu\.be/i.test(u.hostname)) {
-                    if (u.hostname === 'youtu.be') return u.pathname.slice(1).split('/')[0] || null;
-                    return u.searchParams.get('v') || null;
+                const u = new URL(url.trim());
+                const host = u.hostname.replace(/^www\./, '');
+                if (host === 'youtu.be') {
+                    const id = (u.pathname.slice(1).split('/')[0] || '').split('?')[0].split('#')[0].trim();
+                    return id.length >= 10 ? id : null;
+                }
+                if (host === 'youtube.com' || host === 'm.youtube.com') {
+                    let id = u.searchParams.get('v');
+                    if (id) {
+                        id = id.split('?')[0].split('#')[0].trim();
+                        return id.length >= 10 ? id : null;
+                    }
+                    const m = u.pathname.match(/^\/(?:embed|v)\/([a-zA-Z0-9_-]{10,})/);
+                    return m ? m[1] : null;
                 }
             } catch (_) {}
             return null;
@@ -4824,13 +4834,16 @@ document.addEventListener('DOMContentLoaded', function() {
         function getSpotifyEmbedUrl(url) {
             if (!url || !/^https?:\/\//i.test(url)) return null;
             try {
-                const u = new URL(url);
-                const path = u.pathname.replace(/^\//, '').split('/');
-                const type = path[0]; // track, playlist, album, etc.
-                const id = path[1];
-                if (/open\.spotify\.com|spotify\.com/i.test(u.hostname) && id) {
-                    return 'https://open.spotify.com/embed/' + type + '/' + id + '?utm_source=generator';
-                }
+                const u = new URL(url.trim());
+                const host = u.hostname.replace(/^www\./, '');
+                if (host !== 'open.spotify.com' && host !== 'spotify.com') return null;
+                const path = u.pathname.replace(/^\//, '').split('/').filter(Boolean);
+                const type = path[0]; // track, playlist, album, show, episode
+                const rawId = path[1];
+                if (!rawId || !/^[\w-]+$/.test(type)) return null;
+                const id = rawId.split('?')[0].split('#')[0].trim();
+                if (!id) return null;
+                return 'https://open.spotify.com/embed/' + type + '/' + id + '?utm_source=generator';
             } catch (_) {}
             return null;
         }
@@ -4930,6 +4943,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 radioPlayIcon.className = 'fas fa-play';
                 return;
             }
+            offBtn.classList.remove('active');
             stopOtherMusics();
             const ytId = getYouTubeVideoId(url);
             const spotifyUrl = getSpotifyEmbedUrl(url);
@@ -4942,34 +4956,16 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
         
-        const RADIO_STATIONS = [
-            { name: 'Off', url: null },
-            { name: 'Chill', url: 'https://icecast.somafm.com/groovesalad-128-mp3' },
-            { name: 'Space', url: 'https://icecast.somafm.com/spacestation-128-mp3' },
-            { name: 'Synth', url: 'https://icecast.somafm.com/synphaera-128-mp3' },
-            { name: 'Lofi', url: 'https://icecast.somafm.com/lush-128-mp3' }
-        ];
-        
-        RADIO_STATIONS.forEach((station, index) => {
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.className = 'radio-preset-btn' + (index === 0 ? ' active' : '');
-            btn.textContent = station.name;
-            btn.dataset.url = station.url || '';
-            btn.addEventListener('click', () => {
-                RADIO_STATIONS.forEach((_, i) => {
-                    radioPresets.querySelectorAll('.radio-preset-btn')[i].classList.toggle('active', i === index);
-                });
-                currentStation = station.url;
-                radioSearch.placeholder = 'Stream, YouTube ou Spotify : colle l’URL...';
-                if (!station.url) {
-                    stopRadio();
-                    return;
-                }
-                playRadioSource(station.url);
-            });
-            radioPresets.appendChild(btn);
+        const offBtn = document.createElement('button');
+        offBtn.type = 'button';
+        offBtn.className = 'radio-preset-btn active';
+        offBtn.textContent = 'Off';
+        offBtn.addEventListener('click', () => {
+            stopRadio();
+            radioSearch.placeholder = 'Colle une URL (stream, YouTube ou Spotify)...';
+            offBtn.classList.add('active');
         });
+        radioPresets.appendChild(offBtn);
         
         radioPlayBtn.addEventListener('click', () => {
             if (radioPlaying) {
