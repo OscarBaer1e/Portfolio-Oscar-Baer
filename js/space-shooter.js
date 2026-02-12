@@ -461,6 +461,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Jingle court quand on change de thème visuel (tous les 10 niveaux)
+    function playThemeTransitionJingle(themeIndex) {
+        const ctx = initAudioContext();
+        if (!ctx) return;
+        try {
+            const root = 261.63 + (themeIndex % 8) * 35;
+            const notes = [root, root * 1.25, root * 1.5, root * 2];
+            notes.forEach((freq, i) => {
+                setTimeout(() => {
+                    try {
+                        const osc = ctx.createOscillator();
+                        const gain = ctx.createGain();
+                        osc.connect(gain);
+                        gain.connect(ctx.destination);
+                        osc.type = 'sine';
+                        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+                        gain.gain.setValueAtTime(0.12 * globalVolume, ctx.currentTime);
+                        gain.gain.exponentialRampToValueAtTime(0.001 * globalVolume, ctx.currentTime + 0.12);
+                        osc.start(ctx.currentTime);
+                        osc.stop(ctx.currentTime + 0.12);
+                    } catch (e) { /* ignore */ }
+                }, i * 120);
+            });
+        } catch (e) { /* ignore */ }
+    }
+    
     // Vaisseau
     const ship = {
         x: canvas.width / 2,
@@ -547,6 +573,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Animations de fond rares
     let backgroundEvents = [];
+    
+    // Météorites d'ambiance (lentes, fond)
+    let ambientMeteors = [];
     
     // Animations visuelles pour les bonus (remplace les messages texte)
     let powerUpVisualAnimations = [];
@@ -1062,6 +1091,7 @@ document.addEventListener('DOMContentLoaded', function() {
         powerUps = [];
         stars = [];
         backgroundEvents = [];
+        ambientMeteors = [];
         shipTrail = [];
         scoreParticles = [];
         screenShake = { x: 0, y: 0, intensity: 0 };
@@ -1129,6 +1159,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 y: Math.random() * canvas.height,
                 size: Math.random() * 2,
                 speed: Math.random() * 0.5 + 0.2
+            });
+        }
+        
+        // Météorites d'ambiance (lentes, traversent l'écran)
+        const maxMeteors = gameState.isMobile ? (gameState.isLowEndDevice ? 8 : 15) : 25;
+        for (let i = 0; i < maxMeteors; i++) {
+            ambientMeteors.push({
+                x: Math.random() * (canvas.width + 100) - 50,
+                y: Math.random() * (canvas.height + 50) - 50,
+                speed: 0.2 + Math.random() * 0.5,
+                size: 1 + Math.random() * 1.5,
+                alpha: 0.12 + Math.random() * 0.2
             });
         }
         
@@ -1256,6 +1298,17 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
+        // Nébuleuse pulsée (ambiance)
+        if (!gameState.isLowEndDevice) {
+            const pulse = 0.02 + 0.025 * Math.sin(Date.now() / 400);
+            const nebula = ctx.createRadialGradient(canvas.width / 2, canvas.height * 0.3, 0, canvas.width / 2, canvas.height * 0.3, canvas.width * 0.8);
+            nebula.addColorStop(0, 'transparent');
+            nebula.addColorStop(0.5, 'rgba(80,120,200,' + pulse + ')');
+            nebula.addColorStop(1, 'transparent');
+            ctx.fillStyle = nebula;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        
         // Effet de ralentissement temporel (distorsion visuelle)
         if (activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime) {
             ctx.save();
@@ -1281,6 +1334,18 @@ document.addEventListener('DOMContentLoaded', function() {
                 ctx.beginPath();
                 ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
                 ctx.fill();
+            });
+        }
+        
+        if (!gameState.isLowEndDevice && ambientMeteors.length > 0) {
+            ambientMeteors.forEach(m => {
+                ctx.save();
+                ctx.globalAlpha = m.alpha;
+                ctx.fillStyle = currentTheme.stars;
+                ctx.beginPath();
+                ctx.arc(m.x, m.y, m.size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
             });
         }
         
@@ -1542,6 +1607,15 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.fillStyle = '#fff';
             ctx.fillText(text, canvas.width / 2, y);
             ctx.restore();
+        }
+        
+        if (!gameState.isLowEndDevice) {
+            const vig = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, canvas.width * 0.2, canvas.width / 2, canvas.height / 2, canvas.width * 0.8);
+            vig.addColorStop(0, 'transparent');
+            vig.addColorStop(0.6, 'rgba(0,0,0,0)');
+            vig.addColorStop(1, 'rgba(0,0,0,0.12)');
+            ctx.fillStyle = vig;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
         
         // Restaurer le contexte après le shake
@@ -2235,6 +2309,15 @@ document.addEventListener('DOMContentLoaded', function() {
             
             if (event.life <= 0 || event.y < -50 || event.y > canvas.height + 50 || event.x > canvas.width + 50) {
                 backgroundEvents.splice(index, 1);
+            }
+        });
+        
+        const slowMulAmbient = activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime ? timeSlowMultiplier : 1.0;
+        ambientMeteors.forEach(m => {
+            m.y += m.speed * slowMulAmbient * gameState.deltaTime;
+            if (m.y > canvas.height + 10) {
+                m.y = -5;
+                m.x = Math.random() * (canvas.width + 80) - 40;
             }
         });
         
@@ -3251,7 +3334,11 @@ document.addEventListener('DOMContentLoaded', function() {
             // Mode infini : le niveau augmente continuellement
         const newLevel = Math.floor(gameState.score / 500) + 1;
         if (newLevel > gameState.level) {
+            const previousLevel = gameState.level;
             gameState.level = newLevel;
+            const prevTheme = Math.floor((previousLevel - 1) / 10);
+            const newTheme = Math.floor((gameState.level - 1) / 10);
+            if (newTheme > prevTheme) playThemeTransitionJingle(newTheme);
             // Vague spéciale : tous les 5 niveaux sauf multiples de 10 (boss)
             if (gameState.level % 5 === 0 && gameState.level % 10 !== 0) {
                 const types = ['meteors', 'swarm', 'bonus'];
@@ -3277,6 +3364,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (newLevel > gameState.level) {
             const previousLevel = gameState.level;
             gameState.level = newLevel;
+            const prevTheme = Math.floor((previousLevel - 1) / 10);
+            const newTheme = Math.floor((gameState.level - 1) / 10);
+            if (newTheme > prevTheme) playThemeTransitionJingle(newTheme);
             // Vague spéciale : tous les 5 niveaux sauf multiples de 10 (boss)
             if (gameState.level % 5 === 0 && gameState.level % 10 !== 0) {
                 const types = ['meteors', 'swarm', 'bonus'];
@@ -4566,6 +4656,20 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Note de partie (grade) selon score, précision, vies, niveau
+    function getGameGrade(score, accuracyNum, lives, level) {
+        let rank = 0; // 0=D, 1=C, 2=B, 3=A, 4=S
+        if (score >= 15000) rank = 4;
+        else if (score >= 7000) rank = 3;
+        else if (score >= 3000) rank = 2;
+        else if (score >= 1000) rank = 1;
+        if (accuracyNum >= 75 && rank < 4) rank++;
+        if (accuracyNum < 35 && rank > 0) rank--;
+        if (lives >= 2 && rank < 4) rank++;
+        if (level >= 20 && rank < 4) rank++;
+        return ['D', 'C', 'B', 'A', 'S'][Math.min(4, Math.max(0, rank))];
+    }
+    
     function endGame() {
         gameState.isPlaying = false;
         if (brolyAudio) {
@@ -4578,7 +4682,8 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Calculer les statistiques finales
-        const accuracy = gameStats.bulletsFired > 0 ? ((gameStats.bulletsHit / gameStats.bulletsFired) * 100).toFixed(1) : 0;
+        const accuracyNum = gameStats.bulletsFired > 0 ? (gameStats.bulletsHit / gameStats.bulletsFired) * 100 : 0;
+        const accuracy = gameStats.bulletsFired > 0 ? accuracyNum.toFixed(1) : 0;
         const timeMinutes = Math.floor(gameStats.timePlayed / 60000);
         const timeSeconds = Math.floor((gameStats.timePlayed % 60000) / 1000);
         const timeFormatted = `${timeMinutes}m ${timeSeconds}s`;
@@ -4600,6 +4705,13 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (finalScore) finalScore.textContent = gameState.score;
         if (finalLevel) finalLevel.textContent = gameState.level;
+        
+        const grade = getGameGrade(finalScoreValue, accuracyNum, gameState.lives, gameState.level);
+        const finalGradeEl = document.getElementById('final-grade');
+        if (finalGradeEl) {
+            finalGradeEl.textContent = grade;
+            finalGradeEl.className = 'final-grade-letter grade-' + grade;
+        }
         
         // Afficher les statistiques post-partie
         if (scoreMessage) {
