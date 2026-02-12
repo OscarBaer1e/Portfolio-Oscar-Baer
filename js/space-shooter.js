@@ -4838,11 +4838,17 @@ document.addEventListener('DOMContentLoaded', function() {
                 const host = u.hostname.replace(/^www\./, '');
                 if (host !== 'open.spotify.com' && host !== 'spotify.com') return null;
                 const path = u.pathname.replace(/^\//, '').split('/').filter(Boolean);
-                const type = path[0]; // track, playlist, album, show, episode
-                const rawId = path[1];
-                if (!rawId || !/^[\w-]+$/.test(type)) return null;
-                const id = rawId.split('?')[0].split('#')[0].trim();
-                if (!id) return null;
+                const spotifyTypes = ['track', 'playlist', 'album', 'show', 'episode'];
+                let type = null;
+                let id = null;
+                for (let i = 0; i < path.length; i++) {
+                    if (spotifyTypes.includes(path[i]) && path[i + 1]) {
+                        type = path[i];
+                        id = (path[i + 1] || '').split('?')[0].split('#')[0].trim();
+                        break;
+                    }
+                }
+                if (!type || !id) return null;
                 return 'https://open.spotify.com/embed/' + type + '/' + id + '?utm_source=generator';
             } catch (_) {}
             return null;
@@ -4856,6 +4862,7 @@ document.addEventListener('DOMContentLoaded', function() {
         function clearEmbed() {
             if (embedContainer) {
                 embedContainer.classList.add('hidden');
+                embedContainer.classList.remove('radio-embed-audio-only');
                 embedContainer.innerHTML = '';
             }
             if (ytPlayer && typeof ytPlayer.stopVideo === 'function') {
@@ -4894,16 +4901,17 @@ document.addEventListener('DOMContentLoaded', function() {
             bgMusic.src = '';
             radioMode = 'youtube';
             if (!embedContainer) return;
-            embedContainer.innerHTML = '<div id="radio-yt-player" style="width:100%;height:80px;"></div>';
+            embedContainer.innerHTML = '<div id="radio-yt-player" class="radio-yt-audio-only"></div>';
             embedContainer.classList.remove('hidden');
+            embedContainer.classList.add('radio-embed-audio-only');
             
             function createPlayer() {
                 if (!document.getElementById('radio-yt-player')) return;
                 ytPlayer = new window.YT.Player('radio-yt-player', {
-                    height: 80,
-                    width: '100%',
+                    height: 1,
+                    width: 1,
                     videoId: videoId,
-                    playerVars: { autoplay: 1, controls: 1, modestbranding: 1, rel: 0 },
+                    playerVars: { autoplay: 1, controls: 0, modestbranding: 1, rel: 0, showinfo: 0 },
                     events: { onReady: function(e) { e.target.playVideo(); radioPlaying = true; radioPlayIcon.className = 'fas fa-pause'; } }
                 });
             }
@@ -4928,6 +4936,7 @@ document.addEventListener('DOMContentLoaded', function() {
             bgMusic.src = '';
             radioMode = 'spotify';
             if (!embedContainer) return;
+            embedContainer.classList.remove('radio-embed-audio-only');
             embedContainer.innerHTML = '<iframe src="' + embedUrl + '" width="100%" height="152" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>';
             embedContainer.classList.remove('hidden');
             radioPlaying = true;
@@ -4935,14 +4944,17 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         function playRadioSource(url) {
+            url = (url || '').trim();
             bgMusic.pause();
             bgMusic.src = '';
             clearEmbed();
             if (!url) {
+                currentStation = null;
                 radioPlaying = false;
                 radioPlayIcon.className = 'fas fa-play';
                 return;
             }
+            currentStation = url;
             offBtn.classList.remove('active');
             stopOtherMusics();
             const ytId = getYouTubeVideoId(url);
