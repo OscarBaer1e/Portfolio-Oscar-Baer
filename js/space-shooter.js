@@ -4477,6 +4477,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (startScreen) startScreen.classList.add('hidden');
         if (startBtn) startBtn.textContent = 'Pause';
         gameLoop();
+        if (typeof window._spaceShooterRadioTryPlayOnGameStart === 'function') window._spaceShooterRadioTryPlayOnGameStart();
     }
     
     // Initialiser le contrôleur de volume au chargement
@@ -4791,7 +4792,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // ----- Radio musique de fond (style rétro) — Stream, YouTube, Spotify -----
+    // ----- Radio musique de fond (style rétro) — Stream, YouTube -----
     (function initRadioWidget() {
         const radioPlayBtn = document.getElementById('radio-play');
         const radioPlayIcon = document.getElementById('radio-play-icon');
@@ -4805,7 +4806,7 @@ document.addEventListener('DOMContentLoaded', function() {
         bgMusic.loop = true;
         let radioPlaying = false;
         let currentStation = null;
-        let radioMode = 'stream'; // 'stream' | 'youtube' | 'spotify'
+        let radioMode = 'stream'; // 'stream' | 'youtube'
         let ytPlayer = null;
         let ytReady = false;
         
@@ -4827,29 +4828,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     const m = u.pathname.match(/^\/(?:embed|v)\/([a-zA-Z0-9_-]{10,})/);
                     return m ? m[1] : null;
                 }
-            } catch (_) {}
-            return null;
-        }
-        
-        function getSpotifyEmbedUrl(url) {
-            if (!url || !/^https?:\/\//i.test(url)) return null;
-            try {
-                const u = new URL(url.trim());
-                const host = u.hostname.replace(/^www\./, '');
-                if (host !== 'open.spotify.com' && host !== 'spotify.com') return null;
-                const path = u.pathname.replace(/^\//, '').split('/').filter(Boolean);
-                const spotifyTypes = ['track', 'playlist', 'album', 'show', 'episode'];
-                let type = null;
-                let id = null;
-                for (let i = 0; i < path.length; i++) {
-                    if (spotifyTypes.includes(path[i]) && path[i + 1]) {
-                        type = path[i];
-                        id = (path[i + 1] || '').split('?')[0].split('#')[0].trim();
-                        break;
-                    }
-                }
-                if (!type || !id) return null;
-                return 'https://open.spotify.com/embed/' + type + '/' + id + '?utm_source=generator&theme=0';
             } catch (_) {}
             return null;
         }
@@ -4931,18 +4909,6 @@ document.addEventListener('DOMContentLoaded', function() {
             radioPlayIcon.className = 'fas fa-pause';
         }
         
-        function playSpotify(embedUrl) {
-            bgMusic.pause();
-            bgMusic.src = '';
-            radioMode = 'spotify';
-            if (!embedContainer) return;
-            embedContainer.classList.remove('radio-embed-audio-only');
-            embedContainer.innerHTML = '<iframe src="' + embedUrl + '" width="100%" height="152" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy" title="Spotify"></iframe>';
-            embedContainer.classList.remove('hidden');
-            radioPlaying = true;
-            radioPlayIcon.className = 'fas fa-pause';
-        }
-        
         function playRadioSource(url) {
             url = (url || '').trim();
             bgMusic.pause();
@@ -4958,15 +4924,20 @@ document.addEventListener('DOMContentLoaded', function() {
             offBtn.classList.remove('active');
             stopOtherMusics();
             const ytId = getYouTubeVideoId(url);
-            const spotifyUrl = getSpotifyEmbedUrl(url);
             if (ytId) {
                 playYouTube(ytId);
-            } else if (spotifyUrl) {
-                playSpotify(spotifyUrl);
             } else {
                 playStream(url);
             }
         }
+        
+        window._spaceShooterRadioTryPlayOnGameStart = function() {
+            const url = (currentStation || (radioSearch && radioSearch.value.trim()) || '').trim();
+            if (url && /^https?:\/\//i.test(url)) {
+                currentStation = url;
+                playRadioSource(url);
+            }
+        };
         
         const offBtn = document.createElement('button');
         offBtn.type = 'button';
@@ -4974,7 +4945,7 @@ document.addEventListener('DOMContentLoaded', function() {
         offBtn.textContent = 'Off';
         offBtn.addEventListener('click', () => {
             stopRadio();
-            radioSearch.placeholder = 'Colle une URL (stream, YouTube ou Spotify)...';
+            radioSearch.placeholder = 'URL YouTube ou stream MP3…';
             offBtn.classList.add('active');
         });
         radioPresets.appendChild(offBtn);
