@@ -3095,36 +3095,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Durées de base pour le stack (stack = durée uniquement)
     const BONUS_DURATIONS = { rapidFire: 10000, shield: 8000, shrink: 12000, bigBullets: 15000, tripleShot: 10000, timeSlow: 12000, offensiveShield: 15000, magnet: 20000, prism: 12000, seeker: 10000, overdrive: 10000, slowTarget: 10000, mirrorShield: 12000 };
     
-    const MAX_ACTIVE_BONUSES = 5;
     const TIMED_BONUS_TYPES = ['rapidFire', 'shield', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet', 'prism', 'seeker', 'overdrive', 'slowTarget', 'mirrorShield'];
-    
-    function countActiveTimedBonuses() {
-        const now = Date.now();
-        let n = 0;
-        TIMED_BONUS_TYPES.forEach(t => {
-            if (activePowerUps[t] && now < activePowerUps[t + 'EndTime']) n++;
-        });
-        return n;
-    }
-    
-    function removeOldestTimedBonus() {
-        const now = Date.now();
-        let minEnd = Infinity;
-        let removeType = null;
-        TIMED_BONUS_TYPES.forEach(t => {
-            const et = activePowerUps[t + 'EndTime'];
-            if (activePowerUps[t] && et > now && et < minEnd) {
-                minEnd = et;
-                removeType = t;
-            }
-        });
-        if (removeType) {
-            activePowerUps[removeType] = false;
-            activePowerUps[removeType + 'EndTime'] = 0;
-            if (removeType === 'rapidFire') currentFireRate = baseFireRate;
-            if (removeType === 'timeSlow') timeSlowMultiplier = 1.0;
-        }
-    }
     
     function applyTimedBonus(type, endTimeKey) {
         const now = Date.now();
@@ -3132,9 +3103,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (activePowerUps[type] && now < activePowerUps[endTimeKey]) {
             activePowerUps[endTimeKey] += duration; // Stack = durée seulement
         } else {
-            if (countActiveTimedBonuses() >= MAX_ACTIVE_BONUSES) {
-                removeOldestTimedBonus();
-            }
             activePowerUps[type] = true;
             activePowerUps[endTimeKey] = now + duration;
             if (type === 'rapidFire') currentFireRate = baseFireRate / 3;
