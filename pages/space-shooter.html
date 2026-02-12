@@ -65,29 +65,6 @@
                             <button id="fullscreen-btn" class="btn secondary-btn">⛶ Plein Écran</button>
                             <a href="../index.html" class="btn secondary-btn"><i class="fas fa-home"></i> Retour</a>
                         </div>
-                        
-                        <!-- Radio musique de fond (style rétro) -->
-                        <div class="game-radio-widget" id="game-radio-widget">
-                            <div class="radio-case">
-                                <div class="radio-antenna"></div>
-                                <div class="radio-speaker-grill"></div>
-                                <div class="radio-label">SPACE RADIO</div>
-                                <div class="radio-dial">
-                                    <input type="text" id="radio-search" class="radio-search" placeholder="Rechercher ou coller une URL de stream..." autocomplete="off">
-                                    <div class="radio-presets" id="radio-presets"></div>
-                                </div>
-                                <div class="radio-controls">
-                                    <button type="button" id="radio-play" class="radio-btn radio-play" aria-label="Play / Pause">
-                                        <i class="fas fa-play" id="radio-play-icon"></i>
-                                    </button>
-                                    <div class="radio-volume-wrap">
-                                        <label for="radio-volume" class="radio-volume-label"><i class="fas fa-volume-up"></i></label>
-                                        <input type="range" id="radio-volume" class="radio-volume" min="0" max="1" step="0.05" value="0.5" aria-label="Volume radio">
-                                    </div>
-                                </div>
-                                <p class="radio-hint">Choisis une station ou colle l’URL d’un stream (MP3/radio) pour la mettre en fond.</p>
-                            </div>
-                        </div>
                     </div>
                     
                     <div class="game-wrapper">
@@ -166,6 +143,30 @@
                                     <span class="shoot-label">TIRER</span>
                                 </button>
                             </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Radio musique de fond (style rétro) -->
+                    <div class="game-radio-widget" id="game-radio-widget">
+                        <div class="radio-case">
+                            <div class="radio-antenna"></div>
+                            <div class="radio-speaker-grill"></div>
+                            <div class="radio-label">SPACE RADIO</div>
+                            <div class="radio-dial">
+                                <input type="text" id="radio-search" class="radio-search" placeholder="Rechercher ou coller une URL de stream..." autocomplete="off">
+                                <div class="radio-presets" id="radio-presets"></div>
+                            </div>
+                            <div class="radio-controls">
+                                <button type="button" id="radio-play" class="radio-btn radio-play" aria-label="Play / Pause">
+                                    <i class="fas fa-play" id="radio-play-icon"></i>
+                                </button>
+                                <div class="radio-volume-wrap">
+                                    <label for="radio-volume" class="radio-volume-label"><i class="fas fa-volume-up"></i></label>
+                                    <input type="range" id="radio-volume" class="radio-volume" min="0" max="1" step="0.05" value="0.5" aria-label="Volume radio">
+                                </div>
+                            </div>
+                            <p class="radio-hint">Stream, YouTube ou Spotify : colle l’URL pour la mettre en fond.</p>
+                            <div id="radio-embed-container" class="radio-embed-container hidden"></div>
                         </div>
                     </div>
                     

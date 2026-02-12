@@ -4791,49 +4791,80 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // ----- Radio musique de fond (style rétro) -----
+    // ----- Radio musique de fond (style rétro) — Stream, YouTube, Spotify -----
     (function initRadioWidget() {
         const radioPlayBtn = document.getElementById('radio-play');
         const radioPlayIcon = document.getElementById('radio-play-icon');
         const radioSearch = document.getElementById('radio-search');
         const radioPresets = document.getElementById('radio-presets');
         const radioVolume = document.getElementById('radio-volume');
+        const embedContainer = document.getElementById('radio-embed-container');
         if (!radioPlayBtn || !radioPresets) return;
         
         const bgMusic = new Audio();
         bgMusic.loop = true;
         let radioPlaying = false;
         let currentStation = null;
+        let radioMode = 'stream'; // 'stream' | 'youtube' | 'spotify'
+        let ytPlayer = null;
+        let ytReady = false;
+        
+        function getYouTubeVideoId(url) {
+            if (!url || !/^https?:\/\//i.test(url)) return null;
+            try {
+                const u = new URL(url);
+                if (/youtube\.com|youtu\.be/i.test(u.hostname)) {
+                    if (u.hostname === 'youtu.be') return u.pathname.slice(1).split('/')[0] || null;
+                    return u.searchParams.get('v') || null;
+                }
+            } catch (_) {}
+            return null;
+        }
+        
+        function getSpotifyEmbedUrl(url) {
+            if (!url || !/^https?:\/\//i.test(url)) return null;
+            try {
+                const u = new URL(url);
+                const path = u.pathname.replace(/^\//, '').split('/');
+                const type = path[0]; // track, playlist, album, etc.
+                const id = path[1];
+                if (/open\.spotify\.com|spotify\.com/i.test(u.hostname) && id) {
+                    return 'https://open.spotify.com/embed/' + type + '/' + id + '?utm_source=generator';
+                }
+            } catch (_) {}
+            return null;
+        }
         
         function stopOtherMusics() {
-            if (brolyAudio) {
-                brolyAudio.pause();
-                brolyAudio.currentTime = 0;
+            if (brolyAudio) { brolyAudio.pause(); brolyAudio.currentTime = 0; }
+            if (beerusAudio) { beerusAudio.pause(); beerusAudio.currentTime = 0; }
+        }
+        
+        function clearEmbed() {
+            if (embedContainer) {
+                embedContainer.classList.add('hidden');
+                embedContainer.innerHTML = '';
             }
-            if (beerusAudio) {
-                beerusAudio.pause();
-                beerusAudio.currentTime = 0;
+            if (ytPlayer && typeof ytPlayer.stopVideo === 'function') {
+                try { ytPlayer.stopVideo(); } catch (_) {}
+                ytPlayer = null;
             }
         }
         
         function stopRadio() {
             bgMusic.pause();
             bgMusic.src = '';
+            clearEmbed();
             radioPlaying = false;
+            radioMode = 'stream';
             if (radioPlayIcon) radioPlayIcon.className = 'fas fa-play';
         }
         
         window._spaceShooterRadioPause = stopRadio;
         
-        function playRadioSource(url) {
-            bgMusic.pause();
-            bgMusic.src = '';
-            if (!url) {
-                radioPlaying = false;
-                radioPlayIcon.className = 'fas fa-play';
-                return;
-            }
-            stopOtherMusics();
+        function playStream(url) {
+            clearEmbed();
+            radioMode = 'stream';
             bgMusic.src = url;
             bgMusic.volume = parseFloat(radioVolume?.value || 0.5);
             bgMusic.play().then(() => {
@@ -4843,6 +4874,72 @@ document.addEventListener('DOMContentLoaded', function() {
                 radioPlaying = false;
                 radioPlayIcon.className = 'fas fa-play';
             });
+        }
+        
+        function playYouTube(videoId) {
+            bgMusic.pause();
+            bgMusic.src = '';
+            radioMode = 'youtube';
+            if (!embedContainer) return;
+            embedContainer.innerHTML = '<div id="radio-yt-player" style="width:100%;height:80px;"></div>';
+            embedContainer.classList.remove('hidden');
+            
+            function createPlayer() {
+                if (!document.getElementById('radio-yt-player')) return;
+                ytPlayer = new window.YT.Player('radio-yt-player', {
+                    height: 80,
+                    width: '100%',
+                    videoId: videoId,
+                    playerVars: { autoplay: 1, controls: 1, modestbranding: 1, rel: 0 },
+                    events: { onReady: function(e) { e.target.playVideo(); radioPlaying = true; radioPlayIcon.className = 'fas fa-pause'; } }
+                });
+            }
+            if (window.YT && window.YT.Player) {
+                createPlayer();
+            } else {
+                window.onYouTubeIframeAPIReady = createPlayer;
+                if (document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+                    if (window.YT) createPlayer();
+                    return;
+                }
+                const script = document.createElement('script');
+                script.src = 'https://www.youtube.com/iframe_api';
+                document.head.appendChild(script);
+            }
+            radioPlaying = true;
+            radioPlayIcon.className = 'fas fa-pause';
+        }
+        
+        function playSpotify(embedUrl) {
+            bgMusic.pause();
+            bgMusic.src = '';
+            radioMode = 'spotify';
+            if (!embedContainer) return;
+            embedContainer.innerHTML = '<iframe src="' + embedUrl + '" width="100%" height="152" allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture" loading="lazy"></iframe>';
+            embedContainer.classList.remove('hidden');
+            radioPlaying = true;
+            radioPlayIcon.className = 'fas fa-pause';
+        }
+        
+        function playRadioSource(url) {
+            bgMusic.pause();
+            bgMusic.src = '';
+            clearEmbed();
+            if (!url) {
+                radioPlaying = false;
+                radioPlayIcon.className = 'fas fa-play';
+                return;
+            }
+            stopOtherMusics();
+            const ytId = getYouTubeVideoId(url);
+            const spotifyUrl = getSpotifyEmbedUrl(url);
+            if (ytId) {
+                playYouTube(ytId);
+            } else if (spotifyUrl) {
+                playSpotify(spotifyUrl);
+            } else {
+                playStream(url);
+            }
         }
         
         const RADIO_STATIONS = [
@@ -4864,7 +4961,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     radioPresets.querySelectorAll('.radio-preset-btn')[i].classList.toggle('active', i === index);
                 });
                 currentStation = station.url;
-                radioSearch.placeholder = station.url ? 'Ou coller une autre URL...' : 'Rechercher ou coller une URL de stream...';
+                radioSearch.placeholder = 'Stream, YouTube ou Spotify : colle l’URL...';
                 if (!station.url) {
                     stopRadio();
                     return;
@@ -4906,7 +5003,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (radioVolume) {
             radioVolume.addEventListener('input', () => {
-                bgMusic.volume = parseFloat(radioVolume.value);
+                if (radioMode === 'stream') bgMusic.volume = parseFloat(radioVolume.value);
             });
         }
         

@@ -409,6 +409,24 @@
     text-align: center;
 }
 
+.radio-embed-container {
+    margin-top: 12px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 1px solid #444;
+    min-height: 0;
+}
+
+.radio-embed-container.hidden {
+    display: none;
+}
+
+.radio-embed-container iframe {
+    display: block;
+    width: 100%;
+    border: none;
+}
+
 .game-wrapper {
     position: relative;
     width: 100%;
