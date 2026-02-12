@@ -40,13 +40,13 @@ document.addEventListener('DOMContentLoaded', function() {
         timeSlow: '⏱️',
         offensiveShield: '🛡️',
         magnet: '🧲',
-        rainbow: '🌈',
+        prism: '💎',
         shockwave: '🌀',
-        homing: '➰',
-        kamehameha: '💥',
-        kienzan: '⭕',
-        kaioken: '🔴',
-        genkiDama: '🔵'
+        seeker: '🎯',
+        plasmaBeam: '💫',
+        buzzsaw: '🔄',
+        overdrive: '🔶',
+        supernova: '☄️'
     };
     
     // Système de thèmes qui change tous les 10 niveaux
@@ -440,12 +440,12 @@ document.addEventListener('DOMContentLoaded', function() {
         timeSlow: false,
         offensiveShield: false,
         magnet: false,
-        rainbow: false,
+        prism: false,
         shockwaveCharges: 0,
-        homing: false,
-        kaioken: false,
-        kamehameha: false,
-        kienzan: false,
+        seeker: false,
+        overdrive: false,
+        plasmaBeam: false,
+        buzzsaw: false,
         rapidFireEndTime: 0,
         shieldEndTime: 0,
         shrinkEndTime: 0,
@@ -454,13 +454,13 @@ document.addEventListener('DOMContentLoaded', function() {
         timeSlowEndTime: 0,
         offensiveShieldEndTime: 0,
         magnetEndTime: 0,
-        rainbowEndTime: 0,
-        homingEndTime: 0,
-        kaiokenEndTime: 0,
-        kamehamehaEndTime: 0,
-        kienzanEndTime: 0
+        prismEndTime: 0,
+        seekerEndTime: 0,
+        overdriveEndTime: 0,
+        plasmaBeamEndTime: 0,
+        buzzsawEndTime: 0
     };
-    let genkiDamaEffect = null;
+    let supernovaEffect = null;
     
     // Multiplicateur de ralentissement temporel
     let timeSlowMultiplier = 1.0;
@@ -1040,12 +1040,12 @@ document.addEventListener('DOMContentLoaded', function() {
             timeSlow: false,
             offensiveShield: false,
             magnet: false,
-            rainbow: false,
+            prism: false,
             shockwaveCharges: 0,
-            homing: false,
-            kaioken: false,
-            kamehameha: false,
-            kienzan: false,
+            seeker: false,
+            overdrive: false,
+            plasmaBeam: false,
+            buzzsaw: false,
             rapidFireEndTime: 0,
             shieldEndTime: 0,
             shrinkEndTime: 0,
@@ -1054,16 +1054,16 @@ document.addEventListener('DOMContentLoaded', function() {
             timeSlowEndTime: 0,
             offensiveShieldEndTime: 0,
             magnetEndTime: 0,
-            rainbowEndTime: 0,
-            homingEndTime: 0,
-            kaiokenEndTime: 0,
-            kamehamehaEndTime: 0,
-            kienzanEndTime: 0
+            prismEndTime: 0,
+            seekerEndTime: 0,
+            overdriveEndTime: 0,
+            plasmaBeamEndTime: 0,
+            buzzsawEndTime: 0
         };
         timeSlowMultiplier = 1.0;
         lastShotTime = 0;
         shockwaveEffect = null;
-        genkiDamaEffect = null;
+        supernovaEffect = null;
         if (currentLevelDisplay) {
             currentLevelDisplay.textContent = gameState.level;
         }
@@ -1095,7 +1095,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const activeBuffs = [];
         
         // Vérifier chaque type de buff
-        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet', 'rainbow', 'homing', 'kaioken', 'kamehameha', 'kienzan'];
+        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet', 'prism', 'seeker', 'overdrive', 'plasmaBeam', 'buzzsaw'];
         buffTypes.forEach(buffType => {
             const isActive = activePowerUps[buffType] && now < activePowerUps[`${buffType}EndTime`];
             if (isActive) {
@@ -1238,12 +1238,12 @@ document.addEventListener('DOMContentLoaded', function() {
         // Traînées de particules du vaisseau (réduites sur mobile) — arc-en-ciel si bonus actif
         if (!gameState.isLowEndDevice) {
             const trailStep = gameState.isMobile ? 2 : 1;
-            const trailRainbow = activePowerUps.rainbow && Date.now() < activePowerUps.rainbowEndTime;
+            const trailPrism = activePowerUps.prism && Date.now() < activePowerUps.prismEndTime;
             shipTrail.forEach((trail, index) => {
                 if (index % trailStep === 0) {
                     ctx.save();
                     ctx.globalAlpha = trail.alpha;
-                    if (trailRainbow) {
+                    if (trailPrism) {
                         const hue = (Date.now() / 40 + index * 35) % 360;
                         ctx.fillStyle = `hsl(${hue}, 100%, 65%)`;
                         ctx.shadowBlur = gameState.isMobile ? 8 : 12;
@@ -1300,91 +1300,94 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.restore();
         }
         
-        // Projectiles selon le thème — arc-en-ciel = barres, aura Broly = vert, aura Beerus = rouge
-        const rainbowActive = activePowerUps.rainbow && Date.now() < activePowerUps.rainbowEndTime;
+        // Projectiles : fusion des bonus (tous les effets actifs se cumulent visuellement)
+        const now = Date.now();
+        const prismActive = activePowerUps.prism && now < activePowerUps.prismEndTime;
         const brolyAuraActive = brolyAudio && !brolyAudio.paused;
         const beerusAuraActive = beerusAudio && !beerusAudio.paused;
-        const kaiokenActive = activePowerUps.kaioken && Date.now() < activePowerUps.kaiokenEndTime;
-        const kamehamehaActive = activePowerUps.kamehameha && Date.now() < activePowerUps.kamehamehaEndTime;
-        const kienzanActive = activePowerUps.kienzan && Date.now() < activePowerUps.kienzanEndTime;
+        const overdriveActive = activePowerUps.overdrive && now < activePowerUps.overdriveEndTime;
+        const plasmaBeamActive = activePowerUps.plasmaBeam && now < activePowerUps.plasmaBeamEndTime;
+        const buzzsawActive = activePowerUps.buzzsaw && now < activePowerUps.buzzsawEndTime;
+        function hslToRgb(h, s, l) {
+            h = h / 360;
+            let r, g, b;
+            if (s === 0) { r = g = b = l; } else {
+                const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+                const p = 2 * l - q;
+                r = hue2rgb(p, q, h + 1/3); g = hue2rgb(p, q, h); b = hue2rgb(p, q, h - 1/3);
+            }
+            return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
+        }
+        function hue2rgb(p, q, t) {
+            if (t < 0) t += 1; if (t > 1) t -= 1;
+            if (t < 1/6) return p + (q - p) * 6 * t;
+            if (t < 1/2) return q;
+            if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+            return p;
+        }
         bullets.forEach((bullet, bulletIndex) => {
             const bulletSize = bullet.size || 4;
-            if (rainbowActive) {
+            const anyVisual = prismActive || brolyAuraActive || beerusAuraActive || overdriveActive || plasmaBeamActive || buzzsawActive;
+            if (!anyVisual) {
                 ctx.save();
                 ctx.translate(bullet.x, bullet.y);
-                const spin = Date.now() * 0.015 + bulletIndex * 1.2;
-                ctx.rotate(spin);
-                const hue = (Date.now() / 25 + bulletIndex * 50) % 360;
-                ctx.fillStyle = `hsl(${hue}, 100%, 60%)`;
-                ctx.shadowBlur = gameState.isMobile ? 12 : 18;
-                ctx.shadowColor = ctx.fillStyle;
-                const barW = bulletSize * 1.2;
-                const barH = bulletSize * 8;
-                ctx.fillRect(-barW / 2, -barH / 2, barW, barH);
-                ctx.restore();
-                ctx.shadowBlur = 0;
-            } else if (brolyAuraActive) {
-                ctx.fillStyle = '#00ff88';
-                ctx.shadowBlur = gameState.isMobile ? 8 : 14;
-                ctx.shadowColor = '#00ff88';
-                ctx.beginPath();
-                ctx.arc(bullet.x, bullet.y, bulletSize, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            } else if (beerusAuraActive) {
-                ctx.fillStyle = '#ff4466';
-                ctx.shadowBlur = gameState.isMobile ? 8 : 14;
-                ctx.shadowColor = '#ff4466';
-                ctx.beginPath();
-                ctx.arc(bullet.x, bullet.y, bulletSize, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            } else if (kaiokenActive) {
-                ctx.fillStyle = '#ff3333';
-                ctx.shadowBlur = gameState.isMobile ? 8 : 12;
-                ctx.shadowColor = '#ff3333';
-                ctx.beginPath();
-                ctx.arc(bullet.x, bullet.y, bulletSize, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.shadowBlur = 0;
-            } else if (kamehamehaActive) {
-                ctx.save();
-                const beamH = 40;
-                const beamW = bulletSize * 3;
-                const grad = ctx.createLinearGradient(bullet.x, bullet.y - beamH, bullet.x, bullet.y + 4);
-                grad.addColorStop(0, 'rgba(0, 200, 255, 0.4)');
-                grad.addColorStop(0.5, 'rgba(0, 180, 255, 0.8)');
-                grad.addColorStop(1, 'rgba(0, 120, 255, 0.95)');
-                ctx.fillStyle = grad;
-                ctx.shadowBlur = 18;
-                ctx.shadowColor = '#00aaff';
-                ctx.fillRect(bullet.x - beamW / 2, bullet.y - beamH, beamW, beamH + 4);
-                ctx.shadowBlur = 0;
-                ctx.restore();
-            } else if (kienzanActive) {
-                ctx.save();
-                ctx.translate(bullet.x, bullet.y);
-                ctx.rotate((Date.now() * 0.01 + bulletIndex) % (Math.PI * 2));
-                ctx.strokeStyle = '#ffcc00';
-                ctx.fillStyle = 'rgba(255, 220, 0, 0.5)';
-                ctx.lineWidth = 2;
-                ctx.shadowBlur = 10;
-                ctx.shadowColor = '#ffaa00';
-                ctx.beginPath();
-                ctx.arc(0, 0, bulletSize * 1.5, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.stroke();
-                ctx.shadowBlur = 0;
-                ctx.restore();
-            } else {
                 ctx.fillStyle = currentTheme.bullets;
                 ctx.shadowBlur = gameState.isMobile ? 5 : 10;
                 ctx.shadowColor = currentTheme.bullets;
                 ctx.beginPath();
-                ctx.arc(bullet.x, bullet.y, bulletSize, 0, Math.PI * 2);
+                ctx.arc(0, 0, bulletSize, 0, Math.PI * 2);
                 ctx.fill();
                 ctx.shadowBlur = 0;
+                ctx.restore();
+                return;
             }
+            const colors = [];
+            if (prismActive) colors.push(hslToRgb((Date.now() / 25 + bulletIndex * 50) % 360, 1, 0.6));
+            if (brolyAuraActive) colors.push([0, 255, 136]);
+            if (beerusAuraActive) colors.push([255, 68, 102]);
+            if (overdriveActive) colors.push([255, 102, 0]);
+            if (plasmaBeamActive) colors.push([136, 102, 255]);
+            if (buzzsawActive) colors.push([255, 153, 0]);
+            let r = 0, g = 0, b = 0;
+            colors.forEach(([rr, gg, bb]) => { r += rr; g += gg; b += bb; });
+            r = Math.min(255, Math.round(r / colors.length));
+            g = Math.min(255, Math.round(g / colors.length));
+            b = Math.min(255, Math.round(b / colors.length));
+            const blend = `rgb(${r},${g},${b})`;
+            const shape = plasmaBeamActive ? 'beam' : buzzsawActive ? 'disc' : prismActive ? 'bar' : 'circle';
+            const shadowBlur = gameState.isMobile ? 10 : 14;
+            ctx.save();
+            ctx.translate(bullet.x, bullet.y);
+            if (shape === 'bar' || shape === 'disc') ctx.rotate((Date.now() * 0.008 + bulletIndex) * (shape === 'bar' ? 0.02 : 1));
+            ctx.fillStyle = blend;
+            ctx.shadowBlur = shadowBlur;
+            ctx.shadowColor = blend;
+            if (shape === 'beam') {
+                const beamH = 40, beamW = bulletSize * 3;
+                const grad = ctx.createLinearGradient(0, -beamH, 0, 4);
+                grad.addColorStop(0, `rgba(${r},${g},${b},0.4)`);
+                grad.addColorStop(0.5, `rgba(${r},${g},${b},0.8)`);
+                grad.addColorStop(1, `rgba(${r},${g},${b},0.95)`);
+                ctx.fillStyle = grad;
+                ctx.shadowColor = blend;
+                ctx.fillRect(-beamW/2, -beamH, beamW, beamH + 4);
+            } else if (shape === 'disc') {
+                ctx.strokeStyle = blend;
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(0, 0, bulletSize * 1.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            } else if (shape === 'bar') {
+                const barW = bulletSize * 1.2, barH = bulletSize * 8;
+                ctx.fillRect(-barW/2, -barH/2, barW, barH);
+            } else {
+                ctx.beginPath();
+                ctx.arc(0, 0, bulletSize, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.shadowBlur = 0;
+            ctx.restore();
         });
         
         // Astéroïdes
@@ -1417,25 +1420,26 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.restore();
         }
         
-        // Genki Dama (sphère bleue)
-        if (genkiDamaEffect) {
+        // Supernova (onde destructrice orange/rouge)
+        if (supernovaEffect) {
             ctx.save();
-            const alpha = 0.8 - (genkiDamaEffect.radius / genkiDamaEffect.maxRadius) * 0.5;
+            const alpha = 0.85 - (supernovaEffect.radius / supernovaEffect.maxRadius) * 0.5;
             const grad = ctx.createRadialGradient(
-                genkiDamaEffect.x, genkiDamaEffect.y, 0,
-                genkiDamaEffect.x, genkiDamaEffect.y, genkiDamaEffect.radius
+                supernovaEffect.x, supernovaEffect.y, 0,
+                supernovaEffect.x, supernovaEffect.y, supernovaEffect.radius
             );
-            grad.addColorStop(0, 'rgba(200, 230, 255, 0.6)');
-            grad.addColorStop(0.4, `rgba(100, 180, 255, ${alpha * 0.5})`);
-            grad.addColorStop(1, 'rgba(50, 100, 200, 0)');
+            grad.addColorStop(0, 'rgba(255, 220, 150, 0.7)');
+            grad.addColorStop(0.3, `rgba(255, 140, 60, ${alpha * 0.6})`);
+            grad.addColorStop(0.7, `rgba(200, 60, 20, ${alpha * 0.3})`);
+            grad.addColorStop(1, 'rgba(100, 20, 0, 0)');
             ctx.fillStyle = grad;
             ctx.beginPath();
-            ctx.arc(genkiDamaEffect.x, genkiDamaEffect.y, genkiDamaEffect.radius, 0, Math.PI * 2);
+            ctx.arc(supernovaEffect.x, supernovaEffect.y, supernovaEffect.radius, 0, Math.PI * 2);
             ctx.fill();
-            ctx.strokeStyle = `rgba(150, 200, 255, ${alpha})`;
+            ctx.strokeStyle = `rgba(255, 180, 80, ${alpha})`;
             ctx.lineWidth = 3;
-            ctx.shadowBlur = 30;
-            ctx.shadowColor = '#4488ff';
+            ctx.shadowBlur = 35;
+            ctx.shadowColor = '#ff6644';
             ctx.stroke();
             ctx.shadowBlur = 0;
             ctx.restore();
@@ -1842,9 +1846,9 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (beerusAudio && !beerusAudio.paused) {
             shipColor = '#ff4466';
             detailColor = '#ffaacc';
-        } else if (activePowerUps.kaioken && Date.now() < activePowerUps.kaiokenEndTime) {
-            shipColor = '#ff3333';
-            detailColor = '#ff6666';
+        } else if (activePowerUps.overdrive && Date.now() < activePowerUps.overdriveEndTime) {
+            shipColor = '#ff6600';
+            detailColor = '#ff9933';
         }
         
         // Corps du vaisseau
@@ -2046,23 +2050,21 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.closePath();
             ctx.fill();
             ctx.stroke();
-        } else if (powerUp.type === 'rainbow') {
-            // Arc-en-ciel - demi-cercle dégradé arc-en-ciel
-            const gradient = ctx.createLinearGradient(-14, 0, 14, 0);
-            gradient.addColorStop(0, '#ff0000');
-            gradient.addColorStop(0.17, '#ff8800');
-            gradient.addColorStop(0.33, '#ffff00');
-            gradient.addColorStop(0.5, '#00ff00');
-            gradient.addColorStop(0.67, '#00ffff');
-            gradient.addColorStop(0.83, '#0088ff');
-            gradient.addColorStop(1, '#ff00ff');
-            ctx.strokeStyle = gradient;
-            ctx.lineWidth = 4;
+        } else if (powerUp.type === 'prism') {
+            // Prisme — cristal dégradé RGB
+            const gradient = ctx.createLinearGradient(-10, -10, 10, 10);
+            gradient.addColorStop(0, '#ff3366');
+            gradient.addColorStop(0.5, '#33ff99');
+            gradient.addColorStop(1, '#3366ff');
+            ctx.fillStyle = gradient;
             ctx.beginPath();
-            ctx.arc(0, 2, 10, Math.PI, 0, false);
-            ctx.stroke();
-            ctx.lineWidth = 2;
-            ctx.strokeStyle = 'rgba(255,255,255,0.6)';
+            ctx.moveTo(0, -10);
+            ctx.lineTo(8, 8);
+            ctx.lineTo(-8, 8);
+            ctx.closePath();
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255,255,255,0.7)';
+            ctx.lineWidth = 1.5;
             ctx.stroke();
         } else if (powerUp.type === 'shockwave') {
             ctx.fillStyle = '#00ccff';
@@ -2076,21 +2078,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 ctx.arc(0, 0, r, 0, Math.PI * 2);
                 ctx.stroke();
             }
-        } else if (powerUp.type === 'homing') {
-            ctx.fillStyle = '#00ff88';
-            ctx.strokeStyle = '#00aa55';
+        } else if (powerUp.type === 'seeker') {
+            ctx.fillStyle = '#00dd88';
+            ctx.strokeStyle = '#00aa66';
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.moveTo(0, -10);
-            ctx.quadraticCurveTo(8, 0, 0, 10);
-            ctx.quadraticCurveTo(-8, 0, 0, -10);
+            ctx.quadraticCurveTo(9, 0, 0, 10);
+            ctx.quadraticCurveTo(-9, 0, 0, -10);
             ctx.fill();
             ctx.stroke();
-        } else if (powerUp.type === 'kamehameha') {
+        } else if (powerUp.type === 'plasmaBeam') {
             const g = ctx.createLinearGradient(-12, -12, 12, 12);
-            g.addColorStop(0, '#00ddff');
-            g.addColorStop(0.5, '#0088ff');
-            g.addColorStop(1, '#0044aa');
+            g.addColorStop(0, '#aa66ff');
+            g.addColorStop(0.5, '#6644cc');
+            g.addColorStop(1, '#332288');
             ctx.fillStyle = g;
             ctx.beginPath();
             ctx.moveTo(0, -12);
@@ -2099,35 +2101,38 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.lineTo(4, 12);
             ctx.closePath();
             ctx.fill();
-            ctx.strokeStyle = '#00aaff';
+            ctx.strokeStyle = '#8866ff';
             ctx.stroke();
-        } else if (powerUp.type === 'kienzan') {
-            ctx.strokeStyle = '#ffcc00';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(0, 0, 10, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(0, 0, 6, 0, Math.PI * 2);
-            ctx.stroke();
-        } else if (powerUp.type === 'kaioken') {
-            ctx.fillStyle = '#ff2222';
-            ctx.strokeStyle = '#aa0000';
+        } else if (powerUp.type === 'buzzsaw') {
+            ctx.strokeStyle = '#ff9900';
+            ctx.fillStyle = 'rgba(255,180,0,0.3)';
             ctx.lineWidth = 2;
             ctx.beginPath();
             ctx.arc(0, 0, 10, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
-        } else if (powerUp.type === 'genkiDama') {
+            ctx.beginPath();
+            ctx.arc(0, 0, 5, 0, Math.PI * 2);
+            ctx.stroke();
+        } else if (powerUp.type === 'overdrive') {
+            ctx.fillStyle = '#ff6600';
+            ctx.strokeStyle = '#cc4400';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+        } else if (powerUp.type === 'supernova') {
             const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 12);
-            g.addColorStop(0, '#aaccff');
-            g.addColorStop(0.6, '#4488ff');
-            g.addColorStop(1, '#2244aa');
+            g.addColorStop(0, '#ffdd88');
+            g.addColorStop(0.4, '#ff8844');
+            g.addColorStop(0.8, '#cc4400');
+            g.addColorStop(1, '#662200');
             ctx.fillStyle = g;
             ctx.beginPath();
             ctx.arc(0, 0, 11, 0, Math.PI * 2);
             ctx.fill();
-            ctx.strokeStyle = '#88aaff';
+            ctx.strokeStyle = '#ffaa44';
             ctx.stroke();
         }
         
@@ -2240,11 +2245,11 @@ document.addEventListener('DOMContentLoaded', function() {
             gameStats.timePlayed = Date.now() - gameStats.startTime;
         }
         
-        // Mise à jour des projectiles (normalisé par delta time) — tir homing si actif
+        // Mise à jour des projectiles (normalisé par delta time) — Chercheur (homing) si actif
         const slowMultiplierBullets = activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime ? timeSlowMultiplier : 1.0;
-        const homingActive = activePowerUps.homing && Date.now() < activePowerUps.homingEndTime;
+        const seekerActive = activePowerUps.seeker && Date.now() < activePowerUps.seekerEndTime;
         bullets.forEach((bullet, index) => {
-            if (homingActive && asteroids.length > 0) {
+            if (seekerActive && asteroids.length > 0) {
                 bullet.vx = bullet.vx ?? 0;
                 bullet.vy = bullet.vy ?? -bullet.speed;
                 let nearest = null;
@@ -2344,13 +2349,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Genki Dama (déclenché à la collecte)
-        if (genkiDamaEffect) {
-            genkiDamaEffect.radius += genkiDamaEffect.speed * gameState.deltaTime;
+        if (supernovaEffect) {
+            supernovaEffect.radius += supernovaEffect.speed * gameState.deltaTime;
             screenShake.intensity = Math.max(screenShake.intensity, 6);
             for (let i = asteroids.length - 1; i >= 0; i--) {
                 const a = asteroids[i];
-                const d = Math.sqrt((genkiDamaEffect.x - a.x) ** 2 + (genkiDamaEffect.y - a.y) ** 2);
-                if (d < genkiDamaEffect.radius + a.size) {
+                const d = Math.sqrt((supernovaEffect.x - a.x) ** 2 + (supernovaEffect.y - a.y) ** 2);
+                if (d < supernovaEffect.radius + a.size) {
                     createEnhancedExplosion(a.x, a.y, a.color, a.size);
                     if (!gameState.bossActive) {
                         const points = Math.floor(a.size / 5) * 10;
@@ -2363,7 +2368,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     asteroids.splice(i, 1);
                 }
             }
-            if (genkiDamaEffect.radius >= genkiDamaEffect.maxRadius) genkiDamaEffect = null;
+            if (supernovaEffect.radius >= supernovaEffect.maxRadius) supernovaEffect = null;
         }
         
         // Mise à jour des astéroïdes (normalisé par delta time)
@@ -2433,23 +2438,18 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Vérifier l'expiration des boosts actifs
         const now = Date.now();
-        if (activePowerUps.rapidFire && now > activePowerUps.rapidFireEndTime) {
+            if (activePowerUps.rapidFire && now > activePowerUps.rapidFireEndTime) {
             activePowerUps.rapidFire = false;
             currentFireRate = baseFireRate;
-            // Réinitialiser l'intervalle de tir automatique
             if (autoShootInterval) {
                 clearInterval(autoShootInterval);
                 autoShootInterval = null;
                 if (keys['Space']) {
-                    // Redémarrer avec la nouvelle vitesse
                     autoShootInterval = setInterval(() => {
-                        if (gameState.isPlaying && !gameState.isPaused && keys['Space']) {
-                            shoot();
-                        }
-                    }, currentFireRate);
+                        if (gameState.isPlaying && !gameState.isPaused && keys['Space']) shoot();
+                    }, getEffectiveFireRate());
                 }
             }
-            // Pas de message de fin
         }
         if (activePowerUps.shield && now > activePowerUps.shieldEndTime) {
             activePowerUps.shield = false;
@@ -2473,20 +2473,20 @@ document.addEventListener('DOMContentLoaded', function() {
         if (activePowerUps.magnet && now > activePowerUps.magnetEndTime) {
             activePowerUps.magnet = false;
         }
-        if (activePowerUps.rainbow && now > activePowerUps.rainbowEndTime) {
-            activePowerUps.rainbow = false;
+        if (activePowerUps.prism && now > activePowerUps.prismEndTime) {
+            activePowerUps.prism = false;
         }
-        if (activePowerUps.homing && now > activePowerUps.homingEndTime) {
-            activePowerUps.homing = false;
+        if (activePowerUps.seeker && now > activePowerUps.seekerEndTime) {
+            activePowerUps.seeker = false;
         }
-        if (activePowerUps.kaioken && now > activePowerUps.kaiokenEndTime) {
-            activePowerUps.kaioken = false;
+        if (activePowerUps.overdrive && now > activePowerUps.overdriveEndTime) {
+            activePowerUps.overdrive = false;
         }
-        if (activePowerUps.kamehameha && now > activePowerUps.kamehamehaEndTime) {
-            activePowerUps.kamehameha = false;
+        if (activePowerUps.plasmaBeam && now > activePowerUps.plasmaBeamEndTime) {
+            activePowerUps.plasmaBeam = false;
         }
-        if (activePowerUps.kienzan && now > activePowerUps.kienzanEndTime) {
-            activePowerUps.kienzan = false;
+        if (activePowerUps.buzzsaw && now > activePowerUps.buzzsawEndTime) {
+            activePowerUps.buzzsaw = false;
         }
         
         // Mettre à jour les icônes de buff
@@ -2519,8 +2519,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     gameStats.asteroidsDestroyed++;
                     gameStats.bulletsHit++;
                     
-                    // Supprimer le projectile sauf si Kienzan (perçant)
-                    if (!activePowerUps.kienzan) bullets.splice(bulletIndex, 1);
+                    // Supprimer le projectile sauf si Scie circulaire (perçant)
+                    if (!activePowerUps.buzzsaw) bullets.splice(bulletIndex, 1);
                     
                     // Vérifier si l'astéroïde doit se séparer
                     const isBigType = asteroid.size >= 48;  // Gros type : toujours se divise en gros morceaux
@@ -2566,7 +2566,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Chance de faire apparaître un boost — tous les bonus à égalité (1% chacun)
                     const DROP_RATE = 0.12;
-                    const DROPPABLE_POWERUPS = ['rapidFire', 'shield', 'shrink', 'magnet', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'life', 'rainbow', 'homing', 'kamehameha', 'kienzan', 'kaioken', 'genkiDama'];
+                    const DROPPABLE_POWERUPS = ['rapidFire', 'shield', 'shrink', 'magnet', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'life', 'prism', 'seeker', 'plasmaBeam', 'buzzsaw', 'overdrive', 'supernova'];
                     if (Math.random() < DROP_RATE) {
                         const type = DROPPABLE_POWERUPS[Math.floor(Math.random() * DROPPABLE_POWERUPS.length)];
                         spawnPowerUp(asteroid.x, asteroid.y, type);
@@ -2789,27 +2789,27 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (type === 'magnet') {
             text = '🧲 Magnet';
             glowColor = '#e74c3c';
-        } else if (type === 'rainbow') {
-            text = '🌈 Arc-en-ciel';
-            glowColor = '#ff0080';
+        } else if (type === 'prism') {
+            text = '💎 Prisme';
+            glowColor = '#aa66ff';
         } else if (type === 'shockwave') {
             text = '🌀 Onde de choc';
             glowColor = '#00ccff';
-        } else if (type === 'homing') {
-            text = '➰ Tir homing';
-            glowColor = '#00ff88';
-        } else if (type === 'kamehameha') {
-            text = '💥 Kamehameha';
-            glowColor = '#00aaff';
-        } else if (type === 'kienzan') {
-            text = '⭕ Kienzan';
-            glowColor = '#ffcc00';
-        } else if (type === 'kaioken') {
-            text = '🔴 Kaioken';
-            glowColor = '#ff2222';
-        } else if (type === 'genkiDama') {
-            text = '🔵 Genki Dama';
-            glowColor = '#4488ff';
+        } else if (type === 'seeker') {
+            text = '🎯 Chercheur';
+            glowColor = '#00dd88';
+        } else if (type === 'plasmaBeam') {
+            text = '💫 Faisceau plasma';
+            glowColor = '#8866ff';
+        } else if (type === 'buzzsaw') {
+            text = '🔄 Scie circulaire';
+            glowColor = '#ff9900';
+        } else if (type === 'overdrive') {
+            text = '🔶 Survolt';
+            glowColor = '#ff6600';
+        } else if (type === 'supernova') {
+            text = '☄️ Supernova';
+            glowColor = '#ff8844';
         }
         
         // Position aléatoire pour le texte (à côté du vaisseau)
@@ -3043,13 +3043,13 @@ document.addEventListener('DOMContentLoaded', function() {
         else if (type === 'timeSlow') color = '#9b59b6';
         else if (type === 'offensiveShield') color = '#ff6b6b';
         else if (type === 'magnet') color = '#e74c3c';
-        else if (type === 'rainbow') color = '#ff0080';
+        else if (type === 'prism') color = '#aa66ff';
         else if (type === 'shockwave') color = '#00ccff';
-        else if (type === 'homing') color = '#00ff88';
-        else if (type === 'kamehameha') color = '#00aaff';
-        else if (type === 'kienzan') color = '#ffcc00';
-        else if (type === 'kaioken') color = '#ff2222';
-        else if (type === 'genkiDama') color = '#4488ff';
+        else if (type === 'seeker') color = '#00dd88';
+        else if (type === 'plasmaBeam') color = '#8866ff';
+        else if (type === 'buzzsaw') color = '#ff9900';
+        else if (type === 'overdrive') color = '#ff6600';
+        else if (type === 'supernova') color = '#ff8844';
         
         powerUps.push({
             x: x,
@@ -3062,7 +3062,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Durées de base pour le stack (stack = durée uniquement)
-    const BONUS_DURATIONS = { rapidFire: 10000, shield: 8000, shrink: 12000, bigBullets: 15000, tripleShot: 10000, timeSlow: 12000, offensiveShield: 15000, magnet: 20000, rainbow: 12000, homing: 10000, kaioken: 10000, kamehameha: 10000, kienzan: 10000 };
+    const BONUS_DURATIONS = { rapidFire: 10000, shield: 8000, shrink: 12000, bigBullets: 15000, tripleShot: 10000, timeSlow: 12000, offensiveShield: 15000, magnet: 20000, prism: 12000, seeker: 10000, overdrive: 10000, plasmaBeam: 10000, buzzsaw: 10000 };
     
     function applyTimedBonus(type, endTimeKey) {
         const now = Date.now();
@@ -3109,26 +3109,26 @@ document.addEventListener('DOMContentLoaded', function() {
             applyTimedBonus('offensiveShield', 'offensiveShieldEndTime');
         } else if (powerUp.type === 'magnet') {
             applyTimedBonus('magnet', 'magnetEndTime');
-        } else if (powerUp.type === 'rainbow') {
-            applyTimedBonus('rainbow', 'rainbowEndTime');
+        } else if (powerUp.type === 'prism') {
+            applyTimedBonus('prism', 'prismEndTime');
         } else if (powerUp.type === 'shockwave') {
             activePowerUps.shockwaveCharges = Math.min(2, (activePowerUps.shockwaveCharges || 0) + 1);
             createPowerUpVisualAnimation('shockwave', ship.x, ship.y);
-        } else if (powerUp.type === 'homing') {
-            applyTimedBonus('homing', 'homingEndTime');
-        } else if (powerUp.type === 'kamehameha') {
-            applyTimedBonus('kamehameha', 'kamehamehaEndTime');
-        } else if (powerUp.type === 'kienzan') {
-            applyTimedBonus('kienzan', 'kienzanEndTime');
-        } else if (powerUp.type === 'kaioken') {
-            applyTimedBonus('kaioken', 'kaiokenEndTime');
-        } else if (powerUp.type === 'genkiDama') {
-            if (!genkiDamaEffect) {
-                genkiDamaEffect = { x: ship.x, y: ship.y, radius: 0, maxRadius: Math.max(canvas.width, canvas.height) * 0.7, speed: 32 };
+        } else if (powerUp.type === 'seeker') {
+            applyTimedBonus('seeker', 'seekerEndTime');
+        } else if (powerUp.type === 'plasmaBeam') {
+            applyTimedBonus('plasmaBeam', 'plasmaBeamEndTime');
+        } else if (powerUp.type === 'buzzsaw') {
+            applyTimedBonus('buzzsaw', 'buzzsawEndTime');
+        } else if (powerUp.type === 'overdrive') {
+            applyTimedBonus('overdrive', 'overdriveEndTime');
+        } else if (powerUp.type === 'supernova') {
+            if (!supernovaEffect) {
+                supernovaEffect = { x: ship.x, y: ship.y, radius: 0, maxRadius: Math.max(canvas.width, canvas.height) * 0.7, speed: 32 };
                 playSound('explosion');
                 screenShake.intensity = Math.max(screenShake.intensity, 12);
             }
-            createPowerUpVisualAnimation('genkiDama', ship.x, ship.y);
+            createPowerUpVisualAnimation('supernova', ship.x, ship.y);
         }
         
         gameStats.powerUpsCollected++;
@@ -4168,30 +4168,32 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
+    // Cadence effective : tous les bonus de tir se cumulent (fusion)
+    function getEffectiveFireRate() {
+        const now = Date.now();
+        let rate = currentFireRate;
+        // Prisme n'augmente plus la cadence : il ajoute 3 projectiles RGB par tir (dans shoot())
+        if (activePowerUps.overdrive && now < activePowerUps.overdriveEndTime) rate *= 0.45;
+        return rate;
+    }
+    
     function shoot() {
         gameStats.bulletsFired++;
         if (!gameState.isPlaying || gameState.isPaused) return;
         
-        // Vérifie le cooldown de tir
-        const now = Date.now();
-        const rainbowActive = activePowerUps.rainbow && now < activePowerUps.rainbowEndTime;
-        const kaiokenActive = activePowerUps.kaioken && now < activePowerUps.kaiokenEndTime;
-        let effectiveFireRate = currentFireRate;
-        if (rainbowActive) effectiveFireRate *= 2;
-        else if (kaiokenActive) effectiveFireRate *= 0.45;
-        if (now - lastShotTime < effectiveFireRate) {
-            return;
-        }
-        
-        lastShotTime = now;
+        const effectiveFireRate = getEffectiveFireRate();
+        if (Date.now() - lastShotTime < effectiveFireRate) return;
+        lastShotTime = Date.now();
         
         const bulletSize = activePowerUps.bigBullets ? 8 : 4;
+        const now = Date.now();
+        const prismActive = activePowerUps.prism && now < activePowerUps.prismEndTime;
         
         if (activePowerUps.tripleShot) {
             // Tir triple : 3 projectiles en éventail
-        bullets.push({
-            x: ship.x,
-            y: ship.y - ship.height / 2,
+            bullets.push({
+                x: ship.x,
+                y: ship.y - ship.height / 2,
                 speed: 8,
                 vx: -0.5,
                 vy: -8,
@@ -4220,6 +4222,31 @@ document.addEventListener('DOMContentLoaded', function() {
                 speed: 8,
                 size: bulletSize
             });
+        }
+        
+        // Prisme : chaque tir "se divise" en 3 (2 projectiles supplémentaires en éventail serré)
+        if (prismActive) {
+            const count = activePowerUps.tripleShot ? 3 : 1;
+            const start = bullets.length - count;
+            for (let i = 0; i < count; i++) {
+                const ref = bullets[start + i];
+                bullets.push({
+                    x: ref.x,
+                    y: ref.y,
+                    speed: ref.speed,
+                    vx: (ref.vx || 0) - 0.35,
+                    vy: ref.vy !== undefined ? ref.vy : -8,
+                    size: ref.size
+                });
+                bullets.push({
+                    x: ref.x,
+                    y: ref.y,
+                    speed: ref.speed,
+                    vx: (ref.vx || 0) + 0.35,
+                    vy: ref.vy !== undefined ? ref.vy : -8,
+                    size: ref.size
+                });
+            }
         }
         
         playSound('shoot');
@@ -4312,7 +4339,7 @@ document.addEventListener('DOMContentLoaded', function() {
                                 if (gameState.isPlaying && !gameState.isPaused && keys['Space']) {
                                     shoot();
                                 }
-                            }, currentFireRate);
+                            }, getEffectiveFireRate());
                         };
                         startAutoShoot();
                     }
@@ -4324,14 +4351,14 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             if (gameState.isPlaying) {
                 shoot();
-                // Démarrer le tir automatique
+                // Démarrer le tir automatique (cadence = fusion des bonus)
                 if (!autoShootInterval) {
                     const startAutoShoot = () => {
                         autoShootInterval = setInterval(() => {
                             if (gameState.isPlaying && !gameState.isPaused && keys['Space']) {
                                 shoot();
                             }
-                        }, currentFireRate);
+                        }, getEffectiveFireRate());
                     };
                     startAutoShoot();
                 }
