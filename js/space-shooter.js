@@ -41,12 +41,10 @@ document.addEventListener('DOMContentLoaded', function() {
         offensiveShield: '🛡️',
         magnet: '🧲',
         prism: '💎',
-        shockwave: '🌀',
         seeker: '🎯',
-        plasmaBeam: '💫',
-        buzzsaw: '🔄',
         overdrive: '🔶',
-        supernova: '☄️'
+        slowTarget: '🔮',
+        mirrorShield: '🪞'
     };
     
     // Système de thèmes qui change tous les 10 niveaux
@@ -441,11 +439,10 @@ document.addEventListener('DOMContentLoaded', function() {
         offensiveShield: false,
         magnet: false,
         prism: false,
-        shockwaveCharges: 0,
         seeker: false,
         overdrive: false,
-        plasmaBeam: false,
-        buzzsaw: false,
+        slowTarget: false,
+        mirrorShield: false,
         rapidFireEndTime: 0,
         shieldEndTime: 0,
         shrinkEndTime: 0,
@@ -457,10 +454,12 @@ document.addEventListener('DOMContentLoaded', function() {
         prismEndTime: 0,
         seekerEndTime: 0,
         overdriveEndTime: 0,
-        plasmaBeamEndTime: 0,
-        buzzsawEndTime: 0
+        slowTargetEndTime: 0,
+        mirrorShieldEndTime: 0
     };
-    let supernovaEffect = null;
+    
+    // Astéroïdes renvoyés par le bouclier miroir (se déplacent comme des projectiles, apparence + hitbox astéroïde)
+    let reflectedAsteroids = [];
     
     // Multiplicateur de ralentissement temporel
     let timeSlowMultiplier = 1.0;
@@ -470,7 +469,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Effet de shake de l'écran
     let screenShake = { x: 0, y: 0, intensity: 0 };
-    let shockwaveEffect = null;
     const BROLY_MUSIC_SRC = '../ressources/Sons/Broly-Transformation.mp3';
     const BEERUS_MUSIC_SRC = '../ressources/Sons/Beerus-Goku.mp3';
     let brolyAudio = null;
@@ -1041,11 +1039,10 @@ document.addEventListener('DOMContentLoaded', function() {
             offensiveShield: false,
             magnet: false,
             prism: false,
-            shockwaveCharges: 0,
             seeker: false,
             overdrive: false,
-            plasmaBeam: false,
-            buzzsaw: false,
+            slowTarget: false,
+            mirrorShield: false,
             rapidFireEndTime: 0,
             shieldEndTime: 0,
             shrinkEndTime: 0,
@@ -1057,13 +1054,12 @@ document.addEventListener('DOMContentLoaded', function() {
             prismEndTime: 0,
             seekerEndTime: 0,
             overdriveEndTime: 0,
-            plasmaBeamEndTime: 0,
-            buzzsawEndTime: 0
+            slowTargetEndTime: 0,
+            mirrorShieldEndTime: 0
         };
+        reflectedAsteroids = [];
         timeSlowMultiplier = 1.0;
         lastShotTime = 0;
-        shockwaveEffect = null;
-        supernovaEffect = null;
         if (currentLevelDisplay) {
             currentLevelDisplay.textContent = gameState.level;
         }
@@ -1095,7 +1091,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const activeBuffs = [];
         
         // Vérifier chaque type de buff
-        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet', 'prism', 'seeker', 'overdrive', 'plasmaBeam', 'buzzsaw'];
+        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet', 'prism', 'seeker', 'overdrive', 'slowTarget', 'mirrorShield'];
         buffTypes.forEach(buffType => {
             const isActive = activePowerUps[buffType] && now < activePowerUps[`${buffType}EndTime`];
             if (isActive) {
@@ -1109,10 +1105,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
-        if ((activePowerUps.shockwaveCharges || 0) > 0) {
-            activeBuffs.push({ type: 'shockwave', emoji: buffEmojis.shockwave, timeLeft: null, charges: activePowerUps.shockwaveCharges });
-        }
-        
         // Vider le conteneur
         activeBuffsContainer.innerHTML = '';
         
@@ -1306,8 +1298,6 @@ document.addEventListener('DOMContentLoaded', function() {
         const brolyAuraActive = brolyAudio && !brolyAudio.paused;
         const beerusAuraActive = beerusAudio && !beerusAudio.paused;
         const overdriveActive = activePowerUps.overdrive && now < activePowerUps.overdriveEndTime;
-        const plasmaBeamActive = activePowerUps.plasmaBeam && now < activePowerUps.plasmaBeamEndTime;
-        const buzzsawActive = activePowerUps.buzzsaw && now < activePowerUps.buzzsawEndTime;
         function hslToRgb(h, s, l) {
             h = h / 360;
             let r, g, b;
@@ -1327,7 +1317,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         bullets.forEach((bullet, bulletIndex) => {
             const bulletSize = bullet.size || 4;
-            const anyVisual = prismActive || brolyAuraActive || beerusAuraActive || overdriveActive || plasmaBeamActive || buzzsawActive;
+            const anyVisual = prismActive || brolyAuraActive || beerusAuraActive || overdriveActive;
             if (!anyVisual) {
                 ctx.save();
                 ctx.translate(bullet.x, bullet.y);
@@ -1346,39 +1336,21 @@ document.addEventListener('DOMContentLoaded', function() {
             if (brolyAuraActive) colors.push([0, 255, 136]);
             if (beerusAuraActive) colors.push([255, 68, 102]);
             if (overdriveActive) colors.push([255, 102, 0]);
-            if (plasmaBeamActive) colors.push([136, 102, 255]);
-            if (buzzsawActive) colors.push([255, 153, 0]);
             let r = 0, g = 0, b = 0;
             colors.forEach(([rr, gg, bb]) => { r += rr; g += gg; b += bb; });
             r = Math.min(255, Math.round(r / colors.length));
             g = Math.min(255, Math.round(g / colors.length));
             b = Math.min(255, Math.round(b / colors.length));
             const blend = `rgb(${r},${g},${b})`;
-            const shape = plasmaBeamActive ? 'beam' : buzzsawActive ? 'disc' : prismActive ? 'bar' : 'circle';
+            const shape = prismActive ? 'bar' : 'circle';
             const shadowBlur = gameState.isMobile ? 10 : 14;
             ctx.save();
             ctx.translate(bullet.x, bullet.y);
-            if (shape === 'bar' || shape === 'disc') ctx.rotate((Date.now() * 0.008 + bulletIndex) * (shape === 'bar' ? 0.02 : 1));
+            if (shape === 'bar') ctx.rotate((Date.now() * 0.008 + bulletIndex) * 0.02);
             ctx.fillStyle = blend;
             ctx.shadowBlur = shadowBlur;
             ctx.shadowColor = blend;
-            if (shape === 'beam') {
-                const beamH = 40, beamW = bulletSize * 3;
-                const grad = ctx.createLinearGradient(0, -beamH, 0, 4);
-                grad.addColorStop(0, `rgba(${r},${g},${b},0.4)`);
-                grad.addColorStop(0.5, `rgba(${r},${g},${b},0.8)`);
-                grad.addColorStop(1, `rgba(${r},${g},${b},0.95)`);
-                ctx.fillStyle = grad;
-                ctx.shadowColor = blend;
-                ctx.fillRect(-beamW/2, -beamH, beamW, beamH + 4);
-            } else if (shape === 'disc') {
-                ctx.strokeStyle = blend;
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                ctx.arc(0, 0, bulletSize * 1.5, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.stroke();
-            } else if (shape === 'bar') {
+            if (shape === 'bar') {
                 const barW = bulletSize * 1.2, barH = bulletSize * 8;
                 ctx.fillRect(-barW/2, -barH/2, barW, barH);
             } else {
@@ -1394,6 +1366,8 @@ document.addEventListener('DOMContentLoaded', function() {
         asteroids.forEach(asteroid => {
             drawAsteroid(asteroid);
         });
+        // Astéroïdes renvoyés par le bouclier miroir (même apparence, même hitbox)
+        reflectedAsteroids.forEach(r => drawAsteroid(r));
         
         // Boosts
         powerUps.forEach(powerUp => {
@@ -1404,45 +1378,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (activePowerUps.shield && Date.now() < activePowerUps.shieldEndTime) {
             drawShield();
         }
-        
-        // Onde de choc (cercle qui s'étend)
-        if (shockwaveEffect) {
-            ctx.save();
-            const alpha = 0.7 - (shockwaveEffect.radius / shockwaveEffect.maxRadius) * 0.5;
-            ctx.strokeStyle = `rgba(0, 220, 255, ${alpha})`;
-            ctx.lineWidth = 4;
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = 'rgba(0, 200, 255, 0.8)';
-            ctx.beginPath();
-            ctx.arc(shockwaveEffect.x, shockwaveEffect.y, shockwaveEffect.radius, 0, Math.PI * 2);
-            ctx.stroke();
-            ctx.shadowBlur = 0;
-            ctx.restore();
-        }
-        
-        // Supernova (onde destructrice orange/rouge)
-        if (supernovaEffect) {
-            ctx.save();
-            const alpha = 0.85 - (supernovaEffect.radius / supernovaEffect.maxRadius) * 0.5;
-            const grad = ctx.createRadialGradient(
-                supernovaEffect.x, supernovaEffect.y, 0,
-                supernovaEffect.x, supernovaEffect.y, supernovaEffect.radius
-            );
-            grad.addColorStop(0, 'rgba(255, 220, 150, 0.7)');
-            grad.addColorStop(0.3, `rgba(255, 140, 60, ${alpha * 0.6})`);
-            grad.addColorStop(0.7, `rgba(200, 60, 20, ${alpha * 0.3})`);
-            grad.addColorStop(1, 'rgba(100, 20, 0, 0)');
-            ctx.fillStyle = grad;
-            ctx.beginPath();
-            ctx.arc(supernovaEffect.x, supernovaEffect.y, supernovaEffect.radius, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = `rgba(255, 180, 80, ${alpha})`;
-            ctx.lineWidth = 3;
-            ctx.shadowBlur = 35;
-            ctx.shadowColor = '#ff6644';
-            ctx.stroke();
-            ctx.shadowBlur = 0;
-            ctx.restore();
+        // Bouclier miroir actif (visuel distinct)
+        if (activePowerUps.mirrorShield && Date.now() < activePowerUps.mirrorShieldEndTime) {
+            drawMirrorShield();
         }
         
         // Particules avec effets stylés selon le type (optimisé pour mobile)
@@ -2066,18 +2004,6 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.strokeStyle = 'rgba(255,255,255,0.7)';
             ctx.lineWidth = 1.5;
             ctx.stroke();
-        } else if (powerUp.type === 'shockwave') {
-            ctx.fillStyle = '#00ccff';
-            ctx.strokeStyle = '#0088ff';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(0, 0, 10, 0, Math.PI * 2);
-            ctx.stroke();
-            for (let r = 4; r <= 8; r += 2) {
-                ctx.beginPath();
-                ctx.arc(0, 0, r, 0, Math.PI * 2);
-                ctx.stroke();
-            }
         } else if (powerUp.type === 'seeker') {
             ctx.fillStyle = '#00dd88';
             ctx.strokeStyle = '#00aa66';
@@ -2088,32 +2014,6 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.quadraticCurveTo(-9, 0, 0, -10);
             ctx.fill();
             ctx.stroke();
-        } else if (powerUp.type === 'plasmaBeam') {
-            const g = ctx.createLinearGradient(-12, -12, 12, 12);
-            g.addColorStop(0, '#aa66ff');
-            g.addColorStop(0.5, '#6644cc');
-            g.addColorStop(1, '#332288');
-            ctx.fillStyle = g;
-            ctx.beginPath();
-            ctx.moveTo(0, -12);
-            ctx.lineTo(-4, 12);
-            ctx.lineTo(0, 8);
-            ctx.lineTo(4, 12);
-            ctx.closePath();
-            ctx.fill();
-            ctx.strokeStyle = '#8866ff';
-            ctx.stroke();
-        } else if (powerUp.type === 'buzzsaw') {
-            ctx.strokeStyle = '#ff9900';
-            ctx.fillStyle = 'rgba(255,180,0,0.3)';
-            ctx.lineWidth = 2;
-            ctx.beginPath();
-            ctx.arc(0, 0, 10, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.arc(0, 0, 5, 0, Math.PI * 2);
-            ctx.stroke();
         } else if (powerUp.type === 'overdrive') {
             ctx.fillStyle = '#ff6600';
             ctx.strokeStyle = '#cc4400';
@@ -2122,17 +2022,31 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.arc(0, 0, 10, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
-        } else if (powerUp.type === 'supernova') {
-            const g = ctx.createRadialGradient(0, 0, 0, 0, 0, 12);
-            g.addColorStop(0, '#ffdd88');
-            g.addColorStop(0.4, '#ff8844');
-            g.addColorStop(0.8, '#cc4400');
-            g.addColorStop(1, '#662200');
-            ctx.fillStyle = g;
+        } else if (powerUp.type === 'slowTarget') {
+            ctx.fillStyle = '#9b59b6';
+            ctx.strokeStyle = '#6c3483';
+            ctx.lineWidth = 2;
             ctx.beginPath();
-            ctx.arc(0, 0, 11, 0, Math.PI * 2);
+            ctx.moveTo(0, -10);
+            ctx.lineTo(6, 8);
+            ctx.lineTo(0, 4);
+            ctx.lineTo(-6, 8);
+            ctx.closePath();
             ctx.fill();
-            ctx.strokeStyle = '#ffaa44';
+            ctx.stroke();
+        } else if (powerUp.type === 'mirrorShield') {
+            ctx.strokeStyle = '#00ccff';
+            ctx.fillStyle = 'rgba(0, 200, 255, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, 10, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(-8, 0);
+            ctx.lineTo(8, 0);
+            ctx.moveTo(0, -8);
+            ctx.lineTo(0, 8);
             ctx.stroke();
         }
         
@@ -2155,6 +2069,23 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.arc(0, 0, (ship.width / 2 + 10) * pulse, 0, Math.PI * 2);
         ctx.stroke();
         
+        ctx.restore();
+    }
+    
+    function drawMirrorShield() {
+        ctx.save();
+        ctx.translate(ship.x, ship.y);
+        const pulse = Math.sin(Date.now() / 120) * 0.08 + 1;
+        ctx.globalAlpha = 0.6;
+        ctx.strokeStyle = '#00ccff';
+        ctx.lineWidth = 2;
+        ctx.setLineDash([6, 4]);
+        ctx.shadowBlur = 15;
+        ctx.shadowColor = '#00aacc';
+        ctx.beginPath();
+        ctx.arc(0, 0, (ship.width / 2 + 10) * pulse, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.setLineDash([]);
         ctx.restore();
     }
     
@@ -2323,62 +2254,37 @@ document.addEventListener('DOMContentLoaded', function() {
             screenShake.y = 0;
         }
         
-        // Onde de choc : expansion et destruction des astéroïdes touchés
-        if (shockwaveEffect) {
-            shockwaveEffect.radius += shockwaveEffect.speed * gameState.deltaTime;
-            screenShake.intensity = Math.max(screenShake.intensity, 5);
-            for (let i = asteroids.length - 1; i >= 0; i--) {
-                const a = asteroids[i];
-                const d = Math.sqrt((shockwaveEffect.x - a.x) ** 2 + (shockwaveEffect.y - a.y) ** 2);
-                if (d < shockwaveEffect.radius + a.size) {
-                    createEnhancedExplosion(a.x, a.y, a.color, a.size);
-                    if (!gameState.bossActive) {
-                        const points = Math.floor(a.size / 5) * 10;
-                        gameState.score += points;
-                        if (scoreElement) scoreElement.textContent = gameState.score;
-                        checkAndUpdateHighScore();
-                        createScoreParticle(a.x, a.y, `+${points}`);
-                    }
-                    gameStats.asteroidsDestroyed++;
-                    asteroids.splice(i, 1);
-                }
-            }
-            if (shockwaveEffect.radius >= shockwaveEffect.maxRadius) {
-                shockwaveEffect = null;
-            }
-        }
-        
-        // Genki Dama (déclenché à la collecte)
-        if (supernovaEffect) {
-            supernovaEffect.radius += supernovaEffect.speed * gameState.deltaTime;
-            screenShake.intensity = Math.max(screenShake.intensity, 6);
-            for (let i = asteroids.length - 1; i >= 0; i--) {
-                const a = asteroids[i];
-                const d = Math.sqrt((supernovaEffect.x - a.x) ** 2 + (supernovaEffect.y - a.y) ** 2);
-                if (d < supernovaEffect.radius + a.size) {
-                    createEnhancedExplosion(a.x, a.y, a.color, a.size);
-                    if (!gameState.bossActive) {
-                        const points = Math.floor(a.size / 5) * 10;
-                        gameState.score += points;
-                        if (scoreElement) scoreElement.textContent = gameState.score;
-                        checkAndUpdateHighScore();
-                        createScoreParticle(a.x, a.y, `+${points}`);
-                    }
-                    gameStats.asteroidsDestroyed++;
-                    asteroids.splice(i, 1);
-                }
-            }
-            if (supernovaEffect.radius >= supernovaEffect.maxRadius) supernovaEffect = null;
-        }
-        
         // Mise à jour des astéroïdes (normalisé par delta time)
         const slowMultiplier = activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime ? timeSlowMultiplier : 1.0;
+        const slowTargetActive = activePowerUps.slowTarget && Date.now() < activePowerUps.slowTargetEndTime;
+        const CONE_DIST = 350;
+        const CONE_COS = 0.7; // ~45° devant le vaisseau
         asteroids.forEach((asteroid, index) => {
-            asteroid.y += asteroid.speed * slowMultiplier * gameState.deltaTime;
-            asteroid.rotation += asteroid.rotationSpeed * slowMultiplier * gameState.deltaTime;
+            let mul = slowMultiplier;
+            if (slowTargetActive && asteroid.y < ship.y) {
+                const dx = asteroid.x - ship.x;
+                const dy = asteroid.y - ship.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist > 0 && dist < CONE_DIST && (ship.y - asteroid.y) / dist >= CONE_COS) {
+                    mul *= 0.35;
+                }
+            }
+            asteroid.y += asteroid.speed * mul * gameState.deltaTime;
+            asteroid.rotation += asteroid.rotationSpeed * mul * gameState.deltaTime;
             
             if (asteroid.y > canvas.height + 50) {
                 asteroids.splice(index, 1);
+            }
+        });
+        
+        // Mise à jour des astéroïdes renvoyés par le bouclier miroir (montent comme des projectiles)
+        const slowMulReflected = activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime ? timeSlowMultiplier : 1.0;
+        reflectedAsteroids.forEach((r, idx) => {
+            r.y += r.vy * slowMulReflected * gameState.deltaTime;
+            r.x += (r.vx || 0) * slowMulReflected * gameState.deltaTime;
+            r.rotation += (r.rotationSpeed || 0) * slowMulReflected * gameState.deltaTime;
+            if (r.y < -50 || r.y > canvas.height + 50 || r.x < -50 || r.x > canvas.width + 50) {
+                reflectedAsteroids.splice(idx, 1);
             }
         });
         
@@ -2482,13 +2388,12 @@ document.addEventListener('DOMContentLoaded', function() {
         if (activePowerUps.overdrive && now > activePowerUps.overdriveEndTime) {
             activePowerUps.overdrive = false;
         }
-        if (activePowerUps.plasmaBeam && now > activePowerUps.plasmaBeamEndTime) {
-            activePowerUps.plasmaBeam = false;
+        if (activePowerUps.slowTarget && now > activePowerUps.slowTargetEndTime) {
+            activePowerUps.slowTarget = false;
         }
-        if (activePowerUps.buzzsaw && now > activePowerUps.buzzsawEndTime) {
-            activePowerUps.buzzsaw = false;
+        if (activePowerUps.mirrorShield && now > activePowerUps.mirrorShieldEndTime) {
+            activePowerUps.mirrorShield = false;
         }
-        
         // Mettre à jour les icônes de buff
         updateBuffIcons();
         
@@ -2519,8 +2424,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     gameStats.asteroidsDestroyed++;
                     gameStats.bulletsHit++;
                     
-                    // Supprimer le projectile sauf si Scie circulaire (perçant)
-                    if (!activePowerUps.buzzsaw) bullets.splice(bulletIndex, 1);
+                    // Perceur (prism) : projectile perçant, ne pas le supprimer
+                    if (!(activePowerUps.prism && Date.now() < activePowerUps.prismEndTime)) {
+                        bullets.splice(bulletIndex, 1);
+                    }
                     
                     // Vérifier si l'astéroïde doit se séparer
                     const isBigType = asteroid.size >= 48;  // Gros type : toujours se divise en gros morceaux
@@ -2566,7 +2473,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     
                     // Chance de faire apparaître un boost — tous les bonus à égalité (1% chacun)
                     const DROP_RATE = 0.12;
-                    const DROPPABLE_POWERUPS = ['rapidFire', 'shield', 'shrink', 'magnet', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'life', 'prism', 'seeker', 'plasmaBeam', 'buzzsaw', 'overdrive', 'supernova'];
+                    const DROPPABLE_POWERUPS = ['rapidFire', 'shield', 'shrink', 'magnet', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'life', 'prism', 'seeker', 'overdrive', 'slowTarget', 'mirrorShield'];
                     if (Math.random() < DROP_RATE) {
                         const type = DROPPABLE_POWERUPS[Math.floor(Math.random() * DROPPABLE_POWERUPS.length)];
                         spawnPowerUp(asteroid.x, asteroid.y, type);
@@ -2581,6 +2488,33 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         });
         
+        // Collision astéroïdes renvoyés (miroir) vs astéroïdes normaux
+        for (let ri = reflectedAsteroids.length - 1; ri >= 0; ri--) {
+            const ref = reflectedAsteroids[ri];
+            for (let ai = asteroids.length - 1; ai >= 0; ai--) {
+                const a = asteroids[ai];
+                const dx = ref.x - a.x;
+                const dy = ref.y - a.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < ref.size + a.size) {
+                    createEnhancedExplosion(a.x, a.y, a.color, a.size);
+                    playSound('explosion');
+                    if (!gameState.bossActive) {
+                        const points = Math.floor(a.size / 5) * 10;
+                        gameState.score += points;
+                        if (scoreElement) scoreElement.textContent = gameState.score;
+                        checkAndUpdateHighScore();
+                        createScoreParticle(a.x, a.y, `+${points}`);
+                    }
+                    gameStats.asteroidsDestroyed++;
+                    asteroids.splice(ai, 1);
+                    reflectedAsteroids.splice(ri, 1);
+                    checkLevel();
+                    break;
+                }
+            }
+        }
+        
         // Collision vaisseau/astéroïdes
         asteroids.forEach((asteroid, index) => {
             const dx = ship.x - asteroid.x;
@@ -2588,13 +2522,27 @@ document.addEventListener('DOMContentLoaded', function() {
             const distance = Math.sqrt(dx * dx + dy * dy);
             
             const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
+            const shieldRadius = ship.width / 2 + 10;
             if (distance < asteroid.size + shipSize) {
-                // Si le bouclier est actif, l'astéroïde est détruit sans perdre de vie
-                if (activePowerUps.shield && Date.now() < activePowerUps.shieldEndTime) {
+                // Bouclier miroir : renvoyer l'astéroïde dans l'autre sens (il devient un "projectile" à l'apparence d'astéroïde)
+                if (activePowerUps.mirrorShield && Date.now() < activePowerUps.mirrorShieldEndTime && distance < asteroid.size + shieldRadius) {
+                    playSound('hit');
+                    reflectedAsteroids.push({
+                        x: asteroid.x,
+                        y: asteroid.y,
+                        vx: 0,
+                        vy: -10,
+                        size: asteroid.size,
+                        color: asteroid.color,
+                        rotation: asteroid.rotation,
+                        rotationSpeed: asteroid.rotationSpeed || (Math.random() - 0.5) * 0.1
+                    });
+                    asteroids.splice(index, 1);
+                } else if (activePowerUps.shield && Date.now() < activePowerUps.shieldEndTime) {
+                    // Si le bouclier normal est actif, l'astéroïde est détruit sans perdre de vie
                     createEnhancedExplosion(asteroid.x, asteroid.y, asteroid.color, asteroid.size);
                     playSound('hit');
                     asteroids.splice(index, 1);
-                    // Animation visuelle remplace le message texte
                 } else {
                 // Explosion
                     createEnhancedExplosion(ship.x, ship.y, ship.color, 30);
@@ -2790,26 +2738,20 @@ document.addEventListener('DOMContentLoaded', function() {
             text = '🧲 Magnet';
             glowColor = '#e74c3c';
         } else if (type === 'prism') {
-            text = '💎 Prisme';
+            text = '💎 Perceur (arc-en-ciel)';
             glowColor = '#aa66ff';
-        } else if (type === 'shockwave') {
-            text = '🌀 Onde de choc';
-            glowColor = '#00ccff';
         } else if (type === 'seeker') {
             text = '🎯 Chercheur';
             glowColor = '#00dd88';
-        } else if (type === 'plasmaBeam') {
-            text = '💫 Faisceau plasma';
-            glowColor = '#8866ff';
-        } else if (type === 'buzzsaw') {
-            text = '🔄 Scie circulaire';
-            glowColor = '#ff9900';
         } else if (type === 'overdrive') {
             text = '🔶 Survolt';
             glowColor = '#ff6600';
-        } else if (type === 'supernova') {
-            text = '☄️ Supernova';
-            glowColor = '#ff8844';
+        } else if (type === 'slowTarget') {
+            text = '🎯 Ralenti cible';
+            glowColor = '#9b59b6';
+        } else if (type === 'mirrorShield') {
+            text = '🪞 Bouclier miroir';
+            glowColor = '#00ccff';
         }
         
         // Position aléatoire pour le texte (à côté du vaisseau)
@@ -3044,12 +2986,10 @@ document.addEventListener('DOMContentLoaded', function() {
         else if (type === 'offensiveShield') color = '#ff6b6b';
         else if (type === 'magnet') color = '#e74c3c';
         else if (type === 'prism') color = '#aa66ff';
-        else if (type === 'shockwave') color = '#00ccff';
         else if (type === 'seeker') color = '#00dd88';
-        else if (type === 'plasmaBeam') color = '#8866ff';
-        else if (type === 'buzzsaw') color = '#ff9900';
         else if (type === 'overdrive') color = '#ff6600';
-        else if (type === 'supernova') color = '#ff8844';
+        else if (type === 'slowTarget') color = '#9b59b6';
+        else if (type === 'mirrorShield') color = '#00ccff';
         
         powerUps.push({
             x: x,
@@ -3062,7 +3002,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Durées de base pour le stack (stack = durée uniquement)
-    const BONUS_DURATIONS = { rapidFire: 10000, shield: 8000, shrink: 12000, bigBullets: 15000, tripleShot: 10000, timeSlow: 12000, offensiveShield: 15000, magnet: 20000, prism: 12000, seeker: 10000, overdrive: 10000, plasmaBeam: 10000, buzzsaw: 10000 };
+    const BONUS_DURATIONS = { rapidFire: 10000, shield: 8000, shrink: 12000, bigBullets: 15000, tripleShot: 10000, timeSlow: 12000, offensiveShield: 15000, magnet: 20000, prism: 12000, seeker: 10000, overdrive: 10000, slowTarget: 10000, mirrorShield: 12000 };
     
     function applyTimedBonus(type, endTimeKey) {
         const now = Date.now();
@@ -3111,24 +3051,14 @@ document.addEventListener('DOMContentLoaded', function() {
             applyTimedBonus('magnet', 'magnetEndTime');
         } else if (powerUp.type === 'prism') {
             applyTimedBonus('prism', 'prismEndTime');
-        } else if (powerUp.type === 'shockwave') {
-            activePowerUps.shockwaveCharges = Math.min(2, (activePowerUps.shockwaveCharges || 0) + 1);
-            createPowerUpVisualAnimation('shockwave', ship.x, ship.y);
         } else if (powerUp.type === 'seeker') {
             applyTimedBonus('seeker', 'seekerEndTime');
-        } else if (powerUp.type === 'plasmaBeam') {
-            applyTimedBonus('plasmaBeam', 'plasmaBeamEndTime');
-        } else if (powerUp.type === 'buzzsaw') {
-            applyTimedBonus('buzzsaw', 'buzzsawEndTime');
         } else if (powerUp.type === 'overdrive') {
             applyTimedBonus('overdrive', 'overdriveEndTime');
-        } else if (powerUp.type === 'supernova') {
-            if (!supernovaEffect) {
-                supernovaEffect = { x: ship.x, y: ship.y, radius: 0, maxRadius: Math.max(canvas.width, canvas.height) * 0.7, speed: 32 };
-                playSound('explosion');
-                screenShake.intensity = Math.max(screenShake.intensity, 12);
-            }
-            createPowerUpVisualAnimation('supernova', ship.x, ship.y);
+        } else if (powerUp.type === 'slowTarget') {
+            applyTimedBonus('slowTarget', 'slowTargetEndTime');
+        } else if (powerUp.type === 'mirrorShield') {
+            applyTimedBonus('mirrorShield', 'mirrorShieldEndTime');
         }
         
         gameStats.powerUpsCollected++;
@@ -4186,8 +4116,6 @@ document.addEventListener('DOMContentLoaded', function() {
         lastShotTime = Date.now();
         
         const bulletSize = activePowerUps.bigBullets ? 8 : 4;
-        const now = Date.now();
-        const prismActive = activePowerUps.prism && now < activePowerUps.prismEndTime;
         
         if (activePowerUps.tripleShot) {
             // Tir triple : 3 projectiles en éventail
@@ -4222,31 +4150,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 speed: 8,
                 size: bulletSize
             });
-        }
-        
-        // Prisme : chaque tir "se divise" en 3 (2 projectiles supplémentaires en éventail serré)
-        if (prismActive) {
-            const count = activePowerUps.tripleShot ? 3 : 1;
-            const start = bullets.length - count;
-            for (let i = 0; i < count; i++) {
-                const ref = bullets[start + i];
-                bullets.push({
-                    x: ref.x,
-                    y: ref.y,
-                    speed: ref.speed,
-                    vx: (ref.vx || 0) - 0.35,
-                    vy: ref.vy !== undefined ? ref.vy : -8,
-                    size: ref.size
-                });
-                bullets.push({
-                    x: ref.x,
-                    y: ref.y,
-                    speed: ref.speed,
-                    vx: (ref.vx || 0) + 0.35,
-                    vy: ref.vy !== undefined ? ref.vy : -8,
-                    size: ref.size
-                });
-            }
         }
         
         playSound('shoot');
