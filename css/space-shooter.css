@@ -684,26 +684,33 @@
     color: var(--primary-color);
 }
 
-.final-grade-line {
-    margin: 12px 0;
-    font-size: 1.1rem;
+.final-grade-block {
+    margin: 20px 0 24px;
+    text-align: center;
 }
 
 .final-grade-letter {
     display: inline-block;
     font-weight: bold;
-    font-size: 2.2rem;
-    min-width: 1.4em;
+    font-size: 4.5rem;
+    line-height: 1;
+    min-width: 1.2em;
     text-align: center;
-    border-radius: 8px;
-    padding: 2px 8px;
+    border-radius: 12px;
+    padding: 8px 16px;
 }
 
-.final-grade-letter.grade-S { color: #ffd700; text-shadow: 0 0 15px #ffd700; }
-.final-grade-letter.grade-A { color: #c0c0c0; text-shadow: 0 0 12px #c0c0c0; }
-.final-grade-letter.grade-B { color: #00ffff; text-shadow: 0 0 10px #00ffff; }
-.final-grade-letter.grade-C { color: #888; text-shadow: 0 0 8px #888; }
+.final-grade-letter.grade-S { color: #ffd700; text-shadow: 0 0 20px #ffd700; }
+.final-grade-letter.grade-A { color: #c0c0c0; text-shadow: 0 0 16px #c0c0c0; }
+.final-grade-letter.grade-B { color: #00ffff; text-shadow: 0 0 14px #00ffff; }
+.final-grade-letter.grade-C { color: #888; text-shadow: 0 0 10px #888; }
 .final-grade-letter.grade-D { color: #666; }
+
+.game-over-details {
+    margin-top: 8px;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0, 255, 255, 0.2);
+}
 
 .score-message {
     margin-top: 15px;

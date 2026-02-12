@@ -9,6 +9,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Anta&family=Open+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script src="../js/block-firebase.js"></script>
+    <script src="https://www.youtube.com/iframe_api" async></script>
 </head>
 <body>
     <div class="animated-background">
@@ -103,11 +104,15 @@
                         </div>
                         <div id="game-over" class="game-over hidden">
                             <h3>Mission Échouée!</h3>
-                            <p class="final-grade-line">Note: <span id="final-grade" class="final-grade-letter">-</span></p>
-                            <p>Score Final: <span id="final-score">0</span></p>
-                            <p>Meilleur Score: <span id="final-high-score">0</span></p>
-                            <p>Niveau Atteint: <span id="final-level">1</span></p>
-                            <p id="score-message" class="score-message"></p>
+                            <div class="final-grade-block" aria-label="Note de partie">
+                                <span id="final-grade" class="final-grade-letter">-</span>
+                            </div>
+                            <div class="game-over-details">
+                                <p>Score Final: <span id="final-score">0</span></p>
+                                <p>Meilleur Score: <span id="final-high-score">0</span></p>
+                                <p>Niveau Atteint: <span id="final-level">1</span></p>
+                                <p id="score-message" class="score-message"></p>
+                            </div>
                             <div class="game-over-buttons">
                                 <button id="restart-btn" class="btn primary-btn">Rejouer</button>
                                 <button id="register-score-btn" class="btn secondary-btn hidden">💾 Enregistrer mon Score</button>

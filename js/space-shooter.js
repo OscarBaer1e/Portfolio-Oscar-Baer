@@ -173,8 +173,6 @@ document.addEventListener('DOMContentLoaded', function() {
         gameSpeed: 2,
         gameMode: 'normal', // 'normal' ou 'infinite'
         bossActive: false,
-        specialWave: null,   // 'meteors' | 'swarm' | 'bonus' (vagues spéciales tous les 5 niveaux, hors boss)
-        specialWaveDisplayUntil: 0, // timestamp jusqu'auquel afficher le bandeau
         deltaTime: 1.0, // Multiplicateur de vitesse normalisé (1.0 = 60fps)
         isSavingScore: false, // Flag pour empêcher le démarrage pendant l'enregistrement
         isMobile: isMobile, // Flag pour optimisations mobile
@@ -1113,8 +1111,6 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.maxLives = 3;
         gameState.gameSpeed = 2;
         gameState.bossActive = false;
-        gameState.specialWave = null;
-        gameState.specialWaveDisplayUntil = 0;
         currentFireRate = baseFireRate;
         activePowerUps = {
             rapidFire: false,
@@ -1589,25 +1585,6 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Dessiner les particules de score
         drawScoreParticles();
-        
-        // Bandeau vague spéciale (affiché quelques secondes au début de la vague)
-        if (gameState.specialWave && Date.now() < gameState.specialWaveDisplayUntil) {
-            const labels = { meteors: 'Météorites', swarm: 'Essaim', bonus: 'Bonus' };
-            const text = 'Vague spéciale : ' + (labels[gameState.specialWave] || gameState.specialWave);
-            const alpha = Math.min(1, (gameState.specialWaveDisplayUntil - Date.now()) / 500);
-            ctx.save();
-            ctx.globalAlpha = alpha;
-            ctx.font = 'bold 28px "Orbitron", sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillStyle = '#000';
-            ctx.lineWidth = 4;
-            ctx.strokeStyle = '#00ffff';
-            const y = 52;
-            ctx.strokeText(text, canvas.width / 2, y);
-            ctx.fillStyle = '#fff';
-            ctx.fillText(text, canvas.width / 2, y);
-            ctx.restore();
-        }
         
         if (!gameState.isLowEndDevice) {
             const vig = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, canvas.width * 0.2, canvas.width / 2, canvas.height / 2, canvas.width * 0.8);
@@ -2572,8 +2549,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Score
                     // Ne pas ajouter de score si un boss est actif
                     if (!gameState.bossActive) {
-                        let points = Math.floor(asteroid.size / 5) * 10;
-                        if (gameState.specialWave === 'meteors') points = Math.floor(points * 1.5);
+                        const points = Math.floor(asteroid.size / 5) * 10;
                         gameState.score += points;
                         if (scoreElement) scoreElement.textContent = gameState.score;
                         // Vérifier et mettre à jour le high score en temps réel
@@ -2631,8 +2607,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                     
-                    // Chance de faire apparaître un boost — raretés pour limiter le stacking et équilibrer (vague bonus = plus de drops)
-                    const DROP_RATE = gameState.specialWave === 'bonus' ? 0.18 : 0.055;
+                    // Chance de faire apparaître un boost — raretés pour limiter le stacking et équilibrer
+                    const DROP_RATE = 0.055;
                     const BONUS_RARITY = {
                         common:   { chance: 0.58, types: ['rapidFire', 'shield', 'shrink', 'bigBullets', 'tripleShot'] },
                         uncommon: { chance: 0.26, types: ['timeSlow', 'magnet', 'seeker'] },
@@ -2672,8 +2648,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     createEnhancedExplosion(a.x, a.y, a.color, a.size);
                     playSound('explosion');
                     if (!gameState.bossActive) {
-                        let points = Math.floor(a.size / 5) * 10;
-                        if (gameState.specialWave === 'meteors') points = Math.floor(points * 1.5);
+                        const points = Math.floor(a.size / 5) * 10;
                         gameState.score += points;
                         if (scoreElement) scoreElement.textContent = gameState.score;
                         checkAndUpdateHighScore();
@@ -2755,9 +2730,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Spawn d'astéroïdes (vague essaim = plus de spawns)
-        let spawnRate = 0.02 + (gameState.level * 0.005);
-        if (gameState.specialWave === 'swarm') spawnRate *= 2.2;
+        // Spawn d'astéroïdes
+        const spawnRate = 0.02 + (gameState.level * 0.005);
         if (Math.random() < spawnRate) {
             spawnAsteroid();
         }
@@ -3263,23 +3237,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const currentTheme = getCurrentTheme();
         const asteroidColors = currentTheme.asteroids;
         const randomColor = asteroidColors[Math.floor(Math.random() * asteroidColors.length)];
-        let baseSpeed = Math.random() * 2 + gameState.gameSpeed;
-        let size;
+        const baseSpeed = Math.random() * 2 + gameState.gameSpeed;
         
-        if (gameState.specialWave === 'meteors') {
-            // Vague météorites : gros et lents, plus de points
-            size = Math.random() * 25 + 45;  // 45–70
-            baseSpeed *= 0.6;
-        } else if (gameState.specialWave === 'swarm') {
-            // Vague essaim : beaucoup de petits
-            size = Math.random() * 14 + 8;   // 8–22
-        } else {
-            // ~15% de chance de faire apparaître un gros astéroïde (se divise en gros morceaux)
-            const isBigType = Math.random() < 0.15;
-            size = isBigType
-                ? Math.random() * 22 + 50   // 50–72 : gros
-                : Math.random() * 30 + 15;  // 15–45 : normal
-        }
+        // ~15% de chance de faire apparaître un gros astéroïde (se divise en gros morceaux)
+        const isBigType = Math.random() < 0.15;
+        const size = isBigType
+            ? Math.random() * 22 + 50   // 50–72 : gros
+            : Math.random() * 30 + 15;  // 15–45 : normal
         
         const speed = getAsteroidSpeedForSize(baseSpeed, size);
         
@@ -3339,15 +3303,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const prevTheme = Math.floor((previousLevel - 1) / 10);
             const newTheme = Math.floor((gameState.level - 1) / 10);
             if (newTheme > prevTheme) playThemeTransitionJingle(newTheme);
-            // Vague spéciale : tous les 5 niveaux sauf multiples de 10 (boss)
-            if (gameState.level % 5 === 0 && gameState.level % 10 !== 0) {
-                const types = ['meteors', 'swarm', 'bonus'];
-                gameState.specialWave = types[(Math.floor(gameState.level / 5) - 1) % 3];
-                gameState.specialWaveDisplayUntil = Date.now() + 3500;
-            } else {
-                gameState.specialWave = null;
-                gameState.specialWaveDisplayUntil = 0;
-            }
             // Augmentation progressive de la vitesse
             const speedIncrease = getSpeedIncrease(gameState.level) * 0.6; // Un peu moins en mode infini
             gameState.gameSpeed += speedIncrease;
@@ -3367,15 +3322,6 @@ document.addEventListener('DOMContentLoaded', function() {
             const prevTheme = Math.floor((previousLevel - 1) / 10);
             const newTheme = Math.floor((gameState.level - 1) / 10);
             if (newTheme > prevTheme) playThemeTransitionJingle(newTheme);
-            // Vague spéciale : tous les 5 niveaux sauf multiples de 10 (boss)
-            if (gameState.level % 5 === 0 && gameState.level % 10 !== 0) {
-                const types = ['meteors', 'swarm', 'bonus'];
-                gameState.specialWave = types[(Math.floor(gameState.level / 5) - 1) % 3];
-                gameState.specialWaveDisplayUntil = Date.now() + 3500;
-            } else {
-                gameState.specialWave = null;
-                gameState.specialWaveDisplayUntil = 0;
-            }
             // Augmentation progressive de la vitesse
             const speedIncrease = getSpeedIncrease(gameState.level);
             gameState.gameSpeed += speedIncrease;
@@ -3441,8 +3387,21 @@ document.addEventListener('DOMContentLoaded', function() {
         
         console.log(`✅ Spawning boss ${bossNumber} (${getBossName(bossNumber)}) at level ${gameState.level}`);
         
-        // Jouer le son d'arrivée du boss
-        playAudioFile('../ressources/Sons/Arrivée Boss.mp3', 0.6);
+        // Jouer le son d'arrivée du boss (chaque boss a sa musique)
+        const bossMusicPaths = [
+            '../ressources/Sons/Boss1.mp3',  // Locked in alien
+            '../ressources/Sons/Boss2.mp3',  // Goku SSJ3
+            '../ressources/Sons/Boss3.mp3',  // Karism
+            '../ressources/Sons/Boss4.mp3',  // Herobrine
+            '../ressources/Sons/Boss5.mp3',  // Goblinstein
+            '../ressources/Sons/Boss6.mp3',  // Michael Personne
+            '../ressources/Sons/Boss7.mp3',  // M. BAER
+            '../ressources/Sons/Boss8.mp3',  // Sunshine
+            '../ressources/Sons/Boss9.mp3',  // WhatSans
+            '../ressources/Sons/Boss10.mp3'  // IUT GUSTAVE EIFFEL
+        ];
+        const bossTrack = bossMusicPaths[bossNumber - 1];
+        if (bossTrack) playAudioFile(bossTrack, 0.6);
         
         const baseHealth = 30 + (bossNumber * 15); // Réduit : était 50 + (bossNumber * 30)
         const baseSize = 60 + (bossNumber * 10);
@@ -5072,25 +5031,35 @@ document.addEventListener('DOMContentLoaded', function() {
             
             function createPlayer() {
                 if (!document.getElementById('radio-yt-player')) return;
+                const vol = Math.round(parseFloat(radioVolume?.value || 0.5) * 100);
                 ytPlayer = new window.YT.Player('radio-yt-player', {
                     height: 1,
                     width: 1,
                     videoId: videoId,
                     playerVars: { autoplay: 1, controls: 0, modestbranding: 1, rel: 0, showinfo: 0 },
-                    events: { onReady: function(e) { e.target.playVideo(); radioPlaying = true; radioPlayIcon.className = 'fas fa-pause'; } }
+                    events: {
+                        onReady: function(e) {
+                            e.target.setVolume(vol);
+                            e.target.playVideo();
+                            radioPlaying = true;
+                            if (radioPlayIcon) radioPlayIcon.className = 'fas fa-pause';
+                        }
+                    }
                 });
             }
             if (window.YT && window.YT.Player) {
                 createPlayer();
             } else {
-                window.onYouTubeIframeAPIReady = createPlayer;
-                if (document.querySelector('script[src*="youtube.com/iframe_api"]')) {
-                    if (window.YT) createPlayer();
-                    return;
+                const prevReady = window.onYouTubeIframeAPIReady;
+                window.onYouTubeIframeAPIReady = function() {
+                    if (prevReady) prevReady();
+                    createPlayer();
+                };
+                if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+                    const script = document.createElement('script');
+                    script.src = 'https://www.youtube.com/iframe_api';
+                    document.head.appendChild(script);
                 }
-                const script = document.createElement('script');
-                script.src = 'https://www.youtube.com/iframe_api';
-                document.head.appendChild(script);
             }
             radioPlaying = true;
             radioPlayIcon.className = 'fas fa-pause';
@@ -5169,7 +5138,11 @@ document.addEventListener('DOMContentLoaded', function() {
         
         if (radioVolume) {
             radioVolume.addEventListener('input', () => {
-                if (radioMode === 'stream') bgMusic.volume = parseFloat(radioVolume.value);
+                const v = parseFloat(radioVolume.value);
+                if (radioMode === 'stream') bgMusic.volume = v;
+                if (radioMode === 'youtube' && ytPlayer && typeof ytPlayer.setVolume === 'function') {
+                    try { ytPlayer.setVolume(Math.round(v * 100)); } catch (_) {}
+                }
             });
         }
         
