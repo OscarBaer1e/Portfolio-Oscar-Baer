@@ -4243,6 +4243,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             if (e.code === 'KeyF') {
                 e.preventDefault();
+                if (typeof window._spaceShooterRadioPause === 'function') window._spaceShooterRadioPause();
                 if (!brolyAudio) {
                     brolyAudio = new Audio(BROLY_MUSIC_SRC);
                     brolyAudio.addEventListener('ended', () => {
@@ -4257,6 +4258,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             if (e.code === 'KeyG') {
                 e.preventDefault();
+                if (typeof window._spaceShooterRadioPause === 'function') window._spaceShooterRadioPause();
                 if (!beerusAudio) {
                     beerusAudio = new Audio(BEERUS_MUSIC_SRC);
                     beerusAudio.addEventListener('ended', () => {
@@ -4788,6 +4790,135 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+    
+    // ----- Radio musique de fond (style rétro) -----
+    (function initRadioWidget() {
+        const radioPlayBtn = document.getElementById('radio-play');
+        const radioPlayIcon = document.getElementById('radio-play-icon');
+        const radioSearch = document.getElementById('radio-search');
+        const radioPresets = document.getElementById('radio-presets');
+        const radioVolume = document.getElementById('radio-volume');
+        if (!radioPlayBtn || !radioPresets) return;
+        
+        const bgMusic = new Audio();
+        bgMusic.loop = true;
+        let radioPlaying = false;
+        let currentStation = null;
+        
+        function stopOtherMusics() {
+            if (brolyAudio) {
+                brolyAudio.pause();
+                brolyAudio.currentTime = 0;
+            }
+            if (beerusAudio) {
+                beerusAudio.pause();
+                beerusAudio.currentTime = 0;
+            }
+        }
+        
+        function stopRadio() {
+            bgMusic.pause();
+            bgMusic.src = '';
+            radioPlaying = false;
+            if (radioPlayIcon) radioPlayIcon.className = 'fas fa-play';
+        }
+        
+        window._spaceShooterRadioPause = stopRadio;
+        
+        function playRadioSource(url) {
+            bgMusic.pause();
+            bgMusic.src = '';
+            if (!url) {
+                radioPlaying = false;
+                radioPlayIcon.className = 'fas fa-play';
+                return;
+            }
+            stopOtherMusics();
+            bgMusic.src = url;
+            bgMusic.volume = parseFloat(radioVolume?.value || 0.5);
+            bgMusic.play().then(() => {
+                radioPlaying = true;
+                radioPlayIcon.className = 'fas fa-pause';
+            }).catch(() => {
+                radioPlaying = false;
+                radioPlayIcon.className = 'fas fa-play';
+            });
+        }
+        
+        const RADIO_STATIONS = [
+            { name: 'Off', url: null },
+            { name: 'Chill', url: 'https://icecast.somafm.com/groovesalad-128-mp3' },
+            { name: 'Space', url: 'https://icecast.somafm.com/spacestation-128-mp3' },
+            { name: 'Synth', url: 'https://icecast.somafm.com/synphaera-128-mp3' },
+            { name: 'Lofi', url: 'https://icecast.somafm.com/lush-128-mp3' }
+        ];
+        
+        RADIO_STATIONS.forEach((station, index) => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'radio-preset-btn' + (index === 0 ? ' active' : '');
+            btn.textContent = station.name;
+            btn.dataset.url = station.url || '';
+            btn.addEventListener('click', () => {
+                RADIO_STATIONS.forEach((_, i) => {
+                    radioPresets.querySelectorAll('.radio-preset-btn')[i].classList.toggle('active', i === index);
+                });
+                currentStation = station.url;
+                radioSearch.placeholder = station.url ? 'Ou coller une autre URL...' : 'Rechercher ou coller une URL de stream...';
+                if (!station.url) {
+                    stopRadio();
+                    return;
+                }
+                playRadioSource(station.url);
+            });
+            radioPresets.appendChild(btn);
+        });
+        
+        radioPlayBtn.addEventListener('click', () => {
+            if (radioPlaying) {
+                stopRadio();
+                return;
+            }
+            if (currentStation) {
+                playRadioSource(currentStation);
+            } else {
+                const url = radioSearch.value.trim();
+                if (url) {
+                    currentStation = url;
+                    playRadioSource(url);
+                }
+            }
+        });
+        
+        radioSearch.addEventListener('keydown', (e) => {
+            if (e.key !== 'Enter') return;
+            e.preventDefault();
+            const url = radioSearch.value.trim();
+            if (!url) return;
+            if (!/^https?:\/\//i.test(url)) {
+                radioSearch.placeholder = 'Entre une URL complète (https://...)';
+                return;
+            }
+            currentStation = url;
+            document.querySelectorAll('.radio-preset-btn').forEach(b => b.classList.remove('active'));
+            playRadioSource(url);
+        });
+        
+        if (radioVolume) {
+            radioVolume.addEventListener('input', () => {
+                bgMusic.volume = parseFloat(radioVolume.value);
+            });
+        }
+        
+        bgMusic.addEventListener('ended', () => {
+            radioPlaying = false;
+            radioPlayIcon.className = 'fas fa-play';
+        });
+        bgMusic.addEventListener('error', () => {
+            radioPlaying = false;
+            radioPlayIcon.className = 'fas fa-play';
+        });
+    })();
     
     // Initialisation
     // Initialiser le jeu (utilise Supabase)
