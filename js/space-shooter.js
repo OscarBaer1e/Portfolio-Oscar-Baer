@@ -2565,19 +2565,21 @@ document.addEventListener('DOMContentLoaded', function() {
                         bullets.splice(bulletIndex, 1);
                     }
                     
-                    // Vérifier si l'astéroïde doit se séparer
+                    // Vérifier si l'astéroïde doit se séparer (vitesse des fragments plafonnée par phase)
                     const isBigType = asteroid.size >= 48;  // Gros type : toujours se divise en gros morceaux
                     const isLargeNormal = asteroid.size > 25 && asteroid.size < 48;
                     const baseSpeedFromParent = asteroid.speed * asteroid.size / ASTEROID_SIZE_REF;
+                    const phase = getDifficultyPhase(gameState.level);
+                    const splitCap = getSplitSpeedCap(phase);
                     
                     if (isBigType) {
-                        // Gros astéroïde : se divise en 2–3 gros morceaux (plus gros = plus lents)
                         const numPieces = Math.floor(Math.random() * 2) + 2;
                         const sizeRatio = 0.5 + Math.random() * 0.15;
                         for (let i = 0; i < numPieces; i++) {
                             const angle = (Math.PI * 2 / numPieces) * i + Math.random() * 0.5;
                             const newSize = asteroid.size * sizeRatio;
-                            const childSpeed = getAsteroidSpeedForSize(baseSpeedFromParent, newSize);
+                            let childSpeed = getAsteroidSpeedForSize(baseSpeedFromParent, newSize);
+                            childSpeed = Math.min(childSpeed, asteroid.speed * splitCap);
                             asteroids.push({
                                 x: asteroid.x + Math.cos(angle) * (asteroid.size / 2),
                                 y: asteroid.y + Math.sin(angle) * (asteroid.size / 2),
@@ -2589,12 +2591,12 @@ document.addEventListener('DOMContentLoaded', function() {
                             });
                         }
                     } else if (isLargeNormal && Math.random() < 0.45) {
-                        // Astéroïde normal gros : 45% de chance de se séparer en 2–3 morceaux
                         const numPieces = Math.floor(Math.random() * 2) + 2;
                         for (let i = 0; i < numPieces; i++) {
                             const angle = (Math.PI * 2 / numPieces) * i;
                             const newSize = asteroid.size * 0.4;
-                            const childSpeed = getAsteroidSpeedForSize(baseSpeedFromParent, newSize);
+                            let childSpeed = getAsteroidSpeedForSize(baseSpeedFromParent, newSize);
+                            childSpeed = Math.min(childSpeed, asteroid.speed * splitCap);
                             asteroids.push({
                                 x: asteroid.x + Math.cos(angle) * (asteroid.size / 2),
                                 y: asteroid.y + Math.sin(angle) * (asteroid.size / 2),
@@ -2730,8 +2732,10 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Spawn d'astéroïdes
-        const spawnRate = 0.02 + (gameState.level * 0.005);
+        // Spawn d'astéroïdes (moins au début pour faciliter le démarrage)
+        const phase = getDifficultyPhase(gameState.level);
+        const spawnCoeff = phase === 0 ? 0.0035 : 0.005;
+        const spawnRate = 0.02 + (gameState.level * spawnCoeff);
         if (Math.random() < spawnRate) {
             spawnAsteroid();
         }
@@ -3233,11 +3237,25 @@ document.addEventListener('DOMContentLoaded', function() {
         return baseSpeed * ASTEROID_SIZE_REF / Math.max(size, 12);
     }
     
+    // Phase de difficulté tous les 20 niveaux (1–20 = facile, 21–40 = moyen, etc.)
+    function getDifficultyPhase(level) {
+        return Math.floor((Math.max(1, level) - 1) / 20);
+    }
+    
+    // Plafond de vitesse des fragments après séparation (évite que les morceaux partent trop vite)
+    function getSplitSpeedCap(phase) {
+        const caps = [1.15, 1.25, 1.35, 1.45, 1.55];
+        return caps[Math.min(phase, caps.length - 1)];
+    }
+    
     function spawnAsteroid() {
         const currentTheme = getCurrentTheme();
         const asteroidColors = currentTheme.asteroids;
         const randomColor = asteroidColors[Math.floor(Math.random() * asteroidColors.length)];
-        const baseSpeed = Math.random() * 2 + gameState.gameSpeed;
+        const phase = getDifficultyPhase(gameState.level);
+        let baseSpeed = Math.random() * 2 + gameState.gameSpeed;
+        const phaseSpeedFactor = [0.85, 0.95, 1.0, 1.05, 1.1][Math.min(phase, 4)];
+        baseSpeed *= phaseSpeedFactor;
         
         // ~15% de chance de faire apparaître un gros astéroïde (se divise en gros morceaux)
         const isBigType = Math.random() < 0.15;
@@ -3263,29 +3281,22 @@ document.addEventListener('DOMContentLoaded', function() {
         return asteroid.size > 25;
     }
     
-    // Calcule l'augmentation de vitesse de manière progressive
-    // Élevée au début (peu d'impact car vitesse faible) puis diminue (beaucoup d'impact car vitesse élevée)
+    // Augmentation de vitesse par niveau : début très doux (1–20), puis paliers tous les 20 niveaux
     function getSpeedIncrease(level) {
-        // Augmentation élevée au début, puis diminue progressivement
-        // Niveau 1-30 : 0.3 → 0.2 (élevée au début)
-        // Niveau 31-60 : 0.2 → 0.15 (diminue)
-        // Niveau 61-90 : 0.15 → 0.1 (diminue encore)
-        // Niveau 91+ : 0.1 → 0.05 (minimum, très faible car impact élevé)
-        
-        if (level <= 30) {
-            // Niveaux 1-30 : de 0.3 à 0.2 (élevée au début car vitesse faible)
-            return 0.3 - ((level - 1) / 30) * 0.1;
-        } else if (level <= 60) {
-            // Niveaux 31-60 : de 0.2 à 0.15 (diminue car vitesse augmente)
-            return 0.2 - ((level - 31) / 30) * 0.05;
-        } else if (level <= 90) {
-            // Niveaux 61-90 : de 0.15 à 0.1 (diminue encore)
-            return 0.15 - ((level - 61) / 30) * 0.05;
-        } else {
-            // Niveaux 91+ : de 0.1 à 0.05 (minimum, très faible car impact élevé)
-            const extraLevels = level - 91;
-            return Math.max(0.05, 0.1 - (extraLevels / 50) * 0.05);
+        if (level <= 20) {
+            return 0.05 + ((level - 1) / 20) * 0.03;
         }
+        if (level <= 40) {
+            return 0.10 + ((level - 21) / 20) * 0.05;
+        }
+        if (level <= 60) {
+            return 0.15 - ((level - 41) / 20) * 0.03;
+        }
+        if (level <= 80) {
+            return 0.12 - ((level - 61) / 20) * 0.03;
+        }
+        const extraLevels = level - 81;
+        return Math.max(0.05, 0.09 - (extraLevels / 40) * 0.04);
     }
     
     function checkLevel() {
