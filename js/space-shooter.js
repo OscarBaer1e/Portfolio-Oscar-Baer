@@ -170,7 +170,7 @@ document.addEventListener('DOMContentLoaded', function() {
         level: 1,
         lives: 3,
         maxLives: 3,
-        gameSpeed: 1.35, // Début plus facile, augmente avec le niveau
+        gameSpeed: 2.0, // Plus nerveux dès le début, augmente avec le niveau
         gameMode: 'normal', // 'normal' ou 'infinite'
         bossActive: false,
         deltaTime: 1.0, // Multiplicateur de vitesse normalisé (1.0 = 60fps)
@@ -491,7 +491,7 @@ document.addEventListener('DOMContentLoaded', function() {
         y: canvas.height - 80,
         width: 40,
         height: 40,
-        speed: 5,
+        speed: 8,
         color: '#00ffff'
     };
     
@@ -585,7 +585,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Variables de tir
     let lastShotTime = 0;
-    let baseFireRate = 300; // Temps entre les tirs en ms
+    let baseFireRate = 220; // Temps entre les tirs en ms (plus nerveux)
     let currentFireRate = baseFireRate;
     
     // Vérifications de sécurité pour tous les éléments
@@ -1154,7 +1154,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 x: Math.random() * canvas.width,
                 y: Math.random() * canvas.height,
                 size: Math.random() * 2,
-                speed: Math.random() * 0.5 + 0.2
+                speed: Math.random() * 1.0 + 0.5
             });
         }
         
@@ -1164,7 +1164,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ambientMeteors.push({
                 x: Math.random() * (canvas.width + 100) - 50,
                 y: Math.random() * (canvas.height + 50) - 50,
-                speed: 0.2 + Math.random() * 0.5,
+                speed: 0.5 + Math.random() * 0.8,
                 size: 1 + Math.random() * 1.5,
                 alpha: 0.12 + Math.random() * 0.2
             });
@@ -2226,7 +2226,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (gameState.isPaused) {
             // Continuer les animations de fond même en pause
             stars.forEach(star => {
-                star.y += (star.speed + gameState.gameSpeed * 0.3) * gameState.deltaTime;
+                star.y += (star.speed + gameState.gameSpeed * 0.65) * gameState.deltaTime;
                 if (star.y > canvas.height) {
                     star.y = 0;
                     star.x = Math.random() * canvas.width;
@@ -2235,17 +2235,17 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Mise à jour des étoiles (normalisé par delta time)
+        // Mise à jour des étoiles (normalisé par delta time) — plus rapides pour plus de mouvement
         stars.forEach(star => {
-            star.y += (star.speed + gameState.gameSpeed * 0.3) * gameState.deltaTime;
+            star.y += (star.speed + gameState.gameSpeed * 0.65) * gameState.deltaTime;
             if (star.y > canvas.height) {
                 star.y = 0;
                 star.x = Math.random() * canvas.width;
             }
         });
         
-        // Événements de fond rares (1% de chance par frame)
-        if (Math.random() < 0.01) {
+        // Événements de fond plus fréquents et plus rapides (2% par frame)
+        if (Math.random() < 0.022) {
             const eventType = Math.random();
             if (eventType < 0.5) {
                 // Fusée (50% des événements)
@@ -2253,7 +2253,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     type: 'rocket',
                     x: Math.random() * canvas.width,
                     y: canvas.height + 20,
-                    speed: Math.random() * 3 + 2,
+                    speed: Math.random() * 4 + 4,
                     alpha: 0.7,
                     life: 200
                 });
@@ -2264,8 +2264,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     type: 'shootingStar',
                     x: startX,
                     y: -20,
-                    length: 30,
-                    speed: Math.random() * 5 + 3,
+                    length: 40,
+                    speed: Math.random() * 5 + 6,
                     alpha: 0.8,
                     life: 150
                 });
@@ -2406,6 +2406,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             }
             asteroid.y += asteroid.speed * mul * gameState.deltaTime;
+            if (asteroid.vx !== undefined) {
+                asteroid.x += asteroid.vx * mul * gameState.deltaTime;
+                if (asteroid.x < -asteroid.size * 2 || asteroid.x > canvas.width + asteroid.size * 2) asteroid.vx *= -0.8;
+            }
             asteroid.rotation += asteroid.rotationSpeed * mul * gameState.deltaTime;
             
             if (asteroid.y > canvas.height + 50) {
@@ -2570,6 +2574,7 @@ document.addEventListener('DOMContentLoaded', function() {
                     const isLargeNormal = asteroid.size > 25 && asteroid.size < 48;
                     const baseSpeedFromParent = asteroid.speed * asteroid.size / ASTEROID_SIZE_REF;
                     
+                    const parentVx = asteroid.vx !== undefined ? asteroid.vx : 0;
                     if (isBigType) {
                         // Gros astéroïde : se divise en 2–3 gros morceaux (plus gros = plus lents)
                         const numPieces = Math.floor(Math.random() * 2) + 2;
@@ -2583,8 +2588,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                 y: asteroid.y + Math.sin(angle) * (asteroid.size / 2),
                                 size: newSize,
                                 speed: childSpeed,
+                                vx: parentVx + (Math.random() - 0.5) * 1.2,
                                 rotation: 0,
-                                rotationSpeed: (Math.random() - 0.5) * 0.12,
+                                rotationSpeed: (Math.random() - 0.5) * 0.28,
                                 color: asteroid.color
                             });
                         }
@@ -2600,8 +2606,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                 y: asteroid.y + Math.sin(angle) * (asteroid.size / 2),
                                 size: newSize,
                                 speed: childSpeed,
+                                vx: parentVx + (Math.random() - 0.5) * 1.2,
                                 rotation: 0,
-                                rotationSpeed: (Math.random() - 0.5) * 0.15,
+                                rotationSpeed: (Math.random() - 0.5) * 0.28,
                                 color: asteroid.color
                             });
                         }
@@ -2730,12 +2737,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Spawn : niveaux 1-80 facile → difficile (linéaire), puis 80+ difficulté croissante
+        // Spawn : plus d'astéroïdes, rythme plus nerveux
         const lvl = gameState.level;
         const spawnRate = lvl <= 80
-            ? 0.012 + ((lvl - 1) / 79) * 0.07
-            : 0.082 + (lvl - 80) * 0.0012;
-        if (Math.random() < Math.min(0.12, spawnRate)) {
+            ? 0.025 + ((lvl - 1) / 79) * 0.095
+            : 0.12 + (lvl - 80) * 0.0015;
+        if (Math.random() < Math.min(0.20, spawnRate)) {
             spawnAsteroid();
         }
     }
@@ -3240,7 +3247,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const currentTheme = getCurrentTheme();
         const asteroidColors = currentTheme.asteroids;
         const randomColor = asteroidColors[Math.floor(Math.random() * asteroidColors.length)];
-        const baseSpeed = Math.random() * 2 + gameState.gameSpeed;
+        const baseSpeed = Math.random() * 3 + gameState.gameSpeed * 1.2;
         
         // Gros astéroïdes : peu en début (1-10), montée jusqu'à 30, stable 30-80, plus après 80
         const l = gameState.level;
@@ -3254,14 +3261,16 @@ document.addEventListener('DOMContentLoaded', function() {
             : Math.random() * 30 + 15;  // 15–45 : normal
         
         const speed = getAsteroidSpeedForSize(baseSpeed, size);
+        const vx = (Math.random() - 0.5) * 1.8;
         
         asteroids.push({
             x: Math.random() * (canvas.width - size * 2) + size,
             y: -size,
             size: size,
             speed: speed,
+            vx: vx,
             rotation: 0,
-            rotationSpeed: (Math.random() - 0.5) * 0.1,
+            rotationSpeed: (Math.random() - 0.5) * 0.28,
             color: randomColor
         });
     }
@@ -3271,12 +3280,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return asteroid.size > 25;
     }
     
-    // Vitesse : niveaux 1-80 = facile → difficile (linéaire), 80+ = montée plus douce
+    // Vitesse : montée plus marquée pour un jeu plus nerveux
     function getSpeedIncrease(level) {
         if (level <= 80) {
-            return 0.035 + ((level - 1) / 79) * 0.033;
+            return 0.04 + ((level - 1) / 79) * 0.04;
         }
-        return Math.max(0.04, 0.055 - (level - 81) * 0.00025);
+        return Math.max(0.045, 0.06 - (level - 81) * 0.0002);
     }
     
     function checkLevel() {
@@ -4278,37 +4287,38 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const bulletSize = activePowerUps.bigBullets ? 8 : 4;
         
+        const bulletSpeed = 12;
         if (activePowerUps.tripleShot) {
             // Tir triple : 3 projectiles en éventail
             bullets.push({
                 x: ship.x,
                 y: ship.y - ship.height / 2,
-                speed: 8,
-                vx: -0.5,
-                vy: -8,
+                speed: bulletSpeed,
+                vx: -0.8,
+                vy: -bulletSpeed,
                 size: bulletSize
             });
             bullets.push({
                 x: ship.x,
                 y: ship.y - ship.height / 2,
-                speed: 8,
+                speed: bulletSpeed,
                 vx: 0,
-                vy: -8,
+                vy: -bulletSpeed,
                 size: bulletSize
             });
             bullets.push({
                 x: ship.x,
                 y: ship.y - ship.height / 2,
-                speed: 8,
-                vx: 0.5,
-                vy: -8,
+                speed: bulletSpeed,
+                vx: 0.8,
+                vy: -bulletSpeed,
                 size: bulletSize
             });
         } else {
             bullets.push({
                 x: ship.x,
                 y: ship.y - ship.height / 2,
-                speed: 8,
+                speed: bulletSpeed,
                 size: bulletSize
             });
         }

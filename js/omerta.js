@@ -1,5 +1,6 @@
 /**
  * Script pour la gestion de la liste des notes collantes sur la page Omerta
+ * Utilise axios pour charger les titres des notes depuis un JSON
  */
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -11,6 +12,27 @@ document.addEventListener('DOMContentLoaded', function() {
     // Séparer les notes normales du bouton retour
     const returnNote = document.querySelector('.return-note');
     const notes = Array.from(allNotes).filter(note => !note.classList.contains('return-note'));
+
+    // Charger les titres des notes via axios (JSON)
+    const notesDataUrl = '../ressources/data/omerta-notes.json';
+    if (typeof axios !== 'undefined') {
+        axios.get(notesDataUrl)
+            .then(function(response) {
+                const data = response.data;
+                if (data && Array.isArray(data.notes)) {
+                    data.notes.forEach(function(item, index) {
+                        const noteEl = notes[index];
+                        if (noteEl && item.title) {
+                            const header = noteEl.querySelector('.note-header h3');
+                            if (header) header.textContent = item.title;
+                        }
+                    });
+                }
+            })
+            .catch(function() {
+                // Garder les titres du HTML si le JSON est indisponible
+            });
+    }
     
     // État de la taille actuelle (comme l'explorateur de fichiers)
     // 0: très petite, 1: petite, 2: moyenne, 3: grande, 4: très grande
