@@ -556,6 +556,18 @@ document.addEventListener('DOMContentLoaded', function() {
     // Particules de score
     let scoreParticles = [];
     
+    // Traînées derrière les balles (effet tir)
+    let bulletTrails = [];
+    
+    // Flash d'impact sur astéroïdes (cercle blanc/jaune avant explosion)
+    let impactFlashes = [];
+    
+    // Étincelles à la sortie du canon
+    let muzzleSparks = [];
+    
+    // Canvas de grain pour overlay rétro (créé une fois)
+    let grainCanvas = null;
+    
     // Statistiques de partie
     let gameStats = {
         asteroidsDestroyed: 0,
@@ -1086,6 +1098,9 @@ document.addEventListener('DOMContentLoaded', function() {
         bullets = [];
         asteroids = [];
         particles = [];
+        bulletTrails = [];
+        impactFlashes = [];
+        muzzleSparks = [];
         powerUps = [];
         stars = [];
         backgroundEvents = [];
@@ -1294,9 +1309,13 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        // Nébuleuse pulsée (ambiance)
+        // Nébuleuse pulsée (ambiance) — pulse plus marquée avec score et musique
         if (!gameState.isLowEndDevice) {
-            const pulse = 0.02 + 0.025 * Math.sin(Date.now() / 400);
+            const pulseBase = 0.02 + 0.025 * Math.sin(Date.now() / 400);
+            const pulseScore = 1 + 0.15 * Math.sin((gameState.score || 0) / 80);
+            const musicPlaying = (brolyAudio && !brolyAudio.paused) || (beerusAudio && !beerusAudio.paused);
+            const pulseMusic = musicPlaying ? 1.25 : 1;
+            const pulse = Math.min(0.12, pulseBase * pulseScore * pulseMusic);
             const nebula = ctx.createRadialGradient(canvas.width / 2, canvas.height * 0.3, 0, canvas.width / 2, canvas.height * 0.3, canvas.width * 0.8);
             nebula.addColorStop(0, 'transparent');
             nebula.addColorStop(0.5, 'rgba(80,120,200,' + pulse + ')');
@@ -1409,6 +1428,51 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.stroke();
             ctx.restore();
         }
+        
+        // Traînées derrière les balles (petites particules qui s'estompent)
+        if (!gameState.isLowEndDevice && bulletTrails.length > 0) {
+            bulletTrails.forEach(t => {
+                if (t.life <= 0) return;
+                ctx.save();
+                ctx.globalAlpha = t.alpha;
+                ctx.fillStyle = t.color;
+                ctx.beginPath();
+                ctx.arc(t.x, t.y, t.size || 2, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+        }
+        
+        // Flashs d'impact sur les astéroïdes (cercle blanc/jaune avant explosion)
+        impactFlashes.forEach(f => {
+            if (f.life <= 0) return;
+            ctx.save();
+            ctx.globalAlpha = f.life;
+            const r = f.radius || 15;
+            const grad = ctx.createRadialGradient(f.x, f.y, 0, f.x, f.y, r);
+            grad.addColorStop(0, 'rgba(255,255,220,0.9)');
+            grad.addColorStop(0.5, 'rgba(255,255,150,0.4)');
+            grad.addColorStop(1, 'rgba(255,200,100,0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(f.x, f.y, r, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        });
+        
+        // Étincelles à la sortie du canon
+        muzzleSparks.forEach(s => {
+            if (s.life <= 0) return;
+            ctx.save();
+            ctx.globalAlpha = s.life;
+            ctx.fillStyle = s.color;
+            ctx.shadowBlur = 4;
+            ctx.shadowColor = s.color;
+            ctx.beginPath();
+            ctx.arc(s.x, s.y, s.size || 1.5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        });
         
         // Projectiles : fusion des bonus (tous les effets actifs se cumulent visuellement)
         const now = Date.now();
@@ -1593,6 +1657,35 @@ document.addEventListener('DOMContentLoaded', function() {
             vig.addColorStop(1, 'rgba(0,0,0,0.12)');
             ctx.fillStyle = vig;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        // Scanlines (overlay rétro discret)
+        if (!gameState.isLowEndDevice) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
+            for (let y = 0; y < canvas.height; y += 2) {
+                ctx.fillRect(0, y, canvas.width, 1);
+            }
+        }
+        
+        // Grain (léger bruit de film)
+        if (!gameState.isLowEndDevice) {
+            if (!grainCanvas || grainCanvas.width !== canvas.width || grainCanvas.height !== canvas.height) {
+                grainCanvas = document.createElement('canvas');
+                grainCanvas.width = canvas.width;
+                grainCanvas.height = canvas.height;
+                const gctx = grainCanvas.getContext('2d');
+                const imgData = gctx.createImageData(grainCanvas.width, grainCanvas.height);
+                const data = imgData.data;
+                for (let i = 0; i < data.length; i += 4) {
+                    const n = Math.floor(Math.random() * 32);
+                    data[i] = data[i + 1] = data[i + 2] = n;
+                    data[i + 3] = 12 + Math.floor(Math.random() * 8);
+                }
+                gctx.putImageData(imgData, 0, 0);
+            }
+            ctx.globalAlpha = 0.08;
+            ctx.drawImage(grainCanvas, 0, 0);
+            ctx.globalAlpha = 1;
         }
         
         // Restaurer le contexte après le shake
@@ -2316,6 +2409,19 @@ document.addEventListener('DOMContentLoaded', function() {
         const slowMultiplierBullets = activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime ? timeSlowMultiplier : 1.0;
         const seekerActive = activePowerUps.seeker && Date.now() < activePowerUps.seekerEndTime;
         bullets.forEach((bullet, index) => {
+            // Traînées derrière les balles (particules qui s'estompent)
+            if (!gameState.isLowEndDevice && Math.random() < 0.4) {
+                const theme = getCurrentTheme();
+                bulletTrails.push({
+                    x: bullet.x,
+                    y: bullet.y,
+                    alpha: 0.55,
+                    life: 1,
+                    color: theme.bullets,
+                    size: (bullet.size || 4) * 0.7
+                });
+                if (bulletTrails.length > 100) bulletTrails.shift();
+            }
             if (seekerActive && asteroids.length > 0) {
                 bullet.vx = bullet.vx ?? 0;
                 bullet.vy = bullet.vy ?? -bullet.speed;
@@ -2379,6 +2485,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 shipTrail.splice(index, 1);
             }
         });
+        
+        // Mise à jour des traînées de balles (estompage)
+        for (let i = bulletTrails.length - 1; i >= 0; i--) {
+            bulletTrails[i].life -= 0.08 * gameState.deltaTime;
+            bulletTrails[i].alpha = bulletTrails[i].life;
+            if (bulletTrails[i].life <= 0) bulletTrails.splice(i, 1);
+        }
+        
+        // Mise à jour des flashs d'impact
+        for (let i = impactFlashes.length - 1; i >= 0; i--) {
+            impactFlashes[i].life -= 0.2 * gameState.deltaTime;
+            if (impactFlashes[i].life <= 0) impactFlashes.splice(i, 1);
+        }
+        
+        // Mise à jour des étincelles canon
+        for (let i = muzzleSparks.length - 1; i >= 0; i--) {
+            muzzleSparks[i].x += muzzleSparks[i].vx * gameState.deltaTime;
+            muzzleSparks[i].y += muzzleSparks[i].vy * gameState.deltaTime;
+            muzzleSparks[i].life -= 0.12 * gameState.deltaTime;
+            if (muzzleSparks[i].life <= 0) muzzleSparks.splice(i, 1);
+        }
         
         // Réduction du shake de l'écran
         screenShake.intensity *= 0.9;
@@ -2546,6 +2673,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const bulletSize = bullet.size || 4;
                 if (distance < asteroid.size + bulletSize) {
+                    // Flash d'impact (petit cercle blanc/jaune avant l'explosion)
+                    impactFlashes.push({
+                        x: asteroid.x,
+                        y: asteroid.y,
+                        life: 1,
+                        maxLife: 1,
+                        radius: Math.min(asteroid.size * 0.6, 25)
+                    });
                     // Explosion améliorée
                     createEnhancedExplosion(asteroid.x, asteroid.y, asteroid.color, asteroid.size);
                     playSound('explosion');
@@ -2949,7 +3084,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.save();
             ctx.globalAlpha = anim.alpha;
             
-            // 1. Dessiner la lumière autour du vaisseau (glow)
+            // 1. Dessiner la lumière autour du vaisseau (glow) — couleur du bonus (ex. jaune pour rapidFire)
             const glowRadius = 30 + Math.sin(Date.now() * 0.005) * 5; // Pulsation légère
             const gradient = ctx.createRadialGradient(
                 anim.shipX, anim.shipY, 0,
@@ -4320,6 +4455,21 @@ document.addEventListener('DOMContentLoaded', function() {
                 y: ship.y - ship.height / 2,
                 speed: bulletSpeed,
                 size: bulletSize
+            });
+        }
+        
+        // Étincelles à la sortie du canon
+        const muzzleY = ship.y - ship.height / 2;
+        const sparkCount = gameState.isLowEndDevice ? 3 : 6;
+        for (let i = 0; i < sparkCount; i++) {
+            muzzleSparks.push({
+                x: ship.x + (Math.random() - 0.5) * 12,
+                y: muzzleY,
+                vx: (Math.random() - 0.5) * 2,
+                vy: -2 - Math.random() * 3,
+                life: 1,
+                size: 1.5 + Math.random() * 1,
+                color: (getCurrentTheme && getCurrentTheme().bullets) || '#00ffff'
             });
         }
         
