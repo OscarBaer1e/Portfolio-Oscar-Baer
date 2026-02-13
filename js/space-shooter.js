@@ -2730,9 +2730,12 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Spawn d'astéroïdes : faible au début, augmente avec le niveau
-        const spawnRate = 0.01 + (gameState.level - 1) * 0.0045;
-        if (Math.random() < Math.max(0.01, spawnRate)) {
+        // Spawn : niveaux 1-80 facile → difficile (linéaire), puis 80+ difficulté croissante
+        const lvl = gameState.level;
+        const spawnRate = lvl <= 80
+            ? 0.012 + ((lvl - 1) / 79) * 0.07
+            : 0.082 + (lvl - 80) * 0.0012;
+        if (Math.random() < Math.min(0.12, spawnRate)) {
             spawnAsteroid();
         }
     }
@@ -3239,8 +3242,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const randomColor = asteroidColors[Math.floor(Math.random() * asteroidColors.length)];
         const baseSpeed = Math.random() * 2 + gameState.gameSpeed;
         
-        // Moins de gros astéroïdes au tout début (niveaux 1-4), puis 15%
-        const bigChance = gameState.level <= 4 ? 0.07 : 0.15;
+        // Gros astéroïdes : peu en début (1-10), montée jusqu'à 30, stable 30-80, plus après 80
+        const l = gameState.level;
+        let bigChance = 0.15;
+        if (l <= 10) bigChance = 0.05;
+        else if (l <= 30) bigChance = 0.05 + ((l - 10) / 20) * 0.10;
+        else if (l > 80) bigChance = 0.18;
         const isBigType = Math.random() < bigChance;
         const size = isBigType
             ? Math.random() * 22 + 50   // 50–72 : gros
@@ -3264,21 +3271,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return asteroid.size > 25;
     }
     
-    // Calcule l'augmentation de vitesse : début très doux, puis montée progressive
+    // Vitesse : niveaux 1-80 = facile → difficile (linéaire), 80+ = montée plus douce
     function getSpeedIncrease(level) {
-        if (level <= 15) {
-            // Niveaux 1-15 : augmentation faible (début facile)
-            return 0.08 + ((level - 1) / 14) * 0.10;
-        } else if (level <= 30) {
-            return 0.18 - ((level - 16) / 15) * 0.03;
-        } else if (level <= 60) {
-            return 0.15 - ((level - 31) / 30) * 0.05;
-        } else if (level <= 90) {
-            return 0.10 - ((level - 61) / 30) * 0.05;
-        } else {
-            const extraLevels = level - 91;
-            return Math.max(0.05, 0.05 - (extraLevels / 80) * 0.02);
+        if (level <= 80) {
+            return 0.035 + ((level - 1) / 79) * 0.033;
         }
+        return Math.max(0.04, 0.055 - (level - 81) * 0.00025);
     }
     
     function checkLevel() {
