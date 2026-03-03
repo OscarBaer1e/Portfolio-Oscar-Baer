@@ -23,26 +23,6 @@ if (isMobile) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const STORAGE_KEY = 'siteInvertMode';
-
-    /* Bascule couleurs négatif (sauvegardée, animation Bézier en CSS) */
-    (function initInvertMode() {
-        try {
-            if (localStorage.getItem(STORAGE_KEY) === 'true') {
-                document.body.classList.add('invert-mode');
-            }
-        } catch (e) {}
-        const invertBtn = document.getElementById('invert-toggle');
-        if (invertBtn) {
-            invertBtn.addEventListener('click', function() {
-                document.body.classList.toggle('invert-mode');
-                try {
-                    localStorage.setItem(STORAGE_KEY, document.body.classList.contains('invert-mode'));
-                } catch (e) {}
-            });
-        }
-    })();
-
     const pageLoader = document.querySelector('.page-loader');
     
     if (pageLoader) {
