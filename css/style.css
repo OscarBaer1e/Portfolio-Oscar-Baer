@@ -1924,6 +1924,171 @@ footer .container {
     transform: rotate(360deg) scale(1.05);
 }
 
+/* ================================================
+   MEME-ORY SECRET GAME
+   ================================================ */
+
+.meme-ory-wrapper {
+    background: var(--dark-bg-color-alt);
+    border-radius: var(--radius-default);
+    border: 3px solid var(--border-color);
+    padding: 30px;
+    box-shadow: 0 0 25px rgba(0, 255, 255, 0.3);
+}
+
+.meme-ory-intro {
+    color: var(--dim-text-color);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.meme-ory-stats {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.meme-ory-stats .stat-label {
+    font-size: 0.9rem;
+    color: var(--dim-text-color);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.meme-ory-stats .stat-value {
+    font-size: 1.6rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    text-shadow: 0 0 10px var(--primary-color);
+}
+
+.meme-ory-controls {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.meme-ory-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(70px, 1fr));
+    gap: 15px;
+    justify-items: center;
+}
+
+@media (max-width: 600px) {
+    .meme-ory-grid {
+        grid-template-columns: repeat(3, minmax(70px, 1fr));
+    }
+}
+
+.meme-card {
+    width: 100%;
+    max-width: 140px;
+    aspect-ratio: 3 / 4;
+    perspective: 800px;
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+}
+
+.meme-card:disabled {
+    cursor: default;
+}
+
+.meme-card-inner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.4s ease;
+}
+
+.meme-card.flipped .meme-card-inner,
+.meme-card.matched .meme-card-inner {
+    transform: rotateY(180deg);
+}
+
+.meme-card-face {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: var(--radius-default);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+}
+
+.meme-card-front {
+    background: radial-gradient(circle at 30% 20%, rgba(0, 255, 255, 0.4), transparent 60%),
+                radial-gradient(circle at 70% 80%, rgba(255, 0, 255, 0.4), transparent 60%),
+                var(--dark-bg-color);
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
+}
+
+.meme-card-front span {
+    font-size: 2.4rem;
+    color: var(--primary-color);
+    text-shadow: 0 0 10px var(--primary-color);
+}
+
+.meme-card-back {
+    transform: rotateY(180deg);
+    background: radial-gradient(circle at 30% 20%, rgba(0, 255, 255, 0.2), transparent 60%),
+                radial-gradient(circle at 70% 80%, rgba(255, 0, 255, 0.2), transparent 60%),
+                var(--background-color-light);
+    border: 2px solid var(--secondary-color);
+    box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+}
+
+.meme-emoji {
+    font-size: 2.4rem;
+}
+
+.meme-card.matched .meme-card-back {
+    box-shadow: 0 0 20px rgba(0, 255, 0, 0.7);
+    border-color: #00ff88;
+}
+
+.meme-ory-win-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    z-index: 99999;
+}
+
+.meme-ory-win-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.meme-ory-win-content {
+    background: var(--dark-bg-color);
+    border-radius: 16px;
+    padding: 30px 40px;
+    border: 3px solid var(--primary-color);
+    box-shadow: 0 0 40px rgba(0, 255, 255, 0.6);
+    text-align: center;
+}
+
+.meme-ory-win-content h3 {
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.meme-ory-win-content p {
+    margin-bottom: 20px;
+}
+
 
 /* ------------------------------------------------ */
 /* 11. SCROLL REVEAL (Basé sur le JS natif) */
