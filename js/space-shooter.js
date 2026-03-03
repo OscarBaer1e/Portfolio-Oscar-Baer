@@ -485,13 +485,13 @@ document.addEventListener('DOMContentLoaded', function() {
         } catch (e) { /* ignore */ }
     }
     
-    // Vaisseau
+    // Vaisseau (vitesse un peu réduite pour un pilotage plus précis)
     const ship = {
         x: canvas.width / 2,
         y: canvas.height - 80,
         width: 40,
         height: 40,
-        speed: 8,
+        speed: 5.8,
         color: '#00ffff'
     };
     
@@ -2535,7 +2535,8 @@ document.addEventListener('DOMContentLoaded', function() {
             asteroid.y += asteroid.speed * mul * gameState.deltaTime;
             if (asteroid.vx !== undefined) {
                 asteroid.x += asteroid.vx * mul * gameState.deltaTime;
-                if (asteroid.x < -asteroid.size * 2 || asteroid.x > canvas.width + asteroid.size * 2) asteroid.vx *= -0.8;
+                // Rebond plus amorti : moins de zigzag, trajectoires plus prévisibles
+                if (asteroid.x < -asteroid.size * 2 || asteroid.x > canvas.width + asteroid.size * 2) asteroid.vx *= -0.45;
             }
             asteroid.rotation += asteroid.rotationSpeed * mul * gameState.deltaTime;
             
@@ -2723,9 +2724,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                 y: asteroid.y + Math.sin(angle) * (asteroid.size / 2),
                                 size: newSize,
                                 speed: childSpeed,
-                                vx: parentVx + (Math.random() - 0.5) * 1.2,
+                                vx: parentVx + (Math.random() - 0.5) * 0.4,
                                 rotation: 0,
-                                rotationSpeed: (Math.random() - 0.5) * 0.28,
+                                rotationSpeed: (Math.random() - 0.5) * 0.1,
                                 color: asteroid.color
                             });
                         }
@@ -2741,9 +2742,9 @@ document.addEventListener('DOMContentLoaded', function() {
                                 y: asteroid.y + Math.sin(angle) * (asteroid.size / 2),
                                 size: newSize,
                                 speed: childSpeed,
-                                vx: parentVx + (Math.random() - 0.5) * 1.2,
+                                vx: parentVx + (Math.random() - 0.5) * 0.4,
                                 rotation: 0,
-                                rotationSpeed: (Math.random() - 0.5) * 0.28,
+                                rotationSpeed: (Math.random() - 0.5) * 0.1,
                                 color: asteroid.color
                             });
                         }
@@ -3382,7 +3383,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const currentTheme = getCurrentTheme();
         const asteroidColors = currentTheme.asteroids;
         const randomColor = asteroidColors[Math.floor(Math.random() * asteroidColors.length)];
-        const baseSpeed = Math.random() * 3 + gameState.gameSpeed * 1.2;
+        // Vitesse verticale plus régulière (moins de hasard) pour des trajectoires prévisibles
+        const baseSpeed = Math.random() * 1.0 + gameState.gameSpeed * 1.2;
         
         // Gros astéroïdes : peu en début (1-10), montée jusqu'à 30, stable 30-80, plus après 80
         const l = gameState.level;
@@ -3396,7 +3398,8 @@ document.addEventListener('DOMContentLoaded', function() {
             : Math.random() * 30 + 15;  // 15–45 : normal
         
         const speed = getAsteroidSpeedForSize(baseSpeed, size);
-        const vx = (Math.random() - 0.5) * 1.8;
+        // Dérive horizontale réduite : trajectoires surtout verticales, plus lisibles
+        const vx = (Math.random() - 0.5) * 0.55;
         
         asteroids.push({
             x: Math.random() * (canvas.width - size * 2) + size,
@@ -3405,7 +3408,7 @@ document.addEventListener('DOMContentLoaded', function() {
             speed: speed,
             vx: vx,
             rotation: 0,
-            rotationSpeed: (Math.random() - 0.5) * 0.28,
+            rotationSpeed: (Math.random() - 0.5) * 0.1,
             color: randomColor
         });
     }
@@ -4606,6 +4609,46 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
     
+    // Contrôles tactiles mobile (d-pad + bouton tir)
+    (function initMobileControls() {
+        const mobileUp = document.getElementById('mobile-up');
+        const mobileDown = document.getElementById('mobile-down');
+        const mobileLeft = document.getElementById('mobile-left');
+        const mobileRight = document.getElementById('mobile-right');
+        const mobileShoot = document.getElementById('mobile-shoot');
+        
+        function setKey(code, pressed) {
+            keys[code] = pressed;
+            if (code === 'Space') {
+                if (pressed && gameState.isPlaying && !gameState.isPaused) {
+                    shoot();
+                    if (!autoShootInterval) {
+                        autoShootInterval = setInterval(() => {
+                            if (gameState.isPlaying && !gameState.isPaused && keys['Space']) shoot();
+                        }, getEffectiveFireRate());
+                    }
+                } else if (!pressed && autoShootInterval) {
+                    clearInterval(autoShootInterval);
+                    autoShootInterval = null;
+                }
+            }
+        }
+        
+        function addMobileButton(el, code) {
+            if (!el) return;
+            el.addEventListener('pointerdown', (e) => { e.preventDefault(); setKey(code, true); });
+            el.addEventListener('pointerup', (e) => { e.preventDefault(); setKey(code, false); });
+            el.addEventListener('pointerleave', (e) => { e.preventDefault(); setKey(code, false); });
+            el.addEventListener('pointercancel', (e) => { e.preventDefault(); setKey(code, false); });
+        }
+        
+        addMobileButton(mobileUp, 'ArrowUp');
+        addMobileButton(mobileDown, 'ArrowDown');
+        addMobileButton(mobileLeft, 'ArrowLeft');
+        addMobileButton(mobileRight, 'ArrowRight');
+        addMobileButton(mobileShoot, 'Space');
+    })();
+    
     // Mouvement du vaisseau (normalisé par delta time)
     function handleMovement() {
         if (!gameState.isPlaying || gameState.isPaused) return;
@@ -4613,12 +4656,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
         const shipHeight = ship.height / 2;
         
-        // Mouvement horizontal (gauche/droite)
+        // Mouvement horizontal (gauche/droite) — légèrement plus lent sur les côtés
+        const horizontalSpeed = ship.speed * 0.78;
         if (keys['ArrowLeft'] || keys['KeyA']) {
-            ship.x = Math.max(shipSize, ship.x - ship.speed * gameState.deltaTime);
+            ship.x = Math.max(shipSize, ship.x - horizontalSpeed * gameState.deltaTime);
         }
         if (keys['ArrowRight'] || keys['KeyD']) {
-            ship.x = Math.min(canvas.width - shipSize, ship.x + ship.speed * gameState.deltaTime);
+            ship.x = Math.min(canvas.width - shipSize, ship.x + horizontalSpeed * gameState.deltaTime);
         }
         
         // Mouvement vertical (avancer/reculer) - vitesse légèrement réduite pour l'équilibre
@@ -4646,8 +4690,20 @@ document.addEventListener('DOMContentLoaded', function() {
     })();
     
     let lastFrameTime = getTime();
+    let gameLoopId = null; // Pour annuler la boucle et éviter les doubles boucles
     const targetFPS = 60;
     const frameTime = 1000 / targetFPS; // Temps par frame à 60fps (16.67ms)
+    
+    // Réinitialiser les touches quand la fenêtre perd le focus (évite touches "bloquées")
+    function clearKeysAndShooting() {
+        keys = {};
+        if (autoShootInterval) {
+            clearInterval(autoShootInterval);
+            autoShootInterval = null;
+        }
+    }
+    
+    window.addEventListener('blur', clearKeysAndShooting);
     
     // Boucle de jeu
     function gameLoop(currentTime) {
@@ -4686,7 +4742,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (gameState.isPlaying) {
-            requestAnimationFrame(gameLoop);
+            gameLoopId = requestAnimationFrame(gameLoop);
         }
     }
     
@@ -4740,12 +4796,19 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Annuler une éventuelle boucle précédente pour éviter les doubles boucles
+        if (gameLoopId != null) {
+            cancelAnimationFrame(gameLoopId);
+            gameLoopId = null;
+        }
+        
         // Récupérer le mode de jeu sélectionné
         if (gameModeSelect) {
             gameState.gameMode = gameModeSelect.value;
         }
         
         init();
+        clearKeysAndShooting();
         gameState.isPlaying = true;
         gameState.isPaused = false;
         if (gameOver) gameOver.classList.add('hidden');
@@ -4782,6 +4845,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function endGame() {
         gameState.isPlaying = false;
+        if (gameLoopId != null) {
+            cancelAnimationFrame(gameLoopId);
+            gameLoopId = null;
+        }
+        clearKeysAndShooting();
         if (brolyAudio) {
             brolyAudio.pause();
             brolyAudio.currentTime = 0;
@@ -4865,6 +4933,11 @@ document.addEventListener('DOMContentLoaded', function() {
     function resetGame() {
         gameState.isPlaying = false;
         gameState.isPaused = false;
+        if (gameLoopId != null) {
+            cancelAnimationFrame(gameLoopId);
+            gameLoopId = null;
+        }
+        clearKeysAndShooting();
         if (brolyAudio) {
             brolyAudio.pause();
             brolyAudio.currentTime = 0;
@@ -5039,6 +5112,7 @@ document.addEventListener('DOMContentLoaded', function() {
         cancelRegisterBtn.addEventListener('click', () => {
             scoreRegister.classList.add('hidden');
             playerNameInput.value = '';
+            gameState.isSavingScore = false;
         });
     }
     
