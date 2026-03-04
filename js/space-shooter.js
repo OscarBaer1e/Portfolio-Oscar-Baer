@@ -592,6 +592,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Animations visuelles pour les bonus (remplace les messages texte)
     let powerUpVisualAnimations = [];
+    let powerUpCollectAnimations = []; // Animation prise → dépose vers la zone des buffs
     
     // Boss
     let boss = null;
@@ -1647,6 +1648,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Animations visuelles des bonus
         drawPowerUpVisualAnimations();
+        drawPowerUpCollectAnimations();
         
         // Boss
         if (boss && gameState.bossActive) {
@@ -2431,6 +2433,7 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Mise à jour des animations visuelles des bonus
         updatePowerUpVisualAnimations();
+        updatePowerUpCollectAnimations();
         
         // Mise à jour des particules de score
         updateScoreParticles();
@@ -3107,6 +3110,26 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Crée une animation visuelle pour le score (comme les bonus)
+    // Cible de l'animation "prise → dépose" (zone des icônes de buff, en coord. canvas)
+    function getBuffZoneTarget() {
+        return { x: canvas.width * 0.09, y: canvas.height * 0.058 };
+    }
+    
+    // Crée l'animation qui prend le bonus et le dépose vers la zone des buffs
+    function createPowerUpCollectAnimation(powerUp) {
+        const target = getBuffZoneTarget();
+        powerUpCollectAnimations.push({
+            type: powerUp.type,
+            startX: powerUp.x,
+            startY: powerUp.y,
+            endX: target.x,
+            endY: target.y,
+            progress: 0,
+            color: powerUp.color,
+            isTastyCrousty: powerUp.type === 'tastyCrousty'
+        });
+    }
+    
     // Crée une animation visuelle pour un bonus avec lumière et texte stylé
     function createPowerUpVisualAnimation(type, x, y) {
         // Définir les textes et couleurs selon le type
@@ -3158,6 +3181,9 @@ document.addEventListener('DOMContentLoaded', function() {
         } else if (type === 'mirrorShield') {
             text = '🪞 Bouclier miroir';
             glowColor = '#00ccff';
+        } else if (type === 'tastyCrousty') {
+            text = '🍗 Tasty Crousty';
+            glowColor = '#ffcc00';
         }
         
         // Position aléatoire pour le texte (à côté du vaisseau)
@@ -3334,6 +3360,63 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
+    // Met à jour les animations "prise → dépose" des bonus
+    function updatePowerUpCollectAnimations() {
+        const target = getBuffZoneTarget();
+        for (let i = powerUpCollectAnimations.length - 1; i >= 0; i--) {
+            const anim = powerUpCollectAnimations[i];
+            anim.endX = target.x;
+            anim.endY = target.y;
+            anim.progress += 0.022;
+            if (anim.progress >= 1) {
+                powerUpCollectAnimations.splice(i, 1);
+            }
+        }
+    }
+    
+    // Dessine les animations "prise → dépose" (bonus vole vers la zone des buffs)
+    function drawPowerUpCollectAnimations() {
+        powerUpCollectAnimations.forEach(anim => {
+            const easeOut = t => 1 - (1 - t) * (1 - t);
+            const t = easeOut(Math.min(1, anim.progress));
+            const x = anim.startX + (anim.endX - anim.startX) * t;
+            const y = anim.startY + (anim.endY - anim.startY) * t;
+            const scale = 1 - 0.35 * t;
+            const size = 14 * scale;
+            const alpha = 1 - 0.5 * t;
+            
+            ctx.save();
+            ctx.globalAlpha = alpha;
+            ctx.translate(x, y);
+            ctx.scale(scale, scale);
+            
+            if (anim.isTastyCrousty && typeof tastyCroustyImg !== 'undefined' && tastyCroustyImg && tastyCroustyImg.complete && tastyCroustyImg.naturalWidth > 0) {
+                ctx.drawImage(tastyCroustyImg, -size, -size, size * 2, size * 2);
+            } else {
+                ctx.fillStyle = anim.color;
+                ctx.shadowBlur = anim.isTastyCrousty ? 18 : 10;
+                ctx.shadowColor = anim.color;
+                ctx.beginPath();
+                ctx.arc(0, 0, size, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+            
+            if (anim.isTastyCrousty) {
+                ctx.font = 'bold 20px "Anta", sans-serif';
+                ctx.fillStyle = '#ffcc00';
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 2.5;
+                ctx.textAlign = 'left';
+                ctx.textBaseline = 'middle';
+                ctx.strokeText('TASTY CROUSTY', size + 8, 0);
+                ctx.fillText('TASTY CROUSTY', size + 8, 0);
+            }
+            
+            ctx.restore();
+        });
+    }
+    
     // Explosion améliorée avec plus de particules et effets
     function createEnhancedExplosion(x, y, color, size) {
         try {
@@ -3433,6 +3516,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const now = Date.now();
         
         playSound('powerup');
+        createPowerUpCollectAnimation(powerUp);
         
         if (powerUp.type === 'rapidFire') {
             applyTimedBonus('rapidFire', 'rapidFireEndTime');
