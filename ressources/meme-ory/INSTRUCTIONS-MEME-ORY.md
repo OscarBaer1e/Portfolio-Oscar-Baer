@@ -1,87 +1,30 @@
-# Meme-ory : ce que tu dois faire pour que les images s’affichent
+# Meme-ory : images
 
-## 1. Format et noms des images
+## Format de base
 
-- **Format obligatoire : PNG** (pas JPG, pas WebP).
-- **Nombre : 16 images.**
-- **Noms exacts (minuscules, sans espace) :**
-  - `meme1.png`
-  - `meme2.png`
-  - `meme3.png`
-  - … jusqu’à …
-  - `meme16.png`
+- **Formats acceptés : JPG ou PNG** (priorité au JPG).
+- **16 images** : `meme1.jpg`, `meme2.jpg`, … `meme16.jpg` (ou `.png`).
+- **Taille max : 150 Ko par fichier** — les images plus lourdes sont ignorées (pour que ça charge bien sur le web).
 
-Tu dois avoir **exactement** ces 16 fichiers dans le dossier  
-`Portfolio-Oscar-Baer-main/ressources/meme-ory/`.
+Noms exacts : **meme1**, **meme2**, … **meme16** (sans tiret), extension **.jpg** ou **.png**.
 
----
+## Où les mettre
 
-## 2. Où mettre les fichiers
+Dans le dossier :  
+`ressources/meme-ory/`
 
-Place tes 16 images ici :
+## Régénérer le jeu après avoir changé les images
 
-```
-Portfolio-Oscar-Baer-main/
-  ressources/
-    meme-ory/
-      meme1.png
-      meme2.png
-      meme3.png
-      ...
-      meme16.png
-```
-
-Pas de tiret : **meme1** et non **meme-1**.  
-Extension en minuscules : **.png**.
-
----
-
-## 3. Régénérer le fichier JS (obligatoire)
-
-Le jeu n’utilise pas les PNG directement : il charge un fichier JavaScript qui contient les images en base64. Il faut donc **régénérer** ce fichier après avoir mis tes 16 PNG au bon endroit.
-
-À la **racine du projet** (dossier `Portfolio-Oscar-Baer-main`), ouvre un terminal et lance :
+À la **racine du projet**, dans un terminal :
 
 ```bash
-node -e "
-const fs = require('fs');
-const path = require('path');
-const dir = 'ressources/meme-ory';
-const arr = [];
-for (let i = 1; i <= 16; i++) {
-  const p = path.join(dir, 'meme' + i + '.png');
-  try {
-    arr.push(fs.readFileSync(p).toString('base64'));
-  } catch (e) {
-    console.error('MANQUANT:', p);
-    arr.push('');
-  }
-}
-const out = 'const MEME_ORY_BASE64 = ' + JSON.stringify(arr) + ';\n';
-fs.writeFileSync('js/meme-ory-images.js', out);
-console.log('OK – js/meme-ory-images.js créé');
-"
+node scripts/build-meme-ory-images.js
 ```
 
-- Si tu vois `MANQUANT: ressources/meme-ory/memeX.png`, le fichier `memeX.png` n’est pas au bon endroit ou pas bien nommé.
-- Si tu vois `OK – js/meme-ory-images.js créé`, c’est bon.
+Cela met à jour `js/meme-ory-images.js`. Les images trop lourdes (> 150 Ko) sont remplacées par une image placeholder.
 
-**Il faut avoir Node.js d’installé** (sinon installe-le depuis https://nodejs.org).
+## En résumé
 
----
-
-## 4. Résumé à faire à chaque fois que tu changes les images
-
-1. Mettre **16 images PNG** dans `ressources/meme-ory/` avec les noms **meme1.png** … **meme16.png**.
-2. Lancer la commande **node** ci-dessus à la racine du projet.
-3. Vérifier que **js/meme-ory-images.js** a bien été mis à jour (et le commiter si tu utilises Git).
-
----
-
-## 5. Si ça ne marche toujours pas
-
-- Ouvre la page du jeu (Meme-ory), puis **F12** → onglet **Console**.
-- Regarde s’il y a des erreurs en rouge.
-- Vérifie que **js/meme-ory-images.js** est bien chargé : onglet **Réseau** (Network), recharge la page, et vérifie que `meme-ory-images.js` apparaît avec un statut 200.
-
-Si tu suis ces étapes (format PNG, noms exacts, dossier `ressources/meme-ory/`, puis commande Node), les images sont censées s’afficher partout (local et en ligne).
+1. Mettre 16 images (JPG ou PNG, max 150 Ko chacune) nommées `meme1` … `meme16` dans `ressources/meme-ory/`.
+2. Lancer `node scripts/build-meme-ory-images.js`.
+3. Recharger la page du jeu (et faire un push si tu utilises Git).

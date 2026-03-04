@@ -17,7 +17,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     var MEME_IMAGES = [];
     if (typeof MEME_ORY_BASE64 !== 'undefined' && MEME_ORY_BASE64 && MEME_ORY_BASE64.length >= 16) {
-        MEME_IMAGES = MEME_ORY_BASE64.map(function(b) { return 'data:image/png;base64,' + b; });
+        var mimes = (typeof MEME_ORY_MIME !== 'undefined' && MEME_ORY_MIME && MEME_ORY_MIME.length >= 16)
+            ? MEME_ORY_MIME : MEME_ORY_BASE64.map(function() { return 'png'; });
+        MEME_IMAGES = MEME_ORY_BASE64.map(function(b, i) {
+            var t = mimes[i] || 'png';
+            return 'data:image/' + t + ';base64,' + b;
+        });
     }
 
     const DIFFICULTIES = {
