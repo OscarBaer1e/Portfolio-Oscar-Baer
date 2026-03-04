@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
         level: 1,
         lives: 3,
         maxLives: 3,
-        gameSpeed: 1.85, // Départ rapide et fluide, montée plus douce par niveau
+        gameSpeed: 1.7, // Plus simple et fluide, kif sans prise de tête
         gameMode: 'normal', // 'normal' ou 'infinite'
         bossActive: false,
         deltaTime: 1.0, // Multiplicateur de vitesse normalisé (1.0 = 60fps)
@@ -492,7 +492,7 @@ document.addEventListener('DOMContentLoaded', function() {
         y: canvas.height - 80,
         width: 40,
         height: 40,
-        speed: 5.8,
+        speed: 7,
         color: '#00ffff'
     };
     
@@ -601,7 +601,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Variables de tir
     let lastShotTime = 0;
-    let baseFireRate = 220; // Temps entre les tirs en ms (plus nerveux)
+    let baseFireRate = 175; // Tir plus rapide pour un gameplay réactif
     let currentFireRate = baseFireRate;
     
     // Vérifications de sécurité pour tous les éléments
@@ -1130,7 +1130,7 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.level = 1;
         gameState.lives = 3;
         gameState.maxLives = 3;
-        gameState.gameSpeed = 1.85; // Départ plus rapide pour un jeu plus fluide
+        gameState.gameSpeed = 1.7; // Départ fluide, plus simple à kifer
         gameState.bossActive = false;
         currentFireRate = baseFireRate;
         activePowerUps = {
@@ -2785,24 +2785,10 @@ document.addEventListener('DOMContentLoaded', function() {
                                     });
                                 }
                             }
-                            const DROP_RATE = 0.055;
-                            const BONUS_RARITY = {
-                                common:   { chance: 0.56, types: ['rapidFire', 'shield', 'shrink', 'bigBullets', 'tripleShot'] },
-                                uncommon: { chance: 0.26, types: ['timeSlow', 'magnet', 'seeker'] },
-                                rare:     { chance: 0.12, types: ['offensiveShield', 'prism', 'overdrive', 'slowTarget'] },
-                                epic:     { chance: 0.04, types: ['life', 'mirrorShield'] },
-                                legendary: { chance: 0.02, types: ['tastyCrousty'] }
-                            };
+                            const DROP_RATE = 0.11;
+                            const ALL_BONUS_TYPES = ['rapidFire', 'shield', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet', 'prism', 'seeker', 'overdrive', 'slowTarget', 'mirrorShield', 'tastyCrousty', 'life'];
                             if (Math.random() < DROP_RATE) {
-                                const r = Math.random();
-                                let tier = 'common';
-                                if (r < BONUS_RARITY.common.chance) tier = 'common';
-                                else if (r < BONUS_RARITY.common.chance + BONUS_RARITY.uncommon.chance) tier = 'uncommon';
-                                else if (r < BONUS_RARITY.common.chance + BONUS_RARITY.uncommon.chance + BONUS_RARITY.rare.chance) tier = 'rare';
-                                else if (r < BONUS_RARITY.common.chance + BONUS_RARITY.uncommon.chance + BONUS_RARITY.rare.chance + BONUS_RARITY.epic.chance) tier = 'epic';
-                                else tier = 'legendary';
-                                const list = BONUS_RARITY[tier].types;
-                                const type = list[Math.floor(Math.random() * list.length)];
+                                const type = ALL_BONUS_TYPES[Math.floor(Math.random() * ALL_BONUS_TYPES.length)];
                                 spawnPowerUp(a.x, a.y, type);
                             }
                         });
@@ -2889,25 +2875,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         }
                     }
                     
-                    // Chance de faire apparaître un boost — raretés pour limiter le stacking et équilibrer
-                    const DROP_RATE = 0.055;
-                    const BONUS_RARITY = {
-                        common:   { chance: 0.56, types: ['rapidFire', 'shield', 'shrink', 'bigBullets', 'tripleShot'] },
-                        uncommon: { chance: 0.26, types: ['timeSlow', 'magnet', 'seeker'] },
-                        rare:     { chance: 0.12, types: ['offensiveShield', 'prism', 'overdrive', 'slowTarget'] },
-                        epic:     { chance: 0.04, types: ['life', 'mirrorShield'] },
-                        legendary: { chance: 0.02, types: ['tastyCrousty'] }
-                    };
+                    const DROP_RATE = 0.11;
+                    const ALL_BONUS_TYPES = ['rapidFire', 'shield', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet', 'prism', 'seeker', 'overdrive', 'slowTarget', 'mirrorShield', 'tastyCrousty', 'life'];
                     if (Math.random() < DROP_RATE) {
-                        const r = Math.random();
-                        let tier = 'common';
-                        if (r < BONUS_RARITY.common.chance) tier = 'common';
-                        else if (r < BONUS_RARITY.common.chance + BONUS_RARITY.uncommon.chance) tier = 'uncommon';
-                        else if (r < BONUS_RARITY.common.chance + BONUS_RARITY.uncommon.chance + BONUS_RARITY.rare.chance) tier = 'rare';
-                        else if (r < BONUS_RARITY.common.chance + BONUS_RARITY.uncommon.chance + BONUS_RARITY.rare.chance + BONUS_RARITY.epic.chance) tier = 'epic';
-                        else tier = 'legendary';
-                        const list = BONUS_RARITY[tier].types;
-                        const type = list[Math.floor(Math.random() * list.length)];
+                        const type = ALL_BONUS_TYPES[Math.floor(Math.random() * ALL_BONUS_TYPES.length)];
                         spawnPowerUp(asteroid.x, asteroid.y, type);
                     }
                     
@@ -3438,7 +3409,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Durées de base pour le stack (stack = durée uniquement)
-    const BONUS_DURATIONS = { rapidFire: 10000, shield: 8000, shrink: 12000, bigBullets: 15000, tripleShot: 10000, timeSlow: 12000, offensiveShield: 15000, magnet: 20000, prism: 12000, seeker: 10000, overdrive: 10000, slowTarget: 10000, mirrorShield: 12000, tastyCrousty: 14000 };
+    // Durées un peu plus courtes pour éviter le cumul infini, tout en gardant du kif
+    const BONUS_DURATIONS = { rapidFire: 8000, shield: 7000, shrink: 10000, bigBullets: 12000, tripleShot: 8000, timeSlow: 10000, offensiveShield: 12000, magnet: 15000, prism: 10000, seeker: 8000, overdrive: 8000, slowTarget: 8000, mirrorShield: 10000, tastyCrousty: 11000 };
     
     const TIMED_BONUS_TYPES = ['rapidFire', 'shield', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet', 'prism', 'seeker', 'overdrive', 'slowTarget', 'mirrorShield', 'tastyCrousty'];
     
@@ -3563,12 +3535,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return asteroid.size > 25;
     }
     
-    // Vitesse : courbe plus douce (départ déjà rapide, donc montée moins forte par niveau)
+    // Vitesse : montée douce pour garder le kif sans punir
     function getSpeedIncrease(level) {
         if (level <= 80) {
-            return 0.012 + ((level - 1) / 79) * 0.028; // ~0.012 à 0.04 par niveau (au lieu de 0.04–0.08)
+            return 0.008 + ((level - 1) / 79) * 0.022; // ~0.008 à 0.03 par niveau
         }
-        return Math.max(0.03, 0.045 - (level - 81) * 0.00015);
+        return Math.max(0.025, 0.038 - (level - 81) * 0.00012);
     }
     
     function checkLevel() {
