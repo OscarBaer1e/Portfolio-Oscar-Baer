@@ -1971,9 +1971,10 @@ footer .container {
 
 .meme-ory-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(70px, 1fr));
-    gap: 15px;
-    justify-items: center;
+    grid-template-columns: repeat(4, var(--meme-card-size, 110px));
+    gap: 12px;
+    justify-content: center;
+    align-items: start;
 }
 
 .meme-ory-grid .meme-card {
@@ -1997,19 +1998,22 @@ footer .container {
 
 @media (max-width: 600px) {
     .meme-ory-grid {
-        grid-template-columns: repeat(3, minmax(70px, 1fr));
+        --meme-card-size: 95px;
+        grid-template-columns: repeat(4, var(--meme-card-size));
     }
 }
 
 .meme-card {
-    width: 100%;
-    max-width: 140px;
-    aspect-ratio: 3 / 4;
+    width: var(--meme-card-size, 110px);
+    height: var(--meme-card-size, 110px);
+    min-width: var(--meme-card-size, 110px);
+    min-height: var(--meme-card-size, 110px);
     perspective: 800px;
     background: transparent;
     border: none;
     padding: 0;
     cursor: pointer;
+    flex-shrink: 0;
 }
 
 .meme-card:hover:not(.flipped):not(.matched) .meme-card-front {
@@ -2058,6 +2062,7 @@ footer .container {
     align-items: center;
     justify-content: center;
     font-size: 2rem;
+    overflow: hidden;
 }
 
 .meme-card-front {
@@ -2084,9 +2089,12 @@ footer .container {
 }
 
 .meme-card-back .meme-card-img {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
+    object-position: center;
     display: block;
 }
 

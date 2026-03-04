@@ -76,8 +76,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const img = document.createElement('img');
         img.src = imageSrc;
         img.alt = '';
-        img.loading = 'lazy';
+        img.loading = 'eager';
         img.className = 'meme-card-img';
+        img.decode().catch(() => {});
         back.appendChild(img);
 
         inner.appendChild(front);
@@ -158,7 +159,8 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function initGame() {
-        cards = shuffle([...MEME_IMAGES, ...MEME_IMAGES]);
+        const shuffledPool = shuffle([...MEME_IMAGES]);
+        cards = shuffle([...shuffledPool, ...shuffledPool]);
         moves = 0;
         matches = 0;
         startTime = null;
