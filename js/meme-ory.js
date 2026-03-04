@@ -11,13 +11,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const finalMovesEl = document.getElementById('meme-final-moves');
     const finalTimeEl = document.getElementById('meme-final-time');
 
-    // Cartes "mème" basées sur des emojis/labels.
-    // Tu peux remplacer les labels par de vraies images si tu veux :
-    // - mets tes images dans ressources/meme-ory/
-    // - et remplace le contenu de cardBack.innerHTML par un <img src="...">
-    const MEME_LABELS = [
-        '😂', '😎', '🔥', '🤯',
-        '👀', '🙃', '🤡', '💀'
+    const MEME_IMAGES_BASE = '../ressources/meme-ory';
+    const MEME_IMAGES = [
+        `${MEME_IMAGES_BASE}/meme-1.png`,
+        `${MEME_IMAGES_BASE}/meme-2.png`,
+        `${MEME_IMAGES_BASE}/meme-3.png`,
+        `${MEME_IMAGES_BASE}/meme-4.png`,
+        `${MEME_IMAGES_BASE}/meme-5.png`,
+        `${MEME_IMAGES_BASE}/meme-6.png`,
+        `${MEME_IMAGES_BASE}/meme-7.png`,
+        `${MEME_IMAGES_BASE}/meme-8.png`
     ];
 
     let cards = [];
@@ -53,29 +56,35 @@ document.addEventListener('DOMContentLoaded', () => {
         return array;
     }
 
-    function createCardElement(label, index) {
+    function createCardElement(imageSrc, index) {
         const card = document.createElement('button');
         card.type = 'button';
         card.className = 'meme-card';
         card.setAttribute('data-index', index.toString());
-        card.setAttribute('aria-label', 'Carte de mème masquée');
+        card.setAttribute('aria-label', 'Carte mème masquée');
+        card.style.animationDelay = `${index * 0.04}s`;
 
         const inner = document.createElement('div');
         inner.className = 'meme-card-inner';
 
         const front = document.createElement('div');
         front.className = 'meme-card-face meme-card-front';
-        front.innerHTML = '<span>?</span>';
+        front.innerHTML = '<span class="meme-card-question">?</span>';
 
         const back = document.createElement('div');
         back.className = 'meme-card-face meme-card-back';
-        back.innerHTML = `<span class="meme-emoji">${label}</span>`;
+        const img = document.createElement('img');
+        img.src = imageSrc;
+        img.alt = '';
+        img.loading = 'lazy';
+        img.className = 'meme-card-img';
+        back.appendChild(img);
 
         inner.appendChild(front);
         inner.appendChild(back);
         card.appendChild(inner);
 
-        card.addEventListener('click', () => onCardClick(card, label));
+        card.addEventListener('click', () => onCardClick(card, imageSrc));
 
         return card;
     }
@@ -86,24 +95,24 @@ document.addEventListener('DOMContentLoaded', () => {
         lockBoard = false;
     }
 
-    function onCardClick(card, label) {
+    function onCardClick(card, imageSrc) {
         if (lockBoard) return;
         if (card.classList.contains('matched') || card.classList.contains('flipped')) return;
 
-        // Démarrage du timer au premier clic
         if (moves === 0 && matches === 0 && !startTime) {
             startTimer();
         }
 
         card.classList.add('flipped');
+        card.classList.add('meme-card-reveal');
 
         if (!firstCard) {
-            firstCard = { card, label };
+            firstCard = { card, label: imageSrc };
             return;
         }
 
         if (!secondCard && card !== firstCard.card) {
-            secondCard = { card, label };
+            secondCard = { card, label: imageSrc };
             moves++;
             if (movesEl) movesEl.textContent = moves.toString();
             checkForMatch();
@@ -117,38 +126,39 @@ document.addEventListener('DOMContentLoaded', () => {
         const isMatch = firstCard.label === secondCard.label;
 
         if (isMatch) {
-            firstCard.card.classList.add('matched');
-            secondCard.card.classList.add('matched');
+            firstCard.card.classList.add('matched', 'meme-card-match');
+            secondCard.card.classList.add('matched', 'meme-card-match');
             matches++;
             if (matchesEl) matchesEl.textContent = matches.toString();
             setTimeout(() => {
+                firstCard.card.classList.remove('meme-card-match');
+                secondCard.card.classList.remove('meme-card-match');
                 resetBoard();
                 checkVictory();
-            }, 400);
+            }, 500);
         } else {
             setTimeout(() => {
-                firstCard.card.classList.remove('flipped');
-                secondCard.card.classList.remove('flipped');
+                firstCard.card.classList.remove('flipped', 'meme-card-reveal');
+                secondCard.card.classList.remove('flipped', 'meme-card-reveal');
                 resetBoard();
-            }, 800);
+            }, 900);
         }
     }
 
     function checkVictory() {
-        if (matches === MEME_LABELS.length) {
-            stopTimer();
-            const totalTime = timeEl ? timeEl.textContent : '';
-            if (finalMovesEl) finalMovesEl.textContent = moves.toString();
-            if (finalTimeEl && totalTime) finalTimeEl.textContent = totalTime;
-            if (winOverlay) {
-                winOverlay.setAttribute('aria-hidden', 'false');
-                winOverlay.classList.add('show');
-            }
+        if (matches !== MEME_IMAGES.length) return;
+        stopTimer();
+        const totalTime = timeEl ? timeEl.textContent : '';
+        if (finalMovesEl) finalMovesEl.textContent = moves.toString();
+        if (finalTimeEl && totalTime) finalTimeEl.textContent = totalTime;
+        if (winOverlay) {
+            winOverlay.setAttribute('aria-hidden', 'false');
+            winOverlay.classList.add('show', 'meme-win-pop');
         }
     }
 
     function initGame() {
-        cards = shuffle([...MEME_LABELS, ...MEME_LABELS]);
+        cards = shuffle([...MEME_IMAGES, ...MEME_IMAGES]);
         moves = 0;
         matches = 0;
         startTime = null;
@@ -159,31 +169,30 @@ document.addEventListener('DOMContentLoaded', () => {
         resetBoard();
 
         if (winOverlay) {
-            winOverlay.classList.remove('show');
+            winOverlay.classList.remove('show', 'meme-win-pop');
             winOverlay.setAttribute('aria-hidden', 'true');
         }
 
         if (grid) {
             grid.innerHTML = '';
-            cards.forEach((label, index) => {
-                const cardEl = createCardElement(label, index);
+            grid.classList.remove('meme-grid-ready');
+            void grid.offsetWidth;
+            cards.forEach((imageSrc, index) => {
+                const cardEl = createCardElement(imageSrc, index);
                 grid.appendChild(cardEl);
+            });
+            requestAnimationFrame(() => {
+                grid.classList.add('meme-grid-ready');
             });
         }
     }
 
     if (restartBtn) {
-        restartBtn.addEventListener('click', () => {
-            initGame();
-        });
+        restartBtn.addEventListener('click', () => initGame());
     }
-
     if (playAgainBtn) {
-        playAgainBtn.addEventListener('click', () => {
-            initGame();
-        });
+        playAgainBtn.addEventListener('click', () => initGame());
     }
 
     initGame();
 });
-
