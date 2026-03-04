@@ -41,6 +41,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     var currentDifficulty = 'easy';
     var cards = [];
+    var currentImageIndices = [];
     var firstCard = null;
     var secondCard = null;
     var lockBoard = false;
@@ -113,12 +114,7 @@ document.addEventListener('DOMContentLoaded', () => {
         back.className = 'meme-card-face meme-card-back';
         var img = document.createElement('img');
         img.alt = '';
-        if (MEME_IMAGES[pairId]) {
-            img.src = MEME_IMAGES[pairId];
-        } else {
-            img.style.background = 'linear-gradient(135deg, #333, #111)';
-            img.style.minHeight = '100%';
-        }
+        img.setAttribute('data-pair-id', String(pairId));
         back.appendChild(img);
 
         inner.appendChild(front);
@@ -237,6 +233,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function initGame() {
         var config = getConfig();
+        var allIndices = [];
+        for (var i = 0; i < 16; i++) allIndices.push(i);
+        currentImageIndices = shuffle(allIndices).slice(0, config.pairs);
         var pairIds = [];
         for (var i = 0; i < config.pairs; i++) pairIds.push(i);
         pairIds = shuffle(pairIds);
@@ -267,6 +266,15 @@ document.addEventListener('DOMContentLoaded', () => {
             var cardEl = createCardElement(item.pairId, index);
             cardEl.style.animationDelay = (index * 0.04) + 's';
             grid.appendChild(cardEl);
+            var img = cardEl.querySelector('.meme-card-back img');
+            var imgIndex = currentImageIndices[item.pairId];
+            if (img && imgIndex !== undefined && MEME_IMAGES[imgIndex]) {
+                img.removeAttribute('src');
+                img.src = MEME_IMAGES[imgIndex];
+            } else if (img) {
+                img.style.background = 'linear-gradient(135deg, #333, #111)';
+                img.style.minHeight = '100%';
+            }
         });
     }
 
@@ -287,5 +295,16 @@ document.addEventListener('DOMContentLoaded', () => {
     if (playAgainBtn) playAgainBtn.addEventListener('click', initGame);
     if (timeoverRetryBtn) timeoverRetryBtn.addEventListener('click', initGame);
 
-    initGame();
+    var startScreen = document.getElementById('meme-ory-start');
+    var gameArea = document.getElementById('meme-ory-game');
+    var launchBtn = document.getElementById('meme-ory-launch-btn');
+    if (launchBtn && startScreen && gameArea) {
+        launchBtn.addEventListener('click', function() {
+            startScreen.style.display = 'none';
+            gameArea.classList.remove('hidden');
+            initGame();
+        });
+    } else {
+        initGame();
+    }
 });
