@@ -16,10 +16,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultTextEl = document.getElementById('meme-result-text');
     const timeoverMatchesEl = document.getElementById('meme-timeover-matches');
 
-    // URL de base absolue pour que les images se chargent (pages/meme-ory.html → ressources/meme-ory/)
+    // URL de base absolue : résolution depuis la page OU depuis le script pour fiabilité (Rejouer / changement niveau)
     function getMemeImageBase() {
         try {
-            return new URL('../ressources/meme-ory/', window.location.href).href;
+            const fromPage = new URL('../ressources/meme-ory/', window.location.href).href;
+            const scriptEl = document.querySelector('script[src*="meme-ory"]');
+            if (scriptEl && scriptEl.src) {
+                const fromScript = new URL('../ressources/meme-ory/', scriptEl.src).href;
+                return fromScript;
+            }
+            return fromPage;
         } catch (e) {
             return '../ressources/meme-ory/';
         }
@@ -101,7 +107,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return a;
     }
 
-    function createCardElement(imageSrc, pairId, index) {
+    function createCardElement(pairId, index) {
         const card = document.createElement('button');
         card.type = 'button';
         card.className = 'meme-card';
@@ -119,10 +125,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const back = document.createElement('div');
         back.className = 'meme-card-face meme-card-back';
         const img = document.createElement('img');
-        img.src = imageSrc;
         img.alt = '';
-        img.loading = 'lazy';
+        img.loading = 'eager';
         img.referrerPolicy = 'no-referrer';
+        img.setAttribute('data-meme-src', 'meme' + (pairId + 1) + '.png');
         img.onerror = function() {
             this.style.background = 'linear-gradient(135deg, #333, #111)';
             this.style.minHeight = '100%';
@@ -262,10 +268,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
         if (grid) {
             grid.innerHTML = '';
-            cards.forEach((item, index) => {
-                const cardEl = createCardElement(item.imageSrc, item.pairId, index);
-                cardEl.style.animationDelay = (index * 0.04) + 's';
-                grid.appendChild(cardEl);
+            const base = getMemeImageBase();
+            requestAnimationFrame(function() {
+                cards.forEach((item, index) => {
+                    const cardEl = createCardElement(item.pairId, index);
+                    cardEl.style.animationDelay = (index * 0.04) + 's';
+                    grid.appendChild(cardEl);
+                    var img = cardEl.querySelector('.meme-card-back img');
+                    if (img && img.getAttribute('data-meme-src')) {
+                        img.src = base + img.getAttribute('data-meme-src');
+                    }
+                });
             });
         }
     }
