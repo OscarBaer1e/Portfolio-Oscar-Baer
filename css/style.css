@@ -1981,6 +1981,16 @@ footer .container {
     box-shadow: 0 0 12px rgba(0, 255, 255, 0.4);
 }
 
+.meme-diff-btn.locked,
+.meme-diff-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.meme-diff-btn.locked::after {
+    content: ' 🔒';
+}
+
 .meme-ory-stats {
     display: flex;
     justify-content: center;

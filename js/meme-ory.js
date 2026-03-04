@@ -16,14 +16,35 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultTextEl = document.getElementById('meme-result-text');
     const timeoverMatchesEl = document.getElementById('meme-timeover-matches');
 
-    const BASE = '../ressources/meme-ory/';
-    const MEME_IMAGES = Array.from({ length: 16 }, (_, i) => BASE + 'meme' + (i + 1) + '.png');
+    // URL de base absolue pour que les images se chargent (pages/meme-ory.html → ressources/meme-ory/)
+    function getMemeImageBase() {
+        try {
+            return new URL('../ressources/meme-ory/', window.location.href).href;
+        } catch (e) {
+            return '../ressources/meme-ory/';
+        }
+    }
+    const MEME_IMAGES = Array.from({ length: 16 }, (_, i) => getMemeImageBase() + 'meme' + (i + 1) + '.png');
 
+    // Niveau 1 = 8 paires (obligatoire), puis déblocage niveau 2, puis 3
     const DIFFICULTIES = {
-        easy:   { pairs: 4,  timeSec: 90,  label: 'Facile' },
-        medium: { pairs: 6,  timeSec: 120, label: 'Moyen' },
-        hard:   { pairs: 8,  timeSec: 150, label: 'Difficile' }
+        easy:   { pairs: 8, timeSec: 150, label: 'Niveau 1', level: 1 },
+        medium: { pairs: 8, timeSec: 120, label: 'Niveau 2', level: 2 },
+        hard:   { pairs: 8, timeSec: 90,  label: 'Niveau 3', level: 3 }
     };
+
+    const STORAGE_KEY = 'memeoryUnlockedLevel';
+    function getUnlockedLevel() {
+        try {
+            const n = parseInt(localStorage.getItem(STORAGE_KEY) || '1', 10);
+            return Math.max(1, Math.min(3, n));
+        } catch (e) { return 1; }
+    }
+    function setUnlockedLevel(level) {
+        try {
+            localStorage.setItem(STORAGE_KEY, String(Math.max(getUnlockedLevel(), level)));
+        } catch (e) {}
+    }
 
     let currentDifficulty = 'easy';
     let cards = [];
@@ -101,6 +122,12 @@ document.addEventListener('DOMContentLoaded', () => {
         img.src = imageSrc;
         img.alt = '';
         img.loading = 'lazy';
+        img.referrerPolicy = 'no-referrer';
+        img.onerror = function() {
+            this.style.background = 'linear-gradient(135deg, #333, #111)';
+            this.style.minHeight = '100%';
+            this.onerror = null;
+        };
         back.appendChild(img);
 
         inner.appendChild(front);
@@ -172,13 +199,16 @@ document.addEventListener('DOMContentLoaded', () => {
         const config = getConfig();
         if (matches === config.pairs) {
             stopTimer();
-            if (resultTitleEl) resultTitleEl.textContent = 'GG, tu as tout trouvé !';
+            const level = config.level || 1;
+            setUnlockedLevel(level + 1);
+            if (resultTitleEl) resultTitleEl.textContent = level < 3 ? 'Niveau ' + level + ' réussi !' : 'GG, tu as tout fini !';
             if (finalMovesEl) finalMovesEl.textContent = moves.toString();
             if (finalTimeEl) finalTimeEl.textContent = timeLeft + 's restants';
             if (winOverlay) {
                 winOverlay.setAttribute('aria-hidden', 'false');
                 winOverlay.classList.add('show');
             }
+            updateDifficultyButtons();
         }
     }
 
@@ -228,6 +258,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resetBoard();
         hideOverlays();
         setGridClass();
+        updateDifficultyButtons();
 
         if (grid) {
             grid.innerHTML = '';
@@ -239,12 +270,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
+    function updateDifficultyButtons() {
+        const unlocked = getUnlockedLevel();
+        document.querySelectorAll('.meme-diff-btn').forEach(btn => {
+            const diff = btn.getAttribute('data-diff');
+            const cfg = DIFFICULTIES[diff];
+            const level = cfg && cfg.level ? cfg.level : 1;
+            const isLocked = level > unlocked;
+            btn.classList.toggle('locked', isLocked);
+            btn.disabled = isLocked;
+            btn.classList.toggle('active', !isLocked && diff === currentDifficulty);
+        });
+    }
+
     function setDifficulty(diff) {
         if (!DIFFICULTIES[diff]) return;
+        const cfg = DIFFICULTIES[diff];
+        const level = cfg && cfg.level ? cfg.level : 1;
+        if (level > getUnlockedLevel()) return;
         currentDifficulty = diff;
-        document.querySelectorAll('.meme-diff-btn').forEach(btn => {
-            btn.classList.toggle('active', btn.getAttribute('data-diff') === diff);
-        });
+        updateDifficultyButtons();
         initGame();
     }
 
