@@ -7,37 +7,60 @@ document.addEventListener('DOMContentLoaded', () => {
     const timeEl = document.getElementById('meme-time');
     const restartBtn = document.getElementById('meme-restart');
     const winOverlay = document.getElementById('meme-win-overlay');
+    const timeoverOverlay = document.getElementById('meme-timeover-overlay');
     const playAgainBtn = document.getElementById('meme-play-again');
+    const timeoverRetryBtn = document.getElementById('meme-timeover-retry');
     const finalMovesEl = document.getElementById('meme-final-moves');
     const finalTimeEl = document.getElementById('meme-final-time');
+    const resultTitleEl = document.getElementById('meme-result-title');
+    const resultTextEl = document.getElementById('meme-result-text');
+    const timeoverMatchesEl = document.getElementById('meme-timeover-matches');
 
-    const MEME_IMAGES_BASE = '../ressources/meme-ory';
-    const MEME_IMAGES = [
-        `${MEME_IMAGES_BASE}/meme-1.png`,
-        `${MEME_IMAGES_BASE}/meme-2.png`,
-        `${MEME_IMAGES_BASE}/meme-3.png`,
-        `${MEME_IMAGES_BASE}/meme-4.png`,
-        `${MEME_IMAGES_BASE}/meme-5.png`,
-        `${MEME_IMAGES_BASE}/meme-6.png`,
-        `${MEME_IMAGES_BASE}/meme-7.png`,
-        `${MEME_IMAGES_BASE}/meme-8.png`
-    ];
+    const BASE = '../ressources/meme-ory/';
+    const MEME_IMAGES = Array.from({ length: 16 }, (_, i) => BASE + 'meme' + (i + 1) + '.png');
 
+    const DIFFICULTIES = {
+        easy:   { pairs: 4,  timeSec: 90,  label: 'Facile' },
+        medium: { pairs: 6,  timeSec: 120, label: 'Moyen' },
+        hard:   { pairs: 8,  timeSec: 150, label: 'Difficile' }
+    };
+
+    let currentDifficulty = 'easy';
     let cards = [];
     let firstCard = null;
     let secondCard = null;
     let lockBoard = false;
     let moves = 0;
     let matches = 0;
-    let startTime = null;
+    let timeLeft = 0;
     let timerId = null;
+    let gameStarted = false;
 
-    function startTimer() {
-        startTime = Date.now();
+    function getConfig() {
+        return DIFFICULTIES[currentDifficulty];
+    }
+
+    function startCountdown() {
+        const config = getConfig();
+        timeLeft = config.timeSec;
+        if (timeEl) timeEl.textContent = timeLeft + 's';
+        timeEl?.classList.remove('meme-timer-warning', 'meme-timer-danger');
         if (timerId) clearInterval(timerId);
         timerId = setInterval(() => {
-            const diff = Math.floor((Date.now() - startTime) / 1000);
-            if (timeEl) timeEl.textContent = diff + 's';
+            timeLeft--;
+            if (timeEl) {
+                timeEl.textContent = timeLeft + 's';
+                if (timeLeft <= 10) {
+                    timeEl.classList.add('meme-timer-danger');
+                    timeEl.classList.remove('meme-timer-warning');
+                } else if (timeLeft <= 20) {
+                    timeEl.classList.add('meme-timer-warning');
+                }
+            }
+            if (timeLeft <= 0) {
+                stopTimer();
+                gameOverTime();
+            }
         }, 1000);
     }
 
@@ -49,20 +72,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function shuffle(array) {
-        for (let i = array.length - 1; i > 0; i--) {
+        const a = [...array];
+        for (let i = a.length - 1; i > 0; i--) {
             const j = Math.floor(Math.random() * (i + 1));
-            [array[i], array[j]] = [array[j], array[i]];
+            [a[i], a[j]] = [a[j], a[i]];
         }
-        return array;
+        return a;
     }
 
-    function createCardElement(imageSrc, index) {
+    function createCardElement(imageSrc, pairId, index) {
         const card = document.createElement('button');
         card.type = 'button';
         card.className = 'meme-card';
         card.setAttribute('data-index', index.toString());
+        card.setAttribute('data-pair-id', pairId.toString());
         card.setAttribute('aria-label', 'Carte mème masquée');
-        card.style.animationDelay = `${index * 0.04}s`;
 
         const inner = document.createElement('div');
         inner.className = 'meme-card-inner';
@@ -76,16 +100,14 @@ document.addEventListener('DOMContentLoaded', () => {
         const img = document.createElement('img');
         img.src = imageSrc;
         img.alt = '';
-        img.loading = 'eager';
-        img.className = 'meme-card-img';
-        img.decode().catch(() => {});
+        img.loading = 'lazy';
         back.appendChild(img);
 
         inner.appendChild(front);
         inner.appendChild(back);
         card.appendChild(inner);
 
-        card.addEventListener('click', () => onCardClick(card, imageSrc));
+        card.addEventListener('click', () => onCardClick(card, pairId));
 
         return card;
     }
@@ -96,24 +118,24 @@ document.addEventListener('DOMContentLoaded', () => {
         lockBoard = false;
     }
 
-    function onCardClick(card, imageSrc) {
+    function onCardClick(card, pairId) {
         if (lockBoard) return;
         if (card.classList.contains('matched') || card.classList.contains('flipped')) return;
 
-        if (moves === 0 && matches === 0 && !startTime) {
-            startTimer();
+        if (!gameStarted) {
+            gameStarted = true;
+            startCountdown();
         }
 
         card.classList.add('flipped');
-        card.classList.add('meme-card-reveal');
 
         if (!firstCard) {
-            firstCard = { card, label: imageSrc };
+            firstCard = { card, pairId };
             return;
         }
 
         if (!secondCard && card !== firstCard.card) {
-            secondCard = { card, label: imageSrc };
+            secondCard = { card, pairId };
             moves++;
             if (movesEl) movesEl.textContent = moves.toString();
             checkForMatch();
@@ -124,77 +146,115 @@ document.addEventListener('DOMContentLoaded', () => {
         if (!firstCard || !secondCard) return;
 
         lockBoard = true;
-        const isMatch = firstCard.label === secondCard.label;
+        const isMatch = firstCard.pairId === secondCard.pairId;
 
         if (isMatch) {
-            firstCard.card.classList.add('matched', 'meme-card-match');
-            secondCard.card.classList.add('matched', 'meme-card-match');
+            firstCard.card.classList.add('matched', 'meme-match-pop');
+            secondCard.card.classList.add('matched', 'meme-match-pop');
             matches++;
             if (matchesEl) matchesEl.textContent = matches.toString();
             setTimeout(() => {
-                firstCard.card.classList.remove('meme-card-match');
-                secondCard.card.classList.remove('meme-card-match');
+                firstCard.card.classList.remove('meme-match-pop');
+                secondCard.card.classList.remove('meme-match-pop');
                 resetBoard();
                 checkVictory();
-            }, 500);
+            }, 450);
         } else {
             setTimeout(() => {
-                firstCard.card.classList.remove('flipped', 'meme-card-reveal');
-                secondCard.card.classList.remove('flipped', 'meme-card-reveal');
+                firstCard.card.classList.remove('flipped');
+                secondCard.card.classList.remove('flipped');
                 resetBoard();
-            }, 900);
+            }, 700);
         }
     }
 
     function checkVictory() {
-        if (matches !== MEME_IMAGES.length) return;
-        stopTimer();
-        const totalTime = timeEl ? timeEl.textContent : '';
-        if (finalMovesEl) finalMovesEl.textContent = moves.toString();
-        if (finalTimeEl && totalTime) finalTimeEl.textContent = totalTime;
-        if (winOverlay) {
-            winOverlay.setAttribute('aria-hidden', 'false');
-            winOverlay.classList.add('show', 'meme-win-pop');
+        const config = getConfig();
+        if (matches === config.pairs) {
+            stopTimer();
+            if (resultTitleEl) resultTitleEl.textContent = 'GG, tu as tout trouvé !';
+            if (finalMovesEl) finalMovesEl.textContent = moves.toString();
+            if (finalTimeEl) finalTimeEl.textContent = timeLeft + 's restants';
+            if (winOverlay) {
+                winOverlay.setAttribute('aria-hidden', 'false');
+                winOverlay.classList.add('show');
+            }
         }
+    }
+
+    function gameOverTime() {
+        if (timeoverMatchesEl) timeoverMatchesEl.textContent = matches.toString();
+        if (timeoverOverlay) {
+            timeoverOverlay.setAttribute('aria-hidden', 'false');
+            timeoverOverlay.classList.add('show');
+        }
+    }
+
+    function hideOverlays() {
+        if (winOverlay) {
+            winOverlay.classList.remove('show');
+            winOverlay.setAttribute('aria-hidden', 'true');
+        }
+        if (timeoverOverlay) {
+            timeoverOverlay.classList.remove('show');
+            timeoverOverlay.setAttribute('aria-hidden', 'true');
+        }
+    }
+
+    function setGridClass() {
+        grid.className = 'meme-ory-grid meme-diff-' + currentDifficulty;
     }
 
     function initGame() {
-        const shuffledPool = shuffle([...MEME_IMAGES]);
-        cards = shuffle([...shuffledPool, ...shuffledPool]);
+        const config = getConfig();
+        const pairIds = shuffle(MEME_IMAGES.slice(0, config.pairs).map((_, i) => i));
+        const deck = shuffle([...pairIds, ...pairIds]);
+        cards = deck.map((pairId, index) => ({ pairId, imageSrc: MEME_IMAGES[pairId] }));
+
+        firstCard = null;
+        secondCard = null;
+        lockBoard = false;
         moves = 0;
         matches = 0;
-        startTime = null;
+        gameStarted = false;
+        stopTimer();
+
         if (movesEl) movesEl.textContent = '0';
         if (matchesEl) matchesEl.textContent = '0';
-        if (timeEl) timeEl.textContent = '0s';
-        stopTimer();
-        resetBoard();
-
-        if (winOverlay) {
-            winOverlay.classList.remove('show', 'meme-win-pop');
-            winOverlay.setAttribute('aria-hidden', 'true');
+        if (timeEl) {
+            timeEl.textContent = config.timeSec + 's';
+            timeEl.classList.remove('meme-timer-warning', 'meme-timer-danger');
         }
+        resetBoard();
+        hideOverlays();
+        setGridClass();
 
         if (grid) {
             grid.innerHTML = '';
-            grid.classList.remove('meme-grid-ready');
-            void grid.offsetWidth;
-            cards.forEach((imageSrc, index) => {
-                const cardEl = createCardElement(imageSrc, index);
+            cards.forEach((item, index) => {
+                const cardEl = createCardElement(item.imageSrc, item.pairId, index);
+                cardEl.style.animationDelay = (index * 0.04) + 's';
                 grid.appendChild(cardEl);
-            });
-            requestAnimationFrame(() => {
-                grid.classList.add('meme-grid-ready');
             });
         }
     }
 
-    if (restartBtn) {
-        restartBtn.addEventListener('click', () => initGame());
+    function setDifficulty(diff) {
+        if (!DIFFICULTIES[diff]) return;
+        currentDifficulty = diff;
+        document.querySelectorAll('.meme-diff-btn').forEach(btn => {
+            btn.classList.toggle('active', btn.getAttribute('data-diff') === diff);
+        });
+        initGame();
     }
-    if (playAgainBtn) {
-        playAgainBtn.addEventListener('click', () => initGame());
-    }
+
+    document.querySelectorAll('.meme-diff-btn').forEach(btn => {
+        btn.addEventListener('click', () => setDifficulty(btn.getAttribute('data-diff')));
+    });
+
+    if (restartBtn) restartBtn.addEventListener('click', () => initGame());
+    if (playAgainBtn) playAgainBtn.addEventListener('click', () => initGame());
+    if (timeoverRetryBtn) timeoverRetryBtn.addEventListener('click', () => initGame());
 
     initGame();
 });

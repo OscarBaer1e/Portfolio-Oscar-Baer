@@ -39,35 +39,48 @@
                     <div class="game-header">
                         <h2 class="section-title">Meme-ory Secret</h2>
                         <p class="meme-ory-intro">
-                            Retrouve toutes les paires le plus vite possible.<br>
-                            Les cartes sont des mèmes Ory — fais-toi plaiz.
+                            Retrouve toutes les paires <strong>dans le temps imparti</strong>.<br>
+                            Choisis ta difficulté et kiffe les mèmes.
                         </p>
+                        <div class="meme-ory-difficulty" role="group" aria-label="Difficulté">
+                            <span class="meme-difficulty-label">Difficulté :</span>
+                            <button type="button" id="meme-diff-easy" class="meme-diff-btn active" data-diff="easy">Facile (4 paires · 90s)</button>
+                            <button type="button" id="meme-diff-medium" class="meme-diff-btn" data-diff="medium">Moyen (6 paires · 120s)</button>
+                            <button type="button" id="meme-diff-hard" class="meme-diff-btn" data-diff="hard">Difficile (8 paires · 150s)</button>
+                        </div>
                         <div class="meme-ory-stats">
                             <div class="stat">
                                 <span class="stat-label">Coups</span>
                                 <span id="meme-moves" class="stat-value">0</span>
                             </div>
                             <div class="stat">
-                                <span class="stat-label">Paires trouvées</span>
+                                <span class="stat-label">Paires</span>
                                 <span id="meme-matches" class="stat-value">0</span>
                             </div>
-                            <div class="stat">
-                                <span class="stat-label">Temps</span>
-                                <span id="meme-time" class="stat-value">0s</span>
+                            <div class="stat stat-time">
+                                <span class="stat-label">Temps restant</span>
+                                <span id="meme-time" class="stat-value meme-timer">—</span>
                             </div>
                         </div>
                         <div class="meme-ory-controls">
-                            <button id="meme-restart" class="btn primary-btn">Recommencer</button>
+                            <button id="meme-restart" class="btn primary-btn">Nouvelle partie</button>
                         </div>
                     </div>
 
                     <div id="meme-grid" class="meme-ory-grid" aria-label="Jeu de memory des mèmes"></div>
 
                     <div id="meme-win-overlay" class="meme-ory-win-overlay" aria-hidden="true">
-                        <div class="meme-ory-win-content">
-                            <h3>GG, tu as tout trouvé !</h3>
-                            <p><span id="meme-final-moves">0</span> coups — <span id="meme-final-time">0s</span></p>
+                        <div class="meme-ory-win-content meme-ory-result-content">
+                            <h3 id="meme-result-title">GG, tu as tout trouvé !</h3>
+                            <p id="meme-result-text"><span id="meme-final-moves">0</span> coups — <span id="meme-final-time">0s</span> restants</p>
                             <button id="meme-play-again" class="btn secondary-btn">Rejouer</button>
+                        </div>
+                    </div>
+                    <div id="meme-timeover-overlay" class="meme-ory-win-overlay meme-ory-timeover" aria-hidden="true">
+                        <div class="meme-ory-win-content">
+                            <h3>Temps écoulé !</h3>
+                            <p>Tu as trouvé <span id="meme-timeover-matches">0</span> paires. Rejoue pour tout débloquer.</p>
+                            <button id="meme-timeover-retry" class="btn primary-btn">Réessayer</button>
                         </div>
                     </div>
                 </div>
