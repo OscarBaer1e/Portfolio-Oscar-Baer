@@ -13,43 +13,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const finalMovesEl = document.getElementById('meme-final-moves');
     const finalTimeEl = document.getElementById('meme-final-time');
     const resultTitleEl = document.getElementById('meme-result-title');
-    const resultTextEl = document.getElementById('meme-result-text');
     const timeoverMatchesEl = document.getElementById('meme-timeover-matches');
 
-    /*
-     * MEME-ORY – Ce qui peut empêcher les images de s’afficher en ligne :
-     * 1. Chemins : on utilise une base absolue (origin + racine du site + ressources/meme-ory/).
-     * 2. Casse : le dossier doit s’appeler exactement "ressources" (minuscules), pas "Ressources".
-     * 3. Déploiement : les fichiers ressources/meme-ory/meme1.png … meme16.png doivent être poussés sur le repo (pas dans .gitignore).
-     * 4. Hébergeur : le site doit être servi en HTTPS (ou en HTTP partout), pas en file://.
-     * 5. GitHub Pages : si le site est dans un repo type "user.github.io/repo", l’URL contient /repo/ ; la détection de base gère ça.
-     */
-    function getMemeImageBase() {
-        try {
-            var pathname = window.location.pathname || '';
-            var basePath = '/';
-            var idx = pathname.indexOf('/pages/');
-            if (idx !== -1) {
-                basePath = pathname.substring(0, idx) + '/';
-            }
-            return window.location.origin + basePath + 'ressources/meme-ory/';
-        } catch (e) {
-            return '../ressources/meme-ory/';
-        }
+    var MEME_IMAGES = [];
+    if (typeof MEME_ORY_BASE64 !== 'undefined' && MEME_ORY_BASE64 && MEME_ORY_BASE64.length >= 16) {
+        MEME_IMAGES = MEME_ORY_BASE64.map(function(b) { return 'data:image/png;base64,' + b; });
     }
-    const MEME_IMAGES = Array.from({ length: 16 }, (_, i) => getMemeImageBase() + 'meme' + (i + 1) + '.png');
 
-    // Niveau 1 = 8 paires (obligatoire), puis déblocage niveau 2, puis 3
     const DIFFICULTIES = {
-        easy:   { pairs: 8, timeSec: 150, label: 'Niveau 1', level: 1 },
-        medium: { pairs: 8, timeSec: 120, label: 'Niveau 2', level: 2 },
-        hard:   { pairs: 8, timeSec: 90,  label: 'Niveau 3', level: 3 }
+        easy:   { pairs: 8, timeSec: 150, level: 1 },
+        medium: { pairs: 8, timeSec: 120, level: 2 },
+        hard:   { pairs: 8, timeSec: 90,  level: 3 }
     };
 
     const STORAGE_KEY = 'memeoryUnlockedLevel';
     function getUnlockedLevel() {
         try {
-            const n = parseInt(localStorage.getItem(STORAGE_KEY) || '1', 10);
+            var n = parseInt(localStorage.getItem(STORAGE_KEY) || '1', 10);
             return Math.max(1, Math.min(3, n));
         } catch (e) { return 1; }
     }
@@ -59,28 +39,28 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) {}
     }
 
-    let currentDifficulty = 'easy';
-    let cards = [];
-    let firstCard = null;
-    let secondCard = null;
-    let lockBoard = false;
-    let moves = 0;
-    let matches = 0;
-    let timeLeft = 0;
-    let timerId = null;
-    let gameStarted = false;
+    var currentDifficulty = 'easy';
+    var cards = [];
+    var firstCard = null;
+    var secondCard = null;
+    var lockBoard = false;
+    var moves = 0;
+    var matches = 0;
+    var timeLeft = 0;
+    var timerId = null;
+    var gameStarted = false;
 
     function getConfig() {
         return DIFFICULTIES[currentDifficulty];
     }
 
     function startCountdown() {
-        const config = getConfig();
+        var config = getConfig();
         timeLeft = config.timeSec;
         if (timeEl) timeEl.textContent = timeLeft + 's';
-        timeEl?.classList.remove('meme-timer-warning', 'meme-timer-danger');
+        timeEl && timeEl.classList.remove('meme-timer-warning', 'meme-timer-danger');
         if (timerId) clearInterval(timerId);
-        timerId = setInterval(() => {
+        timerId = setInterval(function() {
             timeLeft--;
             if (timeEl) {
                 timeEl.textContent = timeLeft + 's';
@@ -106,49 +86,46 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function shuffle(array) {
-        const a = [...array];
-        for (let i = a.length - 1; i > 0; i--) {
-            const j = Math.floor(Math.random() * (i + 1));
-            [a[i], a[j]] = [a[j], a[i]];
+        var a = array.slice();
+        for (var i = a.length - 1; i > 0; i--) {
+            var j = Math.floor(Math.random() * (i + 1));
+            var t = a[i]; a[i] = a[j]; a[j] = t;
         }
         return a;
     }
 
     function createCardElement(pairId, index) {
-        const card = document.createElement('button');
+        var card = document.createElement('button');
         card.type = 'button';
         card.className = 'meme-card';
-        card.setAttribute('data-index', index.toString());
-        card.setAttribute('data-pair-id', pairId.toString());
-        card.setAttribute('aria-label', 'Carte mème masquée');
+        card.setAttribute('data-index', String(index));
+        card.setAttribute('data-pair-id', String(pairId));
+        card.setAttribute('aria-label', 'Carte mème');
 
-        const inner = document.createElement('div');
+        var inner = document.createElement('div');
         inner.className = 'meme-card-inner';
 
-        const front = document.createElement('div');
+        var front = document.createElement('div');
         front.className = 'meme-card-face meme-card-front';
         front.innerHTML = '<span class="meme-card-question">?</span>';
 
-        const back = document.createElement('div');
+        var back = document.createElement('div');
         back.className = 'meme-card-face meme-card-back';
-        const img = document.createElement('img');
+        var img = document.createElement('img');
         img.alt = '';
-        img.loading = 'eager';
-        img.referrerPolicy = 'no-referrer';
-        img.setAttribute('data-meme-src', 'meme' + (pairId + 1) + '.png');
-        img.onerror = function() {
-            this.style.background = 'linear-gradient(135deg, #333, #111)';
-            this.style.minHeight = '100%';
-            this.onerror = null;
-        };
+        if (MEME_IMAGES[pairId]) {
+            img.src = MEME_IMAGES[pairId];
+        } else {
+            img.style.background = 'linear-gradient(135deg, #333, #111)';
+            img.style.minHeight = '100%';
+        }
         back.appendChild(img);
 
         inner.appendChild(front);
         inner.appendChild(back);
         card.appendChild(inner);
 
-        card.addEventListener('click', () => onCardClick(card, pairId));
-
+        card.addEventListener('click', function() { onCardClick(card, pairId); });
         return card;
     }
 
@@ -170,37 +147,36 @@ document.addEventListener('DOMContentLoaded', () => {
         card.classList.add('flipped');
 
         if (!firstCard) {
-            firstCard = { card, pairId };
+            firstCard = { card: card, pairId: pairId };
             return;
         }
 
-        if (!secondCard && card !== firstCard.card) {
-            secondCard = { card, pairId };
+        if (card !== firstCard.card) {
+            secondCard = { card: card, pairId: pairId };
             moves++;
-            if (movesEl) movesEl.textContent = moves.toString();
+            if (movesEl) movesEl.textContent = String(moves);
             checkForMatch();
         }
     }
 
     function checkForMatch() {
         if (!firstCard || !secondCard) return;
-
         lockBoard = true;
-        const isMatch = firstCard.pairId === secondCard.pairId;
+        var isMatch = firstCard.pairId === secondCard.pairId;
 
         if (isMatch) {
             firstCard.card.classList.add('matched', 'meme-match-pop');
             secondCard.card.classList.add('matched', 'meme-match-pop');
             matches++;
-            if (matchesEl) matchesEl.textContent = matches.toString();
-            setTimeout(() => {
+            if (matchesEl) matchesEl.textContent = String(matches);
+            setTimeout(function() {
                 firstCard.card.classList.remove('meme-match-pop');
                 secondCard.card.classList.remove('meme-match-pop');
                 resetBoard();
                 checkVictory();
             }, 450);
         } else {
-            setTimeout(() => {
+            setTimeout(function() {
                 firstCard.card.classList.remove('flipped');
                 secondCard.card.classList.remove('flipped');
                 resetBoard();
@@ -209,24 +185,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function checkVictory() {
-        const config = getConfig();
-        if (matches === config.pairs) {
-            stopTimer();
-            const level = config.level || 1;
-            setUnlockedLevel(level + 1);
-            if (resultTitleEl) resultTitleEl.textContent = level < 3 ? 'Niveau ' + level + ' réussi !' : 'GG, tu as tout fini !';
-            if (finalMovesEl) finalMovesEl.textContent = moves.toString();
-            if (finalTimeEl) finalTimeEl.textContent = timeLeft + 's restants';
-            if (winOverlay) {
-                winOverlay.setAttribute('aria-hidden', 'false');
-                winOverlay.classList.add('show');
-            }
-            updateDifficultyButtons();
+        var config = getConfig();
+        if (matches !== config.pairs) return;
+        stopTimer();
+        setUnlockedLevel((config.level || 1) + 1);
+        if (resultTitleEl) resultTitleEl.textContent = config.level < 3 ? 'Niveau ' + config.level + ' réussi !' : 'GG, tu as tout fini !';
+        if (finalMovesEl) finalMovesEl.textContent = String(moves);
+        if (finalTimeEl) finalTimeEl.textContent = timeLeft + 's restants';
+        if (winOverlay) {
+            winOverlay.setAttribute('aria-hidden', 'false');
+            winOverlay.classList.add('show');
         }
+        updateDifficultyButtons();
     }
 
     function gameOverTime() {
-        if (timeoverMatchesEl) timeoverMatchesEl.textContent = matches.toString();
+        if (timeoverMatchesEl) timeoverMatchesEl.textContent = String(matches);
         if (timeoverOverlay) {
             timeoverOverlay.setAttribute('aria-hidden', 'false');
             timeoverOverlay.classList.add('show');
@@ -248,11 +222,26 @@ document.addEventListener('DOMContentLoaded', () => {
         grid.className = 'meme-ory-grid meme-diff-' + currentDifficulty;
     }
 
+    function updateDifficultyButtons() {
+        var unlocked = getUnlockedLevel();
+        document.querySelectorAll('.meme-diff-btn').forEach(function(btn) {
+            var diff = btn.getAttribute('data-diff');
+            var cfg = DIFFICULTIES[diff];
+            var level = (cfg && cfg.level) ? cfg.level : 1;
+            var isLocked = level > unlocked;
+            btn.classList.toggle('locked', isLocked);
+            btn.disabled = isLocked;
+            btn.classList.toggle('active', !isLocked && diff === currentDifficulty);
+        });
+    }
+
     function initGame() {
-        const config = getConfig();
-        const pairIds = shuffle(MEME_IMAGES.slice(0, config.pairs).map((_, i) => i));
-        const deck = shuffle([...pairIds, ...pairIds]);
-        cards = deck.map((pairId, index) => ({ pairId, imageSrc: MEME_IMAGES[pairId] }));
+        var config = getConfig();
+        var pairIds = [];
+        for (var i = 0; i < config.pairs; i++) pairIds.push(i);
+        pairIds = shuffle(pairIds);
+        var deck = shuffle(pairIds.concat(pairIds));
+        cards = deck.map(function(pairId, index) { return { pairId: pairId, index: index }; });
 
         firstCard = null;
         secondCard = null;
@@ -273,53 +262,30 @@ document.addEventListener('DOMContentLoaded', () => {
         setGridClass();
         updateDifficultyButtons();
 
-        if (grid) {
-            grid.innerHTML = '';
-            const base = getMemeImageBase();
-            requestAnimationFrame(function() {
-                cards.forEach((item, index) => {
-                    const cardEl = createCardElement(item.pairId, index);
-                    cardEl.style.animationDelay = (index * 0.04) + 's';
-                    grid.appendChild(cardEl);
-                    var img = cardEl.querySelector('.meme-card-back img');
-                    if (img && img.getAttribute('data-meme-src')) {
-                        img.src = base + img.getAttribute('data-meme-src');
-                    }
-                });
-            });
-        }
-    }
-
-    function updateDifficultyButtons() {
-        const unlocked = getUnlockedLevel();
-        document.querySelectorAll('.meme-diff-btn').forEach(btn => {
-            const diff = btn.getAttribute('data-diff');
-            const cfg = DIFFICULTIES[diff];
-            const level = cfg && cfg.level ? cfg.level : 1;
-            const isLocked = level > unlocked;
-            btn.classList.toggle('locked', isLocked);
-            btn.disabled = isLocked;
-            btn.classList.toggle('active', !isLocked && diff === currentDifficulty);
+        grid.innerHTML = '';
+        cards.forEach(function(item, index) {
+            var cardEl = createCardElement(item.pairId, index);
+            cardEl.style.animationDelay = (index * 0.04) + 's';
+            grid.appendChild(cardEl);
         });
     }
 
     function setDifficulty(diff) {
         if (!DIFFICULTIES[diff]) return;
-        const cfg = DIFFICULTIES[diff];
-        const level = cfg && cfg.level ? cfg.level : 1;
+        var cfg = DIFFICULTIES[diff];
+        var level = (cfg && cfg.level) ? cfg.level : 1;
         if (level > getUnlockedLevel()) return;
         currentDifficulty = diff;
         updateDifficultyButtons();
         initGame();
     }
 
-    document.querySelectorAll('.meme-diff-btn').forEach(btn => {
-        btn.addEventListener('click', () => setDifficulty(btn.getAttribute('data-diff')));
+    document.querySelectorAll('.meme-diff-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() { setDifficulty(btn.getAttribute('data-diff')); });
     });
-
-    if (restartBtn) restartBtn.addEventListener('click', () => initGame());
-    if (playAgainBtn) playAgainBtn.addEventListener('click', () => initGame());
-    if (timeoverRetryBtn) timeoverRetryBtn.addEventListener('click', () => initGame());
+    if (restartBtn) restartBtn.addEventListener('click', initGame);
+    if (playAgainBtn) playAgainBtn.addEventListener('click', initGame);
+    if (timeoverRetryBtn) timeoverRetryBtn.addEventListener('click', initGame);
 
     initGame();
 });
