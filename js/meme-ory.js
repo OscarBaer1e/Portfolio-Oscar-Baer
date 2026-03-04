@@ -16,16 +16,23 @@ document.addEventListener('DOMContentLoaded', () => {
     const resultTextEl = document.getElementById('meme-result-text');
     const timeoverMatchesEl = document.getElementById('meme-timeover-matches');
 
-    // URL de base absolue : résolution depuis la page OU depuis le script pour fiabilité (Rejouer / changement niveau)
+    /*
+     * MEME-ORY – Ce qui peut empêcher les images de s’afficher en ligne :
+     * 1. Chemins : on utilise une base absolue (origin + racine du site + ressources/meme-ory/).
+     * 2. Casse : le dossier doit s’appeler exactement "ressources" (minuscules), pas "Ressources".
+     * 3. Déploiement : les fichiers ressources/meme-ory/meme1.png … meme16.png doivent être poussés sur le repo (pas dans .gitignore).
+     * 4. Hébergeur : le site doit être servi en HTTPS (ou en HTTP partout), pas en file://.
+     * 5. GitHub Pages : si le site est dans un repo type "user.github.io/repo", l’URL contient /repo/ ; la détection de base gère ça.
+     */
     function getMemeImageBase() {
         try {
-            const fromPage = new URL('../ressources/meme-ory/', window.location.href).href;
-            const scriptEl = document.querySelector('script[src*="meme-ory"]');
-            if (scriptEl && scriptEl.src) {
-                const fromScript = new URL('../ressources/meme-ory/', scriptEl.src).href;
-                return fromScript;
+            var pathname = window.location.pathname || '';
+            var basePath = '/';
+            var idx = pathname.indexOf('/pages/');
+            if (idx !== -1) {
+                basePath = pathname.substring(0, idx) + '/';
             }
-            return fromPage;
+            return window.location.origin + basePath + 'ressources/meme-ory/';
         } catch (e) {
             return '../ressources/meme-ory/';
         }
