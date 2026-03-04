@@ -44,7 +44,8 @@ document.addEventListener('DOMContentLoaded', function() {
         seeker: '🎯',
         overdrive: '🔶',
         slowTarget: '🔮',
-        mirrorShield: '🪞'
+        mirrorShield: '🪞',
+        tastyCrousty: '🍗'
     };
     
     // Système de thèmes qui change tous les 10 niveaux
@@ -170,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
         level: 1,
         lives: 3,
         maxLives: 3,
-        gameSpeed: 2.0, // Plus nerveux dès le début, augmente avec le niveau
+        gameSpeed: 1.85, // Départ rapide et fluide, montée plus douce par niveau
         gameMode: 'normal', // 'normal' ou 'infinite'
         bossActive: false,
         deltaTime: 1.0, // Multiplicateur de vitesse normalisé (1.0 = 60fps)
@@ -522,6 +523,7 @@ document.addEventListener('DOMContentLoaded', function() {
         overdrive: false,
         slowTarget: false,
         mirrorShield: false,
+        tastyCrousty: false,
         rapidFireEndTime: 0,
         shieldEndTime: 0,
         shrinkEndTime: 0,
@@ -534,7 +536,8 @@ document.addEventListener('DOMContentLoaded', function() {
         seekerEndTime: 0,
         overdriveEndTime: 0,
         slowTargetEndTime: 0,
-        mirrorShieldEndTime: 0
+        mirrorShieldEndTime: 0,
+        tastyCroustyEndTime: 0
     };
     
     // Astéroïdes renvoyés par le bouclier miroir (se déplacent comme des projectiles, apparence + hitbox astéroïde)
@@ -594,6 +597,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let boss = null;
     let bossBullets = [];
     let bossPhotos = {}; // Stocke les photos des boss (1-10)
+    let tastyCroustyImg = null;
     
     // Variables de tir
     let lastShotTime = 0;
@@ -683,6 +687,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Charger les images au démarrage
     loadDefaultBossImages();
+    tastyCroustyImg = new Image();
+    tastyCroustyImg.src = '../ressources/images/tasty_crousty_bonus.png';
     
     // Plein écran
     let isFullscreen = false;
@@ -1124,7 +1130,7 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.level = 1;
         gameState.lives = 3;
         gameState.maxLives = 3;
-        gameState.gameSpeed = 1.35;
+        gameState.gameSpeed = 1.85; // Départ plus rapide pour un jeu plus fluide
         gameState.bossActive = false;
         currentFireRate = baseFireRate;
         activePowerUps = {
@@ -1153,7 +1159,8 @@ document.addEventListener('DOMContentLoaded', function() {
             seekerEndTime: 0,
             overdriveEndTime: 0,
             slowTargetEndTime: 0,
-            mirrorShieldEndTime: 0
+            mirrorShieldEndTime: 0,
+            tastyCroustyEndTime: 0
         };
         reflectedAsteroids = [];
         timeSlowMultiplier = 1.0;
@@ -1201,7 +1208,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const activeBuffs = [];
         
         // Vérifier chaque type de buff
-        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet', 'prism', 'seeker', 'overdrive', 'slowTarget', 'mirrorShield'];
+        const buffTypes = ['rapidFire', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet', 'prism', 'seeker', 'overdrive', 'slowTarget', 'mirrorShield', 'tastyCrousty'];
         buffTypes.forEach(buffType => {
             const isActive = activePowerUps[buffType] && now < activePowerUps[`${buffType}EndTime`];
             if (isActive) {
@@ -1499,6 +1506,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         bullets.forEach((bullet, bulletIndex) => {
             const bulletSize = bullet.size || 4;
+            if (bullet.isChicken) {
+                ctx.save();
+                ctx.translate(bullet.x, bullet.y);
+                if (typeof tastyCroustyImg !== 'undefined' && tastyCroustyImg && tastyCroustyImg.complete && tastyCroustyImg.naturalWidth > 0) {
+                    const s = bulletSize * 2.2;
+                    ctx.drawImage(tastyCroustyImg, -s/2, -s/2, s, s);
+                } else {
+                    ctx.fillStyle = '#ffcc00';
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#ffcc00';
+                    ctx.beginPath();
+                    ctx.arc(0, 0, bulletSize, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+                ctx.restore();
+                return;
+            }
             const anyVisual = prismActive || brolyAuraActive || beerusAuraActive || overdriveActive;
             if (!anyVisual) {
                 ctx.save();
@@ -2268,6 +2293,19 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.moveTo(0, -8);
             ctx.lineTo(0, 8);
             ctx.stroke();
+        } else if (powerUp.type === 'tastyCrousty') {
+            if (typeof tastyCroustyImg !== 'undefined' && tastyCroustyImg && tastyCroustyImg.complete && tastyCroustyImg.naturalWidth > 0) {
+                const s = 20;
+                ctx.drawImage(tastyCroustyImg, -s/2, -s/2, s, s);
+            } else {
+                ctx.fillStyle = '#ffcc00';
+                ctx.strokeStyle = '#cc9900';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                ctx.arc(0, 0, 10, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            }
         }
         
         ctx.restore();
@@ -2662,6 +2700,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (activePowerUps.mirrorShield && now > activePowerUps.mirrorShieldEndTime) {
             activePowerUps.mirrorShield = false;
         }
+        if (activePowerUps.tastyCrousty && now > activePowerUps.tastyCroustyEndTime) {
+            activePowerUps.tastyCrousty = false;
+        }
         // Mettre à jour les icônes de buff
         updateBuffIcons();
         
@@ -2674,6 +2715,104 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const bulletSize = bullet.size || 4;
                 if (distance < asteroid.size + bulletSize) {
+                    // Tasty Crousty : dégâts de zone (poulets explosifs)
+                    if (bullet.isChicken) {
+                        const impactX = asteroid.x;
+                        const impactY = asteroid.y;
+                        const CHICKEN_RADIUS = 110;
+                        impactFlashes.push({
+                            x: impactX,
+                            y: impactY,
+                            life: 1,
+                            maxLife: 1,
+                            radius: 45
+                        });
+                        createEnhancedExplosion(impactX, impactY, '#ffcc00', 50);
+                        playSound('explosion');
+                        const inRadius = [];
+                        asteroids.forEach((a, i) => {
+                            const d = Math.hypot(a.x - impactX, a.y - impactY);
+                            if (d <= CHICKEN_RADIUS) inRadius.push({ asteroid: a, index: i });
+                        });
+                        inRadius.sort((a, b) => b.index - a.index);
+                        inRadius.forEach(({ asteroid: a }) => {
+                            createEnhancedExplosion(a.x, a.y, a.color, a.size);
+                            if (!gameState.bossActive) {
+                                const points = Math.floor(a.size / 5) * 10;
+                                gameState.score += points;
+                                if (scoreElement) scoreElement.textContent = gameState.score;
+                                checkAndUpdateHighScore();
+                                createScoreParticle(a.x, a.y, `+${points}`);
+                            }
+                            gameStats.asteroidsDestroyed++;
+                            const isBigType = a.size >= 48;
+                            const isLargeNormal = a.size > 25 && a.size < 48;
+                            const baseSpeedFromParent = a.speed * a.size / ASTEROID_SIZE_REF;
+                            const parentVx = a.vx !== undefined ? a.vx : 0;
+                            if (isBigType) {
+                                const numPieces = Math.floor(Math.random() * 2) + 2;
+                                const sizeRatio = 0.5 + Math.random() * 0.15;
+                                for (let i = 0; i < numPieces; i++) {
+                                    const angle = (Math.PI * 2 / numPieces) * i + Math.random() * 0.5;
+                                    const newSize = a.size * sizeRatio;
+                                    const childSpeed = getAsteroidSpeedForSize(baseSpeedFromParent, newSize);
+                                    asteroids.push({
+                                        x: a.x + Math.cos(angle) * (a.size / 2),
+                                        y: a.y + Math.sin(angle) * (a.size / 2),
+                                        size: newSize,
+                                        speed: childSpeed,
+                                        vx: parentVx + (Math.random() - 0.5) * 0.4,
+                                        rotation: 0,
+                                        rotationSpeed: (Math.random() - 0.5) * 0.1,
+                                        color: a.color
+                                    });
+                                }
+                            } else if (isLargeNormal && Math.random() < 0.45) {
+                                const numPieces = Math.floor(Math.random() * 2) + 2;
+                                for (let i = 0; i < numPieces; i++) {
+                                    const angle = (Math.PI * 2 / numPieces) * i;
+                                    const newSize = a.size * 0.4;
+                                    const childSpeed = getAsteroidSpeedForSize(baseSpeedFromParent, newSize);
+                                    asteroids.push({
+                                        x: a.x + Math.cos(angle) * (a.size / 2),
+                                        y: a.y + Math.sin(angle) * (a.size / 2),
+                                        size: newSize,
+                                        speed: childSpeed,
+                                        vx: parentVx + (Math.random() - 0.5) * 0.4,
+                                        rotation: 0,
+                                        rotationSpeed: (Math.random() - 0.5) * 0.1,
+                                        color: a.color
+                                    });
+                                }
+                            }
+                            const DROP_RATE = 0.055;
+                            const BONUS_RARITY = {
+                                common:   { chance: 0.56, types: ['rapidFire', 'shield', 'shrink', 'bigBullets', 'tripleShot'] },
+                                uncommon: { chance: 0.26, types: ['timeSlow', 'magnet', 'seeker'] },
+                                rare:     { chance: 0.12, types: ['offensiveShield', 'prism', 'overdrive', 'slowTarget'] },
+                                epic:     { chance: 0.04, types: ['life', 'mirrorShield'] },
+                                legendary: { chance: 0.02, types: ['tastyCrousty'] }
+                            };
+                            if (Math.random() < DROP_RATE) {
+                                const r = Math.random();
+                                let tier = 'common';
+                                if (r < BONUS_RARITY.common.chance) tier = 'common';
+                                else if (r < BONUS_RARITY.common.chance + BONUS_RARITY.uncommon.chance) tier = 'uncommon';
+                                else if (r < BONUS_RARITY.common.chance + BONUS_RARITY.uncommon.chance + BONUS_RARITY.rare.chance) tier = 'rare';
+                                else if (r < BONUS_RARITY.common.chance + BONUS_RARITY.uncommon.chance + BONUS_RARITY.rare.chance + BONUS_RARITY.epic.chance) tier = 'epic';
+                                else tier = 'legendary';
+                                const list = BONUS_RARITY[tier].types;
+                                const type = list[Math.floor(Math.random() * list.length)];
+                                spawnPowerUp(a.x, a.y, type);
+                            }
+                        });
+                        inRadius.forEach(({ index }) => asteroids.splice(index, 1)); // indices déjà triés desc
+                        bullets.splice(bulletIndex, 1);
+                        gameStats.bulletsHit++;
+                        checkLevel();
+                        return;
+                    }
+                    
                     // Flash d'impact (petit cercle blanc/jaune avant l'explosion)
                     impactFlashes.push({
                         x: asteroid.x,
@@ -2753,10 +2892,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     // Chance de faire apparaître un boost — raretés pour limiter le stacking et équilibrer
                     const DROP_RATE = 0.055;
                     const BONUS_RARITY = {
-                        common:   { chance: 0.58, types: ['rapidFire', 'shield', 'shrink', 'bigBullets', 'tripleShot'] },
+                        common:   { chance: 0.56, types: ['rapidFire', 'shield', 'shrink', 'bigBullets', 'tripleShot'] },
                         uncommon: { chance: 0.26, types: ['timeSlow', 'magnet', 'seeker'] },
                         rare:     { chance: 0.12, types: ['offensiveShield', 'prism', 'overdrive', 'slowTarget'] },
-                        epic:     { chance: 0.04, types: ['life', 'mirrorShield'] }
+                        epic:     { chance: 0.04, types: ['life', 'mirrorShield'] },
+                        legendary: { chance: 0.02, types: ['tastyCrousty'] }
                     };
                     if (Math.random() < DROP_RATE) {
                         const r = Math.random();
@@ -2764,7 +2904,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         if (r < BONUS_RARITY.common.chance) tier = 'common';
                         else if (r < BONUS_RARITY.common.chance + BONUS_RARITY.uncommon.chance) tier = 'uncommon';
                         else if (r < BONUS_RARITY.common.chance + BONUS_RARITY.uncommon.chance + BONUS_RARITY.rare.chance) tier = 'rare';
-                        else tier = 'epic';
+                        else if (r < BONUS_RARITY.common.chance + BONUS_RARITY.uncommon.chance + BONUS_RARITY.rare.chance + BONUS_RARITY.epic.chance) tier = 'epic';
+                        else tier = 'legendary';
                         const list = BONUS_RARITY[tier].types;
                         const type = list[Math.floor(Math.random() * list.length)];
                         spawnPowerUp(asteroid.x, asteroid.y, type);
@@ -2873,11 +3014,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Spawn : plus d'astéroïdes, rythme plus nerveux
+        // Spawn : départ un peu plus fourni (fluide), montée plus progressive
         const lvl = gameState.level;
         const spawnRate = lvl <= 80
-            ? 0.025 + ((lvl - 1) / 79) * 0.095
-            : 0.12 + (lvl - 80) * 0.0015;
+            ? 0.038 + ((lvl - 1) / 79) * 0.082
+            : 0.12 + (lvl - 80) * 0.0012;
         if (Math.random() < Math.min(0.20, spawnRate)) {
             spawnAsteroid();
         }
@@ -3284,6 +3425,7 @@ document.addEventListener('DOMContentLoaded', function() {
         else if (type === 'overdrive') color = '#ff6600';
         else if (type === 'slowTarget') color = '#9b59b6';
         else if (type === 'mirrorShield') color = '#00ccff';
+        else if (type === 'tastyCrousty') color = '#ffcc00';
         
         powerUps.push({
             x: x,
@@ -3296,9 +3438,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     // Durées de base pour le stack (stack = durée uniquement)
-    const BONUS_DURATIONS = { rapidFire: 10000, shield: 8000, shrink: 12000, bigBullets: 15000, tripleShot: 10000, timeSlow: 12000, offensiveShield: 15000, magnet: 20000, prism: 12000, seeker: 10000, overdrive: 10000, slowTarget: 10000, mirrorShield: 12000 };
+    const BONUS_DURATIONS = { rapidFire: 10000, shield: 8000, shrink: 12000, bigBullets: 15000, tripleShot: 10000, timeSlow: 12000, offensiveShield: 15000, magnet: 20000, prism: 12000, seeker: 10000, overdrive: 10000, slowTarget: 10000, mirrorShield: 12000, tastyCrousty: 14000 };
     
-    const TIMED_BONUS_TYPES = ['rapidFire', 'shield', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet', 'prism', 'seeker', 'overdrive', 'slowTarget', 'mirrorShield'];
+    const TIMED_BONUS_TYPES = ['rapidFire', 'shield', 'shrink', 'bigBullets', 'tripleShot', 'timeSlow', 'offensiveShield', 'magnet', 'prism', 'seeker', 'overdrive', 'slowTarget', 'mirrorShield', 'tastyCrousty'];
     
     function applyTimedBonus(type, endTimeKey) {
         const now = Date.now();
@@ -3355,6 +3497,9 @@ document.addEventListener('DOMContentLoaded', function() {
             applyTimedBonus('slowTarget', 'slowTargetEndTime');
         } else if (powerUp.type === 'mirrorShield') {
             applyTimedBonus('mirrorShield', 'mirrorShieldEndTime');
+        } else if (powerUp.type === 'tastyCrousty') {
+            applyTimedBonus('tastyCrousty', 'tastyCroustyEndTime');
+            if (typeof showMessage === 'function') showMessage('🍗 Tasty Crousty ! Poulets explosifs à l\'impact !', 'powerup');
         }
         
         gameStats.powerUpsCollected++;
@@ -3418,12 +3563,12 @@ document.addEventListener('DOMContentLoaded', function() {
         return asteroid.size > 25;
     }
     
-    // Vitesse : montée plus marquée pour un jeu plus nerveux
+    // Vitesse : courbe plus douce (départ déjà rapide, donc montée moins forte par niveau)
     function getSpeedIncrease(level) {
         if (level <= 80) {
-            return 0.04 + ((level - 1) / 79) * 0.04;
+            return 0.012 + ((level - 1) / 79) * 0.028; // ~0.012 à 0.04 par niveau (au lieu de 0.04–0.08)
         }
-        return Math.max(0.045, 0.06 - (level - 81) * 0.0002);
+        return Math.max(0.03, 0.045 - (level - 81) * 0.00015);
     }
     
     function checkLevel() {
@@ -4424,41 +4569,24 @@ document.addEventListener('DOMContentLoaded', function() {
         lastShotTime = Date.now();
         
         const bulletSize = activePowerUps.bigBullets ? 8 : 4;
-        
         const bulletSpeed = 12;
-        if (activePowerUps.tripleShot) {
-            // Tir triple : 3 projectiles en éventail
-            bullets.push({
-                x: ship.x,
-                y: ship.y - ship.height / 2,
-                speed: bulletSpeed,
-                vx: -0.8,
-                vy: -bulletSpeed,
-                size: bulletSize
-            });
-            bullets.push({
-                x: ship.x,
-                y: ship.y - ship.height / 2,
-                speed: bulletSpeed,
-                vx: 0,
-                vy: -bulletSpeed,
-                size: bulletSize
-            });
-            bullets.push({
-                x: ship.x,
-                y: ship.y - ship.height / 2,
-                speed: bulletSpeed,
-                vx: 0.8,
-                vy: -bulletSpeed,
-                size: bulletSize
-            });
+        const isChicken = activePowerUps.tastyCrousty && Date.now() < activePowerUps.tastyCroustyEndTime;
+        const size = isChicken ? Math.max(bulletSize, 10) : bulletSize;
+        
+        if (isChicken) {
+            if (activePowerUps.tripleShot) {
+                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: -0.8, vy: -bulletSpeed, size, isChicken: true });
+                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0, vy: -bulletSpeed, size, isChicken: true });
+                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0.8, vy: -bulletSpeed, size, isChicken: true });
+            } else {
+                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, size, isChicken: true });
+            }
+        } else if (activePowerUps.tripleShot) {
+            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: -0.8, vy: -bulletSpeed, size: bulletSize });
+            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0, vy: -bulletSpeed, size: bulletSize });
+            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0.8, vy: -bulletSpeed, size: bulletSize });
         } else {
-            bullets.push({
-                x: ship.x,
-                y: ship.y - ship.height / 2,
-                speed: bulletSpeed,
-                size: bulletSize
-            });
+            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, size: bulletSize });
         }
         
         // Étincelles à la sortie du canon
