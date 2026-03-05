@@ -238,12 +238,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function initGame() {
         var config = getConfig();
-        var allIndices = [];
-        for (var i = 0; i < 16; i++) allIndices.push(i);
-        currentImageIndices = shuffle(allIndices).slice(0, config.pairs);
+        // Images fixes : on prend toujours les premières images dans l'ordre
+        currentImageIndices = [];
+        for (var i = 0; i < config.pairs; i++) currentImageIndices.push(i);
+        // Ids de paires fixes (0,1,2,...)
         var pairIds = [];
-        for (var i = 0; i < config.pairs; i++) pairIds.push(i);
-        pairIds = shuffle(pairIds);
+        for (var j = 0; j < config.pairs; j++) pairIds.push(j);
+        // On garde juste le mélange du deck pour l'ordre des cartes
         var deck = shuffle(pairIds.concat(pairIds));
         cards = deck.map(function(pairId, index) { return { pairId: pairId, index: index }; });
 
