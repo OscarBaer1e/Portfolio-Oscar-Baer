@@ -124,7 +124,7 @@ body {
     overflow: hidden;
 }
 
-/* Grille de fond - animation légère (pulse uniquement) */
+/* Grille animée - LÉGÈREMENT RÉDUITE */
 .grid-lines {
     position: absolute;
     top: 0;
@@ -132,11 +132,14 @@ body {
     width: 100%;
     height: 100%;
     background-image: 
-        linear-gradient(rgba(0, 255, 255, 0.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 255, 255, 0.07) 1px, transparent 1px);
-    background-size: 80px 80px, 80px 80px;
-    animation: gridPulse 6s ease-in-out infinite;
+        linear-gradient(rgba(0, 255, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.08) 1px, transparent 1px),
+        linear-gradient(rgba(255, 0, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 0, 255, 0.05) 1px, transparent 1px);
+    background-size: 80px 80px, 80px 80px, 40px 40px, 40px 40px;
+    animation: gridMove 15s linear infinite, gridPulse 4s ease-in-out infinite;
     opacity: 0.5;
+    will-change: transform, opacity;
 }
 
 /* Désactiver les animations de fond sur mobile pour les performances */
@@ -170,9 +173,14 @@ body {
     }
 }
 
+@keyframes gridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(80px, 80px); }
+}
+
 @keyframes gridPulse {
-    0%, 100% { opacity: 0.45; }
-    50% { opacity: 0.55; }
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.6; }
 }
 
 /* Réduction des animations si l'utilisateur le préfère (accessibilité) */
@@ -1357,101 +1365,79 @@ nav .nav-list a.active::after {
     animation: bounce 2s infinite;
 }
 
-/* Section Skills Preview - Mise en valeur */
-#skills-preview.skills-section-highlight {
-    background: linear-gradient(180deg, var(--dark-bg-color) 0%, var(--dark-bg-color-alt) 50%, var(--dark-bg-color) 100%);
-    padding: 120px 0;
-}
-
-.skills-intro {
-    text-align: center;
-    color: var(--dim-text-color);
-    font-size: 1.15rem;
-    max-width: 480px;
-    margin: 0 auto 50px;
-    line-height: 1.7;
+/* Section Skills Preview */
+#skills-preview {
+    background: linear-gradient(180deg, var(--dark-bg-color), var(--dark-bg-color-alt));
+    padding: 100px 0;
 }
 
 .skills-preview-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 35px;
-    margin-top: 0;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
+    margin-top: 50px;
 }
 
 .skill-preview-card {
-    background: rgba(34, 34, 34, 0.95);
-    padding: 45px 35px;
-    border-radius: 12px;
+    background: var(--background-color-light);
+    padding: 40px;
+    border-radius: var(--radius-default);
     border: 2px solid var(--border-color);
     text-align: center;
-    transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+    transition: all 0.4s ease;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
 }
 
 .skill-preview-card::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0, 255, 255, 0.1), transparent);
     opacity: 0;
-    transition: opacity 0.25s ease;
-}
-
-.skill-preview-card:hover {
-    transform: translateY(-6px);
-    border-color: var(--primary-color);
-    box-shadow: 0 12px 28px rgba(0, 255, 255, 0.2);
+    transition: opacity 0.4s ease;
 }
 
 .skill-preview-card:hover::before {
     opacity: 1;
 }
 
+.skill-preview-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary-color);
+    box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+}
+
 .skill-icon {
-    width: 72px;
-    height: 72px;
-    margin: 0 auto 22px;
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     border-radius: 50%;
-    font-size: 1.75rem;
+    font-size: 2rem;
     color: var(--dark-bg-color);
-    transition: transform 0.25s ease;
+    transition: transform 0.4s ease;
 }
 
 .skill-preview-card:hover .skill-icon {
-    transform: scale(1.08);
+    transform: rotate(360deg) scale(1.1);
 }
 
 .skill-preview-card h3 {
     color: var(--primary-color);
-    margin-bottom: 12px;
-    font-size: 1.4rem;
-    font-weight: 600;
+    margin-bottom: 15px;
+    font-size: 1.5rem;
 }
 
 .skill-preview-card p {
     color: var(--dim-text-color);
-    line-height: 1.65;
-    font-size: 0.95rem;
-}
-
-/* Page portfolio : pas de barre sous le header ni avant le titre */
-.page-portfolio header {
-    border-bottom: none;
-    box-shadow: none;
-}
-
-.page-portfolio #portfolio-list.section-padding::before {
-    display: none;
+    line-height: 1.6;
 }
 
 .section-subtitle {
@@ -1639,55 +1625,52 @@ nav .nav-list a.active::after {
 }
 
 .portfolio-item {
-    background-color: var(--background-color-light);
-    border-radius: 10px;
+    background-color: var(--background-color-light); 
+    border-radius: var(--radius-default); 
     overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
-    border: 1px solid var(--border-color);
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.1); 
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+    border: 2px solid var(--border-color);
     position: relative;
+    transform-style: preserve-3d;
 }
 
 .portfolio-item:hover {
-    transform: translateY(-6px);
-    border-color: rgba(0, 255, 255, 0.4);
-    box-shadow: 0 12px 30px rgba(0, 255, 255, 0.15);
+    transform: translateY(-10px) scale(1.03) rotateY(5deg); 
+    border-color: var(--secondary-color); 
+    box-shadow: 0 20px 40px rgba(255, 0, 255, 0.6), 0 0 30px rgba(0, 255, 255, 0.4); 
 }
 
 .portfolio-item-content {
-    padding: 24px 20px;
+    padding: var(--spacing-unit);
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(transparent 0%, rgba(10, 10, 10, 0.97) 40%);
+    background: linear-gradient(transparent, rgba(0,0,0,0.95)); 
     color: var(--light-text-color);
     transform: translateY(0);
-    transition: transform 0.25s ease;
+    transition: transform 0.4s ease;
 }
 
 .portfolio-item:hover .portfolio-item-content {
-    transform: translateY(0);
+    transform: translateY(-5px);
 }
 
 .portfolio-item h3 {
-    color: #fff;
-    font-size: 1.25rem;
-    font-weight: 600;
-    margin-bottom: 6px;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    color: var(--light-text-color);
+    text-shadow: none;
 }
 
 .portfolio-item h3 a {
-    color: #fff;
+    color: var(--light-text-color);
 }
 
 .portfolio-item .category {
-    color: var(--primary-color);
-    font-size: 0.85rem;
+    color: var(--primary-color); 
+    font-size: 0.9rem;
     text-transform: uppercase;
-    letter-spacing: 0.5px;
-    opacity: 0.95;
+    font-family: monospace;
 }
 
 
@@ -2845,8 +2828,8 @@ footer .container {
 }
 
 .portfolio-item:hover .portfolio-image-wrapper img {
-    transform: scale(1.05);
-    filter: brightness(1.05);
+    transform: scale(1.2) rotate(5deg);
+    filter: grayscale(0%) brightness(100%);
 }
 
 .overlay-buttons {
@@ -2869,8 +2852,8 @@ footer .container {
 }
 
 .portfolio-item:hover .btn-overlay {
-    animation: slideUp 0.3s ease forwards;
-    animation-delay: 0.1s;
+    animation: slideUp 0.5s ease forwards;
+    animation-delay: 0.2s;
 }
 
 @keyframes slideUp {
@@ -3145,7 +3128,7 @@ footer .container {
     animation: neonBlink 2s ease-in-out infinite;
 }
 
-/* Curseur personnalisé - suit la souris sans décalage */
+/* Curseur personnalisé */
 .custom-cursor {
     width: 20px;
     height: 20px;
@@ -3153,12 +3136,13 @@ footer .container {
     border-radius: 50%;
     position: fixed;
     pointer-events: none;
-    z-index: 10001;
-    transition: background-color 0.15s ease, width 0.15s ease, height 0.15s ease;
+    z-index: 10001; /* Au-dessus du header (z-index: 10000) */
+    transition: transform 0.15s ease, background-color 0.15s ease, width 0.15s ease, height 0.15s ease;
     mix-blend-mode: difference;
     left: 0;
     top: 0;
     transform: translate(-50%, -50%);
+    will-change: transform;
 }
 
 .custom-cursor.cursor-hover {

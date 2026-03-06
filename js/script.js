@@ -228,18 +228,20 @@ document.addEventListener('DOMContentLoaded', function() {
         card.classList.add('reveal');
         revealObserver.observe(card);
     });
-    /* Parallax très léger (effet discret) */
     let lastScrollTop = 0;
     let ticking = false;
-    const parallaxElements = document.querySelectorAll('.parallax-section, .morph');
+    const parallaxElements = document.querySelectorAll('.parallax-section, .hero-content, .morph');
     
     function updateParallax() {
         const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
+        const scrollDirection = scrollTop > lastScrollTop ? 'down' : 'up';
+        
         parallaxElements.forEach((el, index) => {
-            const speed = 0.08 + (index * 0.02);
+            const speed = 0.5 + (index * 0.1);
             const yPos = -(scrollTop * speed);
             el.style.transform = `translate3d(0, ${yPos}px, 0)`;
         });
+        
         lastScrollTop = scrollTop;
         ticking = false;
     }
@@ -280,11 +282,25 @@ document.addEventListener('DOMContentLoaded', function() {
         // Cacher le curseur système et utiliser la bulle
         document.body.style.cursor = 'none';
         
-        // Suivre la souris immédiatement (sans décalage)
+        // Utiliser requestAnimationFrame pour des performances optimales
+        let rafId = null;
+        let mouseX = 0;
+        let mouseY = 0;
+        
+        // Positionner directement sur la souris (pas de lag)
         document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-            cursor.style.transform = 'translate(-50%, -50%)';
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            
+            // Utiliser RAF pour limiter les mises à jour
+            if (!rafId) {
+                rafId = requestAnimationFrame(() => {
+                    cursor.style.left = mouseX + 'px';
+                    cursor.style.top = mouseY + 'px';
+                    cursor.style.transform = 'translate(-50%, -50%)';
+                    rafId = null;
+                });
+            }
         }, { passive: true });
         
         // Masquer le curseur quand la souris quitte la page
@@ -330,23 +346,40 @@ document.addEventListener('DOMContentLoaded', function() {
     }, { threshold: 0.5 });
     
     counters.forEach(counter => countObserver.observe(counter));
-    /* Effet de tilt très léger uniquement sur les cartes graphisme (pas sur portfolio) */
+    // Effet de tilt sur les cartes (désactivé sur mobile pour les performances)
     if (!isMobile) {
-        const tiltCards = document.querySelectorAll('.graphisme-card');
+        const tiltCards = document.querySelectorAll('.portfolio-item, .graphisme-card');
         tiltCards.forEach(card => {
+            let rafId = null;
+            let currentX = 0;
+            let currentY = 0;
+            
             card.addEventListener('mousemove', (e) => {
                 const rect = card.getBoundingClientRect();
-                const x = (e.clientX - rect.left) / rect.width - 0.5;
-                const y = (e.clientY - rect.top) / rect.height - 0.5;
-                const tiltX = Math.max(-4, Math.min(4, y * 6));
-                const tiltY = Math.max(-4, Math.min(4, -x * 6));
-                card.style.transform = `perspective(800px) rotateX(${tiltX}deg) rotateY(${tiltY}deg) translateY(-4px)`;
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                currentX = (y - centerY) / 10;
+                currentY = (centerX - x) / 10;
+                
+                if (!rafId) {
+                    rafId = requestAnimationFrame(() => {
+                        card.style.transform = `perspective(1000px) rotateX(${currentX}deg) rotateY(${currentY}deg) translateY(-10px)`;
+                        rafId = null;
+                    });
+                }
             }, { passive: true });
+            
             card.addEventListener('mouseleave', () => {
                 card.style.transform = '';
             });
         });
     }
+    // Animation des titres (simplifiée sur mobile)
+    if (!isLowEndDevice) {
     // Animation des titres (simplifiée sur mobile)
     if (!isLowEndDevice) {
         const animatedTitles = document.querySelectorAll('.section-title');
@@ -364,6 +397,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }
         });
+    }
     }
     // Lazy loading des images optimisé pour mobile
     const images = document.querySelectorAll('img[loading="lazy"], img:not([loading])');
