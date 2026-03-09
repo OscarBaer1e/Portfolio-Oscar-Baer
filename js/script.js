@@ -60,8 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
         '<div class="a11y-option"><label for="a11y-text-large">Texte agrandi</label><input type="checkbox" id="a11y-text-large" aria-describedby="a11y-desc-text"></div>' +
         '<div class="a11y-option"><label for="a11y-reduce-motion">Réduire les animations</label><input type="checkbox" id="a11y-reduce-motion" aria-describedby="a11y-desc-motion"></div>' +
         '</div>' +
-        '<div class="a11y-option a11y-option-chaos"><label for="a11y-chaos">Mode CRAZY <span aria-hidden="true">🤪</span></label><input type="checkbox" id="a11y-chaos" aria-describedby="a11y-desc-chaos"></div>' +
-        '<p id="a11y-desc-chaos" class="a11y-option-hint">Défigure tout. Les boutons t\'échappent.</p>' +
+        '<div class="a11y-option a11y-option-chaos"><label for="a11y-chaos">Mode CRAZY <span aria-hidden="true">🤪</span></label><input type="checkbox" id="a11y-chaos"></div>' +
         '<button type="button" class="a11y-reset">Tout réinitialiser</button></div>';
     document.body.appendChild(widget);
 
