@@ -23,6 +23,81 @@ if (isMobile) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    /* ----- Accessibilité : lien d'évitement ----- */
+    var mainEl = document.querySelector('main');
+    if (mainEl && !mainEl.id) mainEl.id = 'main-content';
+    var skipLink = document.createElement('a');
+    skipLink.href = '#main-content';
+    skipLink.className = 'skip-link';
+    skipLink.textContent = 'Aller au contenu principal';
+    document.body.insertBefore(skipLink, document.body.firstChild);
+
+    /* ----- Accessibilité : widget et préférences ----- */
+    var A11Y_KEYS = { contrast: 'a11y-high-contrast', textLarge: 'a11y-text-large', reduceMotion: 'a11y-reduce-motion' };
+    function a11yLoad() {
+        if (localStorage.getItem(A11Y_KEYS.contrast) === '1') document.body.classList.add('a11y-high-contrast');
+        if (localStorage.getItem(A11Y_KEYS.textLarge) === '1') document.documentElement.classList.add('a11y-text-large');
+        if (localStorage.getItem(A11Y_KEYS.reduceMotion) === '1') document.documentElement.classList.add('a11y-reduce-motion');
+    }
+    function a11ySave() {
+        document.querySelector('#a11y-contrast') && (localStorage.setItem(A11Y_KEYS.contrast, document.body.classList.contains('a11y-high-contrast') ? '1' : '0'));
+        document.querySelector('#a11y-text-large') && (localStorage.setItem(A11Y_KEYS.textLarge, document.documentElement.classList.contains('a11y-text-large') ? '1' : '0'));
+        document.querySelector('#a11y-reduce-motion') && (localStorage.setItem(A11Y_KEYS.reduceMotion, document.documentElement.classList.contains('a11y-reduce-motion') ? '1' : '0'));
+    }
+    a11yLoad();
+
+    var widget = document.createElement('div');
+    widget.className = 'a11y-widget';
+    widget.innerHTML = '<button type="button" class="a11y-trigger" aria-label="Options d\'accessibilité" aria-expanded="false" aria-haspopup="true"><i class="fas fa-universal-access"></i></button>' +
+        '<div class="a11y-panel" id="a11y-panel" role="dialog" aria-label="Préférences d\'accessibilité">' +
+        '<h3><i class="fas fa-sliders-h"></i> Accessibilité</h3>' +
+        '<div class="a11y-option"><label for="a11y-contrast">Contraste élevé</label><input type="checkbox" id="a11y-contrast" aria-describedby="a11y-desc-contrast"></div>' +
+        '<div class="a11y-option"><label for="a11y-text-large">Texte agrandi</label><input type="checkbox" id="a11y-text-large" aria-describedby="a11y-desc-text"></div>' +
+        '<div class="a11y-option"><label for="a11y-reduce-motion">Réduire les animations</label><input type="checkbox" id="a11y-reduce-motion" aria-describedby="a11y-desc-motion"></div>' +
+        '<button type="button" class="a11y-reset">Réinitialiser</button></div>';
+    document.body.appendChild(widget);
+
+    var trigger = widget.querySelector('.a11y-trigger');
+    var panel = widget.querySelector('.a11y-panel');
+    var cbContrast = widget.querySelector('#a11y-contrast');
+    var cbText = widget.querySelector('#a11y-text-large');
+    var cbMotion = widget.querySelector('#a11y-reduce-motion');
+    cbContrast.checked = document.body.classList.contains('a11y-high-contrast');
+    cbText.checked = document.documentElement.classList.contains('a11y-text-large');
+    cbMotion.checked = document.documentElement.classList.contains('a11y-reduce-motion');
+
+    trigger.addEventListener('click', function() {
+        var open = panel.classList.toggle('open');
+        trigger.setAttribute('aria-expanded', open);
+    });
+    document.addEventListener('click', function(e) {
+        if (panel.classList.contains('open') && !widget.contains(e.target)) {
+            panel.classList.remove('open');
+            trigger.setAttribute('aria-expanded', 'false');
+        }
+    });
+    cbContrast.addEventListener('change', function() {
+        document.body.classList.toggle('a11y-high-contrast', this.checked);
+        a11ySave();
+    });
+    cbText.addEventListener('change', function() {
+        document.documentElement.classList.toggle('a11y-text-large', this.checked);
+        a11ySave();
+    });
+    cbMotion.addEventListener('change', function() {
+        document.documentElement.classList.toggle('a11y-reduce-motion', this.checked);
+        a11ySave();
+    });
+    widget.querySelector('.a11y-reset').addEventListener('click', function() {
+        localStorage.removeItem(A11Y_KEYS.contrast); localStorage.removeItem(A11Y_KEYS.textLarge); localStorage.removeItem(A11Y_KEYS.reduceMotion);
+        document.body.classList.remove('a11y-high-contrast');
+        document.documentElement.classList.remove('a11y-text-large');
+        document.documentElement.classList.remove('a11y-reduce-motion');
+        cbContrast.checked = false; cbText.checked = false; cbMotion.checked = false;
+        panel.classList.remove('open');
+        trigger.setAttribute('aria-expanded', 'false');
+    });
+
     const pageLoader = document.querySelector('.page-loader');
     
     if (pageLoader) {

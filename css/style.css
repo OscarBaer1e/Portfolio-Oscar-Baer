@@ -21,12 +21,12 @@
     --grad-dark: linear-gradient(145deg, #0d0d12 0%, var(--black) 100%);
     --grad-neon: linear-gradient(45deg, var(--bright-indigo) 0%, var(--slate-blue) 100%);
     
-    /* Texte et fonds */
-    --light-text-color: var(--pale-slate);
-    --dim-text-color: var(--lavender-grey);
+    /* Texte et fonds (contraste renforcé pour accessibilité) */
+    --light-text-color: #c8c9dc;
+    --dim-text-color: #a8aad4;
     --background-color-light: #0d0d12;
     --dark-bg-color-alt: #0a0a0e;
-    --border-color: rgba(102, 101, 221, 0.25);
+    --border-color: rgba(102, 101, 221, 0.35);
     
     /* Structure et typographie */
     --header-height: 70px;
@@ -91,7 +91,7 @@ html {
 :focus-visible {
     outline: 2px solid var(--primary-color);
     outline-offset: 4px;
-    box-shadow: 0 0 0 4px rgba(0, 255, 255, 0.2);
+    box-shadow: 0 0 0 4px rgba(71, 59, 240, 0.35);
 }
 
 button:focus-visible,
@@ -226,6 +226,192 @@ body {
     html {
         scroll-behavior: auto;
     }
+}
+
+/* ================================================
+   ACCESSIBILITÉ : Contraste élevé, taille texte, skip link
+   ================================================ */
+
+/* Lien d'évitement "Aller au contenu" */
+.skip-link {
+    position: absolute;
+    top: -100px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 100001;
+    padding: 12px 24px;
+    background: var(--primary-color);
+    color: var(--black);
+    font-weight: 700;
+    font-size: 1rem;
+    border-radius: var(--radius-default);
+    text-decoration: none;
+    transition: top 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 4px 12px rgba(71, 59, 240, 0.5);
+}
+.skip-link:focus {
+    top: 16px;
+    outline: 3px solid var(--pale-slate);
+    outline-offset: 4px;
+    box-shadow: 0 6px 20px rgba(71, 59, 240, 0.6);
+}
+
+/* Mode contraste élevé (classe sur body) */
+body.a11y-high-contrast {
+    --light-text-color: #f2f2f8;
+    --dim-text-color: #e4e4f0;
+    --border-color: rgba(102, 101, 221, 0.6);
+}
+body.a11y-high-contrast .section-padding::before,
+body.a11y-high-contrast .portfolio-item,
+body.a11y-high-contrast .skill-preview-card {
+    border-width: 2px;
+    border-color: var(--slate-blue);
+}
+body.a11y-high-contrast .animated-background::before,
+body.a11y-high-contrast .animated-background::after {
+    opacity: 0.5;
+}
+
+/* Taille du texte augmentée (classe sur html) */
+html.a11y-text-large {
+    font-size: 112.5%;
+}
+html.a11y-text-large body {
+    font-size: 1.1rem;
+}
+html.a11y-text-large h1 { font-size: 4.5rem; }
+html.a11y-text-large h2 { font-size: 3.25rem; }
+html.a11y-text-large .section-title { font-size: 3.25rem; }
+
+/* Réduire les animations (classe sur html, choix utilisateur) */
+html.a11y-reduce-motion .animated-background::before,
+html.a11y-reduce-motion .animated-background::after,
+html.a11y-reduce-motion .grid-lines {
+    animation: none !important;
+}
+html.a11y-reduce-motion *,
+html.a11y-reduce-motion *::before,
+html.a11y-reduce-motion *::after {
+    transition-duration: 0.15s !important;
+}
+
+/* ================================================
+   WIDGET ACCESSIBILITÉ (bouton + panneau)
+   ================================================ */
+
+.a11y-widget {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    z-index: 10000;
+    font-family: 'Open Sans', sans-serif;
+}
+
+.a11y-trigger {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: 2px solid var(--primary-color);
+    background: var(--dark-bg-color);
+    color: var(--primary-color);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    box-shadow: 0 4px 20px rgba(71, 59, 240, 0.35);
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+.a11y-trigger:hover {
+    background: rgba(71, 59, 240, 0.2);
+    transform: scale(1.05);
+    box-shadow: 0 6px 24px rgba(71, 59, 240, 0.45);
+}
+.a11y-trigger:focus-visible {
+    outline-offset: 4px;
+}
+.a11y-trigger[aria-expanded="true"] {
+    background: var(--primary-color);
+    color: var(--black);
+}
+
+.a11y-panel {
+    position: absolute;
+    bottom: 60px;
+    right: 0;
+    width: 280px;
+    background: var(--dark-bg-color-alt);
+    border: 2px solid var(--primary-color);
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 24px rgba(71, 59, 240, 0.2);
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(8px);
+    transition: opacity 0.2s ease, visibility 0.2s ease, transform 0.2s ease;
+}
+.a11y-panel.open {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.a11y-panel h3 {
+    font-size: 1.1rem;
+    margin-bottom: 14px;
+    color: var(--light-text-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.a11y-panel h3 i {
+    color: var(--primary-color);
+}
+
+.a11y-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+.a11y-option:last-child {
+    border-bottom: none;
+}
+.a11y-option label {
+    font-size: 0.95rem;
+    color: var(--dim-text-color);
+    cursor: pointer;
+}
+.a11y-option input[type="checkbox"] {
+    width: 44px;
+    height: 24px;
+    accent-color: var(--primary-color);
+    cursor: pointer;
+}
+
+.a11y-reset {
+    margin-top: 14px;
+    padding: 8px 12px;
+    width: 100%;
+    font-size: 0.9rem;
+    background: transparent;
+    color: var(--secondary-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: var(--radius-default);
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+.a11y-reset:hover {
+    background: rgba(102, 101, 221, 0.2);
+    color: var(--light-text-color);
+}
+
+@media (max-width: 480px) {
+    .a11y-widget { bottom: 16px; right: 16px; }
+    .a11y-panel { width: calc(100vw - 32px); right: -8px; }
 }
 
 /* ================================================
@@ -409,7 +595,7 @@ a[href*="wikipedia"], a[href*="linkedin"], a[href*="github"] {
     position: relative;
 }
 
-/* Séparateur en dégradé entre sections (ligne néon) */
+/* Séparateur en dégradé entre sections */
 .section-padding::before {
     content: '';
     position: absolute;
@@ -419,12 +605,12 @@ a[href*="wikipedia"], a[href*="linkedin"], a[href*="github"] {
     height: 2px;
     background: linear-gradient(90deg, 
         transparent, 
-        rgba(0, 255, 255, 0.3) 25%, 
+        rgba(102, 101, 221, 0.4) 25%, 
         var(--primary-color) 50%, 
         var(--secondary-color) 75%, 
         transparent);
-    opacity: 0.7;
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+    opacity: 0.8;
+    box-shadow: 0 0 10px rgba(102, 101, 221, 0.3);
 }
 
 /* Réduire le padding sur mobile */
