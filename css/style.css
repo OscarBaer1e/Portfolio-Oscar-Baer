@@ -358,8 +358,8 @@ html.a11y-reduce-motion *::after {
 }
 
 .a11y-panel h3 {
-    font-size: 1.1rem;
-    margin-bottom: 14px;
+    font-size: 1.15rem;
+    margin-bottom: 4px;
     color: var(--light-text-color);
     display: flex;
     align-items: center;
@@ -368,7 +368,18 @@ html.a11y-reduce-motion *::after {
 .a11y-panel h3 i {
     color: var(--primary-color);
 }
+.a11y-panel-desc {
+    font-size: 0.85rem;
+    color: var(--dim-text-color);
+    margin-bottom: 16px;
+    line-height: 1.4;
+}
 
+.a11y-options-group {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 12px;
+    margin-bottom: 12px;
+}
 .a11y-option {
     display: flex;
     align-items: center;
@@ -377,29 +388,47 @@ html.a11y-reduce-motion *::after {
     padding: 10px 0;
     border-bottom: 1px solid var(--border-color);
 }
+.a11y-options-group .a11y-option {
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+}
+.a11y-options-group .a11y-option:last-child {
+    border-bottom: none;
+}
 .a11y-option:last-child {
     border-bottom: none;
 }
 .a11y-option label {
     font-size: 0.95rem;
-    color: var(--dim-text-color);
+    color: var(--light-text-color);
     cursor: pointer;
+    flex: 1;
 }
 .a11y-option input[type="checkbox"] {
     width: 44px;
     height: 24px;
     accent-color: var(--primary-color);
     cursor: pointer;
+    flex-shrink: 0;
+}
+.a11y-option-chaos {
+    margin-top: 4px;
+}
+.a11y-option-hint {
+    font-size: 0.8rem;
+    color: var(--dim-text-color);
+    margin: -4px 0 12px 0;
+    padding-left: 0;
 }
 
 .a11y-reset {
-    margin-top: 14px;
-    padding: 8px 12px;
+    margin-top: 8px;
+    padding: 10px 14px;
     width: 100%;
     font-size: 0.9rem;
+    font-weight: 600;
     background: transparent;
     color: var(--secondary-color);
-    border: 1px solid var(--secondary-color);
+    border: 2px solid var(--secondary-color);
     border-radius: var(--radius-default);
     cursor: pointer;
     transition: background 0.2s ease, color 0.2s ease;
@@ -411,7 +440,102 @@ html.a11y-reduce-motion *::after {
 
 @media (max-width: 480px) {
     .a11y-widget { bottom: 16px; right: 16px; }
-    .a11y-panel { width: calc(100vw - 32px); right: -8px; }
+    .a11y-panel { width: calc(100vw - 32px); right: -8px; max-height: 85vh; overflow-y: auto; }
+}
+
+/* ================================================
+   MODE CHAOS — déjanté et marrant (easter egg)
+   ================================================ */
+body.chaos-mode .grid-lines {
+    animation: chaosGrid 12s linear infinite;
+}
+@keyframes chaosGrid {
+    0% { transform: translate(0, 0) rotate(0deg); }
+    100% { transform: translate(56px, 56px) rotate(360deg); }
+}
+body.chaos-mode .animated-background::before {
+    animation: bgGlowPulse 10s ease-in-out infinite, chaosWobble 3s ease-in-out infinite;
+}
+body.chaos-mode .animated-background::after {
+    animation: bgGlowFloat 20s ease-in-out infinite, chaosFloat 4s ease-in-out infinite;
+}
+@keyframes chaosWobble {
+    0%, 100% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.05) rotate(2deg); }
+    75% { transform: scale(0.98) rotate(-2deg); }
+}
+@keyframes chaosFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(5%, -5%) scale(1.1); }
+}
+body.chaos-mode h1,
+body.chaos-mode h2,
+body.chaos-mode .section-title {
+    animation: chaosWiggle 2s ease-in-out infinite;
+}
+@keyframes chaosWiggle {
+    0%, 100% { transform: rotate(-1deg); }
+    50% { transform: rotate(1deg); }
+}
+body.chaos-mode .logo a {
+    animation: chaosBounce 1.5s ease-in-out infinite;
+}
+@keyframes chaosBounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+}
+body.chaos-mode .portfolio-item:hover,
+body.chaos-mode .skill-category:hover {
+    animation: chaosTilt 0.5s ease-in-out;
+}
+@keyframes chaosTilt {
+    0% { transform: translateY(-6px) rotate(0deg); }
+    25% { transform: translateY(-8px) rotate(2deg); }
+    75% { transform: translateY(-8px) rotate(-2deg); }
+    100% { transform: translateY(-6px) rotate(0deg); }
+}
+body.chaos-mode .btn:hover,
+body.chaos-mode .primary-btn:hover,
+body.chaos-mode .secondary-btn:hover {
+    animation: chaosBtn 0.6s ease-in-out infinite;
+}
+@keyframes chaosBtn {
+    0%, 100% { transform: translateY(-2px) rotate(0deg); }
+    50% { transform: translateY(-4px) rotate(3deg); }
+}
+body.chaos-mode header {
+    animation: chaosHeader 4s ease-in-out infinite;
+}
+@keyframes chaosHeader {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(3px); }
+    75% { transform: translateX(-3px); }
+}
+body.chaos-mode .morph {
+    animation: chaosMorph 5s ease-in-out infinite;
+}
+@keyframes chaosMorph {
+    0%, 100% { transform: scale(1) rotate(0deg); border-radius: 50%; }
+    33% { transform: scale(1.05) rotate(5deg); border-radius: 45% 55% 50% 50%; }
+    66% { transform: scale(1.02) rotate(-5deg); border-radius: 55% 45% 50% 50%; }
+}
+
+/* Désactiver le mode chaos si l'utilisateur préfère réduire les animations */
+html.a11y-reduce-motion body.chaos-mode .grid-lines,
+html.a11y-reduce-motion body.chaos-mode .animated-background::before,
+html.a11y-reduce-motion body.chaos-mode .animated-background::after,
+html.a11y-reduce-motion body.chaos-mode h1,
+html.a11y-reduce-motion body.chaos-mode h2,
+html.a11y-reduce-motion body.chaos-mode .section-title,
+html.a11y-reduce-motion body.chaos-mode .logo a,
+html.a11y-reduce-motion body.chaos-mode .portfolio-item:hover,
+html.a11y-reduce-motion body.chaos-mode .skill-category:hover,
+html.a11y-reduce-motion body.chaos-mode .btn:hover,
+html.a11y-reduce-motion body.chaos-mode .primary-btn:hover,
+html.a11y-reduce-motion body.chaos-mode .secondary-btn:hover,
+html.a11y-reduce-motion body.chaos-mode header,
+html.a11y-reduce-motion body.chaos-mode .morph {
+    animation: none !important;
 }
 
 /* ================================================

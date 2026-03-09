@@ -33,28 +33,36 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.insertBefore(skipLink, document.body.firstChild);
 
     /* ----- Accessibilité : widget et préférences ----- */
-    var A11Y_KEYS = { contrast: 'a11y-high-contrast', textLarge: 'a11y-text-large', reduceMotion: 'a11y-reduce-motion' };
+    var A11Y_KEYS = { contrast: 'a11y-high-contrast', textLarge: 'a11y-text-large', reduceMotion: 'a11y-reduce-motion', chaos: 'a11y-chaos' };
     function a11yLoad() {
         if (localStorage.getItem(A11Y_KEYS.contrast) === '1') document.body.classList.add('a11y-high-contrast');
         if (localStorage.getItem(A11Y_KEYS.textLarge) === '1') document.documentElement.classList.add('a11y-text-large');
         if (localStorage.getItem(A11Y_KEYS.reduceMotion) === '1') document.documentElement.classList.add('a11y-reduce-motion');
+        if (localStorage.getItem(A11Y_KEYS.chaos) === '1') document.body.classList.add('chaos-mode');
     }
     function a11ySave() {
-        document.querySelector('#a11y-contrast') && (localStorage.setItem(A11Y_KEYS.contrast, document.body.classList.contains('a11y-high-contrast') ? '1' : '0'));
-        document.querySelector('#a11y-text-large') && (localStorage.setItem(A11Y_KEYS.textLarge, document.documentElement.classList.contains('a11y-text-large') ? '1' : '0'));
-        document.querySelector('#a11y-reduce-motion') && (localStorage.setItem(A11Y_KEYS.reduceMotion, document.documentElement.classList.contains('a11y-reduce-motion') ? '1' : '0'));
+        var el;
+        if ((el = document.querySelector('#a11y-contrast'))) localStorage.setItem(A11Y_KEYS.contrast, document.body.classList.contains('a11y-high-contrast') ? '1' : '0');
+        if ((el = document.querySelector('#a11y-text-large'))) localStorage.setItem(A11Y_KEYS.textLarge, document.documentElement.classList.contains('a11y-text-large') ? '1' : '0');
+        if ((el = document.querySelector('#a11y-reduce-motion'))) localStorage.setItem(A11Y_KEYS.reduceMotion, document.documentElement.classList.contains('a11y-reduce-motion') ? '1' : '0');
+        if ((el = document.querySelector('#a11y-chaos'))) localStorage.setItem(A11Y_KEYS.chaos, document.body.classList.contains('chaos-mode') ? '1' : '0');
     }
     a11yLoad();
 
     var widget = document.createElement('div');
     widget.className = 'a11y-widget';
-    widget.innerHTML = '<button type="button" class="a11y-trigger" aria-label="Options d\'accessibilité" aria-expanded="false" aria-haspopup="true"><i class="fas fa-universal-access"></i></button>' +
-        '<div class="a11y-panel" id="a11y-panel" role="dialog" aria-label="Préférences d\'accessibilité">' +
-        '<h3><i class="fas fa-sliders-h"></i> Accessibilité</h3>' +
+    widget.innerHTML = '<button type="button" class="a11y-trigger" aria-label="Options d\'accessibilité et préférences" aria-expanded="false" aria-haspopup="true"><i class="fas fa-universal-access"></i></button>' +
+        '<div class="a11y-panel" id="a11y-panel" role="dialog" aria-labelledby="a11y-panel-title" aria-describedby="a11y-panel-desc">' +
+        '<h3 id="a11y-panel-title"><i class="fas fa-sliders-h" aria-hidden="true"></i> Préférences</h3>' +
+        '<p id="a11y-panel-desc" class="a11y-panel-desc">Contraste, taille du texte et animations.</p>' +
+        '<div class="a11y-options-group">' +
         '<div class="a11y-option"><label for="a11y-contrast">Contraste élevé</label><input type="checkbox" id="a11y-contrast" aria-describedby="a11y-desc-contrast"></div>' +
         '<div class="a11y-option"><label for="a11y-text-large">Texte agrandi</label><input type="checkbox" id="a11y-text-large" aria-describedby="a11y-desc-text"></div>' +
         '<div class="a11y-option"><label for="a11y-reduce-motion">Réduire les animations</label><input type="checkbox" id="a11y-reduce-motion" aria-describedby="a11y-desc-motion"></div>' +
-        '<button type="button" class="a11y-reset">Réinitialiser</button></div>';
+        '</div>' +
+        '<div class="a11y-option a11y-option-chaos"><label for="a11y-chaos">Mode chaos <span aria-hidden="true">🎉</span></label><input type="checkbox" id="a11y-chaos" aria-describedby="a11y-desc-chaos"></div>' +
+        '<p id="a11y-desc-chaos" class="a11y-option-hint">Rend le site déjanté (fun).</p>' +
+        '<button type="button" class="a11y-reset">Tout réinitialiser</button></div>';
     document.body.appendChild(widget);
 
     var trigger = widget.querySelector('.a11y-trigger');
@@ -62,9 +70,11 @@ document.addEventListener('DOMContentLoaded', function() {
     var cbContrast = widget.querySelector('#a11y-contrast');
     var cbText = widget.querySelector('#a11y-text-large');
     var cbMotion = widget.querySelector('#a11y-reduce-motion');
+    var cbChaos = widget.querySelector('#a11y-chaos');
     cbContrast.checked = document.body.classList.contains('a11y-high-contrast');
     cbText.checked = document.documentElement.classList.contains('a11y-text-large');
     cbMotion.checked = document.documentElement.classList.contains('a11y-reduce-motion');
+    cbChaos.checked = document.body.classList.contains('chaos-mode');
 
     trigger.addEventListener('click', function() {
         var open = panel.classList.toggle('open');
@@ -88,12 +98,15 @@ document.addEventListener('DOMContentLoaded', function() {
         document.documentElement.classList.toggle('a11y-reduce-motion', this.checked);
         a11ySave();
     });
+    cbChaos.addEventListener('change', function() {
+        document.body.classList.toggle('chaos-mode', this.checked);
+        a11ySave();
+    });
     widget.querySelector('.a11y-reset').addEventListener('click', function() {
-        localStorage.removeItem(A11Y_KEYS.contrast); localStorage.removeItem(A11Y_KEYS.textLarge); localStorage.removeItem(A11Y_KEYS.reduceMotion);
-        document.body.classList.remove('a11y-high-contrast');
-        document.documentElement.classList.remove('a11y-text-large');
-        document.documentElement.classList.remove('a11y-reduce-motion');
-        cbContrast.checked = false; cbText.checked = false; cbMotion.checked = false;
+        localStorage.removeItem(A11Y_KEYS.contrast); localStorage.removeItem(A11Y_KEYS.textLarge); localStorage.removeItem(A11Y_KEYS.reduceMotion); localStorage.removeItem(A11Y_KEYS.chaos);
+        document.body.classList.remove('a11y-high-contrast', 'chaos-mode');
+        document.documentElement.classList.remove('a11y-text-large', 'a11y-reduce-motion');
+        cbContrast.checked = false; cbText.checked = false; cbMotion.checked = false; cbChaos.checked = false;
         panel.classList.remove('open');
         trigger.setAttribute('aria-expanded', 'false');
     });
