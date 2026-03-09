@@ -228,97 +228,8 @@ document.addEventListener('DOMContentLoaded', function() {
         card.classList.add('reveal');
         revealObserver.observe(card);
     });
-    let lastScrollTop = 0;
-    let ticking = false;
-    const parallaxElements = document.querySelectorAll('.parallax-section, .hero-content, .morph');
-    
-    function updateParallax() {
-        const scrollTop = window.pageYOffset || document.documentElement.scrollTop;
-        const scrollDirection = scrollTop > lastScrollTop ? 'down' : 'up';
-        
-        parallaxElements.forEach((el, index) => {
-            const speed = 0.5 + (index * 0.1);
-            const yPos = -(scrollTop * speed);
-            el.style.transform = `translate3d(0, ${yPos}px, 0)`;
-        });
-        
-        lastScrollTop = scrollTop;
-        ticking = false;
-    }
-    
-    window.addEventListener('scroll', () => {
-        if (!ticking) {
-            requestAnimationFrame(updateParallax);
-            ticking = true;
-        }
-    }, { passive: true });
-    const buttons = document.querySelectorAll('.btn, .btn-overlay');
-    buttons.forEach(button => {
-        button.addEventListener('click', function(e) {
-            const ripple = document.createElement('span');
-            const rect = this.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const x = e.clientX - rect.left - size / 2;
-            const y = e.clientY - rect.top - size / 2;
-            
-            ripple.style.width = ripple.style.height = size + 'px';
-            ripple.style.left = x + 'px';
-            ripple.style.top = y + 'px';
-            ripple.classList.add('ripple');
-            
-            this.appendChild(ripple);
-            
-            setTimeout(() => {
-                ripple.remove();
-            }, 600);
-        });
-    });
-    // Curseur personnalisé - directement sur la souris (désactivé sur mobile)
-    if (!isMobile) {
-        const cursor = document.createElement('div');
-        cursor.classList.add('custom-cursor');
-        document.body.appendChild(cursor);
-        
-        // Cacher le curseur système et utiliser la bulle
-        document.body.style.cursor = 'none';
-        
-        // Utiliser requestAnimationFrame pour des performances optimales
-        let rafId = null;
-        let mouseX = 0;
-        let mouseY = 0;
-        
-        // Positionner directement sur la souris (pas de lag)
-        document.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            
-            // Utiliser RAF pour limiter les mises à jour
-            if (!rafId) {
-                rafId = requestAnimationFrame(() => {
-                    cursor.style.left = mouseX + 'px';
-                    cursor.style.top = mouseY + 'px';
-                    cursor.style.transform = 'translate(-50%, -50%)';
-                    rafId = null;
-                });
-            }
-        }, { passive: true });
-        
-        // Masquer le curseur quand la souris quitte la page
-        document.addEventListener('mouseleave', () => {
-            cursor.style.opacity = '0';
-        });
-        
-        document.addEventListener('mouseenter', () => {
-            cursor.style.opacity = '1';
-        });
-        
-        // Agrandit le curseur au survol des éléments interactifs
-        const interactiveElements = document.querySelectorAll('a, button, .portfolio-item, .graphisme-card');
-        interactiveElements.forEach(el => {
-            el.addEventListener('mouseenter', () => cursor.classList.add('cursor-hover'));
-            el.addEventListener('mouseleave', () => cursor.classList.remove('cursor-hover'));
-        });
-    }
+    // Parallaxe désactivée pour alléger les calculs au scroll
+    // Effet ripple et curseur personnalisé supprimés pour simplifier l'expérience
     const counters = document.querySelectorAll('[data-count]');
     const countObserver = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
@@ -346,38 +257,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }, { threshold: 0.5 });
     
     counters.forEach(counter => countObserver.observe(counter));
-    // Effet de tilt sur les cartes (désactivé sur mobile pour les performances)
-    if (!isMobile) {
-        const tiltCards = document.querySelectorAll('.portfolio-item, .graphisme-card');
-        tiltCards.forEach(card => {
-            let rafId = null;
-            let currentX = 0;
-            let currentY = 0;
-            
-            card.addEventListener('mousemove', (e) => {
-                const rect = card.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                
-                const centerX = rect.width / 2;
-                const centerY = rect.height / 2;
-                
-                currentX = (y - centerY) / 10;
-                currentY = (centerX - x) / 10;
-                
-                if (!rafId) {
-                    rafId = requestAnimationFrame(() => {
-                        card.style.transform = `perspective(1000px) rotateX(${currentX}deg) rotateY(${currentY}deg) translateY(-10px)`;
-                        rafId = null;
-                    });
-                }
-            }, { passive: true });
-            
-            card.addEventListener('mouseleave', () => {
-                card.style.transform = '';
-            });
-        });
-    }
+    // Effet de tilt 3D sur les cartes désactivé pour une interaction plus sobre
     // Animation des titres (simplifiée sur mobile)
     if (!isLowEndDevice) {
     // Animation des titres (simplifiée sur mobile)
@@ -452,68 +332,7 @@ document.addEventListener('DOMContentLoaded', function() {
     allRevealElements.forEach(el => {
         enhancedRevealObserver.observe(el);
     });
-    function createParticle() {
-        const particle = document.createElement('div');
-        const size = Math.random() * 4 + 2;
-        const colors = ['var(--primary-color)', 'var(--secondary-color)'];
-        const color = colors[Math.floor(Math.random() * colors.length)];
-        
-        particle.style.position = 'fixed';
-        particle.style.width = size + 'px';
-        particle.style.height = size + 'px';
-        particle.style.background = `radial-gradient(circle, ${color}, transparent)`;
-        particle.style.borderRadius = '50%';
-        particle.style.pointerEvents = 'none';
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.top = '100%';
-        particle.style.opacity = '0';
-        particle.style.zIndex = '1';
-        particle.style.boxShadow = `0 0 ${size * 2}px ${color}`;
-        
-        document.body.appendChild(particle);
-        
-        const endX = (Math.random() - 0.5) * 300;
-        const endY = -window.innerHeight - 100;
-        
-        const animation = particle.animate([
-            { 
-                transform: 'translateY(0) translateX(0) scale(0)', 
-                opacity: 0 
-            },
-            { 
-                transform: `translateY(${endY * 0.3}px) translateX(${endX * 0.3}px) scale(1)`, 
-                opacity: 0.8 
-            },
-            { 
-                transform: `translateY(${endY}px) translateX(${endX}px) scale(0)`, 
-                opacity: 0 
-            }
-        ], {
-            duration: 4000 + Math.random() * 2000,
-            easing: 'cubic-bezier(0.25, 0.46, 0.45, 0.94)'
-        });
-        
-        animation.onfinish = () => particle.remove();
-    }
-    
-    // Crée des particules occasionnellement (optimisé pour les performances)
-    if (window.innerWidth > 768 && document.querySelector('.animated-background')) {
-        let particleInterval = setInterval(() => {
-            if (Math.random() > 0.6) {
-                createParticle();
-            }
-        }, 3000);
-        
-        // Arrête les particules si l'utilisateur quitte la page
-        window.addEventListener('blur', () => clearInterval(particleInterval));
-        window.addEventListener('focus', () => {
-            particleInterval = setInterval(() => {
-                if (Math.random() > 0.6) {
-                    createParticle();
-                }
-            }, 3000);
-        });
-    }
+    // Particules décoratives supprimées pour réduire la charge graphique
     if (document.querySelector('#hero')) {
         const heroElements = document.querySelectorAll('.hero-left, .hero-right, .hero-intro > *');
         heroElements.forEach((el, index) => {

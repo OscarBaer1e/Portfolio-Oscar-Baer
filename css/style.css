@@ -5,10 +5,10 @@
 
 /* 1. VARIABLES CSS ET BASE */
 :root {
-    /* Couleurs de base ÉLECTRIQUES */
-   --primary-color: #00ffff;       /* Bleu Cyan Néon (Action / Lumière) */
-    --secondary-color: #ff00ff;     /* Magenta Vif (Accent / Glitch) */
-    --dark-bg-color: #0a0a0a;       /* Noir Ultime (Fond de l'interface) */
+    /* Couleurs de base adoucies (moins néon) */
+    --primary-color: #4fd1c5;       /* Turquoise douce (Action / Lumière) */
+    --secondary-color: #718096;     /* Gris bleuté (Accent discret) */
+    --dark-bg-color: #111827;       /* Bleu nuit très sombre (Fond de l'interface) */
     
     /* Couleurs des Dégradés Spécifiques */
     --grad-dark: linear-gradient(145deg, #1f1f1f 0%, #0a0a0a 100%); 
@@ -131,15 +131,11 @@ body {
     left: 0;
     width: 100%;
     height: 100%;
-    background-image: 
-        linear-gradient(rgba(0, 255, 255, 0.08) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0, 255, 255, 0.08) 1px, transparent 1px),
-        linear-gradient(rgba(255, 0, 255, 0.05) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255, 0, 255, 0.05) 1px, transparent 1px);
-    background-size: 80px 80px, 80px 80px, 40px 40px, 40px 40px;
-    animation: gridMove 15s linear infinite, gridPulse 4s ease-in-out infinite;
-    opacity: 0.5;
-    will-change: transform, opacity;
+    /* Fond très léger, sans animations continues pour ne pas distraire */
+    background-image: none;
+    background-color: rgba(15, 23, 42, 0.85);
+    opacity: 1;
+    will-change: auto;
 }
 
 /* Désactiver les animations de fond sur mobile pour les performances */
@@ -212,29 +208,8 @@ body {
     height: 6px;
     background: var(--primary-color);
     border-radius: 50%;
-    box-shadow: 
-        0 0 8px var(--primary-color),
-        100px 200px 0 4px rgba(0, 255, 255, 0.6),
-        100px 200px 0 0 rgba(0, 255, 255, 0.4),
-        300px 100px 0 3px rgba(0, 255, 255, 0.5),
-        300px 100px 0 0 rgba(0, 255, 255, 0.3),
-        500px 400px 0 4px rgba(255, 0, 255, 0.6),
-        500px 400px 0 0 rgba(255, 0, 255, 0.4),
-        700px 150px 0 3px rgba(0, 255, 255, 0.55),
-        700px 150px 0 0 rgba(0, 255, 255, 0.35),
-        900px 300px 0 4px rgba(255, 0, 255, 0.5),
-        900px 300px 0 0 rgba(255, 0, 255, 0.3),
-        1100px 500px 0 4px rgba(0, 255, 255, 0.6),
-        1100px 500px 0 0 rgba(0, 255, 255, 0.4),
-        200px 600px 0 3px rgba(255, 0, 255, 0.55),
-        200px 600px 0 0 rgba(255, 0, 255, 0.35),
-        400px 700px 0 4px rgba(0, 255, 255, 0.5),
-        400px 700px 0 0 rgba(0, 255, 255, 0.3),
-        800px 800px 0 4px rgba(255, 0, 255, 0.6),
-        800px 800px 0 0 rgba(255, 0, 255, 0.4),
-        1200px 900px 0 3px rgba(0, 255, 255, 0.55),
-        1200px 900px 0 0 rgba(0, 255, 255, 0.35);
-    animation: floatParticles 12s ease-in-out infinite;
+    box-shadow: none;
+    animation: none;
 }
 
 .floating-particles::after {
@@ -284,55 +259,9 @@ body {
 }
 
 /* Lignes animées - LÉGÈREMENT RÉDUITES */
+/* Lignes animées supprimées pour un fond plus calme */
 .animated-lines {
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    background-image: 
-        linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.06) 50%, transparent),
-        linear-gradient(0deg, transparent, rgba(255, 0, 255, 0.06) 50%, transparent);
-    background-size: 100% 2px, 2px 100%;
-    background-position: 0 30%, 30% 0;
-    animation: diagonalLines 10s linear infinite;
-}
-
-.animated-lines::before,
-.animated-lines::after {
-    content: '';
-    position: absolute;
-    width: 3px;
-    height: 200%;
-    background: linear-gradient(to bottom, 
-        transparent 0%, 
-        var(--primary-color) 20%,
-        var(--primary-color) 50%,
-        var(--primary-color) 80%,
-        transparent 100%);
-    opacity: 0.4;
-    box-shadow: 
-        0 0 8px var(--primary-color),
-        0 0 15px var(--primary-color);
-    animation: lineMove 6s linear infinite;
-}
-
-.animated-lines::before {
-    left: 15%;
-    animation-delay: 0s;
-}
-
-.animated-lines::after {
-    left: 85%;
-    background: linear-gradient(to bottom, 
-        transparent 0%, 
-        var(--secondary-color) 20%,
-        var(--secondary-color) 50%,
-        var(--secondary-color) 80%,
-        transparent 100%);
-    box-shadow: 
-        0 0 8px var(--secondary-color),
-        0 0 15px var(--secondary-color);
-    animation-delay: -3s;
+    display: none;
 }
 
 @keyframes lineMove {
@@ -456,12 +385,12 @@ main, header, footer {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    /* Utilise Anta ou une police similaire si Anta est utilisée dans le HTML */
     font-family: 'Anta', sans-serif; 
     margin-bottom: var(--spacing-unit);
     color: var(--primary-color);   
     line-height: 1.1;
-    text-shadow: 0 0 5px rgba(0, 255, 255, 0.5); 
+    /* Suppression de la lueur néon pour un rendu plus sobre */
+    text-shadow: none;
 }
 
 h1 { 
@@ -577,11 +506,13 @@ a[href*="wikipedia"], a[href*="linkedin"], a[href*="github"] {
     font-weight: 700;
     color: var(--light-text-color);
     text-align: left !important; /* Titres non justifiés */
-    text-shadow: 0 0 20px var(--primary-color), 0 0 40px rgba(0, 255, 255, 0.5); /* Contraste amélioré */
+    /* On enlève l'effet de glow néon pour mettre davantage en valeur le contenu */
+    text-shadow: none;
 }
 
 .section-title::after {
-    content: '>> DATA_LOG_END <<'; 
+    /* Ligne simple et discrète plutôt qu'un texte glitch */
+    content: ''; 
     position: absolute;
     left: 50%;
     bottom: 0;
@@ -1031,7 +962,8 @@ nav .nav-list a.active::after {
     text-align: left; 
     padding: 100px var(--spacing-unit) 80px;
     min-height: calc(100vh - var(--header-height)); 
-    border-bottom: 5px dashed var(--secondary-color);
+    /* Bordure plus fine et continue pour un rendu plus calme */
+    border-bottom: 1px solid var(--secondary-color);
     position: relative;
     overflow: hidden;
     display: flex;
@@ -1039,22 +971,9 @@ nav .nav-list a.active::after {
 }
 
 /* Légères lignes de scan en arrière-plan (effet écran cyberpunk) */
+/* Suppression des lignes de scan pour un fond plus neutre */
 #hero::after {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: repeating-linear-gradient(
-        0deg,
-        transparent 0px,
-        transparent 3px,
-        rgba(0, 255, 255, 0.02) 3px,
-        rgba(0, 255, 255, 0.02) 4px
-    );
-    pointer-events: none;
-    z-index: 0;
+    content: none;
 }
 
 @media (max-width: 768px) {
@@ -1071,10 +990,10 @@ nav .nav-list a.active::after {
     left: 0;
     width: 100%;
     height: 100%;
-    background: radial-gradient(circle at 30% 50%, rgba(0, 255, 255, 0.1), transparent 50%),
-                radial-gradient(circle at 70% 50%, rgba(255, 0, 255, 0.1), transparent 50%);
+    background: radial-gradient(circle at 30% 50%, rgba(79, 209, 197, 0.12), transparent 55%);
     z-index: 0;
-    animation: pulse 4s ease-in-out infinite;
+    /* Pas d'animation continue pour limiter la charge GPU */
+    animation: none;
 }
 
 .hero-content {
@@ -1115,17 +1034,16 @@ nav .nav-list a.active::after {
     transition: all 0.5s ease;
 }
 
-/* Grosse animation d'entrée type PowerPoint sur l'image d'accueil */
+/* Image d'accueil plus simple, sans grosse animation d'entrée */
 .hero-photo-entrance {
-    opacity: 0;
-    transform: scale(0.15) rotate(-25deg);
-    filter: blur(15px);
-    animation: heroPhotoEntrance 2s cubic-bezier(0.34, 1.5, 0.64, 1) 0.5s forwards;
+    opacity: 1;
+    transform: none;
+    filter: none;
+    animation: none;
 }
 
 .hero-photo-entrance.float-animation {
-    animation: heroPhotoEntrance 2s cubic-bezier(0.34, 1.5, 0.64, 1) 0.5s forwards,
-               heroPhotoMad 6s ease-in-out 2.6s infinite;
+    animation: none;
 }
 
 /* Explosion de lumière derrière la photo (effet PowerPoint) */
@@ -1138,9 +1056,10 @@ nav .nav-list a.active::after {
     height: 200px;
     margin: -100px 0 0 -100px;
     border-radius: 50%;
-    background: radial-gradient(circle, rgba(0, 255, 255, 0.5) 0%, rgba(255, 0, 255, 0.25) 50%, transparent 70%);
-    opacity: 0;
-    animation: heroPhotoGlowBurst 2s ease-out 0.5s forwards;
+    background: radial-gradient(circle, rgba(79, 209, 197, 0.35) 0%, transparent 70%);
+    opacity: 0.2;
+    /* Pas d'animation de flash pour calmer l'interface */
+    animation: none;
     pointer-events: none;
     z-index: 0;
 }
@@ -1182,33 +1101,7 @@ nav .nav-list a.active::after {
     }
 }
 
-/* Animation de malade : tourne + se déplace en boucle */
-@keyframes heroPhotoMad {
-    0%, 100% {
-        transform: translate(0, 0) rotate(0deg) scale(1);
-    }
-    12.5% {
-        transform: translate(28px, -35px) rotate(45deg) scale(1.03);
-    }
-    25% {
-        transform: translate(40px, 0) rotate(90deg) scale(1.05);
-    }
-    37.5% {
-        transform: translate(28px, 35px) rotate(135deg) scale(1.03);
-    }
-    50% {
-        transform: translate(0, 45px) rotate(180deg) scale(1);
-    }
-    62.5% {
-        transform: translate(-28px, 35px) rotate(225deg) scale(1.03);
-    }
-    75% {
-        transform: translate(-40px, 0) rotate(270deg) scale(1.05);
-    }
-    87.5% {
-        transform: translate(-28px, -35px) rotate(315deg) scale(1.03);
-    }
-}
+/* Animation héroïque complexe supprimée pour plus de stabilité visuelle */
 
 .morph:hover {
     transform: scale(1.05);
@@ -1260,7 +1153,8 @@ nav .nav-list a.active::after {
     font-size: 4.5rem;
     margin-bottom: 15px;
     color: var(--primary-color);
-    text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+    /* Titre plus lisible sans clignotement ni forte lueur */
+    text-shadow: none;
 }
 
 .hero-subtitle {
@@ -1296,7 +1190,7 @@ nav .nav-list a.active::after {
     font-size: 2.5rem;
     font-weight: bold;
     color: var(--primary-color);
-    text-shadow: 0 0 10px var(--primary-color);
+    text-shadow: none;
     font-family: 'Anta', sans-serif;
 }
 
@@ -2666,17 +2560,14 @@ footer .container {
 
 .glitch-text {
     position: relative;
-    animation: glitch 0.3s infinite;
+    /* Effet glitch désactivé pour une DA plus minimaliste */
+    animation: none;
 }
 
 .glitch-text::before,
 .glitch-text::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
+    /* On ne duplique plus le texte en surimpression */
+    content: none;
 }
 
 .glitch-text::before {
@@ -3125,37 +3016,18 @@ footer .container {
 }
 
 .neon-blink {
-    animation: neonBlink 2s ease-in-out infinite;
+    /* Désactivation du clignotement néon pour plus de confort de lecture */
+    animation: none;
 }
 
 /* Curseur personnalisé */
 .custom-cursor {
-    width: 20px;
-    height: 20px;
-    border: 2px solid var(--primary-color);
-    border-radius: 50%;
-    position: fixed;
-    pointer-events: none;
-    z-index: 10001; /* Au-dessus du header (z-index: 10000) */
-    transition: transform 0.15s ease, background-color 0.15s ease, width 0.15s ease, height 0.15s ease;
-    mix-blend-mode: difference;
-    left: 0;
-    top: 0;
-    transform: translate(-50%, -50%);
-    will-change: transform;
+    /* Curseur personnalisé désactivé : on garde le curseur système natif */
+    display: none;
 }
 
 .custom-cursor.cursor-hover {
-    width: 40px;
-    height: 40px;
-    background-color: var(--primary-color);
-    border-color: var(--secondary-color);
-    transform: translate(-50%, -50%) scale(1);
-}
-
-/* Cacher le curseur système sur les éléments interactifs */
-a, button, .btn, .portfolio-item, .graphisme-card, input, textarea, select {
-    cursor: none !important;
+    display: none;
 }
 
 /* Sur mobile/tablette, réafficher le curseur système (déjà géré plus haut) */
