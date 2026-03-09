@@ -60,8 +60,8 @@ document.addEventListener('DOMContentLoaded', function() {
         '<div class="a11y-option"><label for="a11y-text-large">Texte agrandi</label><input type="checkbox" id="a11y-text-large" aria-describedby="a11y-desc-text"></div>' +
         '<div class="a11y-option"><label for="a11y-reduce-motion">Réduire les animations</label><input type="checkbox" id="a11y-reduce-motion" aria-describedby="a11y-desc-motion"></div>' +
         '</div>' +
-        '<div class="a11y-option a11y-option-chaos"><label for="a11y-chaos">Mode chaos <span aria-hidden="true">🎉</span></label><input type="checkbox" id="a11y-chaos" aria-describedby="a11y-desc-chaos"></div>' +
-        '<p id="a11y-desc-chaos" class="a11y-option-hint">Rend le site déjanté (fun).</p>' +
+        '<div class="a11y-option a11y-option-chaos"><label for="a11y-chaos">Mode CRAZY <span aria-hidden="true">🤪</span></label><input type="checkbox" id="a11y-chaos" aria-describedby="a11y-desc-chaos"></div>' +
+        '<p id="a11y-desc-chaos" class="a11y-option-hint">Défigure tout. Les boutons t\'échappent.</p>' +
         '<button type="button" class="a11y-reset">Tout réinitialiser</button></div>';
     document.body.appendChild(widget);
 
@@ -101,7 +101,9 @@ document.addEventListener('DOMContentLoaded', function() {
     cbChaos.addEventListener('change', function() {
         document.body.classList.toggle('chaos-mode', this.checked);
         a11ySave();
+        if (this.checked) initCrazyDodge(); else stopCrazyDodge();
     });
+    if (document.body.classList.contains('chaos-mode')) initCrazyDodge();
     widget.querySelector('.a11y-reset').addEventListener('click', function() {
         localStorage.removeItem(A11Y_KEYS.contrast); localStorage.removeItem(A11Y_KEYS.textLarge); localStorage.removeItem(A11Y_KEYS.reduceMotion); localStorage.removeItem(A11Y_KEYS.chaos);
         document.body.classList.remove('a11y-high-contrast', 'chaos-mode');
@@ -109,7 +111,43 @@ document.addEventListener('DOMContentLoaded', function() {
         cbContrast.checked = false; cbText.checked = false; cbMotion.checked = false; cbChaos.checked = false;
         panel.classList.remove('open');
         trigger.setAttribute('aria-expanded', 'false');
+        stopCrazyDodge();
     });
+
+    /* Mode CRAZY : boutons qui esquivent le curseur */
+    var crazyDodgeRaf = null, crazyDodgeMouse = { x: -1e4, y: -1e4 };
+    document.addEventListener('mousemove', function(e) { crazyDodgeMouse.x = e.clientX; crazyDodgeMouse.y = e.clientY; });
+    function initCrazyDodge() {
+        if (document.documentElement.classList.contains('a11y-reduce-motion')) return;
+        function updateDodge() {
+            if (!document.body.classList.contains('chaos-mode') || document.documentElement.classList.contains('a11y-reduce-motion')) return;
+            var mx = crazyDodgeMouse.x, my = crazyDodgeMouse.y;
+            var sel = '.btn, .primary-btn, .secondary-btn, header .nav-links a, .hero a.btn';
+            [].slice.call(document.querySelectorAll(sel)).forEach(function(el) {
+                if (el.closest('.a11y-widget')) return;
+                var r = el.getBoundingClientRect();
+                var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+                var dx = cx - mx, dy = cy - my;
+                var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                var zone = 160, maxPush = 90;
+                var push = dist < zone ? ((zone - dist) / zone) * maxPush : 0;
+                var tx = (dx / dist) * push, ty = (dy / dist) * push;
+                el.style.transform = 'translate(' + tx + 'px, ' + ty + 'px)';
+                el.style.transition = 'transform 0.05s ease-out';
+            });
+            crazyDodgeRaf = requestAnimationFrame(updateDodge);
+        }
+        crazyDodgeRaf = requestAnimationFrame(updateDodge);
+    }
+    function stopCrazyDodge() {
+        if (crazyDodgeRaf) cancelAnimationFrame(crazyDodgeRaf);
+        crazyDodgeRaf = null;
+        [].slice.call(document.querySelectorAll('.btn, .primary-btn, .secondary-btn, header .nav-links a, .hero a.btn')).forEach(function(el) {
+            if (el.closest('.a11y-widget')) return;
+            el.style.transform = '';
+            el.style.transition = '';
+        });
+    }
 
     const pageLoader = document.querySelector('.page-loader');
     

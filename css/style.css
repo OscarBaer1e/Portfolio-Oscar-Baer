@@ -444,83 +444,143 @@ html.a11y-reduce-motion *::after {
 }
 
 /* ================================================
-   MODE CHAOS — déjanté et marrant (easter egg)
+   MODE CRAZY — tout explose, site défiguré (easter egg)
+   Les boutons esquivent le curseur (voir script.js)
    ================================================ */
-body.chaos-mode .grid-lines {
-    animation: chaosGrid 12s linear infinite;
+body.chaos-mode {
+    overflow-x: hidden;
 }
-@keyframes chaosGrid {
-    0% { transform: translate(0, 0) rotate(0deg); }
-    100% { transform: translate(56px, 56px) rotate(360deg); }
+body.chaos-mode .grid-lines {
+    animation: crazyGrid 4s linear infinite;
+    transform-origin: 50% 50%;
+}
+@keyframes crazyGrid {
+    0% { transform: translate(0, 0) rotate(0deg) scale(0.8); }
+    50% { transform: translate(56px, 56px) rotate(180deg) scale(1.4); }
+    100% { transform: translate(0, 0) rotate(360deg) scale(0.8); }
 }
 body.chaos-mode .animated-background::before {
-    animation: bgGlowPulse 10s ease-in-out infinite, chaosWobble 3s ease-in-out infinite;
+    animation: crazyOrb1 2s ease-in-out infinite;
 }
 body.chaos-mode .animated-background::after {
-    animation: bgGlowFloat 20s ease-in-out infinite, chaosFloat 4s ease-in-out infinite;
+    animation: crazyOrb2 3s ease-in-out infinite;
 }
-@keyframes chaosWobble {
-    0%, 100% { transform: scale(1) rotate(0deg); }
-    25% { transform: scale(1.05) rotate(2deg); }
-    75% { transform: scale(0.98) rotate(-2deg); }
+@keyframes crazyOrb1 {
+    0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); left: 20%; top: 30%; }
+    25% { transform: translate(-50%, -50%) scale(1.4) rotate(90deg); left: 80%; top: 20%; }
+    50% { transform: translate(-50%, -50%) scale(0.7) rotate(180deg); left: 70%; top: 70%; }
+    75% { transform: translate(-50%, -50%) scale(1.2) rotate(270deg); left: 15%; top: 80%; }
 }
-@keyframes chaosFloat {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    50% { transform: translate(5%, -5%) scale(1.1); }
+@keyframes crazyOrb2 {
+    0%, 100% { transform: translate(-50%, -50%) scale(1.1); left: 75%; top: 60%; }
+    33% { transform: translate(-50%, -50%) scale(0.6) rotate(120deg); left: 25%; top: 25%; }
+    66% { transform: translate(-50%, -50%) scale(1.3) rotate(240deg); left: 60%; top: 85%; }
 }
-body.chaos-mode h1,
+body.chaos-mode h1 {
+    animation: crazyH1 1.2s ease-in-out infinite;
+}
 body.chaos-mode h2,
 body.chaos-mode .section-title {
-    animation: chaosWiggle 2s ease-in-out infinite;
+    animation: crazyH2 1.8s ease-in-out infinite;
 }
-@keyframes chaosWiggle {
-    0%, 100% { transform: rotate(-1deg); }
-    50% { transform: rotate(1deg); }
+@keyframes crazyH1 {
+    0%, 100% { transform: rotate(-8deg) scale(1.05); }
+    50% { transform: rotate(8deg) scale(0.95); }
+}
+@keyframes crazyH2 {
+    0%, 100% { transform: rotate(5deg) scale(1.02); }
+    50% { transform: rotate(-5deg) scale(1.08); }
 }
 body.chaos-mode .logo a {
-    animation: chaosBounce 1.5s ease-in-out infinite;
+    animation: crazyLogo 0.8s ease-in-out infinite;
 }
-@keyframes chaosBounce {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+@keyframes crazyLogo {
+    0%, 100% { transform: scale(1) rotate(-5deg); }
+    50% { transform: scale(1.15) rotate(5deg); }
 }
-body.chaos-mode .portfolio-item:hover,
-body.chaos-mode .skill-category:hover {
-    animation: chaosTilt 0.5s ease-in-out;
+body.chaos-mode .portfolio-item,
+body.chaos-mode .skill-category {
+    animation: crazyCard 3s ease-in-out infinite;
 }
-@keyframes chaosTilt {
-    0% { transform: translateY(-6px) rotate(0deg); }
-    25% { transform: translateY(-8px) rotate(2deg); }
-    75% { transform: translateY(-8px) rotate(-2deg); }
-    100% { transform: translateY(-6px) rotate(0deg); }
+body.chaos-mode .portfolio-item:nth-child(odd) {
+    animation: crazyCardOdd 2.5s ease-in-out infinite;
 }
-body.chaos-mode .btn:hover,
-body.chaos-mode .primary-btn:hover,
-body.chaos-mode .secondary-btn:hover {
-    animation: chaosBtn 0.6s ease-in-out infinite;
+@keyframes crazyCard {
+    0%, 100% { transform: rotate(-3deg) translateY(0); }
+    50% { transform: rotate(3deg) translateY(-10px); }
 }
-@keyframes chaosBtn {
-    0%, 100% { transform: translateY(-2px) rotate(0deg); }
-    50% { transform: translateY(-4px) rotate(3deg); }
+@keyframes crazyCardOdd {
+    0%, 100% { transform: rotate(4deg) translateY(0); }
+    50% { transform: rotate(-4deg) translateY(8px); }
+}
+body.chaos-mode .btn,
+body.chaos-mode .primary-btn,
+body.chaos-mode .secondary-btn {
+    transition: transform 0.05s ease-out;
 }
 body.chaos-mode header {
-    animation: chaosHeader 4s ease-in-out infinite;
+    animation: crazyHeader 1.5s ease-in-out infinite;
 }
-@keyframes chaosHeader {
-    0%, 100% { transform: translateX(0); }
-    25% { transform: translateX(3px); }
-    75% { transform: translateX(-3px); }
+@keyframes crazyHeader {
+    0%, 100% { transform: translateX(0) rotate(-1deg); }
+    25% { transform: translateX(15px) rotate(2deg); }
+    75% { transform: translateX(-15px) rotate(-2deg); }
 }
 body.chaos-mode .morph {
-    animation: chaosMorph 5s ease-in-out infinite;
+    animation: crazyMorph 2s ease-in-out infinite;
 }
-@keyframes chaosMorph {
+@keyframes crazyMorph {
     0%, 100% { transform: scale(1) rotate(0deg); border-radius: 50%; }
-    33% { transform: scale(1.05) rotate(5deg); border-radius: 45% 55% 50% 50%; }
-    66% { transform: scale(1.02) rotate(-5deg); border-radius: 55% 45% 50% 50%; }
+    25% { transform: scale(1.3) rotate(25deg); border-radius: 30% 70% 60% 40%; }
+    50% { transform: scale(0.9) rotate(-25deg); border-radius: 70% 30% 40% 60%; }
+    75% { transform: scale(1.15) rotate(15deg); border-radius: 50% 50% 40% 60%; }
+}
+body.chaos-mode p,
+body.chaos-mode .hero-subtitle {
+    animation: crazyText 4s ease-in-out infinite;
+}
+@keyframes crazyText {
+    0%, 100% { transform: rotate(-0.5deg) translateX(0); }
+    50% { transform: rotate(0.5deg) translateX(5px); }
+}
+body.chaos-mode .nav-links a {
+    animation: crazyNav 2s ease-in-out infinite;
+}
+body.chaos-mode .nav-links a:nth-child(1) { animation-delay: 0s; }
+body.chaos-mode .nav-links a:nth-child(2) { animation-delay: 0.2s; }
+body.chaos-mode .nav-links a:nth-child(3) { animation-delay: 0.4s; }
+body.chaos-mode .nav-links a:nth-child(4) { animation-delay: 0.6s; }
+@keyframes crazyNav {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-8px) rotate(4deg); }
+}
+body.chaos-mode main {
+    animation: crazyMain 6s ease-in-out infinite;
+}
+@keyframes crazyMain {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    33% { transform: rotate(0.5deg) scale(1.01); }
+    66% { transform: rotate(-0.5deg) scale(0.99); }
+}
+body.chaos-mode section {
+    animation: crazySection 5s ease-in-out infinite;
+}
+body.chaos-mode section:nth-child(odd) {
+    animation-direction: reverse;
+}
+@keyframes crazySection {
+    0%, 100% { transform: skewX(0deg); }
+    50% { transform: skewX(-1deg); }
+}
+body.chaos-mode .animated-background {
+    animation: crazyBg 10s linear infinite;
+}
+@keyframes crazyBg {
+    0%, 100% { filter: hue-rotate(0deg); }
+    50% { filter: hue-rotate(25deg); }
 }
 
-/* Désactiver le mode chaos si l'utilisateur préfère réduire les animations */
+/* Désactiver le mode CRAZY si l'utilisateur préfère réduire les animations */
 html.a11y-reduce-motion body.chaos-mode .grid-lines,
 html.a11y-reduce-motion body.chaos-mode .animated-background::before,
 html.a11y-reduce-motion body.chaos-mode .animated-background::after,
@@ -528,13 +588,16 @@ html.a11y-reduce-motion body.chaos-mode h1,
 html.a11y-reduce-motion body.chaos-mode h2,
 html.a11y-reduce-motion body.chaos-mode .section-title,
 html.a11y-reduce-motion body.chaos-mode .logo a,
-html.a11y-reduce-motion body.chaos-mode .portfolio-item:hover,
-html.a11y-reduce-motion body.chaos-mode .skill-category:hover,
-html.a11y-reduce-motion body.chaos-mode .btn:hover,
-html.a11y-reduce-motion body.chaos-mode .primary-btn:hover,
-html.a11y-reduce-motion body.chaos-mode .secondary-btn:hover,
+html.a11y-reduce-motion body.chaos-mode .portfolio-item,
+html.a11y-reduce-motion body.chaos-mode .skill-category,
 html.a11y-reduce-motion body.chaos-mode header,
-html.a11y-reduce-motion body.chaos-mode .morph {
+html.a11y-reduce-motion body.chaos-mode .morph,
+html.a11y-reduce-motion body.chaos-mode p,
+html.a11y-reduce-motion body.chaos-mode .hero-subtitle,
+html.a11y-reduce-motion body.chaos-mode .nav-links a,
+html.a11y-reduce-motion body.chaos-mode main,
+html.a11y-reduce-motion body.chaos-mode section,
+html.a11y-reduce-motion body.chaos-mode .animated-background {
     animation: none !important;
 }
 
