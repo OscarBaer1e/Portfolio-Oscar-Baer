@@ -1650,20 +1650,19 @@ nav .nav-list a.active::after {
 }
 
 .portfolio-item {
-    background-color: var(--background-color-light); 
-    border-radius: var(--radius-default); 
+    background-color: var(--background-color-light);
+    border-radius: var(--radius-default);
     overflow: hidden;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.1); 
-    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); 
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    transition: transform 0.35s ease, box-shadow 0.35s ease, border-color 0.35s ease;
     border: 2px solid var(--border-color);
     position: relative;
-    transform-style: preserve-3d;
 }
 
 .portfolio-item:hover {
-    transform: translateY(-10px) scale(1.03) rotateY(5deg); 
-    border-color: var(--secondary-color); 
-    box-shadow: 0 20px 40px rgba(255, 0, 255, 0.6), 0 0 30px rgba(0, 255, 255, 0.4); 
+    transform: translateY(-8px) scale(1.02);
+    border-color: var(--secondary-color);
+    box-shadow: 0 16px 40px rgba(71, 59, 240, 0.25), 0 0 24px rgba(102, 101, 221, 0.15);
 }
 
 .portfolio-item-content {
@@ -1672,14 +1671,14 @@ nav .nav-list a.active::after {
     bottom: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(transparent, rgba(0,0,0,0.95)); 
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.92));
     color: var(--light-text-color);
     transform: translateY(0);
     transition: transform 0.4s ease;
 }
 
 .portfolio-item:hover .portfolio-item-content {
-    transform: translateY(-5px);
+    transform: translateY(-4px);
 }
 
 .portfolio-item h3 {
@@ -1692,10 +1691,75 @@ nav .nav-list a.active::after {
 }
 
 .portfolio-item .category {
-    color: var(--primary-color); 
+    color: var(--primary-color);
     font-size: 0.9rem;
     text-transform: uppercase;
     font-family: monospace;
+}
+
+/* Page Portfolio dédiée : cartes en colonne, lien unique, CTA en bas */
+.portfolio-page .portfolio-item {
+    display: flex;
+    flex-direction: column;
+}
+.portfolio-page .portfolio-item-link {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    text-decoration: none;
+    color: inherit;
+}
+.portfolio-page .portfolio-item-link:focus {
+    outline: none;
+}
+.portfolio-page .portfolio-item-link:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+}
+.portfolio-page .portfolio-item-link:hover .portfolio-image-wrapper img,
+.portfolio-page .portfolio-item-link:focus .portfolio-image-wrapper img {
+    filter: grayscale(0%) brightness(100%);
+    transform: scale(1.05);
+}
+.portfolio-page .portfolio-image-wrapper {
+    position: relative;
+}
+.portfolio-page .portfolio-item-content {
+    position: static;
+    background: var(--dark-bg-color-alt);
+    padding: 1.25rem var(--spacing-unit);
+    flex: 1;
+}
+.portfolio-page .portfolio-item-content h3 {
+    margin-bottom: 0.35rem;
+}
+.portfolio-page .portfolio-item-content .category {
+    margin-bottom: 0;
+}
+.portfolio-page .portfolio-item-cta {
+    margin: 0 var(--spacing-unit) var(--spacing-unit);
+    align-self: flex-start;
+}
+.portfolio-page-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+.portfolio-page-header .section-title {
+    margin-bottom: 1rem;
+}
+.portfolio-page-intro {
+    max-width: 42em;
+    margin: 0 auto;
+    font-size: 1.05rem;
+    color: var(--dim-text-color);
+    line-height: 1.65;
+}
+.portfolio-page-footer {
+    margin-top: 3rem;
+    text-align: center;
+}
+.portfolio-page-footer .btn {
+    margin: 0;
 }
 
 
@@ -2534,18 +2598,32 @@ footer .container {
     filter: grayscale(100%) brightness(50%);
 }
 
-.portfolio-overlay {
+.portfolio-overlay,
+.portfolio-overlay-label {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, rgba(0, 255, 255, 0.9), rgba(255, 0, 255, 0.9));
     display: flex;
     align-items: center;
     justify-content: center;
     opacity: 0;
-    transition: opacity 0.4s ease;
+    transition: opacity 0.35s ease;
+}
+.portfolio-overlay {
+    background: linear-gradient(135deg, rgba(71, 59, 240, 0.88), rgba(102, 101, 221, 0.88));
+}
+.portfolio-overlay-label {
+    background: rgba(71, 59, 240, 0.85);
+    color: var(--light-text-color);
+    font-weight: 700;
+    font-size: 1rem;
+    gap: 0.5rem;
+}
+.portfolio-item-link:hover .portfolio-overlay-label,
+.portfolio-item-link:focus .portfolio-overlay-label {
+    opacity: 1;
 }
 
 .portfolio-item:hover .portfolio-overlay {
