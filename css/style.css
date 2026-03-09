@@ -451,7 +451,7 @@ body.chaos-mode {
     overflow-x: hidden;
 }
 body.chaos-mode .grid-lines {
-    animation: crazyGrid 4s linear infinite;
+    animation: crazyGrid 4.2s linear infinite;
     transform-origin: 50% 50%;
 }
 @keyframes crazyGrid {
@@ -460,10 +460,10 @@ body.chaos-mode .grid-lines {
     100% { transform: translate(0, 0) rotate(360deg) scale(0.8); }
 }
 body.chaos-mode .animated-background::before {
-    animation: crazyOrb1 2s ease-in-out infinite;
+    animation: crazyOrb1 2.3s ease-in-out infinite;
 }
 body.chaos-mode .animated-background::after {
-    animation: crazyOrb2 3s ease-in-out infinite;
+    animation: crazyOrb2 3.1s ease-in-out infinite;
 }
 @keyframes crazyOrb1 {
     0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); left: 20%; top: 30%; }
@@ -479,9 +479,11 @@ body.chaos-mode .animated-background::after {
 body.chaos-mode h1 {
     animation: crazyH1 1.2s ease-in-out infinite;
 }
-body.chaos-mode h2,
+body.chaos-mode h2 {
+    animation: crazyH2 1.7s ease-in-out infinite;
+}
 body.chaos-mode .section-title {
-    animation: crazyH2 1.8s ease-in-out infinite;
+    animation: crazySectionTitle 2.1s ease-in-out infinite;
 }
 @keyframes crazyH1 {
     0%, 100% { transform: rotate(-8deg) scale(1.05); }
@@ -489,29 +491,75 @@ body.chaos-mode .section-title {
 }
 @keyframes crazyH2 {
     0%, 100% { transform: rotate(5deg) scale(1.02); }
-    50% { transform: rotate(-5deg) scale(1.08); }
+    50% { transform: rotate(-6deg) scale(1.08); }
+}
+@keyframes crazySectionTitle {
+    0%, 100% { transform: rotate(-4deg) scale(1.03); }
+    50% { transform: rotate(7deg) scale(0.97); }
 }
 body.chaos-mode .logo a {
-    animation: crazyLogo 0.8s ease-in-out infinite;
+    animation: crazyLogo 0.9s ease-in-out infinite;
 }
 @keyframes crazyLogo {
     0%, 100% { transform: scale(1) rotate(-5deg); }
     50% { transform: scale(1.15) rotate(5deg); }
 }
-body.chaos-mode .portfolio-item,
-body.chaos-mode .skill-category {
-    animation: crazyCard 3s ease-in-out infinite;
+body.chaos-mode .portfolio-item:nth-child(1) { animation: crazyCardP1 5s ease-in-out infinite; }
+body.chaos-mode .portfolio-item:nth-child(2) { animation: crazyCardP2 4.3s ease-in-out infinite; }
+body.chaos-mode .portfolio-item:nth-child(3) { animation: crazyCardP3 6.1s ease-in-out infinite; }
+body.chaos-mode .portfolio-item:nth-child(4) { animation: crazyCardP4 4.8s ease-in-out infinite; }
+body.chaos-mode .portfolio-item:nth-child(5) { animation: crazyCardP5 5.5s ease-in-out infinite; }
+body.chaos-mode .portfolio-item:nth-child(6) { animation: crazyCardP6 4.1s ease-in-out infinite; }
+body.chaos-mode .portfolio-item:nth-child(n+7) { animation: crazyCardP1 5.2s ease-in-out infinite; }
+body.chaos-mode .skill-category:nth-child(1) { animation: crazyCardS1 4.5s ease-in-out infinite; }
+body.chaos-mode .skill-category:nth-child(2) { animation: crazyCardS2 5.8s ease-in-out infinite; }
+body.chaos-mode .skill-category:nth-child(3) { animation: crazyCardS3 4.2s ease-in-out infinite; }
+body.chaos-mode .skill-category:nth-child(n+4) { animation: crazyCardS1 5s ease-in-out infinite; }
+@keyframes crazyCardP1 {
+    0% { transform: rotate(-3deg) translateY(0) rotate(0deg); }
+    25% { transform: rotate(4deg) translateY(-12px) rotate(90deg); }
+    50% { transform: rotate(-2deg) translateY(0) rotate(180deg); }
+    75% { transform: rotate(5deg) translateY(-8px) rotate(270deg); }
+    100% { transform: rotate(-3deg) translateY(0) rotate(360deg); }
 }
-body.chaos-mode .portfolio-item:nth-child(odd) {
-    animation: crazyCardOdd 2.5s ease-in-out infinite;
+@keyframes crazyCardP2 {
+    0% { transform: rotate(2deg) translateY(0) rotate(360deg); }
+    33% { transform: rotate(-5deg) translateY(10px) rotate(240deg); }
+    66% { transform: rotate(3deg) translateY(0) rotate(120deg); }
+    100% { transform: rotate(2deg) translateY(0) rotate(0deg); }
 }
-@keyframes crazyCard {
-    0%, 100% { transform: rotate(-3deg) translateY(0); }
-    50% { transform: rotate(3deg) translateY(-10px); }
+@keyframes crazyCardP3 {
+    0% { transform: rotate(0deg) translateX(0) translateY(0); }
+    50% { transform: rotate(180deg) translateX(5px) translateY(-15px); }
+    100% { transform: rotate(360deg) translateX(0) translateY(0); }
 }
-@keyframes crazyCardOdd {
+@keyframes crazyCardP4 {
+    0%, 100% { transform: rotate(-6deg) scale(1.02); }
+    50% { transform: rotate(6deg) scale(0.98); }
+}
+@keyframes crazyCardP5 {
+    0% { transform: rotate(0deg) skewX(0deg); }
+    25% { transform: rotate(90deg) skewX(3deg); }
+    75% { transform: rotate(270deg) skewX(-2deg); }
+    100% { transform: rotate(360deg) skewX(0deg); }
+}
+@keyframes crazyCardP6 {
     0%, 100% { transform: rotate(4deg) translateY(0); }
-    50% { transform: rotate(-4deg) translateY(8px); }
+    50% { transform: rotate(-4deg) translateY(-10px); }
+}
+@keyframes crazyCardS1 {
+    0% { transform: rotate(-2deg) translateY(0) rotate(0deg); }
+    50% { transform: rotate(3deg) translateY(-8px) rotate(180deg); }
+    100% { transform: rotate(-2deg) translateY(0) rotate(360deg); }
+}
+@keyframes crazyCardS2 {
+    0% { transform: rotate(5deg) translateY(5px); }
+    50% { transform: rotate(-5deg) translateY(-5px); }
+    100% { transform: rotate(5deg) translateY(5px); }
+}
+@keyframes crazyCardS3 {
+    0%, 100% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.05); }
 }
 body.chaos-mode .btn,
 body.chaos-mode .primary-btn,
@@ -526,42 +574,69 @@ body.chaos-mode header {
     25% { transform: translateX(15px) rotate(2deg); }
     75% { transform: translateX(-15px) rotate(-2deg); }
 }
-body.chaos-mode p,
+body.chaos-mode p {
+    animation: crazyTextP 4.2s ease-in-out infinite;
+}
 body.chaos-mode .hero-subtitle {
-    animation: crazyText 4s ease-in-out infinite;
+    animation: crazyTextHero 3.5s ease-in-out infinite;
 }
-@keyframes crazyText {
+@keyframes crazyTextP {
     0%, 100% { transform: rotate(-0.5deg) translateX(0); }
-    50% { transform: rotate(0.5deg) translateX(5px); }
+    50% { transform: rotate(0.8deg) translateX(6px); }
 }
-body.chaos-mode .nav-links a {
-    animation: crazyNav 2s ease-in-out infinite;
+@keyframes crazyTextHero {
+    0%, 100% { transform: rotate(0.3deg) translateY(0); }
+    50% { transform: rotate(-0.4deg) translateY(4px); }
 }
-body.chaos-mode .nav-links a:nth-child(1) { animation-delay: 0s; }
-body.chaos-mode .nav-links a:nth-child(2) { animation-delay: 0.2s; }
-body.chaos-mode .nav-links a:nth-child(3) { animation-delay: 0.4s; }
-body.chaos-mode .nav-links a:nth-child(4) { animation-delay: 0.6s; }
-@keyframes crazyNav {
+body.chaos-mode .nav-links a:nth-child(1) { animation: crazyNav1 2.2s ease-in-out infinite; }
+body.chaos-mode .nav-links a:nth-child(2) { animation: crazyNav2 1.8s ease-in-out infinite; }
+body.chaos-mode .nav-links a:nth-child(3) { animation: crazyNav3 2.5s ease-in-out infinite; }
+body.chaos-mode .nav-links a:nth-child(4) { animation: crazyNav4 2s ease-in-out infinite; }
+@keyframes crazyNav1 {
     0%, 100% { transform: translateY(0) rotate(0deg); }
-    50% { transform: translateY(-8px) rotate(4deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
+}
+@keyframes crazyNav2 {
+    0%, 100% { transform: translateY(0) rotate(-3deg); }
+    50% { transform: translateY(-6px) rotate(4deg); }
+}
+@keyframes crazyNav3 {
+    0%, 100% { transform: translateX(0) rotate(0deg); }
+    50% { transform: translateX(5px) rotate(-4deg); }
+}
+@keyframes crazyNav4 {
+    0%, 100% { transform: translateY(0) translateX(0); }
+    50% { transform: translateY(-8px) translateX(-4px); }
 }
 body.chaos-mode main {
-    animation: crazyMain 6s ease-in-out infinite;
+    animation: crazyMain 6.3s ease-in-out infinite;
 }
 @keyframes crazyMain {
     0%, 100% { transform: rotate(0deg) scale(1); }
     33% { transform: rotate(0.5deg) scale(1.01); }
     66% { transform: rotate(-0.5deg) scale(0.99); }
 }
-body.chaos-mode section {
-    animation: crazySection 5s ease-in-out infinite;
-}
-body.chaos-mode section:nth-child(odd) {
-    animation-direction: reverse;
-}
-@keyframes crazySection {
+body.chaos-mode section:nth-child(1) { animation: crazySect1 5s ease-in-out infinite; }
+body.chaos-mode section:nth-child(2) { animation: crazySect2 4.8s ease-in-out infinite; }
+body.chaos-mode section:nth-child(3) { animation: crazySect3 5.5s ease-in-out infinite; }
+body.chaos-mode section:nth-child(4) { animation: crazySect4 4.2s ease-in-out infinite; }
+body.chaos-mode section:nth-child(5) { animation: crazySect1 5.2s ease-in-out infinite; }
+body.chaos-mode section:nth-child(n+6) { animation: crazySect2 5s ease-in-out infinite; }
+@keyframes crazySect1 {
     0%, 100% { transform: skewX(0deg); }
-    50% { transform: skewX(-1deg); }
+    50% { transform: skewX(-1.5deg); }
+}
+@keyframes crazySect2 {
+    0%, 100% { transform: skewX(0deg); }
+    50% { transform: skewX(1.2deg); }
+}
+@keyframes crazySect3 {
+    0%, 100% { transform: skewY(0deg); }
+    50% { transform: skewY(0.8deg); }
+}
+@keyframes crazySect4 {
+    0%, 100% { transform: skewX(0deg) skewY(0deg); }
+    50% { transform: skewX(0.5deg) skewY(-0.5deg); }
 }
 body.chaos-mode .animated-background {
     animation: crazyBg 6s linear infinite;
@@ -571,7 +646,7 @@ body.chaos-mode .animated-background {
     100% { filter: hue-rotate(360deg); }
 }
 
-/* Couleurs qui changent partout */
+/* Couleurs qui changent (chacune différente) */
 body.chaos-mode {
     animation: crazyBodyHue 8s linear infinite;
 }
@@ -580,99 +655,115 @@ body.chaos-mode {
     100% { filter: hue-rotate(360deg); }
 }
 body.chaos-mode h1 { animation: crazyH1 1.2s ease-in-out infinite, crazyColorH1 3s ease-in-out infinite; }
-body.chaos-mode h2,
-body.chaos-mode .section-title { animation: crazyH2 1.8s ease-in-out infinite, crazyColorText 4s ease-in-out infinite; }
+body.chaos-mode h2 { animation: crazyH2 1.7s ease-in-out infinite, crazyColorH2 3.8s ease-in-out infinite; }
+body.chaos-mode .section-title { animation: crazySectionTitle 2.1s ease-in-out infinite, crazyColorSection 4.5s ease-in-out infinite; }
 @keyframes crazyColorH1 {
     0%, 100% { filter: hue-rotate(0deg) brightness(1); }
     50% { filter: hue-rotate(180deg) brightness(1.2); }
 }
-@keyframes crazyColorText {
+@keyframes crazyColorH2 {
     0%, 100% { filter: hue-rotate(0deg); }
-    50% { filter: hue-rotate(90deg); }
+    50% { filter: hue-rotate(120deg); }
+}
+@keyframes crazyColorSection {
+    0%, 100% { filter: hue-rotate(0deg); }
+    50% { filter: hue-rotate(60deg); }
 }
 
-/* Boutons qui partent en morceaux (fragments qui s'éloignent) */
-body.chaos-mode .btn,
-body.chaos-mode .primary-btn,
-body.chaos-mode .secondary-btn {
-    animation: crazyBtnShatter 2s ease-in-out infinite;
-    position: relative;
+/* Boutons en morceaux : 3 animations différentes */
+body.chaos-mode .btn { animation: crazyBtnShatter1 2s ease-in-out infinite; position: relative; }
+body.chaos-mode .primary-btn { animation: crazyBtnShatter2 2.4s ease-in-out infinite; position: relative; }
+body.chaos-mode .secondary-btn { animation: crazyBtnShatter3 1.8s ease-in-out infinite; position: relative; }
+body.chaos-mode .btn::before {
+    content: ''; position: absolute; inset: -4px; border-radius: inherit; pointer-events: none;
+    animation: crazyBtnPseudo1 2s ease-in-out infinite;
 }
-body.chaos-mode .btn::before,
-body.chaos-mode .primary-btn::before,
+body.chaos-mode .primary-btn::before {
+    content: ''; position: absolute; inset: -4px; border-radius: inherit; pointer-events: none;
+    animation: crazyBtnPseudo2 2.4s ease-in-out infinite;
+}
 body.chaos-mode .secondary-btn::before {
-    content: '';
-    position: absolute;
-    inset: -4px;
-    border-radius: inherit;
-    pointer-events: none;
-    animation: crazyBtnShatterPseudo 2s ease-in-out infinite;
+    content: ''; position: absolute; inset: -4px; border-radius: inherit; pointer-events: none;
+    animation: crazyBtnPseudo3 1.8s ease-in-out infinite;
 }
-@keyframes crazyBtnShatter {
-    0%, 100% {
-        box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent, 0 0 0 0 transparent, 0 0 0 0 transparent, 0 0 0 0 transparent;
-    }
-    50% {
-        box-shadow: 14px -10px 0 -2px rgba(255, 120, 100, 0.85), -14px 10px 0 -2px rgba(100, 255, 150, 0.85), 10px 14px 0 -2px rgba(100, 180, 255, 0.85), -10px -14px 0 -2px rgba(255, 220, 100, 0.85), 0 18px 0 -2px rgba(255, 100, 200, 0.85);
-    }
+@keyframes crazyBtnShatter1 {
+    0%, 100% { box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent, 0 0 0 0 transparent; }
+    50% { box-shadow: 14px -10px 0 -2px rgba(255,120,100,0.85), -14px 10px 0 -2px rgba(100,255,150,0.85), 10px 14px 0 -2px rgba(100,180,255,0.85); }
 }
-@keyframes crazyBtnShatterPseudo {
+@keyframes crazyBtnShatter2 {
+    0%, 100% { box-shadow: 0 0 0 0 transparent, 0 0 0 0 transparent; }
+    50% { box-shadow: -12px -14px 0 -2px rgba(255,200,100,0.9), 12px 14px 0 -2px rgba(150,100,255,0.9); }
+}
+@keyframes crazyBtnShatter3 {
+    0%, 100% { box-shadow: 0 0 0 0 transparent; }
+    50% { box-shadow: 0 16px 0 -2px rgba(100,255,200,0.85), 16px 0 0 -2px rgba(255,100,150,0.85); }
+}
+@keyframes crazyBtnPseudo1 {
     0%, 100% { opacity: 0; transform: scale(1); }
-    50% { opacity: 1; transform: scale(1.1); box-shadow: 8px -6px 0 -1px rgba(255,80,80,0.6), -8px 6px 0 -1px rgba(80,255,80,0.6), 6px 8px 0 -1px rgba(80,80,255,0.6); }
+    50% { opacity: 1; transform: scale(1.08); box-shadow: 8px -6px 0 -1px rgba(255,80,80,0.6), -8px 6px 0 -1px rgba(80,255,80,0.6); }
+}
+@keyframes crazyBtnPseudo2 {
+    0%, 100% { opacity: 0; transform: scale(1) rotate(0deg); }
+    50% { opacity: 1; transform: scale(1.12) rotate(10deg); box-shadow: 6px 8px 0 -1px rgba(255,180,80,0.6); }
+}
+@keyframes crazyBtnPseudo3 {
+    0%, 100% { opacity: 0; transform: scale(1); }
+    50% { opacity: 1; transform: scale(1.05); box-shadow: -6px -8px 0 -1px rgba(80,200,255,0.6); }
 }
 
-/* Tout tourne : cartes en rotation 360 + wobble combinés */
-body.chaos-mode .portfolio-item {
-    animation: crazyCardSpin 6s ease-in-out infinite;
+/* Icônes / images : chaque type avec sa propre rotation */
+body.chaos-mode .portfolio-item img {
+    animation: crazyIconImg 4s linear infinite;
 }
-body.chaos-mode .portfolio-item:nth-child(odd) {
-    animation: crazyCardSpinOdd 8s ease-in-out infinite;
+body.chaos-mode .portfolio-item:nth-child(odd) img {
+    animation: crazyIconImgOdd 3.3s linear infinite reverse;
 }
-body.chaos-mode .skill-category {
-    animation: crazyCardSpin 7s ease-in-out infinite;
-}
-body.chaos-mode .skill-category:nth-child(even) {
-    animation: crazyCardSpinOdd 5s ease-in-out infinite;
-}
-@keyframes crazyCardSpin {
-    0% { transform: rotate(-3deg) translateY(0) rotate(0deg); }
-    25% { transform: rotate(3deg) translateY(-10px) rotate(90deg); }
-    50% { transform: rotate(-3deg) translateY(0) rotate(180deg); }
-    75% { transform: rotate(3deg) translateY(-10px) rotate(270deg); }
-    100% { transform: rotate(-3deg) translateY(0) rotate(360deg); }
-}
-@keyframes crazyCardSpinOdd {
-    0% { transform: rotate(4deg) translateY(0) rotate(360deg); }
-    25% { transform: rotate(-4deg) translateY(8px) rotate(270deg); }
-    50% { transform: rotate(4deg) translateY(0) rotate(180deg); }
-    75% { transform: rotate(-4deg) translateY(8px) rotate(90deg); }
-    100% { transform: rotate(4deg) translateY(0) rotate(0deg); }
-}
-body.chaos-mode .portfolio-item img,
 body.chaos-mode .skill-category .skill-icon,
 body.chaos-mode .skill-category-icon .fas {
-    animation: crazyIconSpin 4s linear infinite;
+    animation: crazyIconSkill 3.8s linear infinite;
 }
-body.chaos-mode .skill-category .skill-icon:nth-child(odd),
 body.chaos-mode .skill-category:nth-child(odd) .skill-category-icon .fas {
-    animation: crazyIconSpin 3s linear infinite reverse;
+    animation: crazyIconSkillOdd 4.5s linear infinite reverse;
 }
-@keyframes crazyIconSpin {
+@keyframes crazyIconImg {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
+@keyframes crazyIconImgOdd {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(-360deg); }
+}
+@keyframes crazyIconSkill {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@keyframes crazyIconSkillOdd {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(-360deg); }
+}
 body.chaos-mode .fas:not(.fa-universal-access):not(.fa-sliders-h) {
-    animation: crazyFasSpin 2s linear infinite;
+    animation: crazyFasOther 1.9s linear infinite;
+}
+body.chaos-mode .hero .fas {
+    animation: crazyFasHero 2.2s linear infinite;
 }
 body.chaos-mode .nav-links .fas {
-    animation: crazyFasSpin 3s linear infinite;
+    animation: crazyFasNav 2.8s linear infinite;
 }
-@keyframes crazyFasSpin {
+@keyframes crazyFasHero {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@keyframes crazyFasNav {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(-360deg); }
+}
+@keyframes crazyFasOther {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
 }
 body.chaos-mode .morph {
-    animation: crazyMorph 5s ease-in-out infinite;
+    animation: crazyMorph 5.2s ease-in-out infinite;
 }
 @keyframes crazyMorph {
     0% { transform: scale(1) rotate(0deg); border-radius: 50%; }
@@ -680,9 +771,6 @@ body.chaos-mode .morph {
     50% { transform: scale(0.9) rotate(180deg); border-radius: 70% 30% 40% 60%; }
     75% { transform: scale(1.15) rotate(270deg); border-radius: 50% 50% 40% 60%; }
     100% { transform: scale(1) rotate(360deg); border-radius: 50%; }
-}
-body.chaos-mode .grid-lines {
-    animation: crazyGrid 4s linear infinite;
 }
 
 /* Désactiver le mode CRAZY si l'utilisateur préfère réduire les animations */
@@ -706,7 +794,12 @@ html.a11y-reduce-motion body.chaos-mode .hero-subtitle,
 html.a11y-reduce-motion body.chaos-mode .nav-links a,
 html.a11y-reduce-motion body.chaos-mode main,
 html.a11y-reduce-motion body.chaos-mode section,
-html.a11y-reduce-motion body.chaos-mode .animated-background {
+html.a11y-reduce-motion body.chaos-mode .animated-background,
+html.a11y-reduce-motion body.chaos-mode .portfolio-item img,
+html.a11y-reduce-motion body.chaos-mode .skill-category-icon .fas,
+html.a11y-reduce-motion body.chaos-mode .hero .fas,
+html.a11y-reduce-motion body.chaos-mode .nav-links .fas,
+html.a11y-reduce-motion body.chaos-mode .fas {
     animation: none !important;
 }
 html.a11y-reduce-motion body.chaos-mode .btn,
