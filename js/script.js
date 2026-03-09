@@ -419,8 +419,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Raccourci clavier : B + O + W + L + I + N + G
     let keySequence = [];
     const bowlingSequence = ['b', 'o', 'w', 'l', 'i', 'n', 'g'];
-    let memeSequence = [];
-    const memeSecret = ['m', 'e', 'm', 'e'];
     
     document.addEventListener('keydown', (e) => {
         const key = e.key.toLowerCase();
@@ -432,43 +430,6 @@ document.addEventListener('DOMContentLoaded', function() {
         if (keySequence.join('') === bowlingSequence.join('')) {
             triggerEasterEgg();
             keySequence = [];
-        }
-
-        // Meme-ory secret : M + E + M + E
-        memeSequence.push(key);
-        if (memeSequence.length > memeSecret.length) {
-            memeSequence.shift();
-        }
-        if (memeSequence.join('') === memeSecret.join('')) {
-            const msg = document.createElement('div');
-            msg.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-                color: var(--dark-bg-color);
-                padding: 30px 50px;
-                border-radius: 15px;
-                font-size: 1.5rem;
-                font-weight: bold;
-                z-index: 100000;
-                text-align: center;
-                box-shadow: 0 0 50px rgba(0, 255, 255, 0.8);
-                animation: easterEggPulse 0.5s ease;
-            `;
-            msg.innerHTML = '🧠 Meme-ory Secret Débloqué ! 🧠<br><small style=\"font-size: 1rem; margin-top: 10px; display: block;\">Redirection vers le mini-jeu...</small>';
-            document.body.appendChild(msg);
-
-            setTimeout(() => {
-                const currentPath = window.location.pathname;
-                const currentUrl = window.location.href;
-                const isInPagesFolder = currentPath.includes('/pages/') || currentPath.includes('\\pages\\') || currentUrl.includes('/pages/') || currentUrl.includes('\\pages\\');
-                const redirectPath = isInPagesFolder ? './meme-ory.html' : './pages/meme-ory.html';
-                window.location.href = redirectPath;
-            }, 1500);
-
-            memeSequence = [];
         }
     });
     let basketballClickCount = 0;
