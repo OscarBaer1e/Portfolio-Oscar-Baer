@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Révision Bac Français – Projet React éducatif</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Anta&family=Lato:wght@300;400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="animated-background">
+        <div class="grid-lines"></div>
+    </div>
+    
+    <header>
+        <div class="container">
+            <h1 class="logo"><a href="../index.html">Oscar Baer</a></h1>
+            <nav>
+                <button class="menu-toggle" aria-label="Ouvrir le menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <ul class="nav-list">
+                    <li><a href="../index.html">Accueil</a></li>
+                    <li><a href="./portfolio.html" class="active">Portfolio</a></li>
+                    <li><a href="./about.html">À Propos</a></li>
+                    <li><a href="./contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="project-detail" class="section-padding project-detail">
+            <div class="container">
+                <h2 class="section-title">Révision Bac Français – Plateforme de mini‑jeux</h2>
+
+                <div class="project-header">
+                    <img src="../ressources/images/bacfr-1.png" alt="Accueil de la plateforme de révision Bac Français" style="width:100%; height:auto; border-radius:15px; margin-bottom: 40px;">
+                    <p class="text-center" style="font-size: 1.2rem; color: var(--dim-text-color); max-width: 52rem; margin: 0 auto;">
+                        Application web que j’ai créée pour mon petit frère afin qu’il révise le Bac Français autrement que par le par‑cœur : 
+                        lecture guidée des textes, définitions contextuelles et mini‑jeux interactifs autour des œuvres du programme.
+                    </p>
+                </div>
+
+                <div class="project-description">
+                    <h3>Objectif du projet</h3>
+                    <p>
+                        Le but de ce projet était de transformer la préparation du Bac Français en une expérience ludique, structurée 
+                        et beaucoup plus motivante. Plutôt qu’une simple fiche de révision, la plateforme propose un catalogue de textes, 
+                        une interface de lecture confortable, et une série de mini‑jeux pour travailler les notions clés 
+                        (citations, registres, procédés, compréhension du texte, etc.).
+                    </p>
+
+                    <h3>Fonctionnalités principales</h3>
+                    <ul>
+                        <li><strong>Accueil avec tous les textes</strong> : sélection par corpus et suivi de la progression, avec option pour réinitialiser ses résultats.</li>
+                        <li><strong>Lecture interactive</strong> : chaque texte est affiché en plein écran, les mots complexes sont cliquables et affichent une définition en bas de l’écran.</li>
+                        <li><strong>Mini‑jeux variés</strong> : textes à trous, questions rapides, reconstitution de mouvements du texte, identification des registres et procédés, etc.</li>
+                        <li><strong>Interface sobre et éducative</strong> : design pensé pour rester très lisible et concentré sur l’apprentissage.</li>
+                    </ul>
+
+                    <h3>Mini‑jeux et expérience utilisateur</h3>
+                    <div class="gallery" style="margin-bottom: 2.5rem;">
+                        <img src="../ressources/images/bacfr-2.png" alt="Lecture d'un texte avec définitions des mots difficiles">
+                        <img src="../ressources/images/bacfr-3.png" alt="Mini‑jeu de citation à trous">
+                    </div>
+                    <div class="gallery" style="margin-bottom: 2.5rem;">
+                        <img src="../ressources/images/bacfr-4.png" alt="Mini‑jeu de quiz sur le texte">
+                        <img src="../ressources/images/bacfr-5.png" alt="Mini‑jeu d’identification des registres">
+                    </div>
+                    <p>
+                        Chaque mini‑jeu cible une compétence précise : mémorisation de citations, compréhension globale, analyse des registres, 
+                        ou encore reconnaissance des procédés d’écriture. L’idée est d’alterner entre 
+                        <strong>lecture</strong>, <strong>interaction</strong> et <strong>auto‑évaluation</strong> pour ancrer durablement les connaissances.
+                    </p>
+
+                    <h3>Stack technique & IA utilisées</h3>
+                    <div class="skills-grid" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px;">
+                        <div class="skill-category" style="padding: 15px;">React.js (SPA front‑end)</div>
+                        <div class="skill-category" style="padding: 15px;">TypeScript / JavaScript</div>
+                        <div class="skill-category" style="padding: 15px;">CSS Modules & design système sobre</div>
+                        <div class="skill-category" style="padding: 15px;">Hébergement sur Vercel</div>
+                        <div class="skill-category" style="padding: 15px;">Cursor pour accélérer le développement</div>
+                        <div class="skill-category" style="padding: 15px;">Gemini pour générer et affiner les épreuves / quiz personnalisés</div>
+                    </div>
+                    <br>
+                    <p>
+                        J’ai utilisé <strong>Cursor</strong> pour prototyper rapidement les composants React et la structure des pages, 
+                        et <strong>Gemini</strong> pour m’aider à générer des séries de questions cohérentes à partir de nombreux textes 
+                        retranscrits et photographiés. Le tout reste entièrement relu et adapté manuellement pour coller aux attentes du Bac.
+                    </p>
+
+                    <div class="text-center mt-5">
+                        <a href="https://bacfr.vercel.app" target="_blank" class="btn primary-btn">
+                            <i class="fas fa-external-link-alt"></i> Voir la plateforme en ligne
+                        </a>
+                        <a href="./portfolio.html" class="btn secondary-btn">
+                            <i class="fas fa-arrow-left"></i> Retour au Portfolio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; <span id="current-year-project"></span> Oscar Baer. Tous droits réservés.</p>
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/oscar-baer-a5bbb029b/" target="_blank" aria-label="LinkedIn" class="social-link-animated"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/OscarBaer" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="./contact.html" aria-label="Me contacter (formulaire)"><i class="fas fa-envelope"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>
+
