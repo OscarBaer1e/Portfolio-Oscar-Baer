@@ -1093,8 +1093,9 @@ a[href*="wikipedia"], a[href*="linkedin"], a[href*="github"] {
     font-weight: 700;
     color: var(--light-text-color);
     text-align: left !important; /* Titres non justifiés */
-    word-break: keep-all;
-    hyphens: manual;
+    word-break: normal;
+    overflow-wrap: normal;
+    hyphens: none;
     /* On enlève l'effet de glow néon pour mettre davantage en valeur le contenu */
     text-shadow: none;
 }
@@ -2370,13 +2371,12 @@ nav .nav-list a.active::after {
 .project-detail .section-title {
     text-align: center !important;
     margin-bottom: 1.5rem;
-    word-break: keep-all;
-    hyphens: manual;
 }
 .project-detail h2,
 .project-detail .project-description h3 {
-    word-break: keep-all;
-    hyphens: manual;
+    word-break: normal;
+    overflow-wrap: normal;
+    hyphens: none;
 }
 
 .project-detail .project-header {
