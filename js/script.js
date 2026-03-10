@@ -1,7 +1,7 @@
 /**
  * Fichier script.js
- * Contient toutes les fonctionnalités JavaScript natives (Vanilla JS)
- * (GSAP et tous ses plugins ont été retirés)
+ * Fonctionnalités principales + GSAP (animations normales et mode CRAZY)
+ * https://gsap.com
  */
 
 // Détection mobile pour optimisations
@@ -126,9 +126,18 @@ document.addEventListener('DOMContentLoaded', function() {
     cbChaos.addEventListener('change', function() {
         document.body.classList.toggle('chaos-mode', this.checked);
         a11ySave();
-        if (this.checked) initCrazyDodge(); else stopCrazyDodge();
+        if (this.checked) {
+            initCrazyDodge();
+            if (typeof gsap !== 'undefined') initChaosGSAP();
+        } else {
+            stopCrazyDodge();
+            if (typeof gsap !== 'undefined') stopChaosGSAP();
+        }
     });
-    if (document.body.classList.contains('chaos-mode')) initCrazyDodge();
+    if (document.body.classList.contains('chaos-mode')) {
+        initCrazyDodge();
+        if (typeof gsap !== 'undefined') initChaosGSAP();
+    }
     widget.querySelector('.a11y-reset').addEventListener('click', function() {
         localStorage.removeItem(A11Y_KEYS.contrast); localStorage.removeItem(A11Y_KEYS.textLarge); localStorage.removeItem(A11Y_KEYS.reduceMotion); localStorage.removeItem(A11Y_KEYS.chaos); localStorage.removeItem(A11Y_KEYS.theme);
         document.body.classList.remove('a11y-high-contrast', 'chaos-mode');
@@ -141,7 +150,39 @@ document.addEventListener('DOMContentLoaded', function() {
         panel.classList.remove('open');
         trigger.setAttribute('aria-expanded', 'false');
         stopCrazyDodge();
+        if (typeof gsap !== 'undefined') stopChaosGSAP();
     });
+
+    /* GSAP : mode CRAZY — animations GSAP (https://gsap.com) quand la lib est dispo */
+    var chaosGSAPTweens = [];
+    function initChaosGSAP() {
+        if (document.documentElement.classList.contains('a11y-reduce-motion') || !document.body.classList.contains('chaos-mode')) return;
+        if (typeof gsap === 'undefined' || typeof ScrollTrigger === 'undefined') return;
+        gsap.registerPlugin(ScrollTrigger);
+        var dur = 1.8;
+        chaosGSAPTweens.push(gsap.to('h1, .hero-name', { rotation: '+=15', duration: dur, repeat: -1, yoyo: true, ease: 'sine.inOut' }));
+        chaosGSAPTweens.push(gsap.to('h2, .section-title', { rotation: '-=12', duration: dur * 1.2, repeat: -1, yoyo: true, ease: 'sine.inOut' }));
+        chaosGSAPTweens.push(gsap.to('.logo a', { scale: 1.15, rotation: 5, duration: 1.2, repeat: -1, yoyo: true, ease: 'power2.inOut' }));
+        chaosGSAPTweens.push(gsap.to('.portfolio-item', { y: -20, rotation: 3, duration: 2, repeat: -1, yoyo: true, stagger: 0.15, ease: 'sine.inOut' }));
+        chaosGSAPTweens.push(gsap.to('.skill-category', { y: 10, rotation: -2, duration: 2.2, repeat: -1, yoyo: true, stagger: 0.12, ease: 'sine.inOut' }));
+        chaosGSAPTweens.push(gsap.to('.btn, .primary-btn, .secondary-btn', { scale: 1.05, duration: 0.8, repeat: -1, yoyo: true, stagger: 0.08, ease: 'power2.inOut' }));
+        chaosGSAPTweens.push(gsap.to('.animated-background', { rotation: 360, duration: 40, repeat: -1, ease: 'none', transformOrigin: '50% 50%' }));
+    }
+    function stopChaosGSAP() {
+        chaosGSAPTweens.forEach(function(t) { t.kill(); });
+        chaosGSAPTweens.length = 0;
+        if (typeof gsap !== 'undefined') gsap.set('h1, h2, .hero-name, .section-title, .logo a, .portfolio-item, .skill-category, .btn, .primary-btn, .secondary-btn, .animated-background', { clearProps: 'all' });
+    }
+
+    /* GSAP : animations d'entrée / scroll (hors mode CRAZY, respecte "réduire les mouvements") */
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && !document.body.classList.contains('chaos-mode') && !document.documentElement.classList.contains('a11y-reduce-motion')) {
+        gsap.registerPlugin(ScrollTrigger);
+        gsap.utils.toArray('.reveal').forEach(function(el) {
+            gsap.fromTo(el, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' } });
+        });
+        var heroName = document.querySelector('.hero-name');
+        if (heroName) gsap.from(heroName, { opacity: 0, scale: 0.9, duration: 1, ease: 'power2.out', delay: 0.3 });
+    }
 
     /* Mode CRAZY : boutons qui esquivent le curseur */
     var crazyDodgeRaf = null, crazyDodgeMouse = { x: -1e4, y: -1e4 };
@@ -232,6 +273,78 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
+
+    /* ----- Lightbox : zoom sur les screens des articles projet ----- */
+    (function initProjectLightbox() {
+        var detail = document.querySelector('.project-detail');
+        if (!detail) return;
+        var galleryImgs = detail.querySelectorAll('.gallery img');
+        if (!galleryImgs.length) return;
+        var overlay = document.createElement('div');
+        overlay.className = 'lightbox-overlay';
+        overlay.setAttribute('role', 'dialog');
+        overlay.setAttribute('aria-modal', 'true');
+        overlay.setAttribute('aria-label', 'Agrandir l\'image');
+        var img = document.createElement('img');
+        img.alt = '';
+        var closeBtn = document.createElement('button');
+        closeBtn.type = 'button';
+        closeBtn.className = 'lightbox-close';
+        closeBtn.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i>';
+        closeBtn.setAttribute('aria-label', 'Fermer');
+        overlay.appendChild(img);
+        overlay.appendChild(closeBtn);
+        document.body.appendChild(overlay);
+        function openLightbox(src, alt) {
+            img.src = src;
+            img.alt = alt || '';
+            overlay.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeLightbox() {
+            overlay.classList.remove('is-open');
+            document.body.style.overflow = '';
+        }
+        galleryImgs.forEach(function(el) {
+            el.addEventListener('click', function(e) {
+                e.preventDefault();
+                openLightbox(this.src, this.getAttribute('alt'));
+            });
+        });
+        overlay.addEventListener('click', function(e) {
+            if (e.target === overlay || e.target.closest('.lightbox-close')) closeLightbox();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && overlay.classList.contains('is-open')) closeLightbox();
+        });
+    })();
+
+    /* ----- Portfolio : filtre par compétence (lié à la page À propos) ----- */
+    (function initPortfolioSkillFilter() {
+        var grid = document.querySelector('.portfolio-grid');
+        var filters = document.querySelector('.portfolio-skill-filters');
+        if (!grid || !filters) return;
+        var items = grid.querySelectorAll('.portfolio-item[data-skills]');
+        var btns = filters.querySelectorAll('.filter-btn');
+        var currentSkill = '';
+        try {
+            var params = new URLSearchParams(window.location.search);
+            currentSkill = (params.get('skill') || '').trim();
+        } catch (e) {}
+        btns.forEach(function(btn) {
+            var skill = (btn.getAttribute('data-skill') || '').trim();
+            if (skill === currentSkill) {
+                btn.classList.add('active');
+            } else {
+                btn.classList.remove('active');
+            }
+        });
+        items.forEach(function(item) {
+            var skills = (item.getAttribute('data-skills') || '').split(',').map(function(s) { return s.trim(); });
+            var show = !currentSkill || skills.indexOf(currentSkill) !== -1;
+            item.classList.toggle('is-hidden', !show);
+        });
+    })();
 
     // ===============================================
     // 3. Effet de Frappe (Typing Effect) sur la page d'accueil

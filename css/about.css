@@ -53,6 +53,8 @@
     width: 100%;
     height: 350px;
     object-fit: cover;
+    object-position: center 32%;
+    transform: scale(0.92);
 }
 
 .bio {
@@ -98,6 +100,15 @@
 .skill-category:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 25px rgba(0, 188, 212, 0.15);
+}
+.skill-projects-link {
+    display: inline-block;
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    padding: 8px 16px;
+}
+.skill-projects-link .fa-arrow-right {
+    margin-left: 6px;
 }
 
 .skill-category h4 {
