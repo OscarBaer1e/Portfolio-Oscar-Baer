@@ -59,6 +59,12 @@
                 <section class="skills-section skills-bento" aria-labelledby="basketball-easter-egg-title">
                     <h2 id="basketball-easter-egg-title" class="skills-section-title reveal">Mes Compétences</h2>
                     <p class="skills-section-intro reveal">Un profil complet : développement, design, stratégie et création multimédia.</p>
+                    <div class="skills-chart-wrapper reveal">
+                        <p class="skills-chart-label">Vue d'ensemble des domaines</p>
+                        <div class="chart-container chart-container-donut" aria-hidden="true">
+                            <canvas id="skills-overview-chart" width="280" height="280"></canvas>
+                        </div>
+                    </div>
                     <div class="skills-grid skills-grid-bento">
                         <div class="skill-category bento-large reveal" data-animation-delay="0">
                             <div class="skill-category-icon"><i class="fas fa-code"></i></div>
@@ -114,6 +120,37 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="../js/script.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var canvas = document.getElementById('skills-overview-chart');
+        if (!canvas || typeof Chart === 'undefined') return;
+        var isDark = document.body.classList.contains('theme-dark');
+        var legendColor = isDark ? '#e5e7eb' : '#2D3436';
+        var ctx = canvas.getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Développement', 'Design & UX/UI', 'Marketing & Pilotage', 'Multimédia & 3D'],
+                datasets: [{
+                    data: [35, 28, 22, 15],
+                    backgroundColor: ['#6C5CE7', '#0984E3', '#00B894', '#E17055'],
+                    borderColor: 'transparent',
+                    borderWidth: 0,
+                    hoverOffset: 8
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                cutout: '62%',
+                plugins: {
+                    legend: { position: 'bottom', labels: { color: legendColor, padding: 16, usePointStyle: true } }
+                }
+            }
+        });
+    });
+    </script>
 </body>
 </html>

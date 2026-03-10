@@ -85,6 +85,12 @@
                         Plusieurs projets de biocontrôle sont accessibles (4SYSLEG, BioREco, BREIZILEG, CanécoH, CAP ReD). 
                         Pour chacun, nous avons construit des graphiques adaptés aux données disponibles et aux questions des commanditaires.
                     </p>
+                    <div class="case-chart-inline" aria-hidden="true">
+                        <p class="case-chart-caption">Types de graphiques utilisés dans l'application</p>
+                        <div class="chart-container chart-container-bar">
+                            <canvas id="biosphere-chart-types"></canvas>
+                        </div>
+                    </div>
 
                     <h3>Exemple 4SYSLEG – Famille méthode (barres)</h3>
                     <div class="browser-mockup">
@@ -166,6 +172,43 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
     <script src="../js/script.js"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var canvas = document.getElementById('biosphere-chart-types');
+        if (!canvas || typeof Chart === 'undefined') return;
+        var isDark = document.body.classList.contains('theme-dark');
+        var tickColor = isDark ? '#e5e7eb' : '#2D3436';
+        var gridColor = isDark ? 'rgba(148, 163, 184, 0.2)' : 'rgba(45, 52, 54, 0.15)';
+        var ctx = canvas.getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Barres', 'Donut', 'Camembert', 'Lignes', 'Radar'],
+                datasets: [{
+                    label: 'Nombre de vues',
+                    data: [4, 3, 2, 1, 1],
+                    backgroundColor: ['rgba(108, 92, 231, 0.85)', 'rgba(9, 132, 227, 0.85)', 'rgba(0, 184, 148, 0.85)', 'rgba(225, 112, 85, 0.85)', 'rgba(253, 203, 110, 0.85)'],
+                    borderColor: ['#6C5CE7', '#0984E3', '#00B894', '#E17055', '#FDCB6E'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: true,
+                indexAxis: 'y',
+                scales: {
+                    x: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: tickColor } },
+                    y: { grid: { display: false }, ticks: { color: tickColor } }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { backgroundColor: isDark ? '#1e293b' : '#334155' }
+                }
+            }
+        });
+    });
+    </script>
 </body>
 </html>
