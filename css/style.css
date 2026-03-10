@@ -2127,7 +2127,8 @@ nav .nav-list a.active::after {
     align-items: flex-start;
     justify-content: space-between; 
     gap: 60px; 
-    background-color: var(--background-color-light); 
+    /* Fond légèrement plus sombre pour un meilleur contraste de lecture */
+    background: linear-gradient(135deg, var(--dark-bg-color-alt) 0%, var(--background-color-light) 100%);
     padding: 50px;
     border-radius: var(--radius-default);
     border: 5px solid var(--primary-color); 
@@ -2180,6 +2181,29 @@ nav .nav-list a.active::after {
     height: 1px;
     background: linear-gradient(90deg, transparent 0%, var(--border-color) 15%, var(--primary-color) 50%, var(--border-color) 85%, transparent 100%);
     opacity: 0.9;
+}
+
+/* Sections projets très textuelles (webdocu, Bac FR, etc.) */
+.project-detail {
+    background-color: var(--dark-bg-color);
+}
+
+.project-detail .project-description {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2.5rem 2rem;
+    background-color: var(--dark-bg-color-alt);
+    border-radius: 16px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.6);
+}
+
+.project-detail .project-description p {
+    color: var(--light-text-color);
+}
+
+.project-detail .project-description ul li {
+    color: var(--dim-text-color);
 }
 
 .skills-section {
