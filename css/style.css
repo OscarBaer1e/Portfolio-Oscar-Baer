@@ -2098,23 +2098,6 @@ nav .nav-list a.active::after {
     align-self: flex-start;
 }
 
-.portfolio-layout {
-    display: flex;
-    align-items: flex-start;
-    gap: 2.5rem;
-    margin-top: 1.5rem;
-}
-
-.portfolio-filters-column {
-    flex: 0 0 300px;
-    max-width: 320px;
-    position: sticky;
-    top: calc(var(--header-height) + 20px);
-}
-
-.portfolio-layout .portfolio-grid {
-    flex: 1;
-}
 .portfolio-page-header {
     text-align: center;
     margin-bottom: 3rem;
@@ -2130,120 +2113,59 @@ nav .nav-list a.active::after {
     line-height: 1.65;
 }
 .portfolio-skill-filters {
-    padding: 1.5rem 1.25rem;
-    background: linear-gradient(180deg, var(--dark-bg-color-alt) 0%, rgba(15, 15, 22, 0.95) 100%);
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-}
-.portfolio-skill-filters .filter-heading {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--primary-color);
-    margin: 0 0 0.35rem 0;
-    padding-bottom: 0.5rem;
-    border-bottom: 2px solid var(--border-color);
-    letter-spacing: 0.5px;
-}
-.portfolio-skill-filters .filter-desc {
-    font-size: 0.85rem;
-    color: var(--dim-text-color);
-    margin: 0 0 1.25rem 0;
-    line-height: 1.4;
-}
-.portfolio-skill-filters .filter-list {
-    list-style: none;
-    margin: 0;
-    padding: 0;
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
     gap: 0.5rem;
+    margin: 1.5rem auto 1.75rem auto;
 }
-.portfolio-skill-filters .filter-list li {
-    margin: 0;
+.portfolio-skill-filters .filter-label {
+    border: none;
+    background: transparent;
+    color: var(--dim-text-color);
+    font-size: 0.95rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    padding: 0;
+    cursor: default;
 }
 .portfolio-skill-filters .filter-btn {
-    display: flex;
-    align-items: flex-start;
-    gap: 0.65rem;
-    padding: 0.75rem 1rem;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.05);
+    padding: 0.6rem 1.1rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.04);
     color: var(--light-text-color);
-    border: 1px solid transparent;
+    border: 1px solid rgba(255, 255, 255, 0.08);
     text-decoration: none;
     font-size: 0.9rem;
-    line-height: 1.4;
-    transition: background 0.2s, border-color 0.2s, color 0.2s;
-}
-.portfolio-skill-filters .filter-btn i {
-    flex-shrink: 0;
-    margin-top: 2px;
-    width: 1.1em;
-    text-align: center;
-    color: var(--secondary-color);
+    transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.1s;
 }
 .portfolio-skill-filters .filter-btn:hover {
     border-color: var(--primary-color);
     color: var(--primary-color);
     background: rgba(255, 255, 255, 0.08);
-}
-.portfolio-skill-filters .filter-btn:hover i {
-    color: var(--primary-color);
+    transform: translateY(-1px);
 }
 .portfolio-skill-filters .filter-btn.active {
     background: var(--primary-color);
     border-color: var(--primary-color);
     color: var(--dark-bg-color);
 }
-.portfolio-skill-filters .filter-btn.active i {
-    color: var(--dark-bg-color);
-}
-.portfolio-skill-filters .filter-sublabel {
-    display: block;
-    font-size: 0.8rem;
-    color: var(--dim-text-color);
-    margin-top: 0.2rem;
-    font-weight: 400;
-}
-.portfolio-skill-filters .filter-btn.active .filter-sublabel {
-    color: rgba(0, 0, 0, 0.7);
-}
-body.theme-light .portfolio-skill-filters {
-    background: linear-gradient(180deg, #0F172A 0%, #0c1222 100%);
-    border-color: rgba(148, 163, 184, 0.4);
-}
-body.theme-light .portfolio-skill-filters .filter-heading {
-    color: var(--primary-color);
-}
 body.theme-light .portfolio-skill-filters .filter-btn {
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(255, 255, 255, 0.08);
     color: #E5E7EB;
 }
 body.theme-light .portfolio-skill-filters .filter-btn:hover {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.16);
 }
 body.theme-light .portfolio-skill-filters .filter-btn.active {
     background: var(--primary-color);
     color: #fff;
 }
-body.theme-light .portfolio-skill-filters .filter-btn.active .filter-sublabel {
-    color: rgba(255, 255, 255, 0.85);
-}
 
-@media (max-width: 992px) {
-    .portfolio-layout {
-        flex-direction: column;
-    }
-    .portfolio-filters-column {
-        position: static;
-        flex: 1 1 auto;
-        max-width: 100%;
-    }
-    .portfolio-skill-filters .filter-list {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-        gap: 0.5rem;
+@media (max-width: 768px) {
+    .portfolio-skill-filters {
+        justify-content: flex-start;
     }
 }
 .portfolio-item.is-hidden {
