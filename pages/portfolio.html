@@ -43,14 +43,17 @@
 
                 <div class="portfolio-layout">
                     <aside class="portfolio-filters-column" aria-label="Filtrer les projets par compétence">
-                        <div class="portfolio-skill-filters" role="group">
-                            <span class="filter-label">Filtrer par compétence</span>
-                            <a href="./portfolio.html" class="filter-btn active" data-skill="">Tous</a>
-                            <a href="./portfolio.html?skill=dev" class="filter-btn" data-skill="dev">Développement</a>
-                            <a href="./portfolio.html?skill=design" class="filter-btn" data-skill="design">Design & UX/UI</a>
-                            <a href="./portfolio.html?skill=marketing" class="filter-btn" data-skill="marketing">Marketing & Pilotage</a>
-                            <a href="./portfolio.html?skill=multimedia" class="filter-btn" data-skill="multimedia">Multimédia & 3D</a>
-                        </div>
+                        <nav class="portfolio-skill-filters" role="navigation" aria-label="Filtrer par compétence">
+                            <h3 class="filter-heading">Mes compétences</h3>
+                            <p class="filter-desc">Filtrer les projets par domaine.</p>
+                            <ul class="filter-list">
+                                <li><a href="./portfolio.html" class="filter-btn active" data-skill=""><i class="fas fa-th-large" aria-hidden="true"></i> Tous les projets</a></li>
+                                <li><a href="./portfolio.html?skill=dev" class="filter-btn" data-skill="dev"><i class="fas fa-code" aria-hidden="true"></i> Développement Fullstack &amp; Mobile <span class="filter-sublabel">(Le Socle)</span></a></li>
+                                <li><a href="./portfolio.html?skill=design" class="filter-btn" data-skill="design"><i class="fas fa-palette" aria-hidden="true"></i> Design &amp; Stratégie UX/UI <span class="filter-sublabel">(L'Interface)</span></a></li>
+                                <li><a href="./portfolio.html?skill=marketing" class="filter-btn" data-skill="marketing"><i class="fas fa-chart-line" aria-hidden="true"></i> Stratégie Marketing &amp; Pilotage <span class="filter-sublabel">(Le Cerveau)</span></a></li>
+                                <li><a href="./portfolio.html?skill=multimedia" class="filter-btn" data-skill="multimedia"><i class="fas fa-cube" aria-hidden="true"></i> Création Multimédia &amp; 3D <span class="filter-sublabel">(L'Univers)</span></a></li>
+                            </ul>
+                        </nav>
                     </aside>
 
                     <div class="portfolio-grid">
