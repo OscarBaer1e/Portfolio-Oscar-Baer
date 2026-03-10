@@ -36,43 +36,64 @@
                 <h2 class="section-title">Révision Bac Français – Plateforme de mini‑jeux</h2>
 
                 <div class="project-header">
-                    <img src="../ressources/images/bacfr-1.png" alt="Accueil de la plateforme de révision Bac Français" style="width:100%; height:auto; border-radius:15px; margin-bottom: 40px;">
+                    <div class="gallery" style="margin-bottom: 2.5rem;">
+                        <img src="../ressources/images/bacfr-1.png" alt="Accueil de la plateforme de révision Bac Français listant les textes du programme">
+                    </div>
                     <p class="text-center" style="font-size: 1.2rem; color: var(--dim-text-color); max-width: 52rem; margin: 0 auto;">
                         Application web que j’ai créée pour mon petit frère afin qu’il révise le Bac Français autrement que par le par‑cœur : 
-                        lecture guidée des textes, définitions contextuelles et mini‑jeux interactifs autour des œuvres du programme.
+                        sélection de textes, suivi de progression, lecture guidée et mini‑jeux interactifs autour des œuvres du programme.
                     </p>
                 </div>
 
                 <div class="project-description">
-                    <h3>Objectif du projet</h3>
+                    <h3>Accueil & choix des textes</h3>
                     <p>
-                        Le but de ce projet était de transformer la préparation du Bac Français en une expérience ludique, structurée 
-                        et beaucoup plus motivante. Plutôt qu’une simple fiche de révision, la plateforme propose un catalogue de textes, 
-                        une interface de lecture confortable, et une série de mini‑jeux pour travailler les notions clés 
-                        (citations, registres, procédés, compréhension du texte, etc.).
+                        L’écran d’accueil présente l’ensemble des textes du programme, regroupés par objet d’étude. On peut filtrer 
+                        par type (littérature d’idées, roman, etc.), voir rapidement où on en est dans ses révisions, et 
+                        <strong>réinitialiser</strong> sa progression si on souhaite tout reprendre depuis le début. 
+                        L’idée est que mon petit frère puisse attaquer n’importe quel texte en quelques clics, sans se perdre.
                     </p>
 
-                    <h3>Fonctionnalités principales</h3>
-                    <ul>
-                        <li><strong>Accueil avec tous les textes</strong> : sélection par corpus et suivi de la progression, avec option pour réinitialiser ses résultats.</li>
-                        <li><strong>Lecture interactive</strong> : chaque texte est affiché en plein écran, les mots complexes sont cliquables et affichent une définition en bas de l’écran.</li>
-                        <li><strong>Mini‑jeux variés</strong> : textes à trous, questions rapides, reconstitution de mouvements du texte, identification des registres et procédés, etc.</li>
-                        <li><strong>Interface sobre et éducative</strong> : design pensé pour rester très lisible et concentré sur l’apprentissage.</li>
-                    </ul>
-
-                    <h3>Mini‑jeux et expérience utilisateur</h3>
-                    <div class="gallery" style="margin-bottom: 2.5rem;">
-                        <img src="../ressources/images/bacfr-2.png" alt="Lecture d'un texte avec définitions des mots difficiles">
-                        <img src="../ressources/images/bacfr-3.png" alt="Mini‑jeu de citation à trous">
-                    </div>
-                    <div class="gallery" style="margin-bottom: 2.5rem;">
-                        <img src="../ressources/images/bacfr-4.png" alt="Mini‑jeu de quiz sur le texte">
-                        <img src="../ressources/images/bacfr-5.png" alt="Mini‑jeu d’identification des registres">
+                    <h3>Lecture interactive du texte</h3>
+                    <div class="gallery" style="margin-bottom: 1.75rem;">
+                        <img src="../ressources/images/bacfr-2.png" alt="Lecture d'un texte avec définitions des mots difficiles affichées en bas d'écran">
                     </div>
                     <p>
-                        Chaque mini‑jeu cible une compétence précise : mémorisation de citations, compréhension globale, analyse des registres, 
-                        ou encore reconnaissance des procédés d’écriture. L’idée est d’alterner entre 
-                        <strong>lecture</strong>, <strong>interaction</strong> et <strong>auto‑évaluation</strong> pour ancrer durablement les connaissances.
+                        En ouvrant un texte, il arrive sur une page de lecture pleine largeur. Les mots difficiles sont <strong>soulignés</strong> : 
+                        un clic affiche immédiatement une définition ou une explication en bas de l’écran. 
+                        Cela lui permet de se concentrer sur le sens sans quitter la page ni aller chercher un dictionnaire à côté.
+                    </p>
+
+                    <h3>Mini‑jeux autour du texte</h3>
+                    <div class="gallery" style="margin-bottom: 1.75rem;">
+                        <img src="../ressources/images/bacfr-3.png" alt="Mini‑jeu de citation à trous pour retravailler les formulations exactes">
+                    </div>
+                    <p>
+                        Premier type de mini‑jeu : les <strong>citations à trous</strong>. On doit remettre les bons mots au bon endroit, 
+                        ce qui oblige à mémoriser les formules exactes et la logique de la phrase. 
+                        Les feedbacks rappellent le cours pour qu’il comprenne ses erreurs, pas seulement la bonne réponse.
+                    </p>
+
+                    <div class="gallery" style="margin-bottom: 1.75rem;">
+                        <img src="../ressources/images/bacfr-4.png" alt="Mini‑jeu de quiz avec questions rapides sur le texte et sa compréhension">
+                    </div>
+                    <p>
+                        Deuxième type : des <strong>quiz rapides</strong> sur le texte, l’auteur, la thèse défendue, ou les passages clés. 
+                        Ici, le but est de vérifier la compréhension globale et de revoir les notions sans forcément relire tout le texte.
+                    </p>
+
+                    <div class="gallery" style="margin-bottom: 1.75rem;">
+                        <img src="../ressources/images/bacfr-5.png" alt="Mini‑jeu d’identification des registres littéraires d'un passage donné">
+                    </div>
+                    <p>
+                        Enfin, un mini‑jeu de type <strong>“détective des registres”</strong> lui demande d’identifier les registres dominants 
+                        (polemique, lyrique, tragique, etc.) à partir d’extraits précis. Une correction détaillée lui rappelle le vocabulaire et 
+                        les indices qui permettent de reconnaître chaque registre.
+                    </p>
+                    <p>
+                        Chaque activité cible une compétence différente : mémorisation, compréhension, analyse stylistique. 
+                        On alterne en permanence entre <strong>lecture</strong>, <strong>interaction</strong> et <strong>auto‑évaluation</strong> 
+                        pour rendre les révisions moins passives et beaucoup plus engageantes.
                     </p>
 
                     <h3>Stack technique & IA utilisées</h3>
