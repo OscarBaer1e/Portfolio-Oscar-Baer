@@ -1093,6 +1093,8 @@ a[href*="wikipedia"], a[href*="linkedin"], a[href*="github"] {
     font-weight: 700;
     color: var(--light-text-color);
     text-align: left !important; /* Titres non justifiés */
+    word-break: keep-all;
+    hyphens: manual;
     /* On enlève l'effet de glow néon pour mettre davantage en valeur le contenu */
     text-shadow: none;
 }
@@ -2033,6 +2035,8 @@ nav .nav-list a.active::after {
 .portfolio-item h3 {
     color: var(--light-text-color);
     text-shadow: none;
+    word-break: keep-all;
+    hyphens: manual;
 }
 
 .portfolio-item h3 a {
