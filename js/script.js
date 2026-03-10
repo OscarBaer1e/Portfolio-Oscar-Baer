@@ -178,10 +178,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && !document.body.classList.contains('chaos-mode') && !document.documentElement.classList.contains('a11y-reduce-motion')) {
         gsap.registerPlugin(ScrollTrigger);
         gsap.utils.toArray('.reveal').forEach(function(el) {
-            gsap.fromTo(el, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' } });
+            gsap.fromTo(el, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' } });
         });
         var heroName = document.querySelector('.hero-name');
-        if (heroName) gsap.from(heroName, { opacity: 0, scale: 0.9, duration: 1, ease: 'power2.out', delay: 0.3 });
+        if (heroName) gsap.from(heroName, { opacity: 0, scale: 0.98, duration: 0.4, ease: 'power2.out', delay: 0.1 });
     }
 
     /* Mode CRAZY : boutons qui esquivent le curseur */
@@ -456,7 +456,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     revealElements.forEach((el, index) => {
         // Ajout d'un petit délai pour l'effet "staggered" (comme le faisait GSAP)
-        const delay = el.dataset.animationDelay || index * 50;
+        const delay = el.dataset.animationDelay || index * 25;
         el.style.transitionDelay = `${delay}ms`; 
         el.style.setProperty('--delay', delay);
         el.classList.add('reveal'); // Classe de base pour la transition CSS
