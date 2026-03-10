@@ -2000,8 +2000,8 @@ nav .nav-list a.active::after {
 
 .portfolio-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); 
-    gap: 40px; 
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); 
+    gap: 32px; 
 }
 
 .portfolio-item {
@@ -2046,52 +2046,92 @@ nav .nav-list a.active::after {
     font-family: monospace;
 }
 
-/* Page Portfolio dédiée : cartes en colonne, lien unique, CTA en bas */
-.portfolio-page .portfolio-item {
+/* Page Portfolio dédiée : mode \"Shop\" minimaliste */
+.page-portfolio .portfolio-item {
+    background: transparent;
+    border: none;
+    box-shadow: none;
     display: flex;
     flex-direction: column;
 }
-.portfolio-page .portfolio-item-link {
+.page-portfolio .portfolio-item-link {
     display: flex;
     flex-direction: column;
     flex: 1;
     text-decoration: none;
     color: inherit;
 }
-.portfolio-page .portfolio-item-link:focus {
+.page-portfolio .portfolio-item-link:focus {
     outline: none;
 }
-.portfolio-page .portfolio-item-link:focus-visible {
+.page-portfolio .portfolio-item-link:focus-visible {
     outline: 2px solid var(--primary-color);
     outline-offset: 2px;
 }
-/* Même logique : au survol on enlève le filtre, pas de calque coloré par-dessus */
-.portfolio-page .portfolio-item-link:hover .portfolio-image-wrapper img,
-.portfolio-page .portfolio-item-link:focus .portfolio-image-wrapper img {
-    filter: none;
-    transform: scale(1.03);
+.page-portfolio .portfolio-image-wrapper {
+    position: relative;
+    border-radius: 16px;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
 }
-.portfolio-page .portfolio-image-wrapper img {
+.page-portfolio .portfolio-image-wrapper img {
     transition: transform 0.4s ease, filter 0.4s ease;
 }
-.portfolio-page .portfolio-image-wrapper {
-    position: relative;
+.page-portfolio .portfolio-item-link:hover .portfolio-image-wrapper img,
+.page-portfolio .portfolio-item-link:focus .portfolio-image-wrapper img {
+    transform: scale(1.03);
+    filter: none;
 }
-.portfolio-page .portfolio-item-content {
+.page-portfolio .portfolio-item-content {
     position: static;
-    background: var(--dark-bg-color-alt);
-    padding: 1.25rem var(--spacing-unit);
+    background: transparent;
+    padding: 0.85rem 0 0;
     flex: 1;
 }
-.portfolio-page .portfolio-item-content h3 {
-    margin-bottom: 0.35rem;
+.page-portfolio .portfolio-item h3 {
+    color: var(--light-text-color);
+    font-weight: 700;
+    margin-bottom: 0.25rem;
 }
-.portfolio-page .portfolio-item-content .category {
-    margin-bottom: 0;
+.page-portfolio .portfolio-item .category {
+    color: #9CA3AF;
+    font-size: 0.9rem;
+    font-family: inherit;
+    text-transform: none;
 }
-.portfolio-page .portfolio-item-cta {
-    margin: 0 var(--spacing-unit) var(--spacing-unit);
-    align-self: flex-start;
+.page-portfolio .portfolio-item-cta {
+    display: none;
+}
+.page-portfolio .portfolio-overlay-label {
+    display: none;
+}
+.page-portfolio .portfolio-hover {
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at top, rgba(108, 92, 231, 0.25), rgba(0, 0, 0, 0.9));
+    color: #f9fafb;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.75rem;
+    text-align: center;
+    gap: 0.75rem;
+    opacity: 0;
+    transform: translateY(8px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+.page-portfolio .portfolio-hover p {
+    font-size: 0.95rem;
+    color: #e5e7eb;
+}
+.page-portfolio .portfolio-item:hover .portfolio-hover,
+.page-portfolio .portfolio-item-link:focus .portfolio-hover {
+    opacity: 1;
+    transform: translateY(0);
+}
+.page-portfolio .shop-cta {
+    margin-top: 0.5rem;
 }
 .portfolio-page-header {
     text-align: center;
@@ -2183,6 +2223,42 @@ nav .nav-list a.active::after {
     opacity: 0.9;
 }
 
+/* Grille de compétences en mode Bento */
+.skills-grid.skills-grid-bento {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-auto-rows: minmax(120px, auto);
+    gap: 24px;
+}
+.skills-grid-bento .skill-category {
+    background-color: #F8F9FD;
+    border-radius: 20px;
+    border: none;
+    box-shadow: none;
+}
+.skills-grid-bento .bento-large {
+    grid-column: span 2;
+    grid-row: span 2;
+}
+.skills-grid-bento .bento-medium {
+    grid-column: span 2;
+}
+.skills-grid-bento .bento-small {
+    grid-column: span 2;
+}
+@media (max-width: 992px) {
+    .skills-grid.skills-grid-bento {
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        grid-auto-rows: auto;
+    }
+    .skills-grid-bento .bento-large,
+    .skills-grid-bento .bento-medium,
+    .skills-grid-bento .bento-small {
+        grid-column: span 1;
+        grid-row: span 1;
+    }
+}
+
 /* Sections projets très textuelles (webdocu, Bac FR, etc.) */
 .project-detail {
     background-color: var(--dark-bg-color);
@@ -2204,6 +2280,65 @@ nav .nav-list a.active::after {
 
 .project-detail .project-description ul li {
     color: var(--dim-text-color);
+}
+
+/* Études de cas (pages projets type Biosphère / Bac FR) */
+.case-hero {
+    max-width: 960px;
+    margin: 0 auto 2.5rem;
+    text-align: left;
+}
+.case-hero-title {
+    font-size: 3rem;
+    margin-bottom: 0.5rem;
+}
+.case-hero-subtitle {
+    font-size: 1.1rem;
+    color: var(--dim-text-color);
+}
+.case-quick-info {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    margin-top: 1.25rem;
+}
+.case-badge {
+    padding: 0.35rem 0.9rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    background-color: rgba(148, 163, 184, 0.2);
+    color: #E5E7EB;
+    border: 1px solid rgba(148, 163, 184, 0.45);
+}
+.case-body {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.browser-mockup {
+    margin: 1.75rem 0;
+    border-radius: 18px;
+    background-color: #020617;
+    box-shadow: 0 20px 45px rgba(0, 0, 0, 0.7);
+    overflow: hidden;
+}
+.browser-mockup-header {
+    height: 30px;
+    background: #111827;
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    gap: 6px;
+}
+.browser-mockup-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #4B5563;
+}
+.browser-mockup-body img {
+    width: 100%;
+    display: block;
 }
 
 .skills-section {
