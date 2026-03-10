@@ -319,30 +319,29 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     })();
 
-    /* ----- Portfolio : filtre par compétence (lié à la page À propos) ----- */
-    (function initPortfolioSkillFilter() {
-        var grid = document.querySelector('.portfolio-grid');
-        var filters = document.querySelector('.portfolio-skill-filters');
-        if (!grid || !filters) return;
-        var items = grid.querySelectorAll('.portfolio-item[data-skills]');
-        var btns = filters.querySelectorAll('.filter-btn');
-        var currentSkill = '';
-        try {
-            var params = new URLSearchParams(window.location.search);
-            currentSkill = (params.get('skill') || '').trim();
-        } catch (e) {}
-        btns.forEach(function(btn) {
-            var skill = (btn.getAttribute('data-skill') || '').trim();
-            if (skill === currentSkill) {
-                btn.classList.add('active');
-            } else {
-                btn.classList.remove('active');
-            }
-        });
-        items.forEach(function(item) {
-            var skills = (item.getAttribute('data-skills') || '').split(',').map(function(s) { return s.trim(); });
-            var show = !currentSkill || skills.indexOf(currentSkill) !== -1;
-            item.classList.toggle('is-hidden', !show);
+    /* ----- Accueil : cartes compétences extensibles (clic = afficher le détail) ----- */
+    (function initSkillCardsExpand() {
+        var cards = document.querySelectorAll('.skill-preview-card[data-expandable]');
+        cards.forEach(function(card) {
+            card.setAttribute('role', 'button');
+            card.setAttribute('tabindex', '0');
+            card.setAttribute('aria-expanded', 'false');
+            card.addEventListener('click', function() {
+                var open = this.classList.toggle('is-expanded');
+                this.setAttribute('aria-expanded', open);
+                cards.forEach(function(other) {
+                    if (other !== card) {
+                        other.classList.remove('is-expanded');
+                        other.setAttribute('aria-expanded', 'false');
+                    }
+                });
+            });
+            card.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
         });
     })();
 

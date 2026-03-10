@@ -1760,6 +1760,13 @@ nav .nav-list a.active::after {
     margin-top: 50px;
 }
 
+.skills-preview-intro {
+    text-align: center;
+    color: var(--dim-text-color);
+    font-size: 1rem;
+    margin: -1rem 0 1.5rem 0;
+}
+
 .skill-preview-card {
     background: var(--background-color-light);
     padding: 40px;
@@ -1769,6 +1776,61 @@ nav .nav-list a.active::after {
     transition: all 0.4s ease;
     position: relative;
     overflow: hidden;
+}
+
+.skill-preview-card[data-expandable] {
+    cursor: pointer;
+}
+
+.skill-preview-card .skill-preview-summary {
+    transition: opacity 0.3s ease;
+}
+
+.skill-preview-card .skill-teaser {
+    font-size: 0.9rem;
+    color: var(--dim-text-color);
+    margin-top: 0.5rem;
+}
+
+.skill-preview-card .skill-preview-detail {
+    max-height: 0;
+    overflow: hidden;
+    text-align: left;
+    transition: max-height 0.45s ease;
+}
+
+.skill-preview-card.is-expanded .skill-preview-detail {
+    max-height: 420px;
+}
+
+.skill-preview-card.is-expanded {
+    border-color: var(--primary-color);
+    box-shadow: 0 12px 40px rgba(0, 255, 255, 0.25);
+}
+
+.skill-preview-card .skill-preview-detail ul {
+    list-style: none;
+    padding: 0;
+    margin: 1.25rem 0 0 0;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.25rem;
+}
+
+.skill-preview-card .skill-preview-detail li {
+    padding: 0.4rem 0;
+    padding-left: 1.25rem;
+    position: relative;
+    color: var(--dim-text-color);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.skill-preview-card .skill-preview-detail li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-weight: bold;
 }
 
 .skill-preview-card::before {
@@ -1791,6 +1853,9 @@ nav .nav-list a.active::after {
     transform: translateY(-10px);
     border-color: var(--primary-color);
     box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+}
+.skill-preview-card.is-expanded:hover {
+    transform: translateY(-6px);
 }
 
 .skill-icon {
@@ -2111,65 +2176,6 @@ nav .nav-list a.active::after {
     font-size: 1.05rem;
     color: var(--dim-text-color);
     line-height: 1.65;
-}
-.portfolio-skill-filters {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    margin: 1.5rem auto 1.75rem auto;
-}
-.portfolio-skill-filters .filter-label {
-    border: none;
-    background: transparent;
-    color: var(--dim-text-color);
-    font-size: 0.95rem;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    padding: 0;
-    cursor: default;
-}
-.portfolio-skill-filters .filter-btn {
-    padding: 0.6rem 1.1rem;
-    border-radius: 999px;
-    background: rgba(255, 255, 255, 0.04);
-    color: var(--light-text-color);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: background 0.2s, border-color 0.2s, color 0.2s, transform 0.1s;
-}
-.portfolio-skill-filters .filter-btn:hover {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-    background: rgba(255, 255, 255, 0.08);
-    transform: translateY(-1px);
-}
-.portfolio-skill-filters .filter-btn.active {
-    background: var(--primary-color);
-    border-color: var(--primary-color);
-    color: var(--dark-bg-color);
-}
-body.theme-light .portfolio-skill-filters .filter-btn {
-    background: rgba(255, 255, 255, 0.08);
-    color: #E5E7EB;
-}
-body.theme-light .portfolio-skill-filters .filter-btn:hover {
-    background: rgba(255, 255, 255, 0.16);
-}
-body.theme-light .portfolio-skill-filters .filter-btn.active {
-    background: var(--primary-color);
-    color: #fff;
-}
-
-@media (max-width: 768px) {
-    .portfolio-skill-filters {
-        justify-content: flex-start;
-    }
-}
-.portfolio-item.is-hidden {
-    display: none;
 }
 .portfolio-page-footer {
     margin-top: 3rem;
