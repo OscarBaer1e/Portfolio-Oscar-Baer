@@ -298,23 +298,23 @@ html.a11y-reduce-motion *::after {
 
 /* Thèmes clair / sombre (préférence dans le widget d'accessibilité) */
 body.theme-light {
-    /* Override des variables pour un vrai mode clair inspiré de ta palette */
-    --primary-color: #6C5CE7;          /* Violet dynamique pour CTA et titres */
-    --secondary-color: #0984E3;        /* Bleu profond pour liens / éléments importants */
-    --background-color-light: #D6E1FF; /* Fond de sections bleu/violet clair mais soutenu */
-    --light-text-color: #1F3B73;       /* Texte principal bleu profond (pas noir) */
-    --dim-text-color: #4F5B8A;         /* Texte secondaire bleu-gris */
-    --border-color: rgba(9, 132, 227, 0.18);
+    /* Mode "classique" : plus neutre que le néon, pas ultra clair */
+    --primary-color: #6C5CE7;          /* Violet pour CTA et titres */
+    --secondary-color: #0984E3;        /* Bleu pour liens / éléments importants */
+    --background-color-light: #F3F4F6; /* Fond de sections gris très clair */
+    --light-text-color: #1F2933;       /* Texte principal gris bleuté foncé */
+    --dim-text-color: #4B5563;         /* Texte secondaire */
+    --border-color: rgba(148, 163, 184, 0.8);
 
-    background-color: #CFDAFF;         /* Fond principal bleu-violet plus présent */
-    color: #1F3B73;
+    background-color: #F3F4F6;         /* Fond principal gris clair (pas "blanc hôpital") */
+    color: #1F2933;
 }
 
 body.theme-light #hero,
 body.theme-light #portfolio-section,
 body.theme-light #about,
 body.theme-light #contact {
-    background-color: #D6E1FF;         /* Fond de section bleu/violet doux mais marqué */
+    background-color: #F9FAFB;         /* Sections légèrement plus claires, look portfolio classique */
 }
 
 body.theme-light .section-padding {
@@ -329,29 +329,29 @@ body.theme-light .contact-info,
 body.theme-light .article-card,
 body.theme-light .gallery-item,
 body.theme-light .graphisme-card {
-    background-color: #E0E7FF;         /* Cartes bleu clair, plus colorées que blanc */
-    border-color: rgba(9, 132, 227, 0.18);
+    background-color: #FFFFFF;         /* Cartes/blocs lisibles sur fond gris */
+    border-color: rgba(148, 163, 184, 0.6);
 }
 
 body.theme-light footer {
-    background-color: #D6E1FF;
-    color: #4F5B8A;
-    box-shadow: 0 -4px 15px rgba(9, 132, 227, 0.08);
+    background-color: #E5E7EB;
+    color: #4B5563;
+    box-shadow: 0 -4px 15px rgba(15, 23, 42, 0.06);
 }
 
 body.theme-light header {
-    background-color: rgba(198, 210, 255, 0.96);
-    box-shadow: 0 0 15px rgba(9, 132, 227, 0.15);
+    background-color: rgba(243, 244, 246, 0.96);
+    box-shadow: 0 0 12px rgba(15, 23, 42, 0.08);
 }
 
 body.theme-light .portfolio-page .portfolio-item-content {
-    background: #EEF3FF;               /* Fond de cartes portfolio bleu très clair */
+    background: #F9FAFB;               /* Fond légèrement distinct dans les cartes portfolio */
 }
 
 body.theme-light .card-badge,
 body.theme-light .intro-badge {
     background-color: #E0D7FF;        /* Accent lavande pour badges et petits accents */
-    color: #1F3B73;
+    color: #1F2933;
 }
 
 body.theme-dark {
