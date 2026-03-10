@@ -49,31 +49,19 @@
                     </p>
                 </header>
 
-                <div class="gallery">
-                    <figure class="gallery-main">
-                        <img src="../ressources/images/txlforma-home.png" alt="Page d’accueil TXLFORMA – Des formations qui font la différence" class="zoomable-image" data-zoom-src="../ressources/images/txlforma-home.png">
-                        <figcaption>Page d’accueil : catalogue, inscription, connexion.</figcaption>
-                    </figure>
-                    <div class="gallery-grid">
-                        <figure>
-                            <img src="../ressources/images/txlforma-3d-salle.png" alt="Salle de classe 3D modélisée dans Blender, intégrée au site TXLFORMA" class="zoomable-image" data-zoom-src="../ressources/images/txlforma-3d-salle.png">
-                            <figcaption>Salle de classe 3D (Blender) intégrée au site, navigation interactive.</figcaption>
-                        </figure>
-                        <figure>
-                            <img src="../ressources/images/txlforma-dashboard.png" alt="Tableau de bord TXLFORMA – Datavisualisations et statistiques" class="zoomable-image" data-zoom-src="../ressources/images/txlforma-dashboard.png">
-                            <figcaption>Tableau de bord admin : CA, utilisateurs, formations, activités récentes.</figcaption>
-                        </figure>
-                    </div>
-                </div>
-
                 <article class="project-description">
+                    <figure class="project-figure project-figure--main" style="margin: 2rem 0 3rem;">
+                        <img src="../ressources/images/txlforma-home.png" alt="Page d’accueil TXLFORMA – Des formations qui font la différence" class="zoomable-image" data-zoom-src="../ressources/images/txlforma-home.png">
+                        <figcaption>Page d’accueil : accroche, catalogue, inscription et connexion.</figcaption>
+                    </figure>
+
                     <h3>Contexte & objectif</h3>
                     <p>
                         TXLFORMA est un projet de <strong>site de vente de formations</strong> en ligne. L’objectif était de livrer une plateforme complète : interface utilisateur moderne (accueil, catalogue, tableau de bord), création de compte avec rôles (utilisateur, formateur, administrateur), paiement sécurisé, suivi pédagogique (notes, émargement), et une expérience immersive via une <strong>salle de classe modélisée en 3D</strong> intégrée au site.
                     </p>
 
                     <h3>Stack technique</h3>
-                    <div class="skills-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 2rem;">
+                    <div class="skills-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 2.5rem;">
                         <div class="skill-category" style="padding: 14px 18px;">Figma (maquettes)</div>
                         <div class="skill-category" style="padding: 14px 18px;">React / JavaScript</div>
                         <div class="skill-category" style="padding: 14px 18px;">Stripe (paiement)</div>
@@ -87,17 +75,25 @@
                         Maquette du site réalisée sur <strong>Figma</strong> (inspiration plateformes e-learning). Développement de l’interface en <strong>React / JavaScript</strong> : page d’accueil avec accroche et boutons d’action (Voir les formations, Je m’inscris), catalogue, tableau de bord selon le rôle. Parcours d’<strong>inscription et connexion</strong>, gestion des rôles (utilisateur, formateur, administrateur). Intégration de <strong>Stripe</strong> pour le paiement des formations. Suivi des tâches et code en équipe avec <strong>Jira</strong>, <strong>Bitbucket</strong> et <strong>Git</strong>.
                     </p>
 
+                    <h3>Modélisation 3D & intégration web</h3>
+                    <figure class="project-figure" style="margin: 1.5rem 0 2rem;">
+                        <img src="../ressources/images/txlforma-3d-salle.png" alt="Salle de classe 3D modélisée dans Blender, intégrée au site TXLFORMA" class="zoomable-image" data-zoom-src="../ressources/images/txlforma-3d-salle.png">
+                        <figcaption>Salle de classe 3D (Blender) : navigation interactive, caméras, rotation et zoom.</figcaption>
+                    </figure>
+                    <p>
+                        Modélisation complète d’une <strong>salle de classe</strong> dans <strong>Blender</strong> (tables, chaises, PC, portes, fenêtres, tableau, équipements) à partir de photos, tutos et imagination. Création des textures avec l’<strong>outil Shading</strong> et <strong>bake</strong> pour de bonnes performances en temps réel. Création d’<strong>animations</strong> (caméras, éléments de scène). La scène 3D est intégrée au site avec des contrôles interactifs : rotation, zoom, déplacement (clic droit), choix de caméras (ex. vue « Professeur »).
+                    </p>
+
                     <h3>Back-end & API</h3>
                     <p>
                         API développée en <strong>Spring Boot</strong> : gestion des comptes, des formations, des sessions et des inscriptions. Données exposées pour alimenter le tableau de bord (chiffre d’affaires, nombre d’utilisateurs, taux de réussite, etc.) et les fonctionnalités métier (notes, émargement).
                     </p>
 
-                    <h3>Modélisation 3D & intégration web</h3>
-                    <p>
-                        Modélisation complète d’une <strong>salle de classe</strong> dans <strong>Blender</strong> (tables, chaises, PC, portes, fenêtres, tableau, équipements) à partir de photos, tutos et imagination. Création des textures avec l’<strong>outil Shading</strong> et <strong>bake</strong> pour de bonnes performances en temps réel. Création d’<strong>animations</strong> (caméras, éléments de scène). La scène 3D est intégrée au site avec des contrôles interactifs : rotation, zoom, déplacement (clic droit), choix de caméras (ex. vue « Professeur »).
-                    </p>
-
                     <h3>Tableau de bord & datavisualisation</h3>
+                    <figure class="project-figure" style="margin: 1.5rem 0 2rem;">
+                        <img src="../ressources/images/txlforma-dashboard.png" alt="Tableau de bord TXLFORMA – Datavisualisations et statistiques" class="zoomable-image" data-zoom-src="../ressources/images/txlforma-dashboard.png">
+                        <figcaption>Tableau de bord admin : CA, utilisateurs par rôle, formations par catégorie, activités récentes.</figcaption>
+                    </figure>
                     <p>
                         Pour les administrateurs, tableau de bord avec <strong>datavisualisations</strong> : chiffre d’affaires (courbe), nombre d’utilisateurs total (répartition par rôle : utilisateur, formateur, administrateur), formations par catégorie, activités récentes (nouveaux utilisateurs). Indicateurs complémentaires : sessions à venir, moyenne générale des sessions. Gestion des <strong>notes</strong> des apprenants et de l’<strong>émargement</strong> pour le suivi pédagogique.
                     </p>

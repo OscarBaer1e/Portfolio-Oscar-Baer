@@ -4,22 +4,26 @@
  * https://gsap.com
  */
 
-// Détection mobile pour optimisations
+// Détection mobile et PC peu performant pour optimisations
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 const isLowEndDevice = isMobile && (navigator.hardwareConcurrency <= 4 || /Android.*Chrome/i.test(navigator.userAgent));
+const isLowPerfPC = !isMobile && (navigator.hardwareConcurrency <= 4 || (typeof navigator.deviceMemory === 'number' && navigator.deviceMemory <= 4));
 
 // Réduire les animations sur mobile
 if (isMobile) {
     document.documentElement.style.setProperty('--animation-duration', '0.3s');
-    // Désactiver les animations complexes sur appareils bas de gamme
     if (isLowEndDevice) {
         document.documentElement.style.setProperty('--animation-duration', '0.1s');
-        // Préférence pour réduire les animations
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
         if (prefersReducedMotion.matches) {
             document.documentElement.classList.add('reduce-motion');
         }
     }
+}
+
+// Activer "réduire les animations" par défaut sur PC peu performants (évite le lag)
+if (isLowPerfPC && typeof localStorage !== 'undefined' && localStorage.getItem('a11y-reduce-motion') === null) {
+    localStorage.setItem('a11y-reduce-motion', '1');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -249,6 +253,13 @@ document.addEventListener('DOMContentLoaded', function() {
         var effectMap = { fog: 'FOG', waves: 'WAVES', dots: 'DOTS', topology: 'TOPOLOGY', halo: 'HALO' };
         var effectName = effectMap[effect.toLowerCase()] || 'FOG';
 
+        function parseHex(attr) {
+            if (!attr) return null;
+            var hex = (attr + '').replace(/^#/, '');
+            if (!/^[0-9a-fA-F]{6}$/.test(hex)) return null;
+            return parseInt(hex, 16);
+        }
+
         var baseOptions = {
             el: '#vanta-bg',
             mouseControls: true,
@@ -256,12 +267,22 @@ document.addEventListener('DOMContentLoaded', function() {
             gyroControls: false,
             minHeight: 200,
             minWidth: 200,
-            scale: 1,
-            scaleMobile: 1,
+            scale: 1.8,
+            scaleMobile: 2,
+            speed: 0.5,
+            waveSpeed: 0.35,
             backgroundColor: 0x0a0a0e,
             color: 0x6665dd,
             highlightColor: 0x9b9ece
         };
+        var bg = parseHex(el.getAttribute('data-vanta-background'));
+        var cl = parseHex(el.getAttribute('data-vanta-color'));
+        var hl = parseHex(el.getAttribute('data-vanta-highlight'));
+        var c2 = parseHex(el.getAttribute('data-vanta-color2'));
+        if (bg != null) baseOptions.backgroundColor = bg;
+        if (cl != null) baseOptions.color = cl;
+        if (hl != null) baseOptions.highlightColor = hl;
+        if (c2 != null) baseOptions.color2 = c2;
 
         function runVanta() {
             if (typeof window.VANTA === 'undefined' || typeof window.VANTA[effectName] !== 'function') return;
@@ -323,11 +344,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    /* ----- Lightbox : zoom sur les screens des articles projet ----- */
+    /* ----- Lightbox : zoom sur les screens des articles projet (désactivé sur Biosphère) ----- */
     (function initProjectLightbox() {
+        if (document.body.classList.contains('page-biosphere')) return;
         var detail = document.querySelector('.project-detail');
         if (!detail) return;
-        var galleryImgs = detail.querySelectorAll('.gallery img');
+        var galleryImgs = detail.querySelectorAll('.gallery img, .project-description .project-figure img');
         if (!galleryImgs.length) return;
         var overlay = document.createElement('div');
         overlay.className = 'lightbox-overlay';

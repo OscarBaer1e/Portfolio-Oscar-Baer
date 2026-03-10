@@ -134,6 +134,111 @@ body {
     background-color: #0a0a0e;
 }
 
+/* Fallback fond (mobile / pas WebGL) : couleurs par page */
+body.page-graphisme .animated-background { background-color: #1a0f00; }
+body.page-webdocumentaire .animated-background { background-color: #0d0d0d; }
+body.page-nouvelle .animated-background { background-color: #1e1e2a; }
+body.page-biosphere .animated-background { background-color: #0d1a0d; }
+
+/* Contraste par page : texte et accents lisibles sur le fond Vanta */
+body.page-graphisme {
+    --primary-color: #ff9f43;
+    --secondary-color: #ffcc00;
+    --light-text-color: #fff5eb;
+    --dim-text-color: #e8d4b8;
+    --border-color: rgba(255, 204, 0, 0.4);
+    --grad-neon: linear-gradient(45deg, #ff9f43 0%, #ffcc00 100%);
+    --dark-bg-color: #1a0f00;
+    --background-color-light: #2a1810;
+}
+body.page-graphisme header {
+    background-color: rgba(26, 15, 0, 0.96);
+    border-bottom-color: rgba(255, 159, 67, 0.6);
+    box-shadow: 0 0 20px rgba(255, 159, 67, 0.2);
+}
+body.page-graphisme footer {
+    background-color: rgba(26, 15, 0, 0.98);
+    color: #e8d4b8;
+    border-top-color: rgba(255, 204, 0, 0.3);
+}
+body.page-graphisme .logo a { color: #ffcc00; }
+body.page-graphisme nav .nav-list a { color: #e8d4b8; }
+body.page-graphisme nav .nav-list a:hover,
+body.page-graphisme nav .nav-list a.active { color: #ff9f43; }
+
+body.page-webdocumentaire {
+    --primary-color: #ffffff;
+    --secondary-color: #e0e0e0;
+    --light-text-color: #ffffff;
+    --dim-text-color: #b0b0b0;
+    --border-color: rgba(255, 255, 255, 0.35);
+    --grad-neon: linear-gradient(45deg, #888888 0%, #ffffff 100%);
+    --dark-bg-color: #0d0d0d;
+    --background-color-light: #1a1a1a;
+}
+body.page-webdocumentaire header {
+    background-color: rgba(13, 13, 13, 0.98);
+    border-bottom-color: rgba(255, 255, 255, 0.4);
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.08);
+}
+body.page-webdocumentaire footer {
+    background-color: rgba(13, 13, 13, 0.98);
+    color: #b0b0b0;
+    border-top-color: rgba(255, 255, 255, 0.2);
+}
+body.page-webdocumentaire .logo a { color: #ffffff; }
+body.page-webdocumentaire nav .nav-list a { color: #b0b0b0; }
+body.page-webdocumentaire nav .nav-list a:hover,
+body.page-webdocumentaire nav .nav-list a.active { color: #ffffff; }
+
+body.page-nouvelle {
+    --primary-color: #b8b8e0;
+    --secondary-color: #9b9ece;
+    --light-text-color: #e8e8f2;
+    --dim-text-color: #b8b8d0;
+    --border-color: rgba(184, 184, 224, 0.4);
+    --grad-neon: linear-gradient(45deg, #9b9ece 0%, #b8b8e0 100%);
+    --dark-bg-color: #1e1e2a;
+    --background-color-light: #2a2a38;
+}
+body.page-nouvelle header {
+    background-color: rgba(30, 30, 42, 0.96);
+    border-bottom-color: rgba(184, 184, 224, 0.5);
+}
+body.page-nouvelle footer {
+    background-color: rgba(30, 30, 42, 0.98);
+    color: #b8b8d0;
+}
+body.page-nouvelle .logo a { color: #b8b8e0; }
+body.page-nouvelle nav .nav-list a { color: #b8b8d0; }
+body.page-nouvelle nav .nav-list a:hover,
+body.page-nouvelle nav .nav-list a.active { color: #e8e8f2; }
+
+body.page-biosphere {
+    --primary-color: #adff2f;
+    --secondary-color: #ccff66;
+    --light-text-color: #f0fff0;
+    --dim-text-color: #c8e6c8;
+    --border-color: rgba(173, 255, 47, 0.45);
+    --grad-neon: linear-gradient(45deg, #7a9e7a 0%, #adff2f 100%);
+    --dark-bg-color: #0d1a0d;
+    --background-color-light: #152515;
+}
+body.page-biosphere header {
+    background-color: rgba(13, 26, 13, 0.96);
+    border-bottom-color: rgba(173, 255, 47, 0.5);
+    box-shadow: 0 0 20px rgba(173, 255, 47, 0.15);
+}
+body.page-biosphere footer {
+    background-color: rgba(13, 26, 13, 0.98);
+    color: #c8e6c8;
+    border-top-color: rgba(173, 255, 47, 0.3);
+}
+body.page-biosphere .logo a { color: #adff2f; }
+body.page-biosphere nav .nav-list a { color: #c8e6c8; }
+body.page-biosphere nav .nav-list a:hover,
+body.page-biosphere nav .nav-list a.active { color: #adff2f; }
+
 /* Réduction des animations si l'utilisateur le préfère (accessibilité) */
 @media (prefers-reduced-motion: reduce) {
     *, *::before, *::after {
@@ -2038,9 +2143,10 @@ nav .nav-list a.active::after {
 }
 
 
-/* 7. ABOUT SECTION (Module d'Information) */
+/* 7. ABOUT SECTION (Module d'Information) — fond transparent pour laisser voir Vanta */
 #about {
-    background-color: var(--dark-bg-color);
+    background-color: transparent;
+    background: none;
 }
 
 .about-content {
@@ -2049,12 +2155,12 @@ nav .nav-list a.active::after {
     align-items: flex-start;
     justify-content: space-between; 
     gap: 60px; 
-    /* Fond légèrement plus sombre pour un meilleur contraste de lecture */
-    background: linear-gradient(135deg, var(--dark-bg-color-alt) 0%, var(--background-color-light) 100%);
+    /* Bloc semi-transparent pour lisibilité tout en laissant voir le fond Vanta */
+    background: linear-gradient(135deg, rgba(13, 13, 18, 0.92) 0%, rgba(10, 10, 14, 0.88) 100%);
     padding: 50px;
     border-radius: var(--radius-default);
-    border: 5px solid var(--primary-color); 
-    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    border: 2px solid var(--border-color); 
+    box-shadow: 0 0 30px rgba(102, 101, 221, 0.2);
     transition: border-color 0.25s, box-shadow 0.25s;
 }
 
@@ -2112,6 +2218,80 @@ nav .nav-list a.active::after {
     opacity: 0.9;
 }
 
+/* Page À propos : section compétences (tags par catégorie) */
+.about-skills {
+    margin-top: 0;
+    padding: 2.5rem 0 1rem;
+}
+.about-skills-title {
+    text-align: center;
+    color: var(--light-text-color);
+    font-size: 1.85rem;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+}
+.about-skills-intro {
+    text-align: center;
+    color: var(--dim-text-color);
+    font-size: 1rem;
+    margin-bottom: 2.5rem;
+    max-width: 28em;
+    margin-left: auto;
+    margin-right: auto;
+}
+.about-skills-list {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+.about-skill-group {
+    padding-bottom: 1.75rem;
+    border-bottom: 1px solid rgba(102, 101, 221, 0.2);
+}
+.about-skill-group:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+}
+.about-skill-group-title {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    font-size: 1.15rem;
+    font-weight: 600;
+    color: var(--primary-color);
+    margin-bottom: 1rem;
+}
+.about-skill-group-title i {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+.about-skill-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+.about-skill-tag {
+    display: inline-block;
+    padding: 0.4rem 0.85rem;
+    font-size: 0.85rem;
+    color: var(--dim-text-color);
+    background: rgba(102, 101, 221, 0.12);
+    border: 1px solid rgba(102, 101, 221, 0.25);
+    border-radius: 20px;
+    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.about-skill-tag:hover {
+    background: rgba(102, 101, 221, 0.22);
+    color: var(--light-text-color);
+    border-color: rgba(102, 101, 221, 0.45);
+}
+@media (max-width: 768px) {
+    .about-skills { padding: 2rem 0 0.5rem; }
+    .about-skills-title { font-size: 1.5rem; }
+    .about-skill-group-title { font-size: 1.05rem; }
+    .about-skill-tag { font-size: 0.8rem; padding: 0.35rem 0.7rem; }
+}
+
 /* Sections projets très textuelles (webdocu, Bac FR, etc.) */
 .project-detail {
     background-color: var(--dark-bg-color);
@@ -2157,9 +2337,37 @@ nav .nav-list a.active::after {
     color: var(--dim-text-color);
 }
 
-/* Zoom / lightbox sur les screens des articles projet */
-.project-detail .gallery img {
+.project-detail .project-figure {
+    width: 100%;
+    margin: 1.5rem 0 2rem;
+}
+.project-detail .project-figure img {
+    width: 100%;
+    height: auto;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
     cursor: zoom-in;
+}
+.project-detail .project-figure figcaption {
+    margin-top: 0.75rem;
+    font-size: 0.95rem;
+    color: var(--dim-text-color);
+    text-align: center;
+    font-style: italic;
+}
+.project-detail .project-figure--main {
+    margin: 2rem 0 3rem;
+}
+
+/* Zoom / lightbox sur les screens des articles projet */
+.project-detail .gallery img,
+.project-detail .project-description .project-figure img {
+    cursor: zoom-in;
+}
+/* Pas de zoom sur la page Biosphère */
+body.page-biosphere .project-detail .gallery img {
+    cursor: default;
 }
 .project-detail .lightbox-overlay {
     position: fixed;
@@ -2214,7 +2422,7 @@ nav .nav-list a.active::after {
 .skills-section {
     margin-top: 0;
     padding: 3.5rem 2rem 2rem;
-    background: linear-gradient(180deg, rgba(15, 15, 22, 0.6) 0%, var(--dark-bg-color-alt) 8%, var(--dark-bg-color-alt) 100%);
+    background: linear-gradient(180deg, rgba(15, 15, 22, 0.75) 0%, rgba(10, 10, 14, 0.82) 100%);
     border-radius: 16px;
     border: 1px solid var(--border-color);
     position: relative;
