@@ -319,22 +319,45 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     })();
 
-    /* ----- Accueil : cartes compétences extensibles (clic = afficher le détail) ----- */
-    (function initSkillCardsExpand() {
+    /* ----- Accueil : cartes compétences → overlay avec forme différente par carte ----- */
+    (function initSkillCardsOverlay() {
         var cards = document.querySelectorAll('.skill-preview-card[data-expandable]');
+        if (!cards.length) return;
+        var overlay = document.createElement('div');
+        overlay.className = 'skill-overlay';
+        overlay.setAttribute('role', 'dialog');
+        overlay.setAttribute('aria-modal', 'true');
+        overlay.setAttribute('aria-label', 'Détail de la compétence');
+        overlay.innerHTML = '<div class="skill-overlay-backdrop"></div><div class="skill-overlay-panel">' +
+            '<button type="button" class="skill-overlay-close" aria-label="Fermer"><i class="fas fa-times"></i></button>' +
+            '<div class="skill-overlay-content"></div></div>';
+        document.body.appendChild(overlay);
+        var backdrop = overlay.querySelector('.skill-overlay-backdrop');
+        var panel = overlay.querySelector('.skill-overlay-panel');
+        var content = overlay.querySelector('.skill-overlay-content');
+        var closeBtn = overlay.querySelector('.skill-overlay-close');
+        function openOverlay(card) {
+            var title = card.querySelector('h3');
+            var detail = card.querySelector('.skill-preview-detail');
+            var shape = card.getAttribute('data-shape') || 'rounded';
+            content.innerHTML = (title ? '<h3 class="skill-overlay-title">' + title.innerHTML + '</h3>' : '') +
+                (detail ? '<div class="skill-overlay-body">' + detail.innerHTML + '</div>' : '');
+            panel.className = 'skill-overlay-panel skill-overlay-panel--' + shape;
+            overlay.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+            closeBtn.focus();
+        }
+        function closeOverlay() {
+            overlay.classList.remove('is-open');
+            document.body.style.overflow = '';
+        }
         cards.forEach(function(card) {
             card.setAttribute('role', 'button');
             card.setAttribute('tabindex', '0');
             card.setAttribute('aria-expanded', 'false');
             card.addEventListener('click', function() {
-                var open = this.classList.toggle('is-expanded');
-                this.setAttribute('aria-expanded', open);
-                cards.forEach(function(other) {
-                    if (other !== card) {
-                        other.classList.remove('is-expanded');
-                        other.setAttribute('aria-expanded', 'false');
-                    }
-                });
+                openOverlay(this);
+                this.setAttribute('aria-expanded', 'true');
             });
             card.addEventListener('keydown', function(e) {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -342,6 +365,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     this.click();
                 }
             });
+        });
+        overlay.addEventListener('click', function(e) {
+            if (e.target.closest('.skill-overlay-close') || (e.target === backdrop)) {
+                closeOverlay();
+                cards.forEach(function(c) { c.setAttribute('aria-expanded', 'false'); });
+            }
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && overlay.classList.contains('is-open')) {
+                closeOverlay();
+                cards.forEach(function(c) { c.setAttribute('aria-expanded', 'false'); });
+            }
         });
     })();
 

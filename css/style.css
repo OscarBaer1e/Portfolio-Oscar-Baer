@@ -1793,19 +1793,7 @@ nav .nav-list a.active::after {
 }
 
 .skill-preview-card .skill-preview-detail {
-    max-height: 0;
-    overflow: hidden;
-    text-align: left;
-    transition: max-height 0.45s ease;
-}
-
-.skill-preview-card.is-expanded .skill-preview-detail {
-    max-height: 420px;
-}
-
-.skill-preview-card.is-expanded {
-    border-color: var(--primary-color);
-    box-shadow: 0 12px 40px rgba(0, 255, 255, 0.25);
+    display: none;
 }
 
 .skill-preview-card .skill-preview-detail ul {
@@ -1854,8 +1842,113 @@ nav .nav-list a.active::after {
     border-color: var(--primary-color);
     box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
 }
-.skill-preview-card.is-expanded:hover {
-    transform: translateY(-6px);
+
+/* Overlay compétences (formes différentes par carte) */
+.skill-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.skill-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+}
+.skill-overlay-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    cursor: pointer;
+}
+.skill-overlay-panel {
+    position: relative;
+    max-width: 480px;
+    max-height: 85vh;
+    overflow: auto;
+    background: var(--dark-bg-color-alt);
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    padding: 2.5rem 2rem;
+    transition: transform 0.35s ease;
+}
+.skill-overlay.is-open .skill-overlay-panel {
+    animation: skillOverlayIn 0.35s ease forwards;
+}
+@keyframes skillOverlayIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+.skill-overlay-panel--circle {
+    border-radius: 50%;
+    width: 380px;
+    height: 380px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem 2rem;
+}
+.skill-overlay-panel--hexagon {
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    padding: 3rem 2.5rem;
+}
+.skill-overlay-panel--rounded {
+    border-radius: 2rem;
+}
+.skill-overlay-panel--blob {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+}
+.skill-overlay-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: rgba(255,255,255,0.1);
+    color: var(--light-text-color);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+.skill-overlay-close:hover {
+    background: var(--primary-color);
+}
+.skill-overlay-title {
+    color: var(--primary-color);
+    font-size: 1.4rem;
+    margin: 0 0 1rem 0;
+    padding-right: 2rem;
+}
+.skill-overlay-body {
+    text-align: left;
+}
+.skill-overlay-body ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.skill-overlay-body li {
+    padding: 0.4rem 0 0.4rem 1.25rem;
+    position: relative;
+    color: var(--dim-text-color);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+.skill-overlay-body li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-weight: bold;
 }
 
 .skill-icon {
