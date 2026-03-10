@@ -296,6 +296,54 @@ html.a11y-reduce-motion *::after {
     transition-duration: 0.15s !important;
 }
 
+/* Thèmes clair / sombre (préférence dans le widget d'accessibilité) */
+body.theme-light {
+    background-color: #f5f7ff;
+    color: #111827;
+}
+
+body.theme-light #hero,
+body.theme-light #portfolio-section,
+body.theme-light #about,
+body.theme-light #contact {
+    background-color: #f5f7ff;
+}
+
+body.theme-light .section-padding {
+    background: linear-gradient(180deg, #f5f7ff 0%, #eef2ff 100%);
+}
+
+body.theme-light .portfolio-item,
+body.theme-light .skill-preview-card,
+body.theme-light .about-content,
+body.theme-light .contact-form,
+body.theme-light .contact-info,
+body.theme-light .article-card,
+body.theme-light .gallery-item,
+body.theme-light .graphisme-card {
+    background-color: #ffffff;
+    border-color: rgba(71, 59, 240, 0.18);
+}
+
+body.theme-light footer {
+    background-color: #ecefff;
+    color: #4b5563;
+    box-shadow: 0 -4px 15px rgba(71, 59, 240, 0.08);
+}
+
+body.theme-light header {
+    background-color: rgba(255, 255, 255, 0.95);
+    box-shadow: 0 0 15px rgba(71, 59, 240, 0.15);
+}
+
+body.theme-light .portfolio-page .portfolio-item-content {
+    background: #f3f4ff;
+}
+
+body.theme-dark {
+    /* Laisse les couleurs par défaut définies plus haut (mode sombre actuel) */
+}
+
 /* ================================================
    WIDGET ACCESSIBILITÉ (bouton + panneau)
    ================================================ */

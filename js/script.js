@@ -33,8 +33,15 @@ document.addEventListener('DOMContentLoaded', function() {
     document.body.insertBefore(skipLink, document.body.firstChild);
 
     /* ----- Accessibilité : widget et préférences ----- */
-    var A11Y_KEYS = { contrast: 'a11y-high-contrast', textLarge: 'a11y-text-large', reduceMotion: 'a11y-reduce-motion', chaos: 'a11y-chaos' };
+    var A11Y_KEYS = { contrast: 'a11y-high-contrast', textLarge: 'a11y-text-large', reduceMotion: 'a11y-reduce-motion', chaos: 'a11y-chaos', theme: 'a11y-theme' };
     function a11yLoad() {
+        // Thème : par défaut en mode clair pour mieux mettre en valeur les projets
+        var storedTheme = localStorage.getItem(A11Y_KEYS.theme);
+        if (storedTheme === 'dark') {
+            document.body.classList.add('theme-dark');
+        } else {
+            document.body.classList.add('theme-light');
+        }
         if (localStorage.getItem(A11Y_KEYS.contrast) === '1') document.body.classList.add('a11y-high-contrast');
         if (localStorage.getItem(A11Y_KEYS.textLarge) === '1') document.documentElement.classList.add('a11y-text-large');
         if (localStorage.getItem(A11Y_KEYS.reduceMotion) === '1') document.documentElement.classList.add('a11y-reduce-motion');
@@ -46,6 +53,11 @@ document.addEventListener('DOMContentLoaded', function() {
         if ((el = document.querySelector('#a11y-text-large'))) localStorage.setItem(A11Y_KEYS.textLarge, document.documentElement.classList.contains('a11y-text-large') ? '1' : '0');
         if ((el = document.querySelector('#a11y-reduce-motion'))) localStorage.setItem(A11Y_KEYS.reduceMotion, document.documentElement.classList.contains('a11y-reduce-motion') ? '1' : '0');
         if ((el = document.querySelector('#a11y-chaos'))) localStorage.setItem(A11Y_KEYS.chaos, document.body.classList.contains('chaos-mode') ? '1' : '0');
+        // Thème : stocke "dark" ou "light"
+        if ((el = document.querySelector('#a11y-theme-dark'))) {
+            var isDark = document.body.classList.contains('theme-dark');
+            localStorage.setItem(A11Y_KEYS.theme, isDark ? 'dark' : 'light');
+        }
     }
     a11yLoad();
 
@@ -54,8 +66,9 @@ document.addEventListener('DOMContentLoaded', function() {
     widget.innerHTML = '<button type="button" class="a11y-trigger" aria-label="Options d\'accessibilité et préférences" aria-expanded="false" aria-haspopup="true"><i class="fas fa-universal-access"></i></button>' +
         '<div class="a11y-panel" id="a11y-panel" role="dialog" aria-labelledby="a11y-panel-title" aria-describedby="a11y-panel-desc">' +
         '<h3 id="a11y-panel-title"><i class="fas fa-sliders-h" aria-hidden="true"></i> Préférences</h3>' +
-        '<p id="a11y-panel-desc" class="a11y-panel-desc">Contraste, taille du texte et animations.</p>' +
+        '<p id="a11y-panel-desc" class="a11y-panel-desc">Thème clair/sombre, contraste, taille du texte et animations.</p>' +
         '<div class="a11y-options-group">' +
+        '<div class="a11y-option"><label for="a11y-theme-dark">Mode sombre</label><input type="checkbox" id="a11y-theme-dark" aria-describedby="a11y-desc-theme"></div>' +
         '<div class="a11y-option"><label for="a11y-contrast">Contraste élevé</label><input type="checkbox" id="a11y-contrast" aria-describedby="a11y-desc-contrast"></div>' +
         '<div class="a11y-option"><label for="a11y-text-large">Texte agrandi</label><input type="checkbox" id="a11y-text-large" aria-describedby="a11y-desc-text"></div>' +
         '<div class="a11y-option"><label for="a11y-reduce-motion">Réduire les animations</label><input type="checkbox" id="a11y-reduce-motion" aria-describedby="a11y-desc-motion"></div>' +
@@ -66,10 +79,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var trigger = widget.querySelector('.a11y-trigger');
     var panel = widget.querySelector('.a11y-panel');
+    var cbThemeDark = widget.querySelector('#a11y-theme-dark');
     var cbContrast = widget.querySelector('#a11y-contrast');
     var cbText = widget.querySelector('#a11y-text-large');
     var cbMotion = widget.querySelector('#a11y-reduce-motion');
     var cbChaos = widget.querySelector('#a11y-chaos');
+    cbThemeDark.checked = document.body.classList.contains('theme-dark');
     cbContrast.checked = document.body.classList.contains('a11y-high-contrast');
     cbText.checked = document.documentElement.classList.contains('a11y-text-large');
     cbMotion.checked = document.documentElement.classList.contains('a11y-reduce-motion');
@@ -84,6 +99,17 @@ document.addEventListener('DOMContentLoaded', function() {
             panel.classList.remove('open');
             trigger.setAttribute('aria-expanded', 'false');
         }
+    });
+    cbThemeDark.addEventListener('change', function() {
+        // Bascule entre thème clair (par défaut) et sombre
+        if (this.checked) {
+            document.body.classList.remove('theme-light');
+            document.body.classList.add('theme-dark');
+        } else {
+            document.body.classList.remove('theme-dark');
+            document.body.classList.add('theme-light');
+        }
+        a11ySave();
     });
     cbContrast.addEventListener('change', function() {
         document.body.classList.toggle('a11y-high-contrast', this.checked);
@@ -104,9 +130,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     if (document.body.classList.contains('chaos-mode')) initCrazyDodge();
     widget.querySelector('.a11y-reset').addEventListener('click', function() {
-        localStorage.removeItem(A11Y_KEYS.contrast); localStorage.removeItem(A11Y_KEYS.textLarge); localStorage.removeItem(A11Y_KEYS.reduceMotion); localStorage.removeItem(A11Y_KEYS.chaos);
+        localStorage.removeItem(A11Y_KEYS.contrast); localStorage.removeItem(A11Y_KEYS.textLarge); localStorage.removeItem(A11Y_KEYS.reduceMotion); localStorage.removeItem(A11Y_KEYS.chaos); localStorage.removeItem(A11Y_KEYS.theme);
         document.body.classList.remove('a11y-high-contrast', 'chaos-mode');
         document.documentElement.classList.remove('a11y-text-large', 'a11y-reduce-motion');
+        // Reset du thème : retour au mode clair par défaut
+        document.body.classList.remove('theme-dark');
+        document.body.classList.add('theme-light');
+        cbThemeDark.checked = false;
         cbContrast.checked = false; cbText.checked = false; cbMotion.checked = false; cbChaos.checked = false;
         panel.classList.remove('open');
         trigger.setAttribute('aria-expanded', 'false');
