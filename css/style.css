@@ -306,7 +306,7 @@ body.theme-light {
     --dim-text-color: #4F5B8A;         /* Texte secondaire bleu-gris */
     --border-color: rgba(9, 132, 227, 0.18);
 
-    background-color: #FFFFFF;         /* Fond principal blanc pur */
+    background-color: #EAF3FF;         /* Fond principal bleu très clair */
     color: #1F3B73;
 }
 
@@ -314,7 +314,7 @@ body.theme-light #hero,
 body.theme-light #portfolio-section,
 body.theme-light #about,
 body.theme-light #contact {
-    background-color: #F8F9FD;         /* Fond de section bleu-gris très clair */
+    background-color: #F3F7FF;         /* Fond de section plus bleu */
 }
 
 body.theme-light .section-padding {
@@ -329,18 +329,18 @@ body.theme-light .contact-info,
 body.theme-light .article-card,
 body.theme-light .gallery-item,
 body.theme-light .graphisme-card {
-    background-color: #FFFFFF;
+    background-color: #F8FBFF;         /* Cartes légèrement bleutées */
     border-color: rgba(9, 132, 227, 0.18);
 }
 
 body.theme-light footer {
-    background-color: #FFFFFF;
+    background-color: #F3F7FF;
     color: #4F5B8A;
     box-shadow: 0 -4px 15px rgba(9, 132, 227, 0.08);
 }
 
 body.theme-light header {
-    background-color: rgba(255, 255, 255, 0.96);
+    background-color: rgba(243, 247, 255, 0.96);
     box-shadow: 0 0 15px rgba(9, 132, 227, 0.15);
 }
 
