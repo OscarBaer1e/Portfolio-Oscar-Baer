@@ -298,19 +298,27 @@ html.a11y-reduce-motion *::after {
 
 /* Thèmes clair / sombre (préférence dans le widget d'accessibilité) */
 body.theme-light {
-    background-color: #f5f7ff;
-    color: #111827;
+    /* Override des variables pour un vrai mode clair inspiré de ta palette */
+    --primary-color: #6C5CE7;          /* Violet dynamique pour CTA et titres */
+    --secondary-color: #0984E3;        /* Bleu profond pour liens / éléments importants */
+    --background-color-light: #F8F9FD; /* Fond de sections très clair */
+    --light-text-color: #2D3436;       /* Texte principal quasi noir */
+    --dim-text-color: #4b5563;         /* Texte secondaire */
+    --border-color: rgba(9, 132, 227, 0.18);
+
+    background-color: #FFFFFF;         /* Fond principal blanc pur */
+    color: #2D3436;
 }
 
 body.theme-light #hero,
 body.theme-light #portfolio-section,
 body.theme-light #about,
 body.theme-light #contact {
-    background-color: #f5f7ff;
+    background-color: #F8F9FD;         /* Fond de section bleu-gris très clair */
 }
 
 body.theme-light .section-padding {
-    background: linear-gradient(180deg, #f5f7ff 0%, #eef2ff 100%);
+    background: none;
 }
 
 body.theme-light .portfolio-item,
@@ -321,23 +329,29 @@ body.theme-light .contact-info,
 body.theme-light .article-card,
 body.theme-light .gallery-item,
 body.theme-light .graphisme-card {
-    background-color: #ffffff;
-    border-color: rgba(71, 59, 240, 0.18);
+    background-color: #FFFFFF;
+    border-color: rgba(9, 132, 227, 0.18);
 }
 
 body.theme-light footer {
-    background-color: #ecefff;
+    background-color: #FFFFFF;
     color: #4b5563;
-    box-shadow: 0 -4px 15px rgba(71, 59, 240, 0.08);
+    box-shadow: 0 -4px 15px rgba(9, 132, 227, 0.08);
 }
 
 body.theme-light header {
-    background-color: rgba(255, 255, 255, 0.95);
-    box-shadow: 0 0 15px rgba(71, 59, 240, 0.15);
+    background-color: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 0 15px rgba(9, 132, 227, 0.15);
 }
 
 body.theme-light .portfolio-page .portfolio-item-content {
-    background: #f3f4ff;
+    background: #FFFFFF;
+}
+
+body.theme-light .card-badge,
+body.theme-light .intro-badge {
+    background-color: #E0D7FF;        /* Accent lavande pour badges et petits accents */
+    color: #2D3436;
 }
 
 body.theme-dark {
