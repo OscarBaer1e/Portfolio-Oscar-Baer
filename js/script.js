@@ -237,6 +237,55 @@ document.addEventListener('DOMContentLoaded', function() {
         el.textContent = new Date().getFullYear();
     });
 
+    /* ----- Vanta.js : fond animé (un effet par page) ----- */
+    (function initVantaBackground() {
+        var el = document.getElementById('vanta-bg');
+        var effect = el && el.getAttribute('data-vanta-effect');
+        if (!el || !effect) return;
+        var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        if (isMobile || prefersReducedMotion) return;
+
+        var vantaInstance = null;
+        var effectMap = { fog: 'FOG', waves: 'WAVES', cells: 'CELLS', dots: 'DOTS', topology: 'TOPOLOGY', halo: 'HALO' };
+        var effectName = effectMap[effect.toLowerCase()] || 'FOG';
+
+        var baseOptions = {
+            el: '#vanta-bg',
+            mouseControls: true,
+            touchControls: true,
+            gyroControls: false,
+            minHeight: 200,
+            minWidth: 200,
+            scale: 1,
+            scaleMobile: 1,
+            backgroundColor: 0x0a0a0e,
+            color: 0x6665dd,
+            highlightColor: 0x9b9ece
+        };
+
+        function runVanta() {
+            if (typeof window.VANTA === 'undefined' || typeof window.VANTA[effectName] !== 'function') return;
+            vantaInstance = window.VANTA[effectName](baseOptions);
+            document.body.classList.add('vanta-active');
+        }
+
+        function loadScript(src, callback) {
+            var s = document.createElement('script');
+            s.src = src;
+            s.onload = callback;
+            s.onerror = function() { if (callback) callback(); };
+            document.head.appendChild(s);
+        }
+
+        if (typeof window.THREE !== 'undefined') {
+            loadScript('https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.' + effect + '.min.js', runVanta);
+        } else {
+            loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js', function() {
+                loadScript('https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.' + effect + '.min.js', runVanta);
+            });
+        }
+    })();
+
     const menuToggle = document.querySelector('.menu-toggle');
     const navList = document.querySelector('.nav-list');
 
@@ -908,110 +957,4 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-
-    /* ----- Vanta.js : fonds animés (fog, waves, cells, dots, halo) - couleurs DA ----- */
-    (function initVanta() {
-        var el = document.getElementById('vanta-bg');
-        if (!el) return;
-        var reduceMotion = document.documentElement.classList.contains('a11y-reduce-motion');
-        var path = (window.location.pathname || '').replace(/\/$/, '') || '/';
-        var page = path.split('/').pop() || 'index.html';
-        var effectMap = {
-            'index.html': 'fog', '': 'fog', '/': 'fog',
-            'portfolio.html': 'net', 'about.html': 'cells', 'contact.html': 'dots',
-            'documents.html': 'halo', 'webdocumentaire.html': 'fog', 'graphisme.html': 'waves',
-            'bacfr.html': 'cells', 'biosphere.html': 'dots', 'txlforma.html': 'halo',
-            'redaction.html': 'fog', 'nouvelle-anne-plantagenet.html': 'waves',
-            'space-shooter.html': 'dots', 'omerta.html': 'halo', 'bowling-game.html': 'cells'
-        };
-        var effect = effectMap[page] || 'fog';
-        var colors = {
-            highlight: 0x473bf0,
-            mid: 0x6665dd,
-            low: 0x0a0a0e,
-            base: 0x000500
-        };
-        function loadScript(src) {
-            return new Promise(function(resolve, reject) {
-                var s = document.createElement('script');
-                s.src = src;
-                s.onload = resolve;
-                s.onerror = reject;
-                document.head.appendChild(s);
-            });
-        }
-        function runVanta() {
-            if (window.THREE && window.VANTA) {
-                var opts = {
-                    el: '#vanta-bg',
-                    mouseControls: true,
-                    touchControls: true,
-                    gyroControls: false,
-                    minHeight: 200,
-                    minWidth: 200,
-                    highlightColor: colors.highlight,
-                    midtoneColor: colors.mid,
-                    lowlightColor: colors.low,
-                    baseColor: colors.base,
-                    blurFactor: 0.6,
-                    speed: reduceMotion ? 0.2 : 1
-                };
-                var name = effect.toUpperCase().charAt(0) + effect.slice(1);
-                if (effect === 'fog' && window.VANTA.FOG) {
-                    window.vantaEffect = window.VANTA.FOG(opts);
-                } else if (effect === 'waves' && window.VANTA.WAVES) {
-                    opts.color = colors.mid;
-                    opts.waveHeight = 15;
-                    opts.waveSpeed = 0.8;
-                    opts.zoom = 0.75;
-                    window.vantaEffect = window.VANTA.WAVES(opts);
-                } else if (effect === 'cells' && window.VANTA.CELLS) {
-                    opts.color = colors.highlight;
-                    opts.cellColor = colors.mid;
-                    opts.backgroundColor = colors.base;
-                    window.vantaEffect = window.VANTA.CELLS(opts);
-                } else if (effect === 'dots' && window.VANTA.DOTS) {
-                    opts.color = colors.highlight;
-                    opts.backgroundColor = colors.base;
-                    opts.color2 = colors.mid;
-                    window.vantaEffect = window.VANTA.DOTS(opts);
-                } else if (effect === 'halo' && window.VANTA.HALO) {
-                    opts.backgroundColor = colors.base;
-                    opts.baseColor = colors.mid;
-                    opts.color2 = colors.highlight;
-                    window.vantaEffect = window.VANTA.HALO(opts);
-                } else if (effect === 'net' && window.VANTA.NET) {
-                    opts.backgroundColor = colors.base;
-                    opts.color = colors.highlight;
-                    opts.pointsColor = colors.mid;
-                    window.vantaEffect = window.VANTA.NET(opts);
-                } else if (window.VANTA.FOG) {
-                    window.vantaEffect = window.VANTA.FOG(opts);
-                }
-            }
-        }
-        loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js')
-            .then(function() {
-                return loadScript('https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.' + effect + '.min.js');
-            })
-            .then(runVanta)
-            .catch(function() {
-                try {
-                    if (window.VANTA && window.VANTA.FOG) {
-                        runVanta();
-                    }
-                } catch (e) {}
-            });
-        var vantaResizeT;
-        window.addEventListener('resize', function() {
-            clearTimeout(vantaResizeT);
-            vantaResizeT = setTimeout(function() {
-                if (window.vantaEffect && typeof window.vantaEffect.destroy === 'function') {
-                    window.vantaEffect.destroy();
-                    window.vantaEffect = null;
-                }
-                runVanta();
-            }, 150);
-        });
-    })();
 });

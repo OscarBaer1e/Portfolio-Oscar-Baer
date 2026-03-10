@@ -119,8 +119,7 @@ body {
 }
 
 /* ================================================
-   FOND : Vanta.js uniquement (fog, waves, cells, dots, halo)
-   Couleurs DA : indigo #473bf0, slate #6665dd, fond #000500
+   ANIMATIONS DE FOND - Lueurs et grille
    ================================================ */
 
 .animated-background {
@@ -134,13 +133,94 @@ body {
     overflow: hidden;
 }
 
-#vanta-bg canvas {
-    position: absolute !important;
-    top: 0 !important;
-    left: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    pointer-events: none;
+/* Quand Vanta.js est actif, masquer les couches CSS (canvas Vanta affiché) */
+body.vanta-active .animated-background::before,
+body.vanta-active .animated-background::after {
+    display: none;
+}
+
+/* Couche 1 : orbes lumineux qui pulsent (indigo / slate) */
+.animated-background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(ellipse 70% 60% at 15% 25%, rgba(71, 59, 240, 0.18), transparent 55%),
+        radial-gradient(ellipse 60% 70% at 88% 75%, rgba(102, 101, 221, 0.14), transparent 50%),
+        radial-gradient(ellipse 50% 50% at 50% 50%, rgba(155, 158, 206, 0.08), transparent 65%);
+    animation: bgGlowPulse 16s ease-in-out infinite;
+    z-index: 0;
+}
+
+/* Couche 2 : lueur secondaire en mouvement lent */
+.animated-background::after {
+    content: '';
+    position: absolute;
+    top: -20%;
+    left: -20%;
+    width: 140%;
+    height: 140%;
+    background: 
+        radial-gradient(circle at 30% 30%, rgba(71, 59, 240, 0.12), transparent 35%),
+        radial-gradient(circle at 70% 70%, rgba(102, 101, 221, 0.1), transparent 40%);
+    animation: bgGlowFloat 28s ease-in-out infinite;
+    z-index: 0;
+}
+
+@keyframes bgGlowPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.85; transform: scale(1.02); }
+}
+
+@keyframes bgGlowFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(3%, 2%) scale(1.03); }
+    66% { transform: translate(-2%, 3%) scale(0.98); }
+}
+
+/* Couche 3 : grille discrète en dérive */
+.grid-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    background-image: 
+        linear-gradient(rgba(102, 101, 221, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(102, 101, 221, 0.07) 1px, transparent 1px);
+    background-size: 56px 56px;
+    animation: gridFade 8s ease-in-out infinite;
+    opacity: 0.85;
+    z-index: 1;
+}
+
+@keyframes gridDrift {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(56px, 56px); }
+}
+
+@keyframes gridFade {
+    0%, 100% { opacity: 0.75; }
+    50% { opacity: 0.9; }
+}
+
+@media (max-width: 768px) {
+    .grid-lines {
+        animation: none;
+        opacity: 0.55;
+    }
+    .animated-background::before {
+        animation-duration: 14s;
+        opacity: 0.9;
+    }
+    .animated-background::after {
+        animation: none;
+        opacity: 0.7;
+    }
 }
 
 /* Réduction des animations si l'utilisateur le préfère (accessibilité) */
@@ -197,7 +277,10 @@ body.a11y-high-contrast .skill-preview-card {
     border-width: 2px;
     border-color: var(--slate-blue);
 }
-body.a11y-high-contrast #vanta-bg { opacity: 0.7; }
+body.a11y-high-contrast .animated-background::before,
+body.a11y-high-contrast .animated-background::after {
+    opacity: 0.5;
+}
 
 /* Taille du texte augmentée (classe sur html) */
 html.a11y-text-large {
@@ -211,7 +294,11 @@ html.a11y-text-large h2 { font-size: 3.25rem; }
 html.a11y-text-large .section-title { font-size: 3.25rem; }
 
 /* Réduire les animations (classe sur html, choix utilisateur) */
-/* Vanta réduit via script si reduce-motion */
+html.a11y-reduce-motion .animated-background::before,
+html.a11y-reduce-motion .animated-background::after,
+html.a11y-reduce-motion .grid-lines {
+    animation: none !important;
+}
 html.a11y-reduce-motion *,
 html.a11y-reduce-motion *::before,
 html.a11y-reduce-motion *::after {
@@ -435,7 +522,32 @@ body.theme-dark {
 body.chaos-mode {
     overflow-x: hidden;
 }
-/* Fond Vanta en chaos-mode inchangé (pas de grille/CSS à animer) */
+body.chaos-mode .grid-lines {
+    animation: crazyGrid 4.2s linear infinite;
+    transform-origin: 50% 50%;
+}
+@keyframes crazyGrid {
+    0% { transform: translate(0, 0) rotate(0deg) scale(0.8); }
+    50% { transform: translate(56px, 56px) rotate(180deg) scale(1.4); }
+    100% { transform: translate(0, 0) rotate(360deg) scale(0.8); }
+}
+body.chaos-mode .animated-background::before {
+    animation: crazyOrb1 2.3s ease-in-out infinite;
+}
+body.chaos-mode .animated-background::after {
+    animation: crazyOrb2 3.1s ease-in-out infinite;
+}
+@keyframes crazyOrb1 {
+    0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); left: 20%; top: 30%; }
+    25% { transform: translate(-50%, -50%) scale(1.4) rotate(90deg); left: 80%; top: 20%; }
+    50% { transform: translate(-50%, -50%) scale(0.7) rotate(180deg); left: 70%; top: 70%; }
+    75% { transform: translate(-50%, -50%) scale(1.2) rotate(270deg); left: 15%; top: 80%; }
+}
+@keyframes crazyOrb2 {
+    0%, 100% { transform: translate(-50%, -50%) scale(1.1); left: 75%; top: 60%; }
+    33% { transform: translate(-50%, -50%) scale(0.6) rotate(120deg); left: 25%; top: 25%; }
+    66% { transform: translate(-50%, -50%) scale(1.3) rotate(240deg); left: 60%; top: 85%; }
+}
 body.chaos-mode h1 {
     animation: crazyH1 1.2s ease-in-out infinite;
 }
@@ -735,6 +847,9 @@ body.chaos-mode .morph {
 
 /* Désactiver le mode CRAZY si l'utilisateur préfère réduire les animations */
 html.a11y-reduce-motion body.chaos-mode,
+html.a11y-reduce-motion body.chaos-mode .grid-lines,
+html.a11y-reduce-motion body.chaos-mode .animated-background::before,
+html.a11y-reduce-motion body.chaos-mode .animated-background::after,
 html.a11y-reduce-motion body.chaos-mode h1,
 html.a11y-reduce-motion body.chaos-mode h2,
 html.a11y-reduce-motion body.chaos-mode .section-title,
@@ -1589,14 +1704,9 @@ nav .nav-list a.active::after {
 
 .hero-actions {
     display: flex;
-    gap: 14px;
+    gap: 20px;
     margin-bottom: 40px;
     flex-wrap: wrap;
-}
-
-.hero-actions .animated-btn {
-    flex: 1 1 auto;
-    min-width: 160px;
 }
 
 .hero-social {
@@ -1646,80 +1756,6 @@ nav .nav-list a.active::after {
 .scroll-indicator i {
     font-size: 1.5rem;
     animation: bounce 2s infinite;
-}
-
-/* Section Projets à découvrir (accueil) – garder l’attention */
-#featured-projects {
-    padding: 80px 0;
-    background: linear-gradient(180deg, var(--dark-bg-color-alt) 0%, var(--dark-bg-color) 100%);
-}
-
-#featured-projects .section-title {
-    margin-bottom: 0.5rem;
-}
-
-.section-intro {
-    text-align: center;
-    color: var(--dim-text-color);
-    font-size: 1.05rem;
-    max-width: 36rem;
-    margin: 0 auto 2.5rem;
-    line-height: 1.6;
-}
-
-#skills-preview .section-intro a {
-    color: var(--primary-color);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-}
-
-#skills-preview .section-intro a:hover {
-    color: var(--secondary-color);
-}
-
-.homepage-featured-grid {
-    margin-bottom: 0;
-}
-
-.homepage-featured-grid .portfolio-item {
-    max-width: 380px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-#featured-projects .text-center.mt-4 {
-    margin-top: 2.5rem !important;
-}
-
-/* Suite du parcours – inciter à cliquer */
-.next-steps {
-    margin-top: 3.5rem;
-    padding-top: 2.5rem;
-    border-top: 1px solid var(--border-color);
-    text-align: center;
-}
-
-.next-steps-intro {
-    font-size: 1rem;
-    color: var(--dim-text-color);
-    margin-bottom: 1.25rem;
-    letter-spacing: 0.03em;
-}
-
-.next-steps-buttons {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 1rem;
-}
-
-.next-step-btn {
-    white-space: nowrap;
-}
-
-@media (max-width: 600px) {
-    .next-steps-buttons { flex-direction: column; align-items: center; }
-    .next-step-btn { width: 100%; max-width: 280px; text-align: center; }
 }
 
 /* Section Compétences clés (accueil) : 4 cartes avec tags */
@@ -2203,115 +2239,6 @@ nav .nav-list a.active::after {
     opacity: 0.9;
 }
 
-/* Bloc « Toutes mes compétences » (À propos) – présentation stylée */
-.skills-showcase {
-    margin-top: 2rem;
-    padding: 3rem 0 4rem;
-}
-
-.skills-showcase-title {
-    text-align: center;
-    color: var(--light-text-color);
-    font-size: 2.25rem;
-    margin-bottom: 0.5rem;
-}
-
-.skills-showcase-intro {
-    text-align: center;
-    color: var(--dim-text-color);
-    font-size: 1.05rem;
-    max-width: 32rem;
-    margin: 0 auto 3rem;
-    line-height: 1.6;
-}
-
-.skills-showcase-inner {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 1.75rem;
-}
-
-.skills-showcase-card {
-    background: linear-gradient(165deg, var(--background-color-light) 0%, rgba(13, 13, 18, 0.98) 100%);
-    border: 1px solid var(--border-color);
-    border-radius: 16px;
-    padding: 1.75rem 1.5rem;
-    position: relative;
-    overflow: hidden;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
-}
-
-.skills-showcase-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-    opacity: 0.6;
-}
-
-.skills-showcase-card:hover {
-    border-color: rgba(102, 101, 221, 0.5);
-    box-shadow: 0 12px 40px rgba(71, 59, 240, 0.12);
-    transform: translateY(-3px);
-}
-
-.skills-showcase-card-header {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin-bottom: 1.25rem;
-}
-
-.skills-showcase-icon {
-    width: 44px;
-    height: 44px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-    border-radius: 12px;
-    color: #fff;
-    font-size: 1.1rem;
-}
-
-.skills-showcase-card h3 {
-    color: var(--primary-color);
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin: 0;
-}
-
-.skills-showcase-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-}
-
-.skills-showcase-tag {
-    display: inline-block;
-    padding: 6px 14px;
-    font-size: 0.85rem;
-    color: var(--dim-text-color);
-    background: rgba(102, 101, 221, 0.1);
-    border: 1px solid rgba(102, 101, 221, 0.22);
-    border-radius: 20px;
-    transition: background 0.2s ease, color 0.2s ease;
-}
-
-.skills-showcase-card:hover .skills-showcase-tag {
-    background: rgba(102, 101, 221, 0.18);
-    color: var(--light-text-color);
-}
-
-@media (max-width: 768px) {
-    .skills-showcase-inner {
-        grid-template-columns: 1fr;
-    }
-}
-
 /* Sections projets très textuelles (webdocu, Bac FR, etc.) */
 .project-detail {
     background-color: var(--dark-bg-color);
@@ -2662,26 +2589,6 @@ footer .container {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    flex-wrap: wrap;
-    gap: 1rem;
-}
-
-.footer-text { flex: 1 1 auto; min-width: 200px; }
-
-.footer-cta {
-    margin-bottom: 0.35rem;
-    font-size: 1rem;
-    color: var(--dim-text-color);
-}
-
-.footer-cta a {
-    color: var(--primary-color);
-    text-decoration: underline;
-    text-underline-offset: 3px;
-}
-
-.footer-cta a:hover {
-    color: var(--secondary-color);
 }
 
 .social-links a {

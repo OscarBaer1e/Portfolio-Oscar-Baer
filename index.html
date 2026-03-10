@@ -8,7 +8,7 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Oscar Baer · Portfolio MMI · En recherche d'alternance 2026</title>
+    <title>Oscar BAER - Portfolio de Développeur Web</title>
 
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Anta&family=Lato:wght@300;400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
@@ -18,7 +18,7 @@
 </head>
 
 <body>
-    <div class="animated-background" id="vanta-bg"></div>
+    <div id="vanta-bg" class="animated-background" data-vanta-effect="fog"></div>
 
     <header>
 
@@ -54,6 +54,7 @@
 
     <main id="main-content">
         <section id="hero">
+            <div class="hero-background"></div>
             <div class="container hero-content">
                 <div class="hero-left reveal" data-animation-delay="0">
                     <div class="morph hero-photo-entrance float-animation" id="easter-egg-trigger-img">
@@ -63,12 +64,12 @@
                 </div>
                 <div class="hero-right reveal" data-animation-delay="200">
                     <div class="hero-intro">
-                        <span class="intro-badge pulse-text">BUT MMI 3e année · Recherche alternance sept. 2026</span>
-                        <h2 class="hero-name neon-blink" id="easter-egg-trigger">Oscar Baer</h2>
-                        <h3 id="typing-text" class="hero-subtitle">Développement web · Design · Audiovisuel</h3>
+                        <span class="intro-badge pulse-text">Bienvenue</span>
+                        <h2 class="hero-name neon-blink" id="easter-egg-trigger">Oscar BAER</h2>
+                        <h3 id="typing-text" class="hero-subtitle">Développeur Full-Stack</h3>
                         <p class="hero-description">
-                            Je crée des expériences numériques à la croisée du code, du design et de la vidéo. 
-                            Projets concrets : plateforme e-learning 3D, datavisualisation, webdocumentaire, interfaces React.
+                            Passionné par le développement web, le design graphique et l'audiovisuel. 
+                            Je crée des expériences numériques innovantes et esthétiques.
                         </p>
                         <div class="hero-stats">
                             <div class="stat-item">
@@ -86,13 +87,10 @@
                         </div>
                         <div class="hero-actions">
                             <a href="./pages/portfolio.html" class="btn primary-btn animated-btn">
-                                <i class="fas fa-briefcase"></i> Découvrir mes réalisations
-                            </a>
-                            <a href="./ressources/documents/CV Oscar Baer.pdf" download class="btn secondary-btn animated-btn">
-                                <i class="fas fa-download"></i> Télécharger mon CV
+                                <i class="fas fa-briefcase"></i> Voir mon Portfolio
                             </a>
                             <a href="./pages/contact.html" class="btn secondary-btn animated-btn">
-                                <i class="fas fa-envelope"></i> Me contacter
+                                <i class="fas fa-envelope"></i> Me Contacter
                             </a>
                         </div>
                         <div class="hero-social">
@@ -115,112 +113,48 @@
             </div>
         </section>
 
-        <section id="featured-projects" class="section-padding">
-            <div class="container">
-                <h2 class="section-title reveal">Projets à découvrir</h2>
-                <p class="section-intro reveal">Quelques réalisations représentatives de mon parcours MMI : web, 3D, dataviz, rédaction.</p>
-                <div class="portfolio-grid homepage-featured-grid">
-                    <article class="portfolio-item reveal" data-animation-delay="0">
-                        <a href="./pages/txlforma.html" class="portfolio-item-link">
-                            <div class="portfolio-image-wrapper">
-                                <img src="./ressources/images/txlforma-dashboard.png" alt="TXLFORMA – Plateforme de formations">
-                                <span class="portfolio-overlay-label"><i class="fas fa-eye"></i> Voir le projet</span>
-                            </div>
-                            <div class="portfolio-item-content">
-                                <h3>TXLFORMA</h3>
-                                <p class="category">React · 3D Blender · Stripe · Spring Boot</p>
-                            </div>
-                        </a>
-                        <a href="./pages/txlforma.html" class="btn primary-btn btn-small portfolio-item-cta">Découvrir</a>
-                    </article>
-                    <article class="portfolio-item reveal" data-animation-delay="100">
-                        <a href="./pages/biosphere.html" class="portfolio-item-link">
-                            <div class="portfolio-image-wrapper">
-                                <img src="./ressources/images/biosphere-1.png" alt="Biosphère – Datavisualisation">
-                                <span class="portfolio-overlay-label"><i class="fas fa-chart-bar"></i> Voir le projet</span>
-                            </div>
-                            <div class="portfolio-item-content">
-                                <h3>Biosphère</h3>
-                                <p class="category">Datavisualisation · API · Décision</p>
-                            </div>
-                        </a>
-                        <a href="./pages/biosphere.html" class="btn primary-btn btn-small portfolio-item-cta">Découvrir</a>
-                    </article>
-                    <article class="portfolio-item reveal" data-animation-delay="200">
-                        <a href="./pages/webdocumentaire.html" class="portfolio-item-link">
-                            <div class="portfolio-image-wrapper">
-                                <img src="./ressources/images/webdocu.png" alt="Webdocumentaire – Une longue histoire de moteur">
-                                <span class="portfolio-overlay-label"><i class="fas fa-video"></i> Voir le projet</span>
-                            </div>
-                            <div class="portfolio-item-content">
-                                <h3>Webdocumentaire</h3>
-                                <p class="category">Web · Rédaction · Audiovisuel</p>
-                            </div>
-                        </a>
-                        <a href="./pages/webdocumentaire.html" class="btn primary-btn btn-small portfolio-item-cta">Découvrir</a>
-                    </article>
-                </div>
-                <p class="text-center mt-4">
-                    <a href="./pages/portfolio.html" class="btn primary-btn">Voir tout le portfolio <i class="fas fa-arrow-right"></i></a>
-                </p>
-            </div>
-        </section>
-
         <section id="skills-preview" class="section-padding">
             <div class="container">
                 <h2 class="section-title reveal">Mes Compétences Clés</h2>
-                <p class="section-intro reveal">Un aperçu de mes domaines de prédilection. <a href="./pages/about.html#skills-full">Voir toutes mes compétences →</a></p>
                 <div class="skills-preview-grid">
                     <div class="skill-preview-card reveal" data-animation-delay="0">
                         <div class="skill-icon"><i class="fas fa-code"></i></div>
                         <h3>Programmation</h3>
                         <div class="skill-tags">
-                            <span class="skill-tag">HTML / CSS</span><span class="skill-tag">JavaScript</span><span class="skill-tag">React</span><span class="skill-tag">Node.js</span><span class="skill-tag">PHP</span>
+                            <span class="skill-tag">HTML</span><span class="skill-tag">CSS</span><span class="skill-tag">JavaScript</span><span class="skill-tag">TypeScript</span><span class="skill-tag">PHP</span><span class="skill-tag">MySQL</span><span class="skill-tag">WordPress</span><span class="skill-tag">Angular</span><span class="skill-tag">Java</span><span class="skill-tag">Node.js</span><span class="skill-tag">React</span><span class="skill-tag">React Native</span><span class="skill-tag">Bootstrap</span><span class="skill-tag">Vercel / Render</span><span class="skill-tag">Linux</span><span class="skill-tag">Bash / SH</span>
                         </div>
                     </div>
                     <div class="skill-preview-card reveal" data-animation-delay="100">
                         <div class="skill-icon"><i class="fas fa-palette"></i></div>
                         <h3>Design</h3>
                         <div class="skill-tags">
-                            <span class="skill-tag">Figma</span><span class="skill-tag">Adobe Suite</span><span class="skill-tag">UI/UX</span>
+                            <span class="skill-tag">Adobe Photoshop</span><span class="skill-tag">InDesign</span><span class="skill-tag">Illustrator</span><span class="skill-tag">Figma</span><span class="skill-tag">Inkscape</span><span class="skill-tag">Krita</span>
                         </div>
                     </div>
                     <div class="skill-preview-card reveal" data-animation-delay="200">
                         <div class="skill-icon"><i class="fas fa-video"></i></div>
                         <h3>Audiovisuel</h3>
                         <div class="skill-tags">
-                            <span class="skill-tag">Montage</span><span class="skill-tag">Prise de son</span><span class="skill-tag">Caméra</span>
+                            <span class="skill-tag">Opération de caméra</span><span class="skill-tag">Prise de son</span><span class="skill-tag">Montage</span><span class="skill-tag">Première Pro</span><span class="skill-tag">Avid</span><span class="skill-tag">Capcut</span>
                         </div>
                     </div>
                     <div class="skill-preview-card reveal" data-animation-delay="300">
                         <div class="skill-icon"><i class="fas fa-chart-line"></i></div>
                         <h3>Marketing &amp; Gestion</h3>
                         <div class="skill-tags">
-                            <span class="skill-tag">Brief</span><span class="skill-tag">Plan média</span><span class="skill-tag">Agile</span>
+                            <span class="skill-tag">Brief</span><span class="skill-tag">Plan média</span><span class="skill-tag">Calendrier éditorial</span><span class="skill-tag">S.W.O.T</span><span class="skill-tag">Agile</span><span class="skill-tag">Sprint</span>
                         </div>
-                    </div>
-                </div>
-                <div class="next-steps reveal">
-                    <p class="next-steps-intro">Pour aller plus loin</p>
-                    <div class="next-steps-buttons">
-                        <a href="./pages/about.html" class="btn secondary-btn next-step-btn">
-                            <i class="fas fa-list"></i> Toutes mes compétences &amp; parcours
-                        </a>
-                        <a href="./pages/portfolio.html" class="btn secondary-btn next-step-btn">
-                            <i class="fas fa-folder-open"></i> Explorer tout le portfolio
-                        </a>
                     </div>
                 </div>
             </div>
         </section>
     </main>
 
+
+
     <footer>
         <div class="container">
-            <div class="footer-text">
-                <p class="footer-cta">Formation ou entreprise ? Envie d'échanger ? <a href="./pages/contact.html">Contactez-moi</a>.</p>
-                <p>&copy; <span id="current-year"></span> Oscar Baer. Tous droits réservés.</p>
-            </div>
+            <p>&copy; <span id="current-year"></span> Oscar Baer. Tous droits réservés.</p>
             <div class="social-links">
                 <a href="https://www.linkedin.com/in/oscar-baer-a5bbb029b/" target="_blank" aria-label="LinkedIn" class="social-link-animated"><i class="fab fa-linkedin"></i></a>
                 <a href="https://github.com/OscarBaer" target="_blank" aria-label="GitHub" class="social-link-animated"><i class="fab fa-github"></i></a>
