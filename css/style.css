@@ -345,7 +345,7 @@ body.theme-light header {
 }
 
 body.theme-light .portfolio-page .portfolio-item-content {
-    background: #FFFFFF;
+    background: #EEF3FF;               /* Fond de cartes portfolio bleu très clair */
 }
 
 body.theme-light .card-badge,
