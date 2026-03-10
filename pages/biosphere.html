@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biosphère – Datavisualisation & biocontrôle</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Anta&family=Lato:wght@300;400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="animated-background">
+        <div class="grid-lines"></div>
+    </div>
+
+    <header>
+        <div class="container">
+            <h1 class="logo"><a href="../index.html">Oscar Baer</a></h1>
+            <nav>
+                <button class="menu-toggle" aria-label="Ouvrir le menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <ul class="nav-list">
+                    <li><a href="../index.html">Accueil</a></li>
+                    <li><a href="./portfolio.html" class="active">Portfolio</a></li>
+                    <li><a href="./about.html">À Propos</a></li>
+                    <li><a href="./contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="project-detail" class="section-padding project-detail">
+            <div class="container">
+                <h2 class="section-title">Biosphère – Visualisation des projets de biocontrôle</h2>
+
+                <div class="project-header">
+                    <p class="text-center" style="font-size: 1.2rem; color: var(--dim-text-color); max-width: 52rem; margin: 0 auto 2.5rem;">
+                        Projet de groupe réalisé en début de 2ᵉ année à l’université. À partir d’une base de données et de plusieurs API, 
+                        nous devions produire des <strong>datavisualisations pertinentes</strong> pour les présenter à des personnes chargées de décision.
+                    </p>
+                </div>
+
+                <div class="project-description">
+                    <h3>Contexte & objectif</h3>
+                    <p>
+                        Biosphère est un travail universitaire en équipe (Makine Mhoumadi, Luxchan Vasanthan, Enzo Antunes et moi). 
+                        L’objectif était d’<strong>analyser et décortiquer plusieurs API</strong> pour en extraire les données, 
+                        puis les afficher sous forme de graphiques clairs et utiles pour des décideurs. 
+                        Le projet est volontairement présenté tel quel : l’interface web reste incomplète, mais j’ai tenu à le mettre en avant 
+                        car il illustre bien un travail de <strong>traitement de données</strong> et de <strong>choix de visualisation</strong> en conditions réelles.
+                    </p>
+
+                    <h3>Écran d’accueil</h3>
+                    <div class="gallery" style="margin-bottom: 1.75rem;">
+                        <img src="../ressources/images/biosphere-1.png" alt="Page d’accueil Biosphère – Visualisation des projets de biocontrôle">
+                    </div>
+                    <p>
+                        La landing présente le nom du projet et sa finalité : « Visualisation des projets de biocontrôle ». 
+                        Un bouton « Démarrer » permet d’accéder aux différentes visualisations par projet.
+                    </p>
+
+                    <h3>Projets & datavisualisations</h3>
+                    <p>
+                        Plusieurs projets de biocontrôle sont accessibles (4SYSLEG, BioREco, BREIZILEG, CanécoH, CAP ReD). 
+                        Pour chacun, nous avons construit des graphiques adaptés aux données disponibles et aux questions des commanditaires.
+                    </p>
+
+                    <h3>Exemple 4SYSLEG – Famille méthode (barres)</h3>
+                    <div class="gallery" style="margin-bottom: 1.75rem;">
+                        <img src="../ressources/images/biosphere-2.png" alt="Graphique en barres – Famille méthode pour le projet 4SYSLEG">
+                    </div>
+                    <p>
+                        Ce graphique en barres montre la répartition des « familles méthode » (micro-organismes, substances naturelles, 
+                        macro-organismes, etc.). Les données proviennent des API que nous avons interrogées et nettoyées pour les rendre exploitables.
+                    </p>
+
+                    <h3>Exemple 4SYSLEG – Type de traitement (donut)</h3>
+                    <div class="gallery" style="margin-bottom: 1.75rem;">
+                        <img src="../ressources/images/biosphere-3.png" alt="Graphique en donut – Type de traitement pour 4SYSLEG">
+                    </div>
+                    <p>
+                        Une autre vue pour le même projet : un diagramme en donut pour les types de traitement (insecticides, fongicides, 
+                        molluscicides, etc.). La navigation entre les graphiques se fait par les flèches latérales.
+                    </p>
+
+                    <h3>Exemple BioREco – Satisfaction</h3>
+                    <div class="gallery" style="margin-bottom: 1.75rem;">
+                        <img src="../ressources/images/biosphere-4.png" alt="Graphique en camembert – Satisfaction pour le projet BioREco">
+                    </div>
+                    <p>
+                        Pour BioREco, nous avons visualisé la satisfaction (Bon, Mitigé, Aucun avis émis) sous forme de camembert. 
+                        Chaque projet dispose ainsi de visualisations ciblées en fonction des jeux de données et des besoins identifiés.
+                    </p>
+
+                    <h3>Rôle & compétences</h3>
+                    <p>
+                        Dans l’équipe, mon rôle était <strong>Données / Développeur</strong> : participation à l’analyse des API, 
+                        à l’extraction et au formatage des données, puis à leur affichage dans l’application. 
+                        Ce projet m’a permis de travailler concrètement sur la chaîne <strong>données brutes → traitement → dataviz</strong> 
+                        dans un cadre universitaire et orienté décideurs.
+                    </p>
+
+                    <div class="text-center mt-5">
+                        <a href="https://biosphere-ten.vercel.app" target="_blank" rel="noopener noreferrer" class="btn primary-btn">
+                            <i class="fas fa-external-link-alt"></i> Voir le projet en ligne
+                        </a>
+                        <a href="./portfolio.html" class="btn secondary-btn">
+                            <i class="fas fa-arrow-left"></i> Retour au Portfolio
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; <span id="current-year-project"></span> Oscar Baer. Tous droits réservés.</p>
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/oscar-baer-a5bbb029b/" target="_blank" aria-label="LinkedIn" class="social-link-animated"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/OscarBaer" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="./contact.html" aria-label="Me contacter (formulaire)"><i class="fas fa-envelope"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="../js/script.js"></script>
+</body>
+</html>
