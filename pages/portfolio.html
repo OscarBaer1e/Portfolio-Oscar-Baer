@@ -39,17 +39,21 @@
                         Réalisations en développement web, design, audiovisuel et projets personnels, 
                         fruit de mon parcours en <strong>BUT MMI</strong>.
                     </p>
-                    <div class="portfolio-skill-filters" role="group" aria-label="Filtrer par compétence">
-                        <span class="filter-label">Filtrer par compétence</span>
-                        <a href="./portfolio.html" class="filter-btn active" data-skill="">Tous</a>
-                        <a href="./portfolio.html?skill=dev" class="filter-btn" data-skill="dev">Développement</a>
-                        <a href="./portfolio.html?skill=design" class="filter-btn" data-skill="design">Design & UX/UI</a>
-                        <a href="./portfolio.html?skill=marketing" class="filter-btn" data-skill="marketing">Marketing & Pilotage</a>
-                        <a href="./portfolio.html?skill=multimedia" class="filter-btn" data-skill="multimedia">Multimédia & 3D</a>
-                    </div>
                 </header>
 
-                <div class="portfolio-grid">
+                <div class="portfolio-layout">
+                    <aside class="portfolio-filters-column" aria-label="Filtrer les projets par compétence">
+                        <div class="portfolio-skill-filters" role="group">
+                            <span class="filter-label">Filtrer par compétence</span>
+                            <a href="./portfolio.html" class="filter-btn active" data-skill="">Tous</a>
+                            <a href="./portfolio.html?skill=dev" class="filter-btn" data-skill="dev">Développement</a>
+                            <a href="./portfolio.html?skill=design" class="filter-btn" data-skill="design">Design & UX/UI</a>
+                            <a href="./portfolio.html?skill=marketing" class="filter-btn" data-skill="marketing">Marketing & Pilotage</a>
+                            <a href="./portfolio.html?skill=multimedia" class="filter-btn" data-skill="multimedia">Multimédia & 3D</a>
+                        </div>
+                    </aside>
+
+                    <div class="portfolio-grid">
                     <article class="portfolio-item reveal" data-animation-delay="0" data-skills="design,multimedia">
                         <a href="./webdocumentaire.html" class="portfolio-item-link">
                             <div class="portfolio-image-wrapper">
@@ -119,6 +123,7 @@
                         </a>
                         <a href="./biosphere.html" class="btn primary-btn btn-small portfolio-item-cta">Découvrir</a>
                     </article>
+                    </div>
                 </div>
 
                 <div class="portfolio-page-footer">

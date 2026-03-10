@@ -2093,6 +2093,24 @@ nav .nav-list a.active::after {
     margin: 0 var(--spacing-unit) var(--spacing-unit);
     align-self: flex-start;
 }
+
+.portfolio-layout {
+    display: flex;
+    align-items: flex-start;
+    gap: 2.5rem;
+    margin-top: 1.5rem;
+}
+
+.portfolio-filters-column {
+    flex: 0 0 260px;
+    max-width: 280px;
+    position: sticky;
+    top: calc(var(--header-height) + 20px);
+}
+
+.portfolio-layout .portfolio-grid {
+    flex: 1;
+}
 .portfolio-page-header {
     text-align: center;
     margin-bottom: 3rem;
@@ -2158,6 +2176,17 @@ body.theme-light .portfolio-skill-filters .filter-btn {
 body.theme-light .portfolio-skill-filters .filter-btn.active {
     background: var(--primary-color);
     color: #fff;
+}
+
+@media (max-width: 992px) {
+    .portfolio-layout {
+        flex-direction: column;
+    }
+    .portfolio-filters-column {
+        position: static;
+        flex: 1 1 auto;
+        max-width: 100%;
+    }
 }
 .portfolio-item.is-hidden {
     display: none;
