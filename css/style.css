@@ -972,7 +972,7 @@ main, header, footer {
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Anta', sans-serif; 
+    font-family: 'Lora', serif; 
     margin-bottom: var(--spacing-unit);
     color: var(--primary-color);   
     line-height: 1.1;
