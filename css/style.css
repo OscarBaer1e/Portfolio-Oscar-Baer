@@ -2232,6 +2232,12 @@ nav .nav-list a.active::after {
     filter: none;
 }
 
+/* Page À propos uniquement : cadre en rectangle arrondi (diversité visuelle) */
+#about .profile-pic--about,
+.profile-pic--about {
+    border-radius: 1.5rem;
+}
+
 .bio {
     flex: 1;
     min-width: 350px; 
