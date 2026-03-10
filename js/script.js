@@ -246,7 +246,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (isMobile || prefersReducedMotion) return;
 
         var vantaInstance = null;
-        var effectMap = { fog: 'FOG', waves: 'WAVES', cells: 'CELLS', dots: 'DOTS', topology: 'TOPOLOGY', halo: 'HALO' };
+        var effectMap = { fog: 'FOG', waves: 'WAVES', dots: 'DOTS', topology: 'TOPOLOGY', halo: 'HALO' };
         var effectName = effectMap[effect.toLowerCase()] || 'FOG';
 
         var baseOptions = {

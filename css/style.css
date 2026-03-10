@@ -119,7 +119,7 @@ body {
 }
 
 /* ================================================
-   ANIMATIONS DE FOND - Lueurs et grille
+   FOND - Vanta.js (un effet par page) ; fallback uni si pas de WebGL
    ================================================ */
 
 .animated-background {
@@ -131,96 +131,7 @@ body {
     z-index: 0;
     pointer-events: none;
     overflow: hidden;
-}
-
-/* Quand Vanta.js est actif, masquer les couches CSS (canvas Vanta affiché) */
-body.vanta-active .animated-background::before,
-body.vanta-active .animated-background::after {
-    display: none;
-}
-
-/* Couche 1 : orbes lumineux qui pulsent (indigo / slate) */
-.animated-background::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: 
-        radial-gradient(ellipse 70% 60% at 15% 25%, rgba(71, 59, 240, 0.18), transparent 55%),
-        radial-gradient(ellipse 60% 70% at 88% 75%, rgba(102, 101, 221, 0.14), transparent 50%),
-        radial-gradient(ellipse 50% 50% at 50% 50%, rgba(155, 158, 206, 0.08), transparent 65%);
-    animation: bgGlowPulse 16s ease-in-out infinite;
-    z-index: 0;
-}
-
-/* Couche 2 : lueur secondaire en mouvement lent */
-.animated-background::after {
-    content: '';
-    position: absolute;
-    top: -20%;
-    left: -20%;
-    width: 140%;
-    height: 140%;
-    background: 
-        radial-gradient(circle at 30% 30%, rgba(71, 59, 240, 0.12), transparent 35%),
-        radial-gradient(circle at 70% 70%, rgba(102, 101, 221, 0.1), transparent 40%);
-    animation: bgGlowFloat 28s ease-in-out infinite;
-    z-index: 0;
-}
-
-@keyframes bgGlowPulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.85; transform: scale(1.02); }
-}
-
-@keyframes bgGlowFloat {
-    0%, 100% { transform: translate(0, 0) scale(1); }
-    33% { transform: translate(3%, 2%) scale(1.03); }
-    66% { transform: translate(-2%, 3%) scale(0.98); }
-}
-
-/* Couche 3 : grille discrète en dérive */
-.grid-lines {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: transparent;
-    background-image: 
-        linear-gradient(rgba(102, 101, 221, 0.07) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(102, 101, 221, 0.07) 1px, transparent 1px);
-    background-size: 56px 56px;
-    animation: gridFade 8s ease-in-out infinite;
-    opacity: 0.85;
-    z-index: 1;
-}
-
-@keyframes gridDrift {
-    0% { transform: translate(0, 0); }
-    100% { transform: translate(56px, 56px); }
-}
-
-@keyframes gridFade {
-    0%, 100% { opacity: 0.75; }
-    50% { opacity: 0.9; }
-}
-
-@media (max-width: 768px) {
-    .grid-lines {
-        animation: none;
-        opacity: 0.55;
-    }
-    .animated-background::before {
-        animation-duration: 14s;
-        opacity: 0.9;
-    }
-    .animated-background::after {
-        animation: none;
-        opacity: 0.7;
-    }
+    background-color: #0a0a0e;
 }
 
 /* Réduction des animations si l'utilisateur le préfère (accessibilité) */
@@ -277,10 +188,6 @@ body.a11y-high-contrast .skill-preview-card {
     border-width: 2px;
     border-color: var(--slate-blue);
 }
-body.a11y-high-contrast .animated-background::before,
-body.a11y-high-contrast .animated-background::after {
-    opacity: 0.5;
-}
 
 /* Taille du texte augmentée (classe sur html) */
 html.a11y-text-large {
@@ -294,11 +201,6 @@ html.a11y-text-large h2 { font-size: 3.25rem; }
 html.a11y-text-large .section-title { font-size: 3.25rem; }
 
 /* Réduire les animations (classe sur html, choix utilisateur) */
-html.a11y-reduce-motion .animated-background::before,
-html.a11y-reduce-motion .animated-background::after,
-html.a11y-reduce-motion .grid-lines {
-    animation: none !important;
-}
 html.a11y-reduce-motion *,
 html.a11y-reduce-motion *::before,
 html.a11y-reduce-motion *::after {
@@ -521,32 +423,6 @@ body.theme-dark {
    ================================================ */
 body.chaos-mode {
     overflow-x: hidden;
-}
-body.chaos-mode .grid-lines {
-    animation: crazyGrid 4.2s linear infinite;
-    transform-origin: 50% 50%;
-}
-@keyframes crazyGrid {
-    0% { transform: translate(0, 0) rotate(0deg) scale(0.8); }
-    50% { transform: translate(56px, 56px) rotate(180deg) scale(1.4); }
-    100% { transform: translate(0, 0) rotate(360deg) scale(0.8); }
-}
-body.chaos-mode .animated-background::before {
-    animation: crazyOrb1 2.3s ease-in-out infinite;
-}
-body.chaos-mode .animated-background::after {
-    animation: crazyOrb2 3.1s ease-in-out infinite;
-}
-@keyframes crazyOrb1 {
-    0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); left: 20%; top: 30%; }
-    25% { transform: translate(-50%, -50%) scale(1.4) rotate(90deg); left: 80%; top: 20%; }
-    50% { transform: translate(-50%, -50%) scale(0.7) rotate(180deg); left: 70%; top: 70%; }
-    75% { transform: translate(-50%, -50%) scale(1.2) rotate(270deg); left: 15%; top: 80%; }
-}
-@keyframes crazyOrb2 {
-    0%, 100% { transform: translate(-50%, -50%) scale(1.1); left: 75%; top: 60%; }
-    33% { transform: translate(-50%, -50%) scale(0.6) rotate(120deg); left: 25%; top: 25%; }
-    66% { transform: translate(-50%, -50%) scale(1.3) rotate(240deg); left: 60%; top: 85%; }
 }
 body.chaos-mode h1 {
     animation: crazyH1 1.2s ease-in-out infinite;
@@ -847,9 +723,6 @@ body.chaos-mode .morph {
 
 /* Désactiver le mode CRAZY si l'utilisateur préfère réduire les animations */
 html.a11y-reduce-motion body.chaos-mode,
-html.a11y-reduce-motion body.chaos-mode .grid-lines,
-html.a11y-reduce-motion body.chaos-mode .animated-background::before,
-html.a11y-reduce-motion body.chaos-mode .animated-background::after,
 html.a11y-reduce-motion body.chaos-mode h1,
 html.a11y-reduce-motion body.chaos-mode h2,
 html.a11y-reduce-motion body.chaos-mode .section-title,
