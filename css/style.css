@@ -301,12 +301,12 @@ body.theme-light {
     /* Override des variables pour un vrai mode clair inspiré de ta palette */
     --primary-color: #6C5CE7;          /* Violet dynamique pour CTA et titres */
     --secondary-color: #0984E3;        /* Bleu profond pour liens / éléments importants */
-    --background-color-light: #F8F9FD; /* Fond de sections très clair */
+    --background-color-light: #D6E1FF; /* Fond de sections bleu/violet clair mais soutenu */
     --light-text-color: #1F3B73;       /* Texte principal bleu profond (pas noir) */
     --dim-text-color: #4F5B8A;         /* Texte secondaire bleu-gris */
     --border-color: rgba(9, 132, 227, 0.18);
 
-    background-color: #EAF3FF;         /* Fond principal bleu très clair */
+    background-color: #CFDAFF;         /* Fond principal bleu-violet plus présent */
     color: #1F3B73;
 }
 
@@ -314,7 +314,7 @@ body.theme-light #hero,
 body.theme-light #portfolio-section,
 body.theme-light #about,
 body.theme-light #contact {
-    background-color: #F3F7FF;         /* Fond de section plus bleu */
+    background-color: #D6E1FF;         /* Fond de section bleu/violet doux mais marqué */
 }
 
 body.theme-light .section-padding {
@@ -329,18 +329,18 @@ body.theme-light .contact-info,
 body.theme-light .article-card,
 body.theme-light .gallery-item,
 body.theme-light .graphisme-card {
-    background-color: #F8FBFF;         /* Cartes légèrement bleutées */
+    background-color: #E0E7FF;         /* Cartes bleu clair, plus colorées que blanc */
     border-color: rgba(9, 132, 227, 0.18);
 }
 
 body.theme-light footer {
-    background-color: #F3F7FF;
+    background-color: #D6E1FF;
     color: #4F5B8A;
     box-shadow: 0 -4px 15px rgba(9, 132, 227, 0.08);
 }
 
 body.theme-light header {
-    background-color: rgba(243, 247, 255, 0.96);
+    background-color: rgba(198, 210, 255, 0.96);
     box-shadow: 0 0 15px rgba(9, 132, 227, 0.15);
 }
 
