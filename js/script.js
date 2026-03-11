@@ -32,13 +32,6 @@ document.addEventListener('DOMContentLoaded', function() {
     skipLink.textContent = 'Aller au contenu principal';
     document.body.insertBefore(skipLink, document.body.firstChild);
 
-    /* Barre de progression de lecture (Data Insights – theme-light uniquement) */
-    var readingProgress = document.createElement('div');
-    readingProgress.className = 'reading-progress';
-    readingProgress.setAttribute('aria-hidden', 'true');
-    readingProgress.setAttribute('role', 'presentation');
-    document.body.insertBefore(readingProgress, document.body.firstChild);
-
     /* ----- Accessibilité : widget et préférences ----- */
     var A11Y_KEYS = { contrast: 'a11y-high-contrast', textLarge: 'a11y-text-large', reduceMotion: 'a11y-reduce-motion', chaos: 'a11y-chaos', theme: 'a11y-theme' };
     function a11yLoad() {
@@ -189,21 +182,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         var heroName = document.querySelector('.hero-name');
         if (heroName) gsap.from(heroName, { opacity: 0, scale: 0.9, duration: 1, ease: 'power2.out', delay: 0.3 });
-
-        /* Barre de progression de lecture (Data Insights) : visible en theme-light, animée au scroll */
-        if (document.body.classList.contains('theme-light') && readingProgress) {
-            gsap.set(readingProgress, { scaleX: 0, transformOrigin: 'left' });
-            gsap.to(readingProgress, {
-                scaleX: 1,
-                ease: 'none',
-                scrollTrigger: {
-                    trigger: document.body,
-                    start: 0,
-                    end: 'max',
-                    scrub: 0.3
-                }
-            });
-        }
     }
 
     /* Mode CRAZY : boutons qui esquivent le curseur */
