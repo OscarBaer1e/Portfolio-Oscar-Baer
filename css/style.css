@@ -2367,7 +2367,7 @@ nav .nav-list a.active::after {
     opacity: 0.9;
 }
 
-/* Sections projets très textuelles (webdocu, Bac FR, etc.) */
+/* Sections projets – pages de cas (webdocu, Bac FR, TXLFORMA, etc.) */
 .project-detail {
     background-color: var(--dark-bg-color);
 }
@@ -2395,41 +2395,23 @@ nav .nav-list a.active::after {
     color: var(--dim-text-color);
 }
 
+/* ========== Mise en page « web » pour les projets (blocs aérés, largeur confortable) ========== */
 .project-detail .project-description {
-    max-width: 900px;
+    max-width: 1120px;
     margin: 0 auto;
-    padding: 2.5rem 2rem;
-    background-color: var(--dark-bg-color-alt);
-    border-radius: 16px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 18px 45px rgba(0, 0, 0, 0.6);
-}
-
-.project-detail .project-description p {
-    color: var(--light-text-color);
-}
-
-.project-detail .project-description ul li {
-    color: var(--dim-text-color);
-}
-
-/* ========== Design éditorial – articles projet (lisibilité, rythme, médias) ========== */
-.project-detail .project-description {
-    max-width: 720px;
-    padding: 3rem 2.5rem;
+    padding: 0 1.5rem 3rem;
     font-family: 'Lato', system-ui, -apple-system, sans-serif;
 }
 .project-detail .project-description p {
-    font-size: 1.125rem;
-    line-height: 1.65;
-    margin-bottom: 1.5rem;
-    max-width: 75ch;
+    font-size: 1.05rem;
+    line-height: 1.7;
+    margin-bottom: 1.75rem;
 }
 .project-detail .project-header p {
-    max-width: 75ch;
+    max-width: 60rem;
     margin-left: auto;
     margin-right: auto;
-    margin-bottom: 2rem;
+    margin-bottom: 2.5rem;
 }
 /* H2 = titre principal (couleur vive) */
 .project-detail .section-title {
@@ -2437,13 +2419,13 @@ nav .nav-list a.active::after {
     font-size: clamp(1.75rem, 4vw, 2.5rem);
     margin-bottom: 1.5rem;
 }
-/* H3 = sous-sections, rythment la lecture */
+/* H3 = sous-sections, blocs bien séparés */
 .project-detail .project-description h3 {
     color: var(--primary-color);
     font-size: 1.5rem;
     font-weight: 700;
-    margin-top: 2.5rem;
-    margin-bottom: 1rem;
+    margin-top: 3rem;
+    margin-bottom: 1.25rem;
     padding-left: 1rem;
     border-left: 4px solid var(--primary-color);
 }
@@ -2453,19 +2435,18 @@ nav .nav-list a.active::after {
 /* Listes à puces – énumérations techniques */
 .project-detail .project-description ul,
 .project-detail .project-description ol {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1.75rem;
     padding-left: 1.5rem;
-    max-width: 75ch;
 }
 .project-detail .project-description li {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.6rem;
     line-height: 1.6;
-    font-size: 1.125rem;
+    font-size: 1.05rem;
 }
 /* Citation / point clé – bordure colorée à gauche */
 .project-detail .project-callout,
 .project-detail .project-key-point {
-    margin: 1.5rem 0;
+    margin: 2rem 0;
     padding: 1rem 1.25rem 1rem 1.25rem;
     border-left: 4px solid var(--primary-color);
     background: rgba(71, 59, 240, 0.08);
@@ -2481,7 +2462,7 @@ nav .nav-list a.active::after {
 /* Médias : images centrées, légende, ombre, bords arrondis */
 .project-detail .gallery,
 .project-detail .project-figure {
-    margin: 2rem 0;
+    margin: 2.5rem 0;
     text-align: center;
 }
 .project-detail .gallery img,
