@@ -1635,6 +1635,11 @@ nav .nav-list a.active::after {
     margin-bottom: 20px;
     text-transform: uppercase;
     letter-spacing: 1px;
+    position: absolute;
+    top: 32px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 2;
 }
 
 .hero-name {

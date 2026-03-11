@@ -182,14 +182,6 @@ document.addEventListener('DOMContentLoaded', function() {
             gsap.fromTo(el, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' } });
         });
 
-        /* ----- 1. Staggered Reveal – Page Portfolio (cartes en cascade) ----- */
-        if (document.body.classList.contains('page-portfolio')) {
-            var portfolioItems = gsap.utils.toArray('.portfolio-grid .portfolio-item');
-            if (portfolioItems.length) {
-                gsap.from(portfolioItems, { y: 28, opacity: 0, duration: 0.6, ease: 'power2.out', stagger: 0.1, overwrite: true });
-            }
-        }
-
         /* ----- 2. Text Reveal – titres principaux (dévoilement vertical) ----- */
         function applyTextReveal(selector) {
             var el = document.querySelector(selector);
