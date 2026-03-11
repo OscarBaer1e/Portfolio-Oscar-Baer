@@ -33,8 +33,6 @@
     --max-width: 1200px;
     --radius-default: 4px;
     --spacing-unit: 20px;
-    --transition-fast: 0.2s;
-    --transition-normal: 0.25s;
 }
 
 /* 2. STYLES DE BASE (Typographie et Reset) */
@@ -119,7 +117,7 @@ body {
 }
 
 /* ================================================
-   FOND - Vanta.js (un effet par page) ; fallback uni si pas de WebGL
+   ANIMATIONS DE FOND - Lueurs et grille
    ================================================ */
 
 .animated-background {
@@ -131,113 +129,91 @@ body {
     z-index: 0;
     pointer-events: none;
     overflow: hidden;
-    background-color: #0a0a0e;
 }
 
-/* Fallback fond (mobile / pas WebGL) : couleurs par page */
-body.page-graphisme .animated-background { background-color: #1a0f00; }
-body.page-webdocumentaire .animated-background { background-color: #0d0d0d; }
-body.page-nouvelle .animated-background { background-color: #1e1e2a; }
-body.page-biosphere .animated-background { background-color: #0d1a0d; }
+/* Couche 1 : orbes lumineux qui pulsent (indigo / slate) */
+.animated-background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        radial-gradient(ellipse 70% 60% at 15% 25%, rgba(71, 59, 240, 0.18), transparent 55%),
+        radial-gradient(ellipse 60% 70% at 88% 75%, rgba(102, 101, 221, 0.14), transparent 50%),
+        radial-gradient(ellipse 50% 50% at 50% 50%, rgba(155, 158, 206, 0.08), transparent 65%);
+    animation: bgGlowPulse 10s ease-in-out infinite;
+    z-index: 0;
+}
 
-/* Contraste par page : texte et accents lisibles sur le fond Vanta */
-body.page-graphisme {
-    --primary-color: #ff9f43;
-    --secondary-color: #ffcc00;
-    --light-text-color: #fff5eb;
-    --dim-text-color: #e8d4b8;
-    --border-color: rgba(255, 204, 0, 0.4);
-    --grad-neon: linear-gradient(45deg, #ff9f43 0%, #ffcc00 100%);
-    --dark-bg-color: #1a0f00;
-    --background-color-light: #2a1810;
+/* Couche 2 : lueur secondaire en mouvement lent */
+.animated-background::after {
+    content: '';
+    position: absolute;
+    top: -20%;
+    left: -20%;
+    width: 140%;
+    height: 140%;
+    background: 
+        radial-gradient(circle at 30% 30%, rgba(71, 59, 240, 0.12), transparent 35%),
+        radial-gradient(circle at 70% 70%, rgba(102, 101, 221, 0.1), transparent 40%);
+    animation: bgGlowFloat 20s ease-in-out infinite;
+    z-index: 0;
 }
-body.page-graphisme header {
-    background-color: rgba(26, 15, 0, 0.96);
-    border-bottom-color: rgba(255, 159, 67, 0.6);
-    box-shadow: 0 0 20px rgba(255, 159, 67, 0.2);
-}
-body.page-graphisme footer {
-    background-color: rgba(26, 15, 0, 0.98);
-    color: #e8d4b8;
-    border-top-color: rgba(255, 204, 0, 0.3);
-}
-body.page-graphisme .logo a { color: #ffcc00; }
-body.page-graphisme nav .nav-list a { color: #e8d4b8; }
-body.page-graphisme nav .nav-list a:hover,
-body.page-graphisme nav .nav-list a.active { color: #ff9f43; }
 
-body.page-webdocumentaire {
-    --primary-color: #ffffff;
-    --secondary-color: #e0e0e0;
-    --light-text-color: #ffffff;
-    --dim-text-color: #b0b0b0;
-    --border-color: rgba(255, 255, 255, 0.35);
-    --grad-neon: linear-gradient(45deg, #888888 0%, #ffffff 100%);
-    --dark-bg-color: #0d0d0d;
-    --background-color-light: #1a1a1a;
+@keyframes bgGlowPulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.85; transform: scale(1.02); }
 }
-body.page-webdocumentaire header {
-    background-color: rgba(13, 13, 13, 0.98);
-    border-bottom-color: rgba(255, 255, 255, 0.4);
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.08);
-}
-body.page-webdocumentaire footer {
-    background-color: rgba(13, 13, 13, 0.98);
-    color: #b0b0b0;
-    border-top-color: rgba(255, 255, 255, 0.2);
-}
-body.page-webdocumentaire .logo a { color: #ffffff; }
-body.page-webdocumentaire nav .nav-list a { color: #b0b0b0; }
-body.page-webdocumentaire nav .nav-list a:hover,
-body.page-webdocumentaire nav .nav-list a.active { color: #ffffff; }
 
-body.page-nouvelle {
-    --primary-color: #b8b8e0;
-    --secondary-color: #9b9ece;
-    --light-text-color: #e8e8f2;
-    --dim-text-color: #b8b8d0;
-    --border-color: rgba(184, 184, 224, 0.4);
-    --grad-neon: linear-gradient(45deg, #9b9ece 0%, #b8b8e0 100%);
-    --dark-bg-color: #1e1e2a;
-    --background-color-light: #2a2a38;
+@keyframes bgGlowFloat {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    33% { transform: translate(3%, 2%) scale(1.03); }
+    66% { transform: translate(-2%, 3%) scale(0.98); }
 }
-body.page-nouvelle header {
-    background-color: rgba(30, 30, 42, 0.96);
-    border-bottom-color: rgba(184, 184, 224, 0.5);
-}
-body.page-nouvelle footer {
-    background-color: rgba(30, 30, 42, 0.98);
-    color: #b8b8d0;
-}
-body.page-nouvelle .logo a { color: #b8b8e0; }
-body.page-nouvelle nav .nav-list a { color: #b8b8d0; }
-body.page-nouvelle nav .nav-list a:hover,
-body.page-nouvelle nav .nav-list a.active { color: #e8e8f2; }
 
-body.page-biosphere {
-    --primary-color: #adff2f;
-    --secondary-color: #ccff66;
-    --light-text-color: #f0fff0;
-    --dim-text-color: #c8e6c8;
-    --border-color: rgba(173, 255, 47, 0.45);
-    --grad-neon: linear-gradient(45deg, #7a9e7a 0%, #adff2f 100%);
-    --dark-bg-color: #0d1a0d;
-    --background-color-light: #152515;
+/* Couche 3 : grille discrète en dérive */
+.grid-lines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: transparent;
+    background-image: 
+        linear-gradient(rgba(102, 101, 221, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(102, 101, 221, 0.07) 1px, transparent 1px);
+    background-size: 56px 56px;
+    animation: gridDrift 30s linear infinite, gridFade 6s ease-in-out infinite;
+    opacity: 0.85;
+    z-index: 1;
 }
-body.page-biosphere header {
-    background-color: rgba(13, 26, 13, 0.96);
-    border-bottom-color: rgba(173, 255, 47, 0.5);
-    box-shadow: 0 0 20px rgba(173, 255, 47, 0.15);
+
+@keyframes gridDrift {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(56px, 56px); }
 }
-body.page-biosphere footer {
-    background-color: rgba(13, 26, 13, 0.98);
-    color: #c8e6c8;
-    border-top-color: rgba(173, 255, 47, 0.3);
+
+@keyframes gridFade {
+    0%, 100% { opacity: 0.75; }
+    50% { opacity: 0.9; }
 }
-body.page-biosphere .logo a { color: #adff2f; }
-body.page-biosphere nav .nav-list a { color: #c8e6c8; }
-body.page-biosphere nav .nav-list a:hover,
-body.page-biosphere nav .nav-list a.active { color: #adff2f; }
+
+@media (max-width: 768px) {
+    .grid-lines {
+        animation: none;
+        opacity: 0.55;
+    }
+    .animated-background::before {
+        animation-duration: 14s;
+        opacity: 0.9;
+    }
+    .animated-background::after {
+        animation: none;
+        opacity: 0.7;
+    }
+}
 
 /* Réduction des animations si l'utilisateur le préfère (accessibilité) */
 @media (prefers-reduced-motion: reduce) {
@@ -288,10 +264,13 @@ body.a11y-high-contrast {
 }
 body.a11y-high-contrast .section-padding::before,
 body.a11y-high-contrast .portfolio-item,
-body.a11y-high-contrast .skill-category,
 body.a11y-high-contrast .skill-preview-card {
     border-width: 2px;
     border-color: var(--slate-blue);
+}
+body.a11y-high-contrast .animated-background::before,
+body.a11y-high-contrast .animated-background::after {
+    opacity: 0.5;
 }
 
 /* Taille du texte augmentée (classe sur html) */
@@ -306,6 +285,11 @@ html.a11y-text-large h2 { font-size: 3.25rem; }
 html.a11y-text-large .section-title { font-size: 3.25rem; }
 
 /* Réduire les animations (classe sur html, choix utilisateur) */
+html.a11y-reduce-motion .animated-background::before,
+html.a11y-reduce-motion .animated-background::after,
+html.a11y-reduce-motion .grid-lines {
+    animation: none !important;
+}
 html.a11y-reduce-motion *,
 html.a11y-reduce-motion *::before,
 html.a11y-reduce-motion *::after {
@@ -338,7 +322,6 @@ body.theme-light .section-padding {
 }
 
 body.theme-light .portfolio-item,
-body.theme-light .skill-category,
 body.theme-light .skill-preview-card,
 body.theme-light .about-content,
 body.theme-light .contact-form,
@@ -528,6 +511,32 @@ body.theme-dark {
    ================================================ */
 body.chaos-mode {
     overflow-x: hidden;
+}
+body.chaos-mode .grid-lines {
+    animation: crazyGrid 4.2s linear infinite;
+    transform-origin: 50% 50%;
+}
+@keyframes crazyGrid {
+    0% { transform: translate(0, 0) rotate(0deg) scale(0.8); }
+    50% { transform: translate(56px, 56px) rotate(180deg) scale(1.4); }
+    100% { transform: translate(0, 0) rotate(360deg) scale(0.8); }
+}
+body.chaos-mode .animated-background::before {
+    animation: crazyOrb1 2.3s ease-in-out infinite;
+}
+body.chaos-mode .animated-background::after {
+    animation: crazyOrb2 3.1s ease-in-out infinite;
+}
+@keyframes crazyOrb1 {
+    0%, 100% { transform: translate(-50%, -50%) scale(1) rotate(0deg); left: 20%; top: 30%; }
+    25% { transform: translate(-50%, -50%) scale(1.4) rotate(90deg); left: 80%; top: 20%; }
+    50% { transform: translate(-50%, -50%) scale(0.7) rotate(180deg); left: 70%; top: 70%; }
+    75% { transform: translate(-50%, -50%) scale(1.2) rotate(270deg); left: 15%; top: 80%; }
+}
+@keyframes crazyOrb2 {
+    0%, 100% { transform: translate(-50%, -50%) scale(1.1); left: 75%; top: 60%; }
+    33% { transform: translate(-50%, -50%) scale(0.6) rotate(120deg); left: 25%; top: 25%; }
+    66% { transform: translate(-50%, -50%) scale(1.3) rotate(240deg); left: 60%; top: 85%; }
 }
 body.chaos-mode h1 {
     animation: crazyH1 1.2s ease-in-out infinite;
@@ -828,6 +837,9 @@ body.chaos-mode .morph {
 
 /* Désactiver le mode CRAZY si l'utilisateur préfère réduire les animations */
 html.a11y-reduce-motion body.chaos-mode,
+html.a11y-reduce-motion body.chaos-mode .grid-lines,
+html.a11y-reduce-motion body.chaos-mode .animated-background::before,
+html.a11y-reduce-motion body.chaos-mode .animated-background::after,
 html.a11y-reduce-motion body.chaos-mode h1,
 html.a11y-reduce-motion body.chaos-mode h2,
 html.a11y-reduce-motion body.chaos-mode .section-title,
@@ -873,7 +885,7 @@ html.a11y-reduce-motion body.chaos-mode .secondary-btn {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: opacity 0.25s ease, visibility 0.25s ease;
+    transition: opacity 0.5s ease, visibility 0.5s ease;
 }
 
 .page-loader.hidden {
@@ -1081,9 +1093,8 @@ a[href*="wikipedia"], a[href*="linkedin"], a[href*="github"] {
     font-weight: 700;
     color: var(--light-text-color);
     text-align: left !important; /* Titres non justifiés */
-    word-break: normal;
-    overflow-wrap: normal;
-    hyphens: none;
+    word-break: keep-all;
+    hyphens: manual;
     /* On enlève l'effet de glow néon pour mettre davantage en valeur le contenu */
     text-shadow: none;
 }
@@ -1271,7 +1282,7 @@ nav .nav-list a::after {
     background: var(--secondary-color); 
     transform: scaleX(0); /* Caché par défaut */
     transform-origin: center right;
-    transition: transform 0.22s ease, box-shadow 0.22s ease;
+    transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), box-shadow 0.4s ease;
     border-radius: 2px;
 }
 
@@ -1508,7 +1519,7 @@ nav .nav-list a.active::after {
     border: 4px solid var(--primary-color);
     box-shadow: 0 0 40px rgba(0, 255, 255, 0.5), 
                 0 0 80px rgba(255, 0, 255, 0.3);
-    transition: all 0.25s ease;
+    transition: all 0.5s ease;
 }
 
 /* Image d'accueil plus simple, sans grosse animation d'entrée */
@@ -1736,7 +1747,7 @@ nav .nav-list a.active::after {
     animation: bounce 2s infinite;
 }
 
-/* Section Compétences clés (accueil) : 4 cartes avec tags */
+/* Section Skills Preview */
 #skills-preview {
     background: linear-gradient(180deg, var(--dark-bg-color), var(--dark-bg-color-alt));
     padding: 100px 0;
@@ -1744,104 +1755,238 @@ nav .nav-list a.active::after {
 
 .skills-preview-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 28px;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
     margin-top: 50px;
-    max-width: 900px;
-    margin-left: auto;
-    margin-right: auto;
 }
 
-@media (max-width: 768px) {
-    .skills-preview-grid {
-        grid-template-columns: 1fr;
-        gap: 24px;
-    }
+.skills-preview-intro {
+    text-align: center;
+    color: var(--dim-text-color);
+    font-size: 1rem;
+    margin: -1rem 0 1.5rem 0;
 }
 
 .skill-preview-card {
-    background: linear-gradient(160deg, var(--background-color-light) 0%, rgba(13, 13, 18, 0.95) 100%);
-    padding: 2rem 1.75rem;
-    border-radius: 16px;
-    border: 1px solid var(--border-color);
+    background: var(--background-color-light);
+    padding: 40px;
+    border-radius: var(--radius-default);
+    border: 2px solid var(--border-color);
     text-align: center;
-    transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+    transition: all 0.4s ease;
     position: relative;
     overflow: hidden;
+}
+
+.skill-preview-card[data-expandable] {
+    cursor: pointer;
+}
+
+.skill-preview-card .skill-preview-summary {
+    transition: opacity 0.3s ease;
+}
+
+.skill-preview-card .skill-teaser {
+    font-size: 0.9rem;
+    color: var(--dim-text-color);
+    margin-top: 0.5rem;
+}
+
+.skill-preview-card .skill-preview-detail {
+    display: none;
+}
+
+.skill-preview-card .skill-preview-detail ul {
+    list-style: none;
+    padding: 0;
+    margin: 1.25rem 0 0 0;
+    border-top: 1px solid var(--border-color);
+    padding-top: 1.25rem;
+}
+
+.skill-preview-card .skill-preview-detail li {
+    padding: 0.4rem 0;
+    padding-left: 1.25rem;
+    position: relative;
+    color: var(--dim-text-color);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+.skill-preview-card .skill-preview-detail li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-weight: bold;
 }
 
 .skill-preview-card::before {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(0, 255, 255, 0.1), transparent);
     opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.skill-preview-card:hover {
-    border-color: rgba(102, 101, 221, 0.5);
-    box-shadow: 0 12px 40px rgba(71, 59, 240, 0.15);
-    transform: translateY(-4px);
+    transition: opacity 0.4s ease;
 }
 
 .skill-preview-card:hover::before {
     opacity: 1;
 }
 
-.skill-preview-card .skill-icon {
-    width: 64px;
-    height: 64px;
-    margin: 0 auto 1.25rem;
+.skill-preview-card:hover {
+    transform: translateY(-10px);
+    border-color: var(--primary-color);
+    box-shadow: 0 10px 30px rgba(0, 255, 255, 0.3);
+}
+
+/* Overlay compétences (formes différentes par carte) */
+.skill-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 10001;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+.skill-overlay.is-open {
+    opacity: 1;
+    visibility: visible;
+}
+.skill-overlay-backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.75);
+    cursor: pointer;
+}
+.skill-overlay-panel {
+    position: relative;
+    max-width: 620px;
+    width: 95%;
+    min-height: 320px;
+    max-height: 90vh;
+    overflow: auto;
+    background: var(--dark-bg-color-alt);
+    border: 2px solid var(--primary-color);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+    padding: 2.75rem 2.25rem;
+    transition: transform 0.35s ease;
+}
+.skill-overlay.is-open .skill-overlay-panel {
+    animation: skillOverlayIn 0.35s ease forwards;
+}
+@keyframes skillOverlayIn {
+    from { opacity: 0; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1); }
+}
+.skill-overlay-panel--circle {
+    border-radius: 50%;
+    width: 460px;
+    height: 460px;
+    min-width: 460px;
+    min-height: 460px;
+    max-width: 90vw;
+    max-height: 90vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3.5rem 2.5rem;
+}
+.skill-overlay-panel--hexagon {
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+    padding: 3.5rem 3rem;
+    min-height: 380px;
+}
+.skill-overlay-panel--rounded {
+    border-radius: 2rem;
+}
+.skill-overlay-panel--blob {
+    border-radius: 60% 40% 30% 70% / 60% 30% 70% 40%;
+}
+.skill-overlay-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: rgba(255,255,255,0.1);
+    color: var(--light-text-color);
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+}
+.skill-overlay-close:hover {
+    background: var(--primary-color);
+}
+.skill-overlay-title {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    margin: 0 0 1rem 0;
+    padding-right: 2.5rem;
+    word-break: keep-all;
+    hyphens: manual;
+}
+.skill-overlay-body {
+    text-align: left;
+}
+.skill-overlay-body ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.skill-overlay-body li {
+    padding: 0.4rem 0 0.4rem 1.25rem;
+    position: relative;
+    color: var(--dim-text-color);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+.skill-overlay-body li::before {
+    content: '›';
+    position: absolute;
+    left: 0;
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+.skill-icon {
+    width: 80px;
+    height: 80px;
+    margin: 0 auto 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     border-radius: 50%;
-    font-size: 1.5rem;
-    color: #fff;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    font-size: 2rem;
+    color: var(--dark-bg-color);
+    transition: transform 0.4s ease;
 }
 
 .skill-preview-card:hover .skill-icon {
-    transform: scale(1.05);
-    box-shadow: 0 0 20px rgba(71, 59, 240, 0.4);
+    transform: rotate(360deg) scale(1.1);
 }
 
 .skill-preview-card h3 {
-    color: var(--light-text-color);
-    margin-bottom: 1rem;
-    font-size: 1.25rem;
-    font-weight: 600;
-    letter-spacing: 0.02em;
+    color: var(--primary-color);
+    margin-bottom: 15px;
+    font-size: 1.5rem;
 }
 
-.skill-tags {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 8px;
-}
-
-.skill-tag {
-    display: inline-block;
-    padding: 6px 12px;
-    font-size: 0.8rem;
-    line-height: 1.3;
+.skill-preview-card p {
     color: var(--dim-text-color);
-    background: rgba(102, 101, 221, 0.12);
-    border: 1px solid rgba(102, 101, 221, 0.25);
-    border-radius: 20px;
-    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-
-.skill-preview-card:hover .skill-tag {
-    background: rgba(102, 101, 221, 0.18);
-    border-color: rgba(102, 101, 221, 0.35);
-    color: var(--light-text-color);
+    line-height: 1.6;
 }
 
 .section-subtitle {
@@ -1958,7 +2103,7 @@ nav .nav-list a.active::after {
 
 /* Amélioration de la galerie redaction */
 .gallery-item {
-    transition: all 0.25s ease;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .gallery-item:hover {
@@ -1967,7 +2112,7 @@ nav .nav-list a.active::after {
 }
 
 .gallery-item img {
-    transition: transform 0.25s ease, filter 0.25s ease;
+    transition: transform 0.5s ease, filter 0.5s ease;
 }
 
 .gallery-item:hover img {
@@ -2098,7 +2243,7 @@ nav .nav-list a.active::after {
     transform: scale(1.03);
 }
 .portfolio-page .portfolio-image-wrapper img {
-    transition: transform 0.22s ease, filter 0.22s ease;
+    transition: transform 0.4s ease, filter 0.4s ease;
 }
 .portfolio-page .portfolio-image-wrapper {
     position: relative;
@@ -2143,10 +2288,9 @@ nav .nav-list a.active::after {
 }
 
 
-/* 7. ABOUT SECTION (Module d'Information) — fond transparent pour laisser voir Vanta */
+/* 7. ABOUT SECTION (Module d'Information) */
 #about {
-    background-color: transparent;
-    background: none;
+    background-color: var(--dark-bg-color);
 }
 
 .about-content {
@@ -2155,13 +2299,13 @@ nav .nav-list a.active::after {
     align-items: flex-start;
     justify-content: space-between; 
     gap: 60px; 
-    /* Bloc semi-transparent pour lisibilité tout en laissant voir le fond Vanta */
-    background: linear-gradient(135deg, rgba(13, 13, 18, 0.92) 0%, rgba(10, 10, 14, 0.88) 100%);
+    /* Fond légèrement plus sombre pour un meilleur contraste de lecture */
+    background: linear-gradient(135deg, var(--dark-bg-color-alt) 0%, var(--background-color-light) 100%);
     padding: 50px;
     border-radius: var(--radius-default);
-    border: 2px solid var(--border-color); 
-    box-shadow: 0 0 30px rgba(102, 101, 221, 0.2);
-    transition: border-color 0.25s, box-shadow 0.25s;
+    border: 5px solid var(--primary-color); 
+    box-shadow: 0 0 20px rgba(0, 255, 255, 0.3);
+    transition: border-color 0.5s, box-shadow 0.5s; /* Gardé pour les effets hover ou autres styles futurs */
 }
 
 .profile-pic {
@@ -2183,7 +2327,7 @@ nav .nav-list a.active::after {
     object-position: center 26%;
     transform: scale(0.88);
     filter: sepia(100%) hue-rotate(180deg) saturate(200%); 
-    transition: filter 0.25s ease;
+    transition: filter 0.5s ease;
 }
 
 .profile-pic:hover img {
@@ -2218,80 +2362,6 @@ nav .nav-list a.active::after {
     opacity: 0.9;
 }
 
-/* Page À propos : section compétences (tags par catégorie) */
-.about-skills {
-    margin-top: 0;
-    padding: 2.5rem 0 1rem;
-}
-.about-skills-title {
-    text-align: center;
-    color: var(--light-text-color);
-    font-size: 1.85rem;
-    margin-bottom: 0.5rem;
-    font-weight: 600;
-}
-.about-skills-intro {
-    text-align: center;
-    color: var(--dim-text-color);
-    font-size: 1rem;
-    margin-bottom: 2.5rem;
-    max-width: 28em;
-    margin-left: auto;
-    margin-right: auto;
-}
-.about-skills-list {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-}
-.about-skill-group {
-    padding-bottom: 1.75rem;
-    border-bottom: 1px solid rgba(102, 101, 221, 0.2);
-}
-.about-skill-group:last-child {
-    border-bottom: none;
-    padding-bottom: 0;
-}
-.about-skill-group-title {
-    display: flex;
-    align-items: center;
-    gap: 0.6rem;
-    font-size: 1.15rem;
-    font-weight: 600;
-    color: var(--primary-color);
-    margin-bottom: 1rem;
-}
-.about-skill-group-title i {
-    font-size: 1rem;
-    opacity: 0.9;
-}
-.about-skill-tags {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-}
-.about-skill-tag {
-    display: inline-block;
-    padding: 0.4rem 0.85rem;
-    font-size: 0.85rem;
-    color: var(--dim-text-color);
-    background: rgba(102, 101, 221, 0.12);
-    border: 1px solid rgba(102, 101, 221, 0.25);
-    border-radius: 20px;
-    transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease;
-}
-.about-skill-tag:hover {
-    background: rgba(102, 101, 221, 0.22);
-    color: var(--light-text-color);
-    border-color: rgba(102, 101, 221, 0.45);
-}
-@media (max-width: 768px) {
-    .about-skills { padding: 2rem 0 0.5rem; }
-    .about-skills-title { font-size: 1.5rem; }
-    .about-skill-group-title { font-size: 1.05rem; }
-    .about-skill-tag { font-size: 0.8rem; padding: 0.35rem 0.7rem; }
-}
-
 /* Sections projets très textuelles (webdocu, Bac FR, etc.) */
 .project-detail {
     background-color: var(--dark-bg-color);
@@ -2300,12 +2370,13 @@ nav .nav-list a.active::after {
 .project-detail .section-title {
     text-align: center !important;
     margin-bottom: 1.5rem;
+    word-break: keep-all;
+    hyphens: manual;
 }
 .project-detail h2,
 .project-detail .project-description h3 {
-    word-break: normal;
-    overflow-wrap: normal;
-    hyphens: none;
+    word-break: keep-all;
+    hyphens: manual;
 }
 
 .project-detail .project-header {
@@ -2337,37 +2408,9 @@ nav .nav-list a.active::after {
     color: var(--dim-text-color);
 }
 
-.project-detail .project-figure {
-    width: 100%;
-    margin: 1.5rem 0 2rem;
-}
-.project-detail .project-figure img {
-    width: 100%;
-    height: auto;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-    cursor: zoom-in;
-}
-.project-detail .project-figure figcaption {
-    margin-top: 0.75rem;
-    font-size: 0.95rem;
-    color: var(--dim-text-color);
-    text-align: center;
-    font-style: italic;
-}
-.project-detail .project-figure--main {
-    margin: 2rem 0 3rem;
-}
-
 /* Zoom / lightbox sur les screens des articles projet */
-.project-detail .gallery img,
-.project-detail .project-description .project-figure img {
+.project-detail .gallery img {
     cursor: zoom-in;
-}
-/* Pas de zoom sur la page Biosphère */
-body.page-biosphere .project-detail .gallery img {
-    cursor: default;
 }
 .project-detail .lightbox-overlay {
     position: fixed;
@@ -2422,7 +2465,7 @@ body.page-biosphere .project-detail .gallery img {
 .skills-section {
     margin-top: 0;
     padding: 3.5rem 2rem 2rem;
-    background: linear-gradient(180deg, rgba(15, 15, 22, 0.75) 0%, rgba(10, 10, 14, 0.82) 100%);
+    background: linear-gradient(180deg, rgba(15, 15, 22, 0.6) 0%, var(--dark-bg-color-alt) 8%, var(--dark-bg-color-alt) 100%);
     border-radius: 16px;
     border: 1px solid var(--border-color);
     position: relative;
@@ -2691,7 +2734,7 @@ footer .container {
     height: 100%;
     object-fit: cover;
     filter: grayscale(0) blur(0px);
-    transition: all 0.25s ease;
+    transition: all 0.5s ease;
     display: block;
     margin: 0 auto;
 }
@@ -2708,8 +2751,10 @@ footer .container {
 /* État initial : caché */
 .reveal {
     opacity: 0;
-    transform: translateY(12px);
-    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+    transform: translateY(20px);
+    /* Définit une transition CSS pour l'animation */
+    transition: opacity 0.8s ease-out, transform 0.8s ease-out; 
+    /* La propriété 'transition-delay' est définie directement en JavaScript */
 }
 
 /* État révélé : visible (ajouté par Intersection Observer) */
@@ -3280,7 +3325,7 @@ footer .container {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.22s ease, filter 0.22s ease;
+    transition: transform 0.4s ease, filter 0.4s ease;
     filter: grayscale(100%) brightness(0.6);
 }
 

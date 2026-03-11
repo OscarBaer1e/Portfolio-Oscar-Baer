@@ -4,26 +4,22 @@
  * https://gsap.com
  */
 
-// Détection mobile et PC peu performant pour optimisations
+// Détection mobile pour optimisations
 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) || window.innerWidth <= 768;
 const isLowEndDevice = isMobile && (navigator.hardwareConcurrency <= 4 || /Android.*Chrome/i.test(navigator.userAgent));
-const isLowPerfPC = !isMobile && (navigator.hardwareConcurrency <= 4 || (typeof navigator.deviceMemory === 'number' && navigator.deviceMemory <= 4));
 
 // Réduire les animations sur mobile
 if (isMobile) {
     document.documentElement.style.setProperty('--animation-duration', '0.3s');
+    // Désactiver les animations complexes sur appareils bas de gamme
     if (isLowEndDevice) {
         document.documentElement.style.setProperty('--animation-duration', '0.1s');
+        // Préférence pour réduire les animations
         const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
         if (prefersReducedMotion.matches) {
             document.documentElement.classList.add('reduce-motion');
         }
     }
-}
-
-// Activer "réduire les animations" par défaut sur PC peu performants (évite le lag)
-if (isLowPerfPC && typeof localStorage !== 'undefined' && localStorage.getItem('a11y-reduce-motion') === null) {
-    localStorage.setItem('a11y-reduce-motion', '1');
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -182,10 +178,10 @@ document.addEventListener('DOMContentLoaded', function() {
     if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && !document.body.classList.contains('chaos-mode') && !document.documentElement.classList.contains('a11y-reduce-motion')) {
         gsap.registerPlugin(ScrollTrigger);
         gsap.utils.toArray('.reveal').forEach(function(el) {
-            gsap.fromTo(el, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.35, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' } });
+            gsap.fromTo(el, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' } });
         });
         var heroName = document.querySelector('.hero-name');
-        if (heroName) gsap.from(heroName, { opacity: 0, scale: 0.98, duration: 0.4, ease: 'power2.out', delay: 0.1 });
+        if (heroName) gsap.from(heroName, { opacity: 0, scale: 0.9, duration: 1, ease: 'power2.out', delay: 0.3 });
     }
 
     /* Mode CRAZY : boutons qui esquivent le curseur */
@@ -241,72 +237,6 @@ document.addEventListener('DOMContentLoaded', function() {
         el.textContent = new Date().getFullYear();
     });
 
-    /* ----- Vanta.js : fond animé (un effet par page) ----- */
-    (function initVantaBackground() {
-        var el = document.getElementById('vanta-bg');
-        var effect = el && el.getAttribute('data-vanta-effect');
-        if (!el || !effect) return;
-        var prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        if (isMobile || prefersReducedMotion) return;
-
-        var vantaInstance = null;
-        var effectMap = { fog: 'FOG', waves: 'WAVES', dots: 'DOTS', topology: 'TOPOLOGY', halo: 'HALO' };
-        var effectName = effectMap[effect.toLowerCase()] || 'FOG';
-
-        function parseHex(attr) {
-            if (!attr) return null;
-            var hex = (attr + '').replace(/^#/, '');
-            if (!/^[0-9a-fA-F]{6}$/.test(hex)) return null;
-            return parseInt(hex, 16);
-        }
-
-        var baseOptions = {
-            el: '#vanta-bg',
-            mouseControls: true,
-            touchControls: true,
-            gyroControls: false,
-            minHeight: 200,
-            minWidth: 200,
-            scale: 1.8,
-            scaleMobile: 2,
-            speed: 0.5,
-            waveSpeed: 0.35,
-            backgroundColor: 0x0a0a0e,
-            color: 0x6665dd,
-            highlightColor: 0x9b9ece
-        };
-        var bg = parseHex(el.getAttribute('data-vanta-background'));
-        var cl = parseHex(el.getAttribute('data-vanta-color'));
-        var hl = parseHex(el.getAttribute('data-vanta-highlight'));
-        var c2 = parseHex(el.getAttribute('data-vanta-color2'));
-        if (bg != null) baseOptions.backgroundColor = bg;
-        if (cl != null) baseOptions.color = cl;
-        if (hl != null) baseOptions.highlightColor = hl;
-        if (c2 != null) baseOptions.color2 = c2;
-
-        function runVanta() {
-            if (typeof window.VANTA === 'undefined' || typeof window.VANTA[effectName] !== 'function') return;
-            vantaInstance = window.VANTA[effectName](baseOptions);
-            document.body.classList.add('vanta-active');
-        }
-
-        function loadScript(src, callback) {
-            var s = document.createElement('script');
-            s.src = src;
-            s.onload = callback;
-            s.onerror = function() { if (callback) callback(); };
-            document.head.appendChild(s);
-        }
-
-        if (typeof window.THREE !== 'undefined') {
-            loadScript('https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.' + effect + '.min.js', runVanta);
-        } else {
-            loadScript('https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js', function() {
-                loadScript('https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.' + effect + '.min.js', runVanta);
-            });
-        }
-    })();
-
     const menuToggle = document.querySelector('.menu-toggle');
     const navList = document.querySelector('.nav-list');
 
@@ -344,12 +274,11 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    /* ----- Lightbox : zoom sur les screens des articles projet (désactivé sur Biosphère) ----- */
+    /* ----- Lightbox : zoom sur les screens des articles projet ----- */
     (function initProjectLightbox() {
-        if (document.body.classList.contains('page-biosphere')) return;
         var detail = document.querySelector('.project-detail');
         if (!detail) return;
-        var galleryImgs = detail.querySelectorAll('.gallery img, .project-description .project-figure img');
+        var galleryImgs = detail.querySelectorAll('.gallery img');
         if (!galleryImgs.length) return;
         var overlay = document.createElement('div');
         overlay.className = 'lightbox-overlay';
@@ -387,6 +316,67 @@ document.addEventListener('DOMContentLoaded', function() {
         });
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && overlay.classList.contains('is-open')) closeLightbox();
+        });
+    })();
+
+    /* ----- Accueil : cartes compétences → overlay avec forme différente par carte ----- */
+    (function initSkillCardsOverlay() {
+        var cards = document.querySelectorAll('.skill-preview-card[data-expandable]');
+        if (!cards.length) return;
+        var overlay = document.createElement('div');
+        overlay.className = 'skill-overlay';
+        overlay.setAttribute('role', 'dialog');
+        overlay.setAttribute('aria-modal', 'true');
+        overlay.setAttribute('aria-label', 'Détail de la compétence');
+        overlay.innerHTML = '<div class="skill-overlay-backdrop"></div><div class="skill-overlay-panel">' +
+            '<button type="button" class="skill-overlay-close" aria-label="Fermer"><i class="fas fa-times"></i></button>' +
+            '<div class="skill-overlay-content"></div></div>';
+        document.body.appendChild(overlay);
+        var backdrop = overlay.querySelector('.skill-overlay-backdrop');
+        var panel = overlay.querySelector('.skill-overlay-panel');
+        var content = overlay.querySelector('.skill-overlay-content');
+        var closeBtn = overlay.querySelector('.skill-overlay-close');
+        function openOverlay(card) {
+            var title = card.querySelector('h3');
+            var detail = card.querySelector('.skill-preview-detail');
+            var shape = card.getAttribute('data-shape') || 'rounded';
+            content.innerHTML = (title ? '<h3 class="skill-overlay-title">' + title.innerHTML + '</h3>' : '') +
+                (detail ? '<div class="skill-overlay-body">' + detail.innerHTML + '</div>' : '');
+            panel.className = 'skill-overlay-panel skill-overlay-panel--' + shape;
+            overlay.classList.add('is-open');
+            document.body.style.overflow = 'hidden';
+            closeBtn.focus();
+        }
+        function closeOverlay() {
+            overlay.classList.remove('is-open');
+            document.body.style.overflow = '';
+        }
+        cards.forEach(function(card) {
+            card.setAttribute('role', 'button');
+            card.setAttribute('tabindex', '0');
+            card.setAttribute('aria-expanded', 'false');
+            card.addEventListener('click', function() {
+                openOverlay(this);
+                this.setAttribute('aria-expanded', 'true');
+            });
+            card.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    this.click();
+                }
+            });
+        });
+        overlay.addEventListener('click', function(e) {
+            if (e.target.closest('.skill-overlay-close') || (e.target === backdrop)) {
+                closeOverlay();
+                cards.forEach(function(c) { c.setAttribute('aria-expanded', 'false'); });
+            }
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && overlay.classList.contains('is-open')) {
+                closeOverlay();
+                cards.forEach(function(c) { c.setAttribute('aria-expanded', 'false'); });
+            }
         });
     })();
 
@@ -527,7 +517,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     revealElements.forEach((el, index) => {
         // Ajout d'un petit délai pour l'effet "staggered" (comme le faisait GSAP)
-        const delay = el.dataset.animationDelay || index * 25;
+        const delay = el.dataset.animationDelay || index * 50;
         el.style.transitionDelay = `${delay}ms`; 
         el.style.setProperty('--delay', delay);
         el.classList.add('reveal'); // Classe de base pour la transition CSS
