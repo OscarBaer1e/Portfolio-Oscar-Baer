@@ -177,11 +177,83 @@ document.addEventListener('DOMContentLoaded', function() {
     /* GSAP : animations d'entrée / scroll (hors mode CRAZY, respecte "réduire les mouvements") */
     if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && !document.body.classList.contains('chaos-mode') && !document.documentElement.classList.contains('a11y-reduce-motion')) {
         gsap.registerPlugin(ScrollTrigger);
+
         gsap.utils.toArray('.reveal').forEach(function(el) {
             gsap.fromTo(el, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' } });
         });
+
+        /* ----- 1. Staggered Reveal – Page Portfolio (cartes en cascade) ----- */
+        if (document.body.classList.contains('page-portfolio')) {
+            var portfolioItems = gsap.utils.toArray('.portfolio-grid .portfolio-item');
+            if (portfolioItems.length) {
+                gsap.from(portfolioItems, { y: 28, opacity: 0, duration: 0.6, ease: 'power2.out', stagger: 0.1, overwrite: true });
+            }
+        }
+
+        /* ----- 2. Text Reveal – titres principaux (dévoilement vertical) ----- */
+        function applyTextReveal(selector) {
+            var el = document.querySelector(selector);
+            if (!el || !el.textContent.trim()) return;
+            var text = el.textContent;
+            el.textContent = '';
+            el.style.overflow = 'hidden';
+            el.style.display = 'inline-block';
+            var wrap = document.createElement('span');
+            wrap.className = 'text-reveal-wrap';
+            wrap.setAttribute('aria-hidden', 'true');
+            wrap.style.display = 'inline-block';
+            wrap.style.overflow = 'hidden';
+            wrap.style.verticalAlign = 'bottom';
+            for (var i = 0; i < text.length; i++) {
+                var s = document.createElement('span');
+                s.className = 'text-reveal-char';
+                s.style.display = 'inline-block';
+                s.textContent = text[i] === ' ' ? '\u00A0' : text[i];
+                wrap.appendChild(s);
+            }
+            el.appendChild(wrap);
+            gsap.from(wrap.children, { y: '100%', duration: 0.6, ease: 'power4.out', stagger: 0.02, delay: selector === '.hero-name' ? 0.25 : 0 });
+        }
         var heroName = document.querySelector('.hero-name');
-        if (heroName) gsap.from(heroName, { opacity: 0, scale: 0.9, duration: 1, ease: 'power2.out', delay: 0.3 });
+        if (heroName) applyTextReveal('.hero-name');
+        var projectTitle = document.querySelector('.project-detail .section-title');
+        if (projectTitle) applyTextReveal('.project-detail .section-title');
+
+        /* ----- 3. ScrollTrigger – Articles projet (H2 + images fade-in au scroll) ----- */
+        if (document.querySelector('.project-detail')) {
+            var articleReveal = gsap.utils.toArray('.project-detail .project-description h2, .project-detail .project-description h1, .project-detail .gallery, .project-detail .project-figure');
+            articleReveal.forEach(function(el) {
+                gsap.fromTo(el, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' } });
+            });
+        }
+
+        /* ----- 4. Magnetic Button – micro-interaction (boutons attirés par le curseur) ----- */
+        if (!isMobile && document.documentElement.classList.contains('a11y-reduce-motion') === false) {
+            var magneticMouse = { x: 0, y: 0 };
+            document.addEventListener('mousemove', function(e) { magneticMouse.x = e.clientX; magneticMouse.y = e.clientY; });
+            var magneticBtns = document.querySelectorAll('.primary-btn, .secondary-btn, .portfolio-item-cta, .btn.primary-btn, .btn.secondary-btn');
+            magneticBtns.forEach(function(btn) {
+                if (btn.closest('.a11y-widget')) return;
+                btn.addEventListener('mouseenter', function() {
+                    var radius = 100, strength = 12;
+                    function update() {
+                        var r = btn.getBoundingClientRect();
+                        var cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+                        var dx = magneticMouse.x - cx, dy = magneticMouse.y - cy;
+                        var dist = Math.sqrt(dx * dx + dy * dy) || 1;
+                        var move = dist < radius ? (1 - dist / radius) * strength : 0;
+                        var tx = (dx / dist) * move, ty = (dy / dist) * move;
+                        gsap.to(btn, { x: tx, y: ty, duration: 0.35, ease: 'power2.out', overwrite: true });
+                    }
+                    var id = setInterval(update, 16);
+                    btn._magneticId = id;
+                });
+                btn.addEventListener('mouseleave', function() {
+                    if (btn._magneticId) clearInterval(btn._magneticId);
+                    gsap.to(btn, { x: 0, y: 0, duration: 0.4, ease: 'power2.out' });
+                });
+            });
+        }
     }
 
     /* Mode CRAZY : boutons qui esquivent le curseur */

@@ -2408,6 +2408,106 @@ nav .nav-list a.active::after {
     color: var(--dim-text-color);
 }
 
+/* ========== Design éditorial – articles projet (lisibilité, rythme, médias) ========== */
+.project-detail .project-description {
+    max-width: 720px;
+    padding: 3rem 2.5rem;
+    font-family: 'Lato', system-ui, -apple-system, sans-serif;
+}
+.project-detail .project-description p {
+    font-size: 1.125rem;
+    line-height: 1.65;
+    margin-bottom: 1.5rem;
+    max-width: 75ch;
+}
+.project-detail .project-header p {
+    max-width: 75ch;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 2rem;
+}
+/* H2 = titre principal (couleur vive) */
+.project-detail .section-title {
+    color: var(--primary-color);
+    font-size: clamp(1.75rem, 4vw, 2.5rem);
+    margin-bottom: 1.5rem;
+}
+/* H3 = sous-sections, rythment la lecture */
+.project-detail .project-description h3 {
+    color: var(--primary-color);
+    font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+    border-left: 4px solid var(--primary-color);
+}
+.project-detail .project-description h3:first-child {
+    margin-top: 0;
+}
+/* Listes à puces – énumérations techniques */
+.project-detail .project-description ul,
+.project-detail .project-description ol {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+    max-width: 75ch;
+}
+.project-detail .project-description li {
+    margin-bottom: 0.5rem;
+    line-height: 1.6;
+    font-size: 1.125rem;
+}
+/* Citation / point clé – bordure colorée à gauche */
+.project-detail .project-callout,
+.project-detail .project-key-point {
+    margin: 1.5rem 0;
+    padding: 1rem 1.25rem 1rem 1.25rem;
+    border-left: 4px solid var(--primary-color);
+    background: rgba(71, 59, 240, 0.08);
+    border-radius: 0 8px 8px 0;
+    font-size: 1.0625rem;
+    line-height: 1.65;
+    max-width: 75ch;
+}
+.project-detail .project-callout strong,
+.project-detail .project-key-point strong {
+    color: var(--primary-color);
+}
+/* Médias : images centrées, légende, ombre, bords arrondis */
+.project-detail .gallery,
+.project-detail .project-figure {
+    margin: 2rem 0;
+    text-align: center;
+}
+.project-detail .gallery img,
+.project-detail .project-figure img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    cursor: zoom-in;
+}
+.project-detail .gallery figcaption,
+.project-detail .project-figure figcaption,
+.project-detail figcaption {
+    margin-top: 0.75rem;
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--dim-text-color);
+    max-width: 65ch;
+    margin-left: auto;
+    margin-right: auto;
+}
+/* Une image seule dans .gallery centrée */
+.project-detail .gallery {
+    display: block;
+}
+.project-detail .gallery img {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+}
+
 /* Zoom / lightbox sur les screens des articles projet */
 .project-detail .gallery img {
     cursor: zoom-in;
