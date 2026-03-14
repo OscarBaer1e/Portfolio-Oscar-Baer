@@ -34,38 +34,7 @@
         .about-skills-cards .skill-category:hover { border-color: var(--primary-color); box-shadow: 0 8px 24px rgba(102, 101, 221, 0.15); }
         .about-skills-cards .skill-category h4 { margin-bottom: 0.75rem; }
 
-        /* Deux colonnes côte à côte : gauche = Formation + Expériences | droite = Compétences + Langues */
-        #about .about-cv-two-cols {
-            display: flex !important;
-            flex-direction: row !important;
-            flex-wrap: nowrap !important;
-            gap: 2.5rem;
-            align-items: flex-start;
-            margin-bottom: 2.5rem;
-            width: 100%;
-            box-sizing: border-box;
-        }
-        #about .about-cv-col {
-            flex: 1 1 0%;
-            min-width: 0;
-            max-width: 50%;
-            box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            gap: 2rem;
-        }
-        #about .about-cv-col .about-cv-section { margin-bottom: 0; }
-        #about .about-cv-col .skills-section { margin-bottom: 0; }
-
-        /* Une seule colonne uniquement sur petits écrans */
-        @media (max-width: 600px) {
-            #about .about-cv-two-cols { flex-direction: column !important; gap: 2rem; margin-bottom: 2rem; }
-            #about .about-cv-col { max-width: none; }
-            #about .about-cv-col .about-cv-section { margin-bottom: 2rem; }
-            #about .about-cv-col .skills-section { margin-bottom: 2rem; }
-            #about .about-cv-col .about-cv-section:last-child { margin-bottom: 0; }
-            #about .about-cv-col .skills-section:last-of-type { margin-bottom: 0; }
-        }
+        /* Règles détaillées 2 colonnes dans style.css (#about .container .about-cv-two-cols) */
         @media (max-width: 640px) {
             .cv-timeline { padding-left: 1.75rem; }
             .cv-timeline-item::before { left: -1.75rem; width: 12px; height: 12px; }

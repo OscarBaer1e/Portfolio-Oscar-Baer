@@ -2359,6 +2359,29 @@ nav .nav-list a.active::after {
     }
 }
 
+/* Grille 2 colonnes À propos : gauche Formation+Expériences, droite Compétences+Langues */
+#about .container .about-cv-two-cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 2.5rem;
+    align-items: start;
+    margin-bottom: 2.5rem;
+}
+#about .about-cv-col {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+#about .about-cv-col .about-cv-section,
+#about .about-cv-col .skills-section { margin-bottom: 0; }
+@media (max-width: 768px) {
+    #about .container .about-cv-two-cols { grid-template-columns: 1fr; gap: 2rem; }
+    #about .about-cv-col .about-cv-section { margin-bottom: 2rem; }
+    #about .about-cv-col .skills-section { margin-bottom: 2rem; }
+    #about .about-cv-col .about-cv-section:last-child { margin-bottom: 0; }
+    #about .about-cv-col .skills-section:last-of-type { margin-bottom: 0; }
+}
+
 /* Séparation nette entre description (à propos) et compétences */
 .about-skills-divider {
     margin-top: 4rem;
