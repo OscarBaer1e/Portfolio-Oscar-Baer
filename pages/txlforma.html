@@ -8,8 +8,21 @@
     <link href="https://fonts.googleapis.com/css2?family=Anta&family=Lato:wght@300;400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        .txlforma-comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.5rem 0; }
-        @media (max-width: 640px) { .txlforma-comparison-grid { grid-template-columns: 1fr; } }
+        /* Image hero (page d'accueil) : plus large, mise en avant */
+        #project-detail .project-figure--hero { margin: 2rem 0 3rem; }
+        #project-detail .project-figure--hero img { max-width: 100%; width: 100%; border-radius: 14px; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4); }
+        #project-detail .project-figure--hero figcaption { margin-top: 1rem; }
+
+        /* Visuels principaux (3D, dashboard) : largeur confortable */
+        #project-detail .project-figure--large { margin: 2rem 0 2.5rem; max-width: 100%; }
+        #project-detail .project-figure--large img { width: 100%; max-width: 900px; margin-left: auto; margin-right: auto; display: block; }
+
+        /* Comparaison avant / après : grille avec cadres */
+        .txlforma-comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin: 2rem 0 2.5rem; align-items: start; }
+        .txlforma-comparison-grid .project-figure { margin: 0; padding: 1rem; background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-color); border-radius: 12px; }
+        .txlforma-comparison-grid .project-figure img { width: 100%; }
+        .txlforma-comparison-grid .project-figure figcaption { margin-top: 0.75rem; font-size: 0.9rem; }
+        @media (max-width: 640px) { .txlforma-comparison-grid { grid-template-columns: 1fr; gap: 1.5rem; } }
     </style>
 </head>
 <body class="page-project">
@@ -52,7 +65,7 @@
                     </p>
 
                     <h3>Page d’accueil</h3>
-                    <figure class="gallery">
+                    <figure class="gallery project-figure project-figure--hero">
                         <img src="../ressources/images/txlforma-home.png" alt="Capture d’écran de la page d’accueil de la plateforme TXLFORMA." class="zoomable-image" data-zoom-src="../ressources/images/txlforma-home.png">
                         <figcaption>Accueil : accroche, catalogue des formations, inscription et connexion.</figcaption>
                     </figure>
@@ -73,7 +86,7 @@
                     </p>
 
                     <h3>Modélisation 3D & intégration web</h3>
-                    <figure class="gallery">
+                    <figure class="gallery project-figure project-figure--large">
                         <img src="../ressources/images/txlforma-3d-salle.png" alt="Vue de la salle de classe en 3D réalisée sous Blender et intégrée au site." class="zoomable-image" data-zoom-src="../ressources/images/txlforma-3d-salle.png">
                         <figcaption>Salle de classe 3D (Blender) : navigation interactive, caméras, rotation et zoom.</figcaption>
                     </figure>
@@ -101,7 +114,7 @@
                     </p>
 
                     <h3>Tableau de bord & datavisualisation</h3>
-                    <figure class="gallery">
+                    <figure class="gallery project-figure project-figure--large">
                         <img src="../ressources/images/txlforma-dashboard.png" alt="Le tableau de bord d’administration de TXLFORMA affiche les formations et les statistiques." class="zoomable-image" data-zoom-src="../ressources/images/txlforma-dashboard.png">
                         <figcaption>Dashboard admin : CA, utilisateurs par rôle, formations par catégorie, activités récentes.</figcaption>
                     </figure>
