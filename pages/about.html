@@ -34,15 +34,14 @@
         .about-skills-cards .skill-category:hover { border-color: var(--primary-color); box-shadow: 0 8px 24px rgba(102, 101, 221, 0.15); }
         .about-skills-cards .skill-category h4 { margin-bottom: 0.75rem; }
 
-        /* Grille 2 colonnes : (Formation + Expériences) | (Compétences + Langues) */
+        /* Grille 2 colonnes juste sous la présentation : Formation | Expériences */
         .about-cv-two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: start; margin-bottom: 2.5rem; }
-        .about-cv-col { display: flex; flex-direction: column; gap: 2rem; }
-        .about-cv-col .about-cv-section { margin-bottom: 0; }
-        .about-cv-col .skills-section { margin-bottom: 0; }
+        .about-cv-two-cols .about-cv-section { margin-bottom: 0; }
 
         @media (max-width: 900px) {
             .about-cv-two-cols { grid-template-columns: 1fr; gap: 2rem; margin-bottom: 2rem; }
-            .about-cv-col { gap: 2rem; }
+            .about-cv-two-cols .about-cv-section { margin-bottom: 2rem; }
+            .about-cv-two-cols .about-cv-section:last-child { margin-bottom: 0; }
         }
         @media (max-width: 640px) {
             .cv-timeline { padding-left: 1.75rem; }
@@ -96,9 +95,8 @@
                     </div>
                 </div>
 
-                <!-- Grille 2 colonnes : (Formation + Expériences) | (Compétences + Langues) -->
+                <!-- Grille 2 colonnes juste sous la présentation : Formation (gauche) | Expériences (droite) -->
                 <div class="about-cv-two-cols">
-                <div class="about-cv-col">
                 <div class="about-cv-section">
                     <h3><i class="fas fa-graduation-cap" aria-hidden="true"></i> Formation</h3>
                     <div class="cv-timeline">
@@ -120,7 +118,7 @@
                         </div>
                     </div>
                 </div>
-
+                <!-- Colonne droite -->
                 <div class="about-cv-section">
                     <h3><i class="fas fa-briefcase" aria-hidden="true"></i> Expériences professionnelles</h3>
                     <div class="cv-timeline">
@@ -165,10 +163,21 @@
                         </div>
                     </div>
                 </div>
-
                 </div>
-                <!-- Colonne droite : Compétences puis Langues -->
-                <div class="about-cv-col">
+                <!-- Fin grille 2 colonnes -->
+
+                <!-- Langues (pleine largeur) -->
+                <div class="about-cv-section">
+                    <h3><i class="fas fa-language" aria-hidden="true"></i> Langues</h3>
+                    <div class="about-langues-pills">
+                        <span>Français (langue maternelle)</span>
+                        <span>Anglais (B2)</span>
+                        <span>Espagnol (B1)</span>
+                        <span>Italien (notions)</span>
+                    </div>
+                </div>
+
+                <!-- Compétences (pleine largeur) -->
                 <div class="skills-section about-cv-section about-skills-cards">
                     <h3 class="section-title" style="margin-bottom: 0.5rem;"><i class="fas fa-tools" aria-hidden="true"></i> Compétences</h3>
                     <p class="text-center" style="color: var(--dim-text-color); max-width: 46rem; margin: 0 auto 1.5rem; font-size: 1rem;">
@@ -210,19 +219,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="about-cv-section">
-                    <h3><i class="fas fa-language" aria-hidden="true"></i> Langues</h3>
-                    <div class="about-langues-pills">
-                        <span>Français (langue maternelle)</span>
-                        <span>Anglais (B2)</span>
-                        <span>Espagnol (B1)</span>
-                        <span>Italien (notions)</span>
-                    </div>
-                </div>
-                </div>
-                </div>
-                <!-- Fin grille 2 colonnes -->
             </div>
         </section>
     </main>
