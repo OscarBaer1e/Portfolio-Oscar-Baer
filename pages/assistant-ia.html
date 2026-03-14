@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assistant IA – Cursor & Auto | Portfolio Oscar Baer</title>
+    <link rel="stylesheet" href="../css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Anta&family=Lato:wght@300;400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="animated-background">
+        <div class="grid-lines"></div>
+    </div>
+
+    <header>
+        <div class="container">
+            <h1 class="logo"><a href="../index.html">Oscar Baer</a></h1>
+            <nav>
+                <button class="menu-toggle" aria-label="Ouvrir le menu">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <ul class="nav-list">
+                    <li><a href="../index.html">Accueil</a></li>
+                    <li><a href="./portfolio.html" class="active">Portfolio</a></li>
+                    <li><a href="./about.html">À Propos</a></li>
+                    <li><a href="./contact.html">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section id="project-detail" class="section-padding project-detail">
+            <div class="container">
+                <h2 class="section-title">Assistant IA – Cursor & Auto</h2>
+
+                <div class="project-header">
+                    <p class="text-center" style="font-size: 1.2rem; color: var(--dim-text-color); max-width: 52rem; margin: 0 auto 2.5rem;">
+                        Ce portfolio et plusieurs projets sont conçus et maintenus avec l’aide d’<strong>Auto</strong>, l’assistant IA intégré à <strong>Cursor</strong>. 
+                        Il m’accompagne au quotidien pour le code, les refactorings et la documentation.
+                    </p>
+                </div>
+
+                <div class="project-description">
+                    <h3>Rôle de l’assistant</h3>
+                    <p>
+                        <strong>Auto</strong> est l’agent IA de Cursor : il peut explorer le projet, modifier des fichiers, exécuter des commandes et proposer des solutions en respectant les conventions du code. 
+                        Il ne remplace pas la réflexion technique ou le design — il accélère l’itération et la maintenance.
+                    </p>
+
+                    <h3>Comment je l’utilise</h3>
+                    <ul style="margin: 1rem 0 1.5rem 1.25rem; color: var(--dim-text-color); line-height: 1.7;">
+                        <li><strong>Développement :</strong> implémentation de fonctionnalités, corrections de bugs, refactoring ciblé.</li>
+                        <li><strong>Documentation :</strong> README, commentaires, guides de déploiement (Vercel, Supabase, etc.).</li>
+                        <li><strong>Tests & debug :</strong> suggestions de tests, diagnostic d’erreurs, vérification de la cohérence du code.</li>
+                        <li><strong>Ce portfolio :</strong> structure des pages, accessibilité, cohérence du style et petites évolutions comme cette page.</li>
+                    </ul>
+
+                    <h3>Transparence</h3>
+                    <p>
+                        Tu lis cette page parce que cet assistant a été explicitement intégré au portfolio. 
+                        Les choix de design, d’architecture et de contenu restent les miens ; l’IA est un outil de productivité, au même titre qu’un linter ou un framework.
+                    </p>
+
+                    <p style="margin-top: 2rem;">
+                        <a href="./portfolio.html" class="btn primary-btn"><i class="fas fa-briefcase"></i> Retour au portfolio</a>
+                    </p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; <span id="current-year-project"></span> Oscar Baer. Tous droits réservés.</p>
+            <div class="social-links">
+                <a href="https://www.linkedin.com/in/oscar-baer-a5bbb029b/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-link-animated"><i class="fab fa-linkedin"></i></a>
+                <a href="https://github.com/OscarBaer" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                <a href="./contact.html" aria-label="Me contacter (formulaire)"><i class="fas fa-envelope"></i></a>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+    <script src="../js/script.js"></script>
+</body>
+</html>

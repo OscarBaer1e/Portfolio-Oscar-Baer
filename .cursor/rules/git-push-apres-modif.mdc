@@ -1,0 +1,14 @@
+---
+description: Après chaque modification du projet, effectuer un commit et un push
+alwaysApply: true
+---
+
+# Git : push après chaque modification
+
+À chaque fois que des fichiers du projet sont modifiés (création, édition, suppression) :
+
+1. **Stager** les changements : `git add` des fichiers concernés (ou `git add -A` si tout doit être commité).
+2. **Commiter** avec un message clair et concis décrivant la modif.
+3. **Pusher** vers le remote : `git push`.
+
+Utiliser les permissions `git_write` et `network` si nécessaire pour que le push aboutisse.
