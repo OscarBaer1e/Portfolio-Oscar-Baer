@@ -34,14 +34,15 @@
         .about-skills-cards .skill-category:hover { border-color: var(--primary-color); box-shadow: 0 8px 24px rgba(102, 101, 221, 0.15); }
         .about-skills-cards .skill-category h4 { margin-bottom: 0.75rem; }
 
-        /* Grille 2 colonnes : Expériences | Formation */
+        /* Grille 2 colonnes : (Formation + Expériences) | (Compétences + Langues) */
         .about-cv-two-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 2.5rem; align-items: start; margin-bottom: 2.5rem; }
-        .about-cv-two-cols .about-cv-section { margin-bottom: 0; }
+        .about-cv-col { display: flex; flex-direction: column; gap: 2rem; }
+        .about-cv-col .about-cv-section { margin-bottom: 0; }
+        .about-cv-col .skills-section { margin-bottom: 0; }
 
         @media (max-width: 900px) {
             .about-cv-two-cols { grid-template-columns: 1fr; gap: 2rem; margin-bottom: 2rem; }
-            .about-cv-two-cols .about-cv-section { margin-bottom: 2rem; }
-            .about-cv-two-cols .about-cv-section:last-child { margin-bottom: 0; }
+            .about-cv-col { gap: 2rem; }
         }
         @media (max-width: 640px) {
             .cv-timeline { padding-left: 1.75rem; }
@@ -95,8 +96,9 @@
                     </div>
                 </div>
 
-                <!-- Grille 2 colonnes : Formation | Expériences -->
+                <!-- Grille 2 colonnes : (Formation + Expériences) | (Compétences + Langues) -->
                 <div class="about-cv-two-cols">
+                <div class="about-cv-col">
                 <div class="about-cv-section">
                     <h3><i class="fas fa-graduation-cap" aria-hidden="true"></i> Formation</h3>
                     <div class="cv-timeline">
@@ -165,20 +167,8 @@
                 </div>
 
                 </div>
-                <!-- Fin grille 2 colonnes -->
-
-                <!-- Langues (pastilles) -->
-                <div class="about-cv-section">
-                    <h3><i class="fas fa-language" aria-hidden="true"></i> Langues</h3>
-                    <div class="about-langues-pills">
-                        <span>Français (langue maternelle)</span>
-                        <span>Anglais (B2)</span>
-                        <span>Espagnol (B1)</span>
-                        <span>Italien (notions)</span>
-                    </div>
-                </div>
-
-                <!-- Compétences (cartes) – en dessous des langues -->
+                <!-- Colonne droite : Compétences puis Langues -->
+                <div class="about-cv-col">
                 <div class="skills-section about-cv-section about-skills-cards">
                     <h3 class="section-title" style="margin-bottom: 0.5rem;"><i class="fas fa-tools" aria-hidden="true"></i> Compétences</h3>
                     <p class="text-center" style="color: var(--dim-text-color); max-width: 46rem; margin: 0 auto 1.5rem; font-size: 1rem;">
@@ -220,6 +210,19 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="about-cv-section">
+                    <h3><i class="fas fa-language" aria-hidden="true"></i> Langues</h3>
+                    <div class="about-langues-pills">
+                        <span>Français (langue maternelle)</span>
+                        <span>Anglais (B2)</span>
+                        <span>Espagnol (B1)</span>
+                        <span>Italien (notions)</span>
+                    </div>
+                </div>
+                </div>
+                </div>
+                <!-- Fin grille 2 colonnes -->
             </div>
         </section>
     </main>
