@@ -1622,20 +1622,23 @@ nav .nav-list a.active::after {
 
 .hero-intro {
     color: var(--light-text-color);
+    display: flex;
+    flex-direction: column;
 }
 
 .intro-badge {
-    display: inline-block;
+    display: block;
+    width: fit-content;
     padding: 8px 20px;
     background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
     color: var(--dark-bg-color);
     font-weight: bold;
     font-size: 0.9rem;
     border-radius: 20px;
-    margin-bottom: 20px;
+    margin: 0 0 20px 0;
     text-transform: uppercase;
     letter-spacing: 1px;
-    /* Position naturelle au-dessus du nom, pour éviter les bugs d’alignement */
+    order: -1;
     position: static;
     transform: none;
 }
