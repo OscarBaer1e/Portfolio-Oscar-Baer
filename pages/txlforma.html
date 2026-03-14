@@ -8,12 +8,14 @@
     <link href="https://fonts.googleapis.com/css2?family=Anta&family=Lato:wght@300;400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        .txlforma-comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        .txlforma-comparison-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin: 1.5rem 0; }
         @media (max-width: 640px) { .txlforma-comparison-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body class="page-project">
-    <div id="vanta-bg" class="animated-background" data-vanta-effect="waves"></div>
+    <div class="animated-background">
+        <div class="grid-lines"></div>
+    </div>
 
     <header>
         <div class="container">
@@ -33,126 +35,98 @@
     </header>
 
     <main id="main-content">
-        <section class="section-padding project-detail">
+        <section id="project-detail" class="section-padding project-detail">
             <div class="container">
-                <!-- Retour -->
-                <p class="back-link" style="margin-bottom: 1.5rem;">
-                    <a href="./portfolio.html" class="btn secondary-btn">
-                        <i class="fas fa-arrow-left"></i> Retour au portfolio
-                    </a>
-                </p>
+                <h1 class="section-title">TXLFORMA – Plateforme e-learning</h1>
 
-                <!-- Hero : titre + pitch + stack -->
-                <header class="project-header" style="text-align: center; margin-bottom: 2.5rem;">
-                    <p class="project-badge" style="font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.15em; color: var(--primary-color); margin-bottom: 0.75rem;">Projet le plus ambitieux de l'année</p>
-                    <h2 class="section-title">TXLFORMA</h2>
-                    <p class="project-tagline" style="font-size: 1.15rem; color: var(--dim-text-color); max-width: 36rem; margin: 0.75rem auto 1.25rem; line-height: 1.6;">
-                        Plateforme e-learning complète : vente de formations, salle 3D immersive, tableau de bord admin, paiement Stripe et gestion des rôles (utilisateur / formateur / admin).
+                <div class="project-header">
+                    <p class="text-center">
+                        Projet fullstack ambitieux réalisé en équipe : plateforme de <strong>vente de formations en ligne</strong> avec tableau de bord selon les rôles (utilisateur, formateur, admin), paiement Stripe, suivi pédagogique et <strong>salle de classe 3D</strong> modélisée dans Blender et intégrée au site.
                     </p>
-                    <div class="skills-grid" style="grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 0.5rem 1rem; max-width: 32rem; margin: 0 auto; justify-items: center;">
-                        <span class="skill-category" style="padding: 0.4rem 0.9rem; font-size: 0.9rem;">Figma</span>
-                        <span class="skill-category" style="padding: 0.4rem 0.9rem; font-size: 0.9rem;">React</span>
-                        <span class="skill-category" style="padding: 0.4rem 0.9rem; font-size: 0.9rem;">Spring Boot</span>
-                        <span class="skill-category" style="padding: 0.4rem 0.9rem; font-size: 0.9rem;">Stripe</span>
-                        <span class="skill-category" style="padding: 0.4rem 0.9rem; font-size: 0.9rem;">Blender 3D</span>
-                        <span class="skill-category" style="padding: 0.4rem 0.9rem; font-size: 0.9rem;">Jira · Git</span>
-                    </div>
-                </header>
+                </div>
 
-                <!-- Image hero : accueil -->
-                <figure class="project-figure project-figure--main" style="margin: 0 0 3rem;">
-                    <img src="../ressources/images/txlforma-home.png" alt="Capture d’écran de la page d’accueil de la plateforme TXLFORMA." class="zoomable-image" data-zoom-src="../ressources/images/txlforma-home.png">
-                    <figcaption>Page d'accueil : accroche, catalogue, inscription et connexion.</figcaption>
-                </figure>
-
-                <article class="project-description">
-                    <!-- Enjeu -->
-                    <div class="project-callout" style="margin-bottom: 1.5rem;">
-                        <strong>Pourquoi ce projet est le plus exigeant :</strong> fullstack (React + Spring Boot), paiement en ligne (Stripe), trois rôles métier distincts, modélisation 3D (Blender) intégrée au site, tableau de bord avec datavisualisations, et travail en équipe avec Jira/Git. Un livrable complet, de la maquette à la mise en production.
-                    </div>
-
+                <div class="project-description">
                     <h3>Contexte & objectif</h3>
                     <p>
-                        <strong>Site de vente de formations</strong> en ligne : accueil, catalogue, inscription/connexion, tableau de bord selon le rôle (utilisateur, formateur, admin), paiement Stripe, suivi pédagogique (notes, émargement) et <strong>salle de classe 3D</strong> intégrée pour l’immersion.
+                        TXLFORMA est un site de formation en ligne complet : page d’accueil, catalogue, inscription et connexion, tableau de bord adapté à chaque rôle (utilisateur, formateur, admin), paiement sécurisé avec <strong>Stripe</strong>, suivi des notes et de l’émargement, et une <strong>salle de classe 3D</strong> immersive pour les cours. L’enjeu était de livrer un produit abouti, de la maquette Figma au déploiement, en travaillant en méthodologie Agile avec Jira et Git.
                     </p>
 
-                    <!-- Stack (compact) -->
+                    <h3>Page d’accueil</h3>
+                    <figure class="gallery">
+                        <img src="../ressources/images/txlforma-home.png" alt="Capture d’écran de la page d’accueil de la plateforme TXLFORMA." class="zoomable-image" data-zoom-src="../ressources/images/txlforma-home.png">
+                        <figcaption>Accueil : accroche, catalogue des formations, inscription et connexion.</figcaption>
+                    </figure>
+
                     <h3>Stack technique</h3>
-                    <p>
-                        Maquettes <strong>Figma</strong> · Front <strong>React / JavaScript</strong> · API <strong>Spring Boot</strong> · Paiement <strong>Stripe</strong> · Salle 3D <strong>Blender</strong> · Suivi <strong>Jira, Bitbucket, Git</strong>.
-                    </p>
+                    <div class="skills-grid" style="grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 0.75rem 1rem;">
+                        <div class="skill-category" style="padding: 0.6rem 1rem;">Figma</div>
+                        <div class="skill-category" style="padding: 0.6rem 1rem;">React / JavaScript</div>
+                        <div class="skill-category" style="padding: 0.6rem 1rem;">Spring Boot</div>
+                        <div class="skill-category" style="padding: 0.6rem 1rem;">Stripe</div>
+                        <div class="skill-category" style="padding: 0.6rem 1rem;">Blender 3D</div>
+                        <div class="skill-category" style="padding: 0.6rem 1rem;">Jira · Git / Bitbucket</div>
+                    </div>
 
-                    <!-- Design & front -->
                     <h3>Design & front-end</h3>
                     <p>
-                        Maquette sur Figma (inspiration e-learning). Développement React : accueil, catalogue, tableau de bord selon le rôle, inscription/connexion, gestion des rôles. Intégration Stripe pour le paiement des formations.
+                        Maquettes réalisées sur <strong>Figma</strong> (inspiration e-learning). Développement en <strong>React</strong> : accueil, catalogue, tableau de bord selon le rôle, inscription et connexion, gestion des rôles. Intégration de <strong>Stripe</strong> pour le paiement des formations.
                     </p>
 
-                    <!-- 3D -->
                     <h3>Modélisation 3D & intégration web</h3>
-                    <figure class="project-figure" style="margin: 1rem 0 1.5rem;">
+                    <figure class="gallery">
                         <img src="../ressources/images/txlforma-3d-salle.png" alt="Vue de la salle de classe en 3D réalisée sous Blender et intégrée au site." class="zoomable-image" data-zoom-src="../ressources/images/txlforma-3d-salle.png">
                         <figcaption>Salle de classe 3D (Blender) : navigation interactive, caméras, rotation et zoom.</figcaption>
                     </figure>
                     <p>
-                        Salle de classe modélisée dans <strong>Blender</strong> (tables, chaises, PC, tableau, équipements). Textures et bake pour les perfs. Animations et caméras. Intégration au site avec contrôles : rotation, zoom, déplacement, vues (ex. « Professeur »).
+                        La salle de classe a été modélisée dans <strong>Blender</strong> (tables, chaises, PC, tableau, équipements). Textures et bake pour les performances. Animations et caméras. Intégration au site avec contrôles : rotation, zoom, déplacement, vues (ex. « Professeur »).
                     </p>
-
-                    <h4 style="margin-top: 2rem; margin-bottom: 1rem;">Comparaison avant / après</h4>
-                    <p style="margin-bottom: 1rem;">
+                    <h4 style="margin-top: 2rem; margin-bottom: 0.75rem; font-size: 1.1rem; color: var(--dim-text-color);">Comparaison avant / après</h4>
+                    <p>
                         Référence réelle de la salle (cours en présentiel) puis rendu 3D final intégré au projet.
                     </p>
-                    <div class="gallery txlforma-comparison-grid" style="margin-bottom: 1.5rem;">
-                        <figure class="project-figure" style="margin: 0;">
-                            <img src="../ressources/images/txlforma-3d-avant.png" alt="Référence : salle de cours réelle avec élèves et équipements." class="zoomable-image" style="width: 100%; height: auto; border-radius: 8px;">
+                    <div class="txlforma-comparison-grid">
+                        <figure class="project-figure">
+                            <img src="../ressources/images/txlforma-3d-avant.png" alt="Référence : salle de cours réelle avec élèves et équipements." class="zoomable-image">
                             <figcaption><strong>Avant</strong> – Salle de cours (référence terrain).</figcaption>
                         </figure>
-                        <figure class="project-figure" style="margin: 0;">
-                            <img src="../ressources/images/txlforma-3d-apres.png" alt="Rendu 3D final de la salle de classe modélisée dans Blender." class="zoomable-image" style="width: 100%; height: auto; border-radius: 8px;">
+                        <figure class="project-figure">
+                            <img src="../ressources/images/txlforma-3d-apres.png" alt="Rendu 3D final de la salle de classe modélisée dans Blender." class="zoomable-image">
                             <figcaption><strong>Après</strong> – Rendu 3D de la salle (Blender).</figcaption>
                         </figure>
                     </div>
 
-                    <!-- Back-end -->
                     <h3>Back-end & API</h3>
                     <p>
-                        API <strong>Spring Boot</strong> : comptes, formations, sessions, inscriptions. Données pour le tableau de bord (CA, utilisateurs, taux de réussite) et métier (notes, émargement).
+                        API <strong>Spring Boot</strong> : gestion des comptes, formations, sessions et inscriptions. Données pour le tableau de bord (chiffre d’affaires, utilisateurs par rôle, taux de réussite) et métier (notes, émargement).
                     </p>
 
-                    <!-- Dashboard -->
                     <h3>Tableau de bord & datavisualisation</h3>
-                    <figure class="project-figure" style="margin: 1rem 0 1.5rem;">
+                    <figure class="gallery">
                         <img src="../ressources/images/txlforma-dashboard.png" alt="Le tableau de bord d’administration de TXLFORMA affiche les formations et les statistiques." class="zoomable-image" data-zoom-src="../ressources/images/txlforma-dashboard.png">
                         <figcaption>Dashboard admin : CA, utilisateurs par rôle, formations par catégorie, activités récentes.</figcaption>
                     </figure>
                     <p>
-                        Pour les admins : datavisualisations (chiffre d'affaires, utilisateurs par rôle, formations par catégorie, activités récentes). Sessions à venir, moyenne des sessions. Gestion des notes et de l'émargement.
+                        Pour les administrateurs : datavisualisations (chiffre d’affaires, utilisateurs par rôle, formations par catégorie, activités récentes). Sessions à venir, moyenne des sessions. Gestion des notes et de l’émargement.
                     </p>
 
-                    <!-- Gestion -->
-                    <h3>Gestion de projet</h3>
+                    <h3>Gestion de projet & méthodologie</h3>
                     <p>
-                        <strong>Jira</strong> (user stories, sprints) · <strong>Git / Bitbucket</strong> pour le versioning et la revue de code. Coordination 3D, front et back pour un livrable cohérent, livré en conditions réelles.
-                    </p>
-
-                    <h3>Organisation en sprints & workflow</h3>
-                    <p>
-                        Méthodologie <strong>Agile / Scrum</strong> en 4 sprints : mise en place de l’environnement, création des fonctionnalités (CRUD, auth JWT, maquettes), ajout des fonctions clés (Stripe, 3D, tableaux de bord) puis intégration finale et déploiement. Workflow industriel <strong>Gitflow</strong> : 1 ticket Jira = 1 branche, pull request avec validations.
+                        <strong>Jira</strong> pour les user stories et les sprints, <strong>Git / Bitbucket</strong> pour le versioning et la revue de code. Méthodologie <strong>Agile / Scrum</strong> en 4 sprints : mise en place de l’environnement, création des fonctionnalités (CRUD, auth JWT, maquettes), ajout des fonctions clés (Stripe, 3D, tableaux de bord), intégration finale et déploiement. Workflow <strong>Gitflow</strong> : un ticket Jira = une branche, pull request avec validations.
                     </p>
 
                     <h3>Ressources & documentation</h3>
                     <p>
-                        Une <strong>présentation PDF complète</strong> détaille les sprints, l’architecture technique, Stripe, la 3D, l’hébergement (Vercel, Render, TiDB), le SEO et la politique de confidentialité.
+                        Une présentation PDF complète détaille les sprints, l’architecture technique, Stripe, la 3D, l’hébergement (Vercel, Render, TiDB), le SEO et la politique de confidentialité.
                     </p>
-                    <p>
-                        <a href="../ressources/documents/TXLFORMA.pdf" class="btn" target="_blank" rel="noopener noreferrer">Ouvrir la documentation TXLFORMA (PDF)</a>
-                    </p>
-                </article>
 
-                <div class="project-footer-nav" style="margin-top: 2.5rem; text-align: center;">
-                    <a href="./portfolio.html" class="btn secondary-btn">
-                        <i class="fas fa-arrow-left"></i> Retour au portfolio
-                    </a>
+                    <div class="text-center mt-5">
+                        <a href="../ressources/documents/TXLFORMA.pdf" class="btn primary-btn" target="_blank" rel="noopener noreferrer">
+                            <i class="fas fa-file-pdf"></i> Ouvrir la documentation TXLFORMA (PDF)
+                        </a>
+                        <a href="./portfolio.html" class="btn secondary-btn">
+                            <i class="fas fa-arrow-left"></i> Retour au Portfolio
+                        </a>
+                    </div>
                 </div>
             </div>
         </section>
