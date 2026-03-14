@@ -3,16 +3,32 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>À Propos de Oscar Baer - Portfolio</title>
+    <title>À Propos – Oscar Baer | CV web</title>
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Anta&family=Lato:wght@300;400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .about-cv-intro { margin-bottom: 2.5rem; }
+        .about-cv-intro .bio p { margin-bottom: 1rem; }
+        .about-cv-section { margin-bottom: 2.5rem; }
+        .about-cv-section h3 { font-size: 1.35rem; margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--primary-color); color: var(--light-text-color); }
+        .cv-item { display: grid; grid-template-columns: 140px 1fr; gap: 1rem 1.5rem; margin-bottom: 1.5rem; padding: 1rem 0; border-bottom: 1px solid var(--border-color); }
+        .cv-item:last-child { border-bottom: none; }
+        .cv-item .cv-dates { font-weight: 600; color: var(--primary-color); font-size: 0.95rem; }
+        .cv-item .cv-content h4 { margin: 0 0 0.25rem 0; font-size: 1.1rem; color: var(--light-text-color); }
+        .cv-item .cv-content .cv-sub { color: var(--dim-text-color); font-size: 0.95rem; margin-bottom: 0.35rem; }
+        .cv-item .cv-content p { margin: 0; font-size: 0.95rem; color: var(--dim-text-color); line-height: 1.5; }
+        @media (max-width: 640px) {
+            .cv-item { grid-template-columns: 1fr; gap: 0.35rem; }
+            .cv-item .cv-dates { margin-bottom: 0.25rem; }
+        }
+    </style>
 </head>
 <body>
     <div class="animated-background">
         <div class="grid-lines"></div>
     </div>
-    
+
     <header>
         <div class="container">
             <h1 class="logo"><a href="../index.html">Oscar Baer</a></h1>
@@ -33,17 +49,16 @@
     <main id="main-content">
         <section id="about" class="section-padding">
             <div class="container">
-                <h2 class="section-title">À Propos de Moi</h2>
-                <div class="about-content">
+                <h2 class="section-title">À Propos</h2>
+
+                <!-- Présentation (haut de page, type CV) -->
+                <div class="about-content about-cv-intro">
                     <div class="profile-pic profile-pic--about" id="basketball-easter-egg">
-                        <img src="../ressources/images/oscar-portrait.png" alt="Portrait d’Oscar Baer, en 3ème année de BUT MMI.">
+                        <img src="../ressources/images/oscar-portrait.png" alt="Portrait d'Oscar Baer, en 3ème année de BUT MMI.">
                     </div>
                     <div class="bio">
                         <p>
-                            Bonjour ! Je suis <strong>Oscar Baer</strong>, en 3ème année de BUT MMI.
-                        </p>
-                        <p>
-                            J’aime le web parce qu’il relie technique, esthétique et stratégie. Au-delà du code, je m’intéresse à l’architecture (Blender/Unity), à l’écriture créative et au cinéma.
+                            Actuellement, étudiant en <strong>3ème année de BUT MMI</strong> (Métiers du Multimédia et de l'Internet), je cherche une <strong>alternance à partir de la rentrée de septembre 2026</strong>, dans les domaines de la communication visuelle, du web et de la création de contenu audiovisuel pour continuer mes études avec un master.
                         </p>
                         <p>
                             Découvrez mes réalisations dans mon <a href="./portfolio.html">portfolio</a>.
@@ -54,11 +69,83 @@
                     </div>
                 </div>
 
-                <!-- Compétences détaillées (version complète de la home) -->
-                <div class="skills-section">
-                    <h3 class="section-title" style="margin-bottom: 0.5rem;">Compétences détaillées</h3>
-                    <p class="text-center" style="color: var(--dim-text-color); max-width: 46rem; margin: 0 auto 2rem; font-size: 1rem;">
-                        Un panorama plus complet de mes domaines : développement, design, audiovisuel et communication.
+                <!-- Expériences professionnelles -->
+                <div class="about-cv-section">
+                    <h3><i class="fas fa-briefcase" aria-hidden="true"></i> Expériences professionnelles</h3>
+                    <div class="cv-item">
+                        <span class="cv-dates">Sept. 2025 – Août 2026</span>
+                        <div class="cv-content">
+                            <h4>Alternance – Direction générale des douanes et des droits indirects (DGDDI)</h4>
+                            <p class="cv-sub">DGDDI</p>
+                            <p>Analyse du site web (cas d’usages, audiences, rapport). Maquettage de la nouvelle version aux normes (Drupal, Sites faciles, Figma). Intégration de scripts JS et déploiement de MATOMO. Gestion de projet (feuilles de route, ateliers, méthode Agile, sprints). Documentation et centralisation des rapports.</p>
+                        </div>
+                    </div>
+                    <div class="cv-item">
+                        <span class="cv-dates">Mai – Juil. 2025</span>
+                        <div class="cv-content">
+                            <h4>Stage – Direction générale des douanes et des droits indirects (DGDDI)</h4>
+                            <p class="cv-sub">DGDDI</p>
+                            <p>Audit ergonomique, personas et parcours utilisateurs. Maquettage de la refonte globale du site sur Figma (haute fidélité). Programmation et intégration de la nouvelle page d’accueil. Pilotage du projet en Agile (feuilles de route, organigrammes, planning). Présentations hebdomadaires et mensuelles.</p>
+                        </div>
+                    </div>
+                    <div class="cv-item">
+                        <span class="cv-dates">Juin – Juil. 2024</span>
+                        <div class="cv-content">
+                            <h4>Stage – Federation Studios</h4>
+                            <p class="cv-sub">Federation Studios</p>
+                            <p>Conception d’un site de phishing simulé pour la sensibilisation à la cybersécurité. Développement Fullstack (PHP/SQL/JS), système d’interception de données préventif. Rédaction et diffusion des annonces internes. Création de supports graphiques (bannière) pour le lancement sur X (Twitter). Initiation au montage et à la colorimétrie sur Avid Media Composer.</p>
+                        </div>
+                    </div>
+                    <div class="cv-item">
+                        <span class="cv-dates">Juil. 2023 + Août 2024</span>
+                        <div class="cv-content">
+                            <h4>Vacataire – Service des archives et du courrier (CNDA)</h4>
+                            <p class="cv-sub">Cour nationale du droit d’asile (CNDA)</p>
+                            <p>Contrôle de la conformité des minutiers et signalement des anomalies. Transfert et sécurisation des dossiers physiques. Gestion du flux documentaire : tri, numérisation et dispatching du courrier entrant. Création de modèles Excel ergonomiques pour l’équipe.</p>
+                        </div>
+                    </div>
+                    <div class="cv-item">
+                        <span class="cv-dates">Déc. 2019</span>
+                        <div class="cv-content">
+                            <h4>Stage de 3e – Cabinet d’architectes IF Architectes</h4>
+                            <p class="cv-sub">IF Architectes</p>
+                            <p>Utilisation d’Autocad et Sketchup pour la modélisation en architecture intérieure. Création de plans d’architectes.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Formation -->
+                <div class="about-cv-section">
+                    <h3><i class="fas fa-graduation-cap" aria-hidden="true"></i> Formation</h3>
+                    <div class="cv-item">
+                        <span class="cv-dates">Sept. 2023 – à ce jour</span>
+                        <div class="cv-content">
+                            <h4>BUT MMI – Métiers du Multimédia et de l’Internet</h4>
+                            <p class="cv-sub">Université Gustave Eiffel · Meaux (77)</p>
+                            <p>Parcours développement web, design, audiovisuel et communication.</p>
+                        </div>
+                    </div>
+                    <div class="cv-item">
+                        <span class="cv-dates">Sept. 2022 – Juin 2023</span>
+                        <div class="cv-content">
+                            <h4>Baccalauréat – Terminale générale</h4>
+                            <p class="cv-sub">Lycée Edouard Branly · Nogent-sur-Marne (94)</p>
+                            <p>Spécialités mathématiques et sciences économiques et sociales.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Langues -->
+                <div class="about-cv-section">
+                    <h3><i class="fas fa-language" aria-hidden="true"></i> Langues</h3>
+                    <p style="color: var(--dim-text-color); margin: 0;">Français (langue maternelle) · Anglais (B2) · Espagnol (B1) · Italien (notions)</p>
+                </div>
+
+                <!-- Compétences (en bas) -->
+                <div class="skills-section about-cv-section">
+                    <h3 class="section-title" style="margin-bottom: 0.5rem;"><i class="fas fa-tools" aria-hidden="true"></i> Compétences</h3>
+                    <p class="text-center" style="color: var(--dim-text-color); max-width: 46rem; margin: 0 auto 1.5rem; font-size: 1rem;">
+                        Développement, design, audiovisuel et communication.
                     </p>
                     <div class="skills-grid">
                         <div class="skill-category">
