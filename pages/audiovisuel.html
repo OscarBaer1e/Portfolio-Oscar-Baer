@@ -12,6 +12,13 @@
         .audiovisuel-item h4 { margin: 0 0 0.5rem 0; font-size: 1.1rem; color: var(--light-text-color); }
         .audiovisuel-item .video-wrap { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 24px rgba(0,0,0,0.3); background: #111; }
         .audiovisuel-item .video-wrap iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+        /* En travaux */
+        .audiovisuel-item.en-travaux { opacity: 0.92; }
+        .audiovisuel-item.en-travaux .video-wrap { background: linear-gradient(145deg, var(--dark-bg-color-alt) 0%, #1a1a2e 100%); border: 1px dashed var(--border-color); display: flex; align-items: center; justify-content: center; padding-bottom: 0; height: 200px; min-height: 200px; }
+        .audiovisuel-item.en-travaux .video-wrap::after { content: ''; position: absolute; inset: 0; border-radius: 12px; }
+        .audiovisuel-item.en-travaux .wip-content { position: absolute; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.75rem; padding: 1rem; text-align: center; }
+        .audiovisuel-item.en-travaux .wip-content i { font-size: 2.5rem; color: var(--primary-color); opacity: 0.8; }
+        .audiovisuel-item.en-travaux .wip-badge { display: inline-block; padding: 0.35rem 0.85rem; background: rgba(102, 101, 221, 0.2); color: var(--primary-color); border: 1px solid var(--primary-color); border-radius: 2rem; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
     </style>
 </head>
 <body>
@@ -74,6 +81,18 @@
                         <p class="category" style="color: var(--primary-color); font-size: 0.9rem; margin-bottom: 0.75rem;">Publicité fictive</p>
                         <div class="video-wrap">
                             <iframe src="https://www.youtube.com/embed/Z5usIN3VDiM" title="Publicité fictive pour Cloone, entreprise de téléportation" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        </div>
+                    </article>
+
+                    <article class="audiovisuel-item en-travaux">
+                        <h4>Premier court métrage</h4>
+                        <p class="category" style="color: var(--primary-color); font-size: 0.9rem; margin-bottom: 0.75rem;">Court métrage · En cours</p>
+                        <div class="video-wrap">
+                            <div class="wip-content">
+                                <i class="fas fa-tools" aria-hidden="true"></i>
+                                <span class="wip-badge">En travaux</span>
+                                <span style="color: var(--dim-text-color); font-size: 0.9rem;">Projet en cours de réalisation</span>
+                            </div>
                         </div>
                     </article>
                 </div>
