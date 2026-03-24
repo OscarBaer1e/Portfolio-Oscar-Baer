@@ -2528,7 +2528,7 @@ nav .nav-list a.active::after {
 .lightbox-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.55);
+    background: radial-gradient(circle at center, rgba(20, 24, 36, 0.35) 0%, rgba(2, 3, 10, 0.78) 70%);
     z-index: 10000;
     display: flex;
     align-items: center;
@@ -2543,6 +2543,16 @@ nav .nav-list a.active::after {
 .lightbox-overlay.is-open {
     opacity: 1;
     visibility: visible;
+}
+.lightbox-content {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translateY(10px) scale(0.98);
+    transition: transform 0.25s ease;
+}
+.lightbox-overlay.is-open .lightbox-content {
+    transform: translateY(0) scale(1);
 }
 .lightbox-overlay img {
     max-width: 95vw;
@@ -2574,6 +2584,36 @@ nav .nav-list a.active::after {
 }
 .lightbox-overlay.has-side-description .lightbox-side-description {
     display: block;
+}
+.lightbox-overlay.description-hidden .lightbox-side-description {
+    display: none;
+}
+.lightbox-overlay.description-hidden.has-side-description img {
+    max-width: 95vw;
+}
+.lightbox-description-toggle {
+    position: absolute;
+    top: 20px;
+    right: 74px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    background: rgba(8, 12, 24, 0.72);
+    color: #fff;
+    border-radius: 999px;
+    font-size: 0.9rem;
+    padding: 10px 14px;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+.lightbox-description-toggle.is-visible {
+    display: inline-flex;
+}
+.lightbox-description-toggle:hover {
+    background: rgba(15, 21, 38, 0.92);
+    border-color: rgba(255, 255, 255, 0.45);
+    transform: translateY(-1px);
 }
 .lightbox-close {
     position: absolute;
@@ -2608,6 +2648,11 @@ nav .nav-list a.active::after {
     .lightbox-overlay.has-side-description img {
         max-width: 92vw;
         max-height: 72vh;
+    }
+    .lightbox-description-toggle {
+        right: 74px;
+        top: 18px;
+        padding: 8px 12px;
     }
 }
 .skills-section {

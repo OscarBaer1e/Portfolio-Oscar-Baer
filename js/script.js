@@ -349,11 +349,22 @@ document.addEventListener('DOMContentLoaded', function() {
         overlay.setAttribute('aria-modal', 'true');
         overlay.setAttribute('aria-label', 'Agrandir l\'image');
 
+        var content = document.createElement('div');
+        content.className = 'lightbox-content';
+
         var img = document.createElement('img');
         img.alt = '';
+
         var sideDescription = document.createElement('div');
         sideDescription.className = 'lightbox-side-description';
         sideDescription.setAttribute('aria-live', 'polite');
+
+        var descriptionToggleBtn = document.createElement('button');
+        descriptionToggleBtn.type = 'button';
+        descriptionToggleBtn.className = 'lightbox-description-toggle';
+        descriptionToggleBtn.innerHTML = '<i class="fas fa-align-left" aria-hidden="true"></i><span>Description</span>';
+        descriptionToggleBtn.setAttribute('aria-label', 'Afficher ou masquer la description');
+        descriptionToggleBtn.setAttribute('aria-pressed', 'true');
 
         var closeBtn = document.createElement('button');
         closeBtn.type = 'button';
@@ -361,10 +372,13 @@ document.addEventListener('DOMContentLoaded', function() {
         closeBtn.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i>';
         closeBtn.setAttribute('aria-label', 'Fermer');
 
-        overlay.appendChild(img);
-        overlay.appendChild(sideDescription);
+        content.appendChild(img);
+        content.appendChild(sideDescription);
+        overlay.appendChild(content);
+        overlay.appendChild(descriptionToggleBtn);
         overlay.appendChild(closeBtn);
         document.body.appendChild(overlay);
+        var descriptionVisible = true;
 
         function canOpenInLightbox(el) {
             if (!el || el.tagName !== 'IMG') return false;
@@ -375,11 +389,21 @@ document.addEventListener('DOMContentLoaded', function() {
 
         function openLightbox(sourceImg) {
             var src = sourceImg.currentSrc || sourceImg.src;
+            var descriptionText = sourceImg.dataset.lightboxDescription || '';
+            if (!descriptionText) {
+                var parentFigure = sourceImg.closest('figure');
+                var figcaption = parentFigure ? parentFigure.querySelector('figcaption') : null;
+                descriptionText = figcaption ? figcaption.textContent.trim() : (sourceImg.getAttribute('alt') || '').trim();
+            }
             if (!src) return;
             img.src = src;
             img.alt = sourceImg.getAttribute('alt') || '';
-            sideDescription.textContent = sourceImg.dataset.lightboxDescription || '';
-            overlay.classList.toggle('has-side-description', !!sourceImg.dataset.lightboxDescription);
+            sideDescription.textContent = descriptionText;
+            overlay.classList.toggle('has-side-description', !!descriptionText);
+            descriptionVisible = !!descriptionText;
+            overlay.classList.toggle('description-hidden', !descriptionVisible);
+            descriptionToggleBtn.classList.toggle('is-visible', !!descriptionText);
+            descriptionToggleBtn.setAttribute('aria-pressed', descriptionVisible ? 'true' : 'false');
             overlay.classList.add('is-open');
             document.body.style.overflow = 'hidden';
         }
@@ -387,9 +411,20 @@ document.addEventListener('DOMContentLoaded', function() {
         function closeLightbox() {
             overlay.classList.remove('is-open');
             overlay.classList.remove('has-side-description');
+            overlay.classList.remove('description-hidden');
             document.body.style.overflow = '';
             img.src = '';
             sideDescription.textContent = '';
+            descriptionVisible = true;
+            descriptionToggleBtn.classList.remove('is-visible');
+            descriptionToggleBtn.setAttribute('aria-pressed', 'true');
+        }
+
+        function toggleDescription() {
+            if (!overlay.classList.contains('has-side-description')) return;
+            descriptionVisible = !descriptionVisible;
+            overlay.classList.toggle('description-hidden', !descriptionVisible);
+            descriptionToggleBtn.setAttribute('aria-pressed', descriptionVisible ? 'true' : 'false');
         }
 
         allImages.forEach(function(el) {
@@ -404,9 +439,14 @@ document.addEventListener('DOMContentLoaded', function() {
         overlay.addEventListener('click', function(e) {
             if (e.target === overlay || e.target.closest('.lightbox-close')) closeLightbox();
         });
+        descriptionToggleBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            toggleDescription();
+        });
 
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && overlay.classList.contains('is-open')) closeLightbox();
+            if ((e.key === 'd' || e.key === 'D') && overlay.classList.contains('is-open')) toggleDescription();
         });
     })();
 
