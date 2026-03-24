@@ -2555,6 +2555,26 @@ nav .nav-list a.active::after {
     cursor: default;
     pointer-events: none;
 }
+.lightbox-side-description {
+    display: none;
+    max-width: 360px;
+    margin-left: 24px;
+    padding: 18px 20px;
+    border-radius: 12px;
+    background: rgba(8, 12, 24, 0.72);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #f3f6ff;
+    line-height: 1.5;
+    font-size: 0.98rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+    cursor: default;
+}
+.lightbox-overlay.has-side-description img {
+    max-width: min(62vw, 980px);
+}
+.lightbox-overlay.has-side-description .lightbox-side-description {
+    display: block;
+}
 .lightbox-close {
     position: absolute;
     top: 16px;
@@ -2574,6 +2594,21 @@ nav .nav-list a.active::after {
 }
 .lightbox-close:hover {
     background: rgba(255, 255, 255, 0.3);
+}
+@media (max-width: 980px) {
+    .lightbox-overlay.has-side-description {
+        flex-direction: column;
+        align-items: center;
+    }
+    .lightbox-overlay.has-side-description .lightbox-side-description {
+        margin-left: 0;
+        margin-top: 14px;
+        max-width: min(92vw, 640px);
+    }
+    .lightbox-overlay.has-side-description img {
+        max-width: 92vw;
+        max-height: 72vh;
+    }
 }
 .skills-section {
     margin-top: 0;

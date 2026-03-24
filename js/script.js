@@ -351,6 +351,9 @@ document.addEventListener('DOMContentLoaded', function() {
 
         var img = document.createElement('img');
         img.alt = '';
+        var sideDescription = document.createElement('div');
+        sideDescription.className = 'lightbox-side-description';
+        sideDescription.setAttribute('aria-live', 'polite');
 
         var closeBtn = document.createElement('button');
         closeBtn.type = 'button';
@@ -359,6 +362,7 @@ document.addEventListener('DOMContentLoaded', function() {
         closeBtn.setAttribute('aria-label', 'Fermer');
 
         overlay.appendChild(img);
+        overlay.appendChild(sideDescription);
         overlay.appendChild(closeBtn);
         document.body.appendChild(overlay);
 
@@ -374,14 +378,18 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!src) return;
             img.src = src;
             img.alt = sourceImg.getAttribute('alt') || '';
+            sideDescription.textContent = sourceImg.dataset.lightboxDescription || '';
+            overlay.classList.toggle('has-side-description', !!sourceImg.dataset.lightboxDescription);
             overlay.classList.add('is-open');
             document.body.style.overflow = 'hidden';
         }
 
         function closeLightbox() {
             overlay.classList.remove('is-open');
+            overlay.classList.remove('has-side-description');
             document.body.style.overflow = '';
             img.src = '';
+            sideDescription.textContent = '';
         }
 
         allImages.forEach(function(el) {
