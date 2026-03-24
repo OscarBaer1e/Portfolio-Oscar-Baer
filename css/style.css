@@ -2362,7 +2362,7 @@ nav .nav-list a.active::after {
 /* Grille 2 colonnes À propos : gauche Formation+Expériences, droite Compétences+Langues */
 #about .container .about-cv-two-cols {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
     gap: 2.5rem;
     align-items: start;
     margin-bottom: 2.5rem;
@@ -2374,7 +2374,7 @@ nav .nav-list a.active::after {
 }
 #about .about-cv-col .about-cv-section,
 #about .about-cv-col .skills-section { margin-bottom: 0; }
-@media (max-width: 768px) {
+@media (max-width: 640px) {
     #about .container .about-cv-two-cols { grid-template-columns: 1fr; gap: 2rem; }
     #about .about-cv-col .about-cv-section { margin-bottom: 2rem; }
     #about .about-cv-col .skills-section { margin-bottom: 2rem; }
