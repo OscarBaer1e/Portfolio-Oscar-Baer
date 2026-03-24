@@ -780,6 +780,12 @@
 .shop-buy-btn:hover:not(.disabled) { background: rgba(255,216,102,0.15); border-color: var(--ss-gold); }
 .shop-buy-btn.disabled { opacity: 0.3; cursor: default; }
 .start-extra-btns { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+.shop-back-btn {
+    margin-top: 18px;
+    width: 100%;
+    padding: 10px;
+    font-size: 0.9rem;
+}
 
 .game-message.level {
     background: linear-gradient(135deg, var(--ss-green), #2ed573);
