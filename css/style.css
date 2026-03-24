@@ -2522,10 +2522,13 @@ nav .nav-list a.active::after {
 .project-detail .gallery img {
     cursor: zoom-in;
 }
-.project-detail .lightbox-overlay {
+.lightbox-zoomable {
+    cursor: zoom-in;
+}
+.lightbox-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(0, 0, 0, 0.55);
     z-index: 10000;
     display: flex;
     align-items: center;
@@ -2535,23 +2538,24 @@ nav .nav-list a.active::after {
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.25s ease, visibility 0.25s ease;
+    backdrop-filter: blur(2px);
 }
-.project-detail .lightbox-overlay.is-open {
+.lightbox-overlay.is-open {
     opacity: 1;
     visibility: visible;
 }
-.project-detail .lightbox-overlay img {
+.lightbox-overlay img {
     max-width: 95vw;
     max-height: 95vh;
     width: auto;
     height: auto;
     object-fit: contain;
     border-radius: 8px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
     cursor: default;
     pointer-events: none;
 }
-.project-detail .lightbox-close {
+.lightbox-close {
     position: absolute;
     top: 16px;
     right: 16px;
@@ -2568,10 +2572,9 @@ nav .nav-list a.active::after {
     justify-content: center;
     transition: background 0.2s ease;
 }
-.project-detail .lightbox-close:hover {
+.lightbox-close:hover {
     background: rgba(255, 255, 255, 0.3);
 }
-
 .skills-section {
     margin-top: 0;
     padding: 3.5rem 2rem 2rem;

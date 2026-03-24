@@ -338,46 +338,65 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    /* ----- Lightbox : zoom sur les screens des articles projet ----- */
-    (function initProjectLightbox() {
-        var detail = document.querySelector('.project-detail');
-        if (!detail) return;
-        var galleryImgs = detail.querySelectorAll('.gallery img');
-        if (!galleryImgs.length) return;
+    /* ----- Lightbox global : zoom sur toutes les images ----- */
+    (function initGlobalImageLightbox() {
+        var allImages = document.querySelectorAll('img');
+        if (!allImages.length) return;
+
         var overlay = document.createElement('div');
         overlay.className = 'lightbox-overlay';
         overlay.setAttribute('role', 'dialog');
         overlay.setAttribute('aria-modal', 'true');
         overlay.setAttribute('aria-label', 'Agrandir l\'image');
+
         var img = document.createElement('img');
         img.alt = '';
+
         var closeBtn = document.createElement('button');
         closeBtn.type = 'button';
         closeBtn.className = 'lightbox-close';
         closeBtn.innerHTML = '<i class="fas fa-times" aria-hidden="true"></i>';
         closeBtn.setAttribute('aria-label', 'Fermer');
+
         overlay.appendChild(img);
         overlay.appendChild(closeBtn);
         document.body.appendChild(overlay);
-        function openLightbox(src, alt) {
+
+        function canOpenInLightbox(el) {
+            if (!el || el.tagName !== 'IMG') return false;
+            if (el.closest('.lightbox-overlay, .zoom-modal, .skill-overlay, .pdf-viewer-overlay')) return false;
+            if (el.dataset.noLightbox === 'true') return false;
+            return true;
+        }
+
+        function openLightbox(sourceImg) {
+            var src = sourceImg.currentSrc || sourceImg.src;
+            if (!src) return;
             img.src = src;
-            img.alt = alt || '';
+            img.alt = sourceImg.getAttribute('alt') || '';
             overlay.classList.add('is-open');
             document.body.style.overflow = 'hidden';
         }
+
         function closeLightbox() {
             overlay.classList.remove('is-open');
             document.body.style.overflow = '';
+            img.src = '';
         }
-        galleryImgs.forEach(function(el) {
+
+        allImages.forEach(function(el) {
+            if (!canOpenInLightbox(el)) return;
+            el.classList.add('lightbox-zoomable');
             el.addEventListener('click', function(e) {
                 e.preventDefault();
-                openLightbox(this.src, this.getAttribute('alt'));
+                openLightbox(el);
             });
         });
+
         overlay.addEventListener('click', function(e) {
             if (e.target === overlay || e.target.closest('.lightbox-close')) closeLightbox();
         });
+
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && overlay.classList.contains('is-open')) closeLightbox();
         });
