@@ -2525,6 +2525,12 @@ nav .nav-list a.active::after {
 .lightbox-zoomable {
     cursor: zoom-in;
 }
+.lightbox-zoomable:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 4px rgba(71, 59, 240, 0.25);
+    border-radius: 8px;
+}
 .lightbox-overlay {
     position: fixed;
     inset: 0;
@@ -2615,6 +2621,11 @@ nav .nav-list a.active::after {
     border-color: rgba(255, 255, 255, 0.45);
     transform: translateY(-1px);
 }
+.lightbox-description-toggle:focus-visible,
+.lightbox-close:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+}
 .lightbox-close {
     position: absolute;
     top: 16px;
@@ -2639,6 +2650,7 @@ nav .nav-list a.active::after {
     pointer-events: none;
     opacity: 0.55;
     cursor: not-allowed;
+    filter: grayscale(0.25);
 }
 @media (max-width: 980px) {
     .lightbox-overlay.has-side-description {

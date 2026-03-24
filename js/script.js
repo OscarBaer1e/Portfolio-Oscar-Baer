@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', function() {
         link.removeAttribute('href');
         link.removeAttribute('target');
         link.setAttribute('aria-disabled', 'true');
+        link.setAttribute('tabindex', '-1');
         link.setAttribute('title', 'GitHub bientôt disponible');
         link.classList.add('disabled-social-link');
     });
@@ -352,6 +353,7 @@ document.addEventListener('DOMContentLoaded', function() {
     (function initGlobalImageLightbox() {
         var allImages = document.querySelectorAll('img');
         if (!allImages.length) return;
+        var lastFocusedElement = null;
 
         var overlay = document.createElement('div');
         overlay.className = 'lightbox-overlay';
@@ -406,6 +408,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 descriptionText = figcaption ? figcaption.textContent.trim() : (sourceImg.getAttribute('alt') || '').trim();
             }
             if (!src) return;
+            lastFocusedElement = sourceImg;
             img.src = src;
             img.alt = sourceImg.getAttribute('alt') || '';
             sideDescription.textContent = descriptionText;
@@ -416,6 +419,7 @@ document.addEventListener('DOMContentLoaded', function() {
             descriptionToggleBtn.setAttribute('aria-pressed', descriptionVisible ? 'true' : 'false');
             overlay.classList.add('is-open');
             document.body.style.overflow = 'hidden';
+            closeBtn.focus();
         }
 
         function closeLightbox() {
@@ -428,6 +432,9 @@ document.addEventListener('DOMContentLoaded', function() {
             descriptionVisible = true;
             descriptionToggleBtn.classList.remove('is-visible');
             descriptionToggleBtn.setAttribute('aria-pressed', 'true');
+            if (lastFocusedElement && typeof lastFocusedElement.focus === 'function') {
+                lastFocusedElement.focus();
+            }
         }
 
         function toggleDescription() {
@@ -440,9 +447,18 @@ document.addEventListener('DOMContentLoaded', function() {
         allImages.forEach(function(el) {
             if (!canOpenInLightbox(el)) return;
             el.classList.add('lightbox-zoomable');
+            el.setAttribute('tabindex', '0');
+            el.setAttribute('role', 'button');
+            el.setAttribute('aria-label', 'Agrandir l\'image');
             el.addEventListener('click', function(e) {
                 e.preventDefault();
                 openLightbox(el);
+            });
+            el.addEventListener('keydown', function(e) {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openLightbox(el);
+                }
             });
         });
 
@@ -457,6 +473,19 @@ document.addEventListener('DOMContentLoaded', function() {
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape' && overlay.classList.contains('is-open')) closeLightbox();
             if ((e.key === 'd' || e.key === 'D') && overlay.classList.contains('is-open')) toggleDescription();
+            if (e.key === 'Tab' && overlay.classList.contains('is-open')) {
+                var focusables = overlay.querySelectorAll('.lightbox-close, .lightbox-description-toggle.is-visible');
+                if (!focusables.length) return;
+                var first = focusables[0];
+                var last = focusables[focusables.length - 1];
+                if (e.shiftKey && document.activeElement === first) {
+                    e.preventDefault();
+                    last.focus();
+                } else if (!e.shiftKey && document.activeElement === last) {
+                    e.preventDefault();
+                    first.focus();
+                }
+            }
         });
     })();
 
@@ -464,6 +493,7 @@ document.addEventListener('DOMContentLoaded', function() {
     (function initSkillCardsOverlay() {
         var cards = document.querySelectorAll('.skill-preview-card[data-expandable]');
         if (!cards.length) return;
+        var lastFocusedCard = null;
         var overlay = document.createElement('div');
         overlay.className = 'skill-overlay';
         overlay.setAttribute('role', 'dialog');
@@ -486,11 +516,15 @@ document.addEventListener('DOMContentLoaded', function() {
             panel.className = 'skill-overlay-panel skill-overlay-panel--' + shape;
             overlay.classList.add('is-open');
             document.body.style.overflow = 'hidden';
+            lastFocusedCard = card;
             closeBtn.focus();
         }
         function closeOverlay() {
             overlay.classList.remove('is-open');
             document.body.style.overflow = '';
+            if (lastFocusedCard && typeof lastFocusedCard.focus === 'function') {
+                lastFocusedCard.focus();
+            }
         }
         cards.forEach(function(card) {
             card.setAttribute('role', 'button');
@@ -517,6 +551,12 @@ document.addEventListener('DOMContentLoaded', function() {
             if (e.key === 'Escape' && overlay.classList.contains('is-open')) {
                 closeOverlay();
                 cards.forEach(function(c) { c.setAttribute('aria-expanded', 'false'); });
+            }
+            if (e.key === 'Tab' && overlay.classList.contains('is-open')) {
+                var focusables = overlay.querySelectorAll('.skill-overlay-close');
+                if (!focusables.length) return;
+                e.preventDefault();
+                focusables[0].focus();
             }
         });
     })();
