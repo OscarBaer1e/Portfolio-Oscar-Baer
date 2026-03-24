@@ -4633,8 +4633,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 if (g.x < -g.size * 2 || g.x > canvas.width + g.size * 2 || g.y > canvas.height + g.size * 2) {
                     perilState.active = false;
-                    addScoreWithCombo(200, canvas.width / 2, canvas.height / 2);
-                    showMessage('PÉRIL SURVÉCU +200', 'powerup');
+                    showMessage('Astéroïde géant évité !', 'powerup');
                 }
             } else if (perilState.type === 'blackhole') {
                 const bh = perilState.data;
@@ -4655,8 +4654,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 if (perilState.timer <= 0) {
                     perilState.active = false;
-                    addScoreWithCombo(300, bh.x, bh.y);
-                    showMessage('TROU NOIR SURVÉCU +300', 'powerup');
+                    showMessage('Trou noir dissipé !', 'powerup');
                 }
             }
             return;
