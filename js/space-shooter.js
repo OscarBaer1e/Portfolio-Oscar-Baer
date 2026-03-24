@@ -1835,14 +1835,19 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // --- Dash ghost trail ---
         if (dashState.ghostTrail.length > 0) {
+            const skinColor = SHIP_SKINS[currentSkin] ? SHIP_SKINS[currentSkin].color : '#8fadff';
             dashState.ghostTrail.forEach((g, i) => {
-                g.alpha -= 0.04;
+                g.alpha -= 0.06;
+                if (g.alpha <= 0) return;
                 ctx.save();
-                ctx.globalAlpha = Math.max(0, g.alpha) * 0.4;
+                ctx.globalAlpha = Math.max(0, g.alpha) * 0.3;
                 ctx.translate(g.x, g.y);
-                ctx.fillStyle = '#6cf';
+                ctx.fillStyle = skinColor;
                 ctx.beginPath();
-                ctx.arc(0, 0, ship.width * 0.5, 0, Math.PI * 2);
+                ctx.moveTo(0, -ship.height * 0.4);
+                ctx.lineTo(-ship.width * 0.3, ship.height * 0.3);
+                ctx.lineTo(ship.width * 0.3, ship.height * 0.3);
+                ctx.closePath();
                 ctx.fill();
                 ctx.restore();
             });
@@ -2069,17 +2074,23 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.restore();
         }
         
-        // --- Screen warp sur dash ---
+        // --- Speed lines pendant le dash ---
         if (dashState.active) {
             ctx.save();
             const dp = 1 - (dashState.timer / DASH_DURATION);
-            const warpAmount = Math.sin(dp * Math.PI) * 0.03;
-            ctx.globalAlpha = 0.15;
-            ctx.fillStyle = '#6cf';
-            const cx = canvas.width / 2, cy = canvas.height / 2;
-            ctx.beginPath();
-            ctx.ellipse(cx, cy, canvas.width * (0.5 + warpAmount), canvas.height * (0.5 - warpAmount), 0, 0, Math.PI * 2);
-            ctx.fill();
+            const intensity = Math.sin(dp * Math.PI);
+            ctx.globalAlpha = intensity * 0.35;
+            ctx.strokeStyle = '#6cf';
+            ctx.lineWidth = 1.5;
+            for (let i = 0; i < 12; i++) {
+                const lx = Math.random() * canvas.width;
+                const ly = Math.random() * canvas.height;
+                const len = 20 + intensity * 40;
+                ctx.beginPath();
+                ctx.moveTo(lx, ly);
+                ctx.lineTo(lx + dashState.dx * 0.15, ly + dashState.dy * 0.15 + len);
+                ctx.stroke();
+            }
             ctx.restore();
         }
         
