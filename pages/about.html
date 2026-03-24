@@ -17,15 +17,18 @@
         .about-highlight-card { background: var(--dark-bg-color-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem 1.1rem; }
         .about-highlight-card h4 { margin: 0 0 0.35rem 0; color: var(--light-text-color); font-size: 1rem; }
         .about-highlight-card p { margin: 0; color: var(--dim-text-color); font-size: 0.92rem; line-height: 1.5; }
-        /* Force la grille principale en 2 colonnes sur desktop */
-        #about .container .about-cv-two-cols {
-            display: grid !important;
-            grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr) !important;
+        /* Grille dédiée About (isolée des autres styles globaux) */
+        #about .container .about-layout-grid {
+            display: grid;
+            grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
             gap: 2.5rem;
             align-items: start;
         }
-        #about .container .about-cv-two-cols > .about-cv-col {
+        #about .container .about-layout-grid > .about-layout-col {
             min-width: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
         }
 
         /* Timeline : expériences & formation */
@@ -54,8 +57,8 @@
             .about-highlights { grid-template-columns: 1fr; }
         }
         @media (max-width: 640px) {
-            #about .container .about-cv-two-cols {
-                grid-template-columns: 1fr !important;
+            #about .container .about-layout-grid {
+                grid-template-columns: 1fr;
                 gap: 2rem;
             }
         }
@@ -136,8 +139,8 @@
                 </div>
 
                 <!-- Deux colonnes : gauche Expériences + Formation | droite Compétences + Langues -->
-                <div class="about-cv-two-cols">
-                <div class="about-cv-col">
+                <div class="about-layout-grid">
+                <div class="about-layout-col">
                 <div class="about-cv-section">
                     <h3><i class="fas fa-briefcase" aria-hidden="true"></i> Expériences professionnelles</h3>
                     <div class="cv-timeline">
@@ -204,7 +207,7 @@
                     </div>
                 </div>
                 </div>
-                <div class="about-cv-col">
+                <div class="about-layout-col">
                 <div class="skills-section about-cv-section about-skills-cards">
                     <h3 class="section-title" style="margin-bottom: 0.5rem;"><i class="fas fa-tools" aria-hidden="true"></i> Compétences</h3>
                     <p class="text-center" style="color: var(--dim-text-color); max-width: 46rem; margin: 0 auto 1.5rem; font-size: 1rem;">
