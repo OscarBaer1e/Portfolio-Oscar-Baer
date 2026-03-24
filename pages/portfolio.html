@@ -7,6 +7,40 @@
     <link rel="stylesheet" href="../css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Anta&family=Lato:wght@300;400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .portfolio-page-intro {
+            max-width: 62ch;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .portfolio-quick-nav {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            justify-content: center;
+            margin: 1.25rem 0 2.25rem;
+        }
+        .portfolio-chip {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.45rem;
+            padding: 0.48rem 0.9rem;
+            border-radius: 999px;
+            border: 1px solid var(--border-color);
+            background: rgba(102, 101, 221, 0.12);
+            color: var(--light-text-color);
+            font-size: 0.9rem;
+            text-decoration: none;
+            transition: transform 0.15s ease, border-color 0.2s ease, background 0.2s ease;
+        }
+        .portfolio-chip:hover,
+        .portfolio-chip:focus-visible {
+            transform: translateY(-1px);
+            border-color: var(--primary-color);
+            background: rgba(102, 101, 221, 0.2);
+            outline: none;
+        }
+    </style>
 </head>
 <body class="page-portfolio">
     <div class="animated-background">
@@ -36,9 +70,14 @@
                 <header class="portfolio-page-header">
                     <h2 class="section-title reveal">Mon Portfolio</h2>
                     <p class="portfolio-page-intro">
-                        Réalisations en développement web, design, audiovisuel et projets personnels, 
-                        fruit de mon parcours en <strong>BUT MMI</strong>.
+                        Sélection de projets en développement web, design et audiovisuel réalisés dans le cadre de mon parcours en <strong>BUT MMI</strong> et de travaux personnels.
                     </p>
+                    <nav class="portfolio-quick-nav" aria-label="Navigation rapide dans les catégories de projets">
+                        <a class="portfolio-chip" href="./txlforma.html"><i class="fas fa-code"></i> Web</a>
+                        <a class="portfolio-chip" href="./graphisme.html"><i class="fas fa-palette"></i> Design</a>
+                        <a class="portfolio-chip" href="./audiovisuel.html"><i class="fas fa-video"></i> Audiovisuel</a>
+                        <a class="portfolio-chip" href="./documents.html"><i class="fas fa-file-alt"></i> Rédaction</a>
+                    </nav>
                 </header>
 
                 <div class="portfolio-grid">
@@ -87,7 +126,7 @@
                         <a href="./biosphere.html" class="btn primary-btn btn-small portfolio-item-cta">Découvrir</a>
                     </article>
 
-                    <!-- 5. Graphisme & Créations -->
+                    <!-- 4. Graphisme & Créations -->
                     <article class="portfolio-item reveal" data-animation-delay="260" data-skills="design">
                         <a href="./graphisme.html" class="portfolio-item-link">
                             <div class="portfolio-image-wrapper">
@@ -102,7 +141,7 @@
                         <a href="./graphisme.html" class="btn primary-btn btn-small portfolio-item-cta">Découvrir</a>
                     </article>
 
-                    <!-- 6. Rédactions & PDF -->
+                    <!-- 5. Rédactions & PDF -->
                     <article class="portfolio-item reveal" data-animation-delay="380" data-skills="design,marketing">
                         <a href="./documents.html" class="portfolio-item-link">
                             <div class="portfolio-image-wrapper">
@@ -117,7 +156,7 @@
                         <a href="./documents.html" class="btn primary-btn btn-small portfolio-item-cta">Découvrir</a>
                     </article>
 
-                    <!-- 7. Révision Bac Français -->
+                    <!-- 6. Révision Bac Français -->
                     <article class="portfolio-item reveal" data-animation-delay="440" data-skills="dev,design">
                         <a href="./bacfr.html" class="portfolio-item-link">
                             <div class="portfolio-image-wrapper">
@@ -132,7 +171,7 @@
                         <a href="./bacfr.html" class="btn primary-btn btn-small portfolio-item-cta">Découvrir</a>
                     </article>
 
-                    <!-- 8. Projet 3D Blender -->
+                    <!-- 7. Projet 3D Blender -->
                     <article class="portfolio-item reveal" data-animation-delay="460" data-skills="dev,design">
                         <a href="./projet-3d-blender.html" class="portfolio-item-link">
                             <div class="portfolio-image-wrapper">
@@ -147,7 +186,7 @@
                         <a href="./projet-3d-blender.html" class="btn primary-btn btn-small portfolio-item-cta">Découvrir</a>
                     </article>
 
-                    <!-- Projets audiovisuels (avant-dernier) -->
+                    <!-- 8. Projets audiovisuels -->
                     <article class="portfolio-item reveal" data-animation-delay="480" data-skills="design,multimedia">
                         <a href="./audiovisuel.html" class="portfolio-item-link">
                             <div class="portfolio-image-wrapper">
@@ -176,7 +215,6 @@
             <p>&copy; <span id="current-year-project"></span> Oscar Baer. Tous droits réservés.</p>
             <div class="social-links">
                 <a href="https://www.linkedin.com/in/oscar-baer-a5bbb029b/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-link-animated"><i class="fab fa-linkedin"></i></a>
-                <a href="https://github.com/OscarBaer" target="_blank" rel="noopener noreferrer" aria-label="GitHub"><i class="fab fa-github"></i></a>
                 <a href="./contact.html" aria-label="Me contacter (formulaire)"><i class="fas fa-envelope"></i></a>
             </div>
         </div>
