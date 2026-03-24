@@ -12,6 +12,11 @@
         .about-cv-intro .bio p { margin-bottom: 1rem; }
         .about-cv-section { margin-bottom: 2.5rem; }
         .about-cv-section h3 { font-size: 1.35rem; margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--primary-color); color: var(--light-text-color); }
+        .about-cv-lead { color: var(--dim-text-color); max-width: 60rem; margin: 0 auto 2rem; text-align: center; font-size: 1.02rem; }
+        .about-highlights { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-bottom: 2.25rem; }
+        .about-highlight-card { background: var(--dark-bg-color-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem 1.1rem; }
+        .about-highlight-card h4 { margin: 0 0 0.35rem 0; color: var(--light-text-color); font-size: 1rem; }
+        .about-highlight-card p { margin: 0; color: var(--dim-text-color); font-size: 0.92rem; line-height: 1.5; }
 
         /* Timeline : expériences & formation */
         .cv-timeline { position: relative; padding-left: 2rem; }
@@ -35,6 +40,9 @@
         .about-skills-cards .skill-category h4 { margin-bottom: 0.75rem; }
 
         /* Règles détaillées 2 colonnes dans style.css (#about .container .about-cv-two-cols) */
+        @media (max-width: 900px) {
+            .about-highlights { grid-template-columns: 1fr; }
+        }
         @media (max-width: 640px) {
             .cv-timeline { padding-left: 1.75rem; }
             .cv-timeline-item::before { left: -1.75rem; width: 12px; height: 12px; }
@@ -67,9 +75,10 @@
         <section id="about" class="section-padding">
             <div class="container">
                 <h2 class="section-title">À Propos</h2>
-                <!-- Mise en page : grille 2 colonnes (Expériences | Formation), pastilles (langues), cartes (compétences). -->
+                <p class="about-cv-lead">
+                    Profil orienté web, design et audiovisuel, avec une approche centrée utilisateur et une forte appétence pour les projets concrets.
+                </p>
 
-                <!-- Présentation (haut de page, type CV) -->
                 <div class="about-content about-cv-intro">
                     <div class="profile-pic profile-pic--about" id="basketball-easter-egg">
                         <img src="../ressources/images/oscar-portrait.png" alt="Portrait d'Oscar Baer, en 3ème année de BUT MMI.">
@@ -79,17 +88,85 @@
                             Actuellement, étudiant en <strong>3ème année de BUT MMI</strong> (Métiers du Multimédia et de l'Internet), je cherche une <strong>alternance à partir de la rentrée de septembre 2026</strong>, dans les domaines de la communication visuelle, du web et de la création de contenu audiovisuel pour continuer mes études avec un master.
                         </p>
                         <p>
-                            Découvrez mes réalisations dans mon <a href="./portfolio.html">portfolio</a>.
+                            Je développe des expériences numériques lisibles, esthétiques et utiles, en reliant conception, développement et narration visuelle.
                         </p>
-                        <a href="../ressources/documents/CV Oscar Baer.pdf" download class="btn primary-btn mt-4">
-                            Télécharger mon CV <i class="fas fa-download"></i>
-                        </a>
+                        <p>
+                            Découvre mes réalisations dans mon <a href="./portfolio.html">portfolio</a> ou consulte mon CV.
+                        </p>
+                        <div class="hero-actions">
+                            <a href="../ressources/documents/CV Oscar Baer.pdf" download class="btn primary-btn mt-4">
+                                Télécharger mon CV <i class="fas fa-download"></i>
+                            </a>
+                            <a href="./contact.html" class="btn secondary-btn mt-4">
+                                Me contacter <i class="fas fa-paper-plane"></i>
+                            </a>
+                        </div>
                     </div>
                 </div>
 
-                <!-- Deux colonnes : gauche Formation + Expériences | droite Compétences + Langues -->
+                <div class="about-highlights">
+                    <article class="about-highlight-card">
+                        <h4><i class="fas fa-calendar-check" aria-hidden="true"></i> Disponibilité</h4>
+                        <p>Recherche d'alternance à partir de septembre 2026.</p>
+                    </article>
+                    <article class="about-highlight-card">
+                        <h4><i class="fas fa-bullseye" aria-hidden="true"></i> Positionnement</h4>
+                        <p>Développement web, design UX/UI et création audiovisuelle.</p>
+                    </article>
+                    <article class="about-highlight-card">
+                        <h4><i class="fas fa-users" aria-hidden="true"></i> Méthode</h4>
+                        <p>Travail en équipe, gestion de projet Agile et documentation claire.</p>
+                    </article>
+                </div>
+
+                <!-- Deux colonnes : gauche Expériences + Formation | droite Compétences + Langues -->
                 <div class="about-cv-two-cols">
                 <div class="about-cv-col">
+                <div class="about-cv-section">
+                    <h3><i class="fas fa-briefcase" aria-hidden="true"></i> Expériences professionnelles</h3>
+                    <div class="cv-timeline">
+                        <div class="cv-timeline-item">
+                        <span class="cv-dates">Sept. 2025 – Août 2026</span>
+                        <div class="cv-content">
+                            <h4>Alternance – Direction générale des douanes et des droits indirects (DGDDI)</h4>
+                            <p class="cv-sub">DGDDI</p>
+                            <p>Analyse du site web (cas d'usages, audiences, rapport). Maquettage de la nouvelle version aux normes (Drupal, Sites faciles, Figma). Intégration de scripts JS et déploiement de MATOMO. Gestion de projet (feuilles de route, ateliers, méthode Agile, sprints). Documentation et centralisation des rapports.</p>
+                        </div>
+                        </div>
+                        <div class="cv-timeline-item">
+                            <span class="cv-dates">Mai – Juil. 2025</span>
+                        <div class="cv-content">
+                            <h4>Stage – Direction générale des douanes et des droits indirects (DGDDI)</h4>
+                            <p class="cv-sub">DGDDI</p>
+                            <p>Audit ergonomique, personas et parcours utilisateurs. Maquettage de la refonte globale du site sur Figma (haute fidélité). Programmation et intégration de la nouvelle page d'accueil. Pilotage du projet en Agile (feuilles de route, organigrammes, planning). Présentations hebdomadaires et mensuelles.</p>
+                        </div>
+                        </div>
+                        <div class="cv-timeline-item">
+                            <span class="cv-dates">Juin – Juil. 2024</span>
+                        <div class="cv-content">
+                            <h4>Stage – Federation Studios</h4>
+                            <p class="cv-sub">Federation Studios</p>
+                            <p>Conception d'un site de phishing simulé pour la sensibilisation à la cybersécurité. Développement Fullstack (PHP/SQL/JS), système d'interception de données préventif. Rédaction et diffusion des annonces internes. Création de supports graphiques (bannière) pour le lancement sur X (Twitter). Initiation au montage et à la colorimétrie sur Avid Media Composer.</p>
+                        </div>
+                        </div>
+                        <div class="cv-timeline-item">
+                            <span class="cv-dates">Juil. 2023 + Août 2024</span>
+                        <div class="cv-content">
+                            <h4>Vacataire – Service des archives et du courrier (CNDA)</h4>
+                            <p class="cv-sub">Cour nationale du droit d'asile (CNDA)</p>
+                            <p>Contrôle de la conformité des minutiers et signalement des anomalies. Transfert et sécurisation des dossiers physiques. Gestion du flux documentaire : tri, numérisation et dispatching du courrier entrant. Création de modèles Excel ergonomiques pour l'équipe.</p>
+                        </div>
+                        </div>
+                        <div class="cv-timeline-item">
+                            <span class="cv-dates">Déc. 2019</span>
+                        <div class="cv-content">
+                            <h4>Stage de 3e – Cabinet d'architectes IF Architectes</h4>
+                            <p class="cv-sub">IF Architectes</p>
+                            <p>Utilisation d'Autocad et Sketchup pour la modélisation en architecture intérieure. Création de plans d'architectes.</p>
+                        </div>
+                    </div>
+                </div>
+                </div>
                 <div class="about-cv-section">
                     <h3><i class="fas fa-graduation-cap" aria-hidden="true"></i> Formation</h3>
                     <div class="cv-timeline">
@@ -110,51 +187,6 @@
                             </div>
                         </div>
                     </div>
-                </div>
-                <div class="about-cv-section">
-                    <h3><i class="fas fa-briefcase" aria-hidden="true"></i> Expériences professionnelles</h3>
-                    <div class="cv-timeline">
-                        <div class="cv-timeline-item">
-                        <span class="cv-dates">Sept. 2025 – Août 2026</span>
-                        <div class="cv-content">
-                            <h4>Alternance – Direction générale des douanes et des droits indirects (DGDDI)</h4>
-                            <p class="cv-sub">DGDDI</p>
-                            <p>Analyse du site web (cas d’usages, audiences, rapport). Maquettage de la nouvelle version aux normes (Drupal, Sites faciles, Figma). Intégration de scripts JS et déploiement de MATOMO. Gestion de projet (feuilles de route, ateliers, méthode Agile, sprints). Documentation et centralisation des rapports.</p>
-                        </div>
-                        </div>
-                        <div class="cv-timeline-item">
-                            <span class="cv-dates">Mai – Juil. 2025</span>
-                        <div class="cv-content">
-                            <h4>Stage – Direction générale des douanes et des droits indirects (DGDDI)</h4>
-                            <p class="cv-sub">DGDDI</p>
-                            <p>Audit ergonomique, personas et parcours utilisateurs. Maquettage de la refonte globale du site sur Figma (haute fidélité). Programmation et intégration de la nouvelle page d’accueil. Pilotage du projet en Agile (feuilles de route, organigrammes, planning). Présentations hebdomadaires et mensuelles.</p>
-                        </div>
-                        </div>
-                        <div class="cv-timeline-item">
-                            <span class="cv-dates">Juin – Juil. 2024</span>
-                        <div class="cv-content">
-                            <h4>Stage – Federation Studios</h4>
-                            <p class="cv-sub">Federation Studios</p>
-                            <p>Conception d’un site de phishing simulé pour la sensibilisation à la cybersécurité. Développement Fullstack (PHP/SQL/JS), système d’interception de données préventif. Rédaction et diffusion des annonces internes. Création de supports graphiques (bannière) pour le lancement sur X (Twitter). Initiation au montage et à la colorimétrie sur Avid Media Composer.</p>
-                        </div>
-                        </div>
-                        <div class="cv-timeline-item">
-                            <span class="cv-dates">Juil. 2023 + Août 2024</span>
-                        <div class="cv-content">
-                            <h4>Vacataire – Service des archives et du courrier (CNDA)</h4>
-                            <p class="cv-sub">Cour nationale du droit d’asile (CNDA)</p>
-                            <p>Contrôle de la conformité des minutiers et signalement des anomalies. Transfert et sécurisation des dossiers physiques. Gestion du flux documentaire : tri, numérisation et dispatching du courrier entrant. Création de modèles Excel ergonomiques pour l’équipe.</p>
-                        </div>
-                        </div>
-                        <div class="cv-timeline-item">
-                            <span class="cv-dates">Déc. 2019</span>
-                        <div class="cv-content">
-                            <h4>Stage de 3e – Cabinet d’architectes IF Architectes</h4>
-                            <p class="cv-sub">IF Architectes</p>
-                            <p>Utilisation d’Autocad et Sketchup pour la modélisation en architecture intérieure. Création de plans d’architectes.</p>
-                        </div>
-                    </div>
-                </div>
                 </div>
                 <div class="about-cv-col">
                 <div class="skills-section about-cv-section about-skills-cards">
@@ -219,7 +251,6 @@
             <p>&copy; <span id="current-year-about"></span> Oscar Baer. Tous droits réservés.</p>
             <div class="social-links">
                 <a href="https://www.linkedin.com/in/oscar-baer-a5bbb029b/" target="_blank" aria-label="LinkedIn" class="social-link-animated"><i class="fab fa-linkedin"></i></a>
-                <a href="https://github.com/OscarBaer" target="_blank" aria-label="GitHub"><i class="fab fa-github"></i></a>
                 <a href="./contact.html" aria-label="Me contacter (formulaire)"><i class="fas fa-envelope"></i></a>
             </div>
         </div>
