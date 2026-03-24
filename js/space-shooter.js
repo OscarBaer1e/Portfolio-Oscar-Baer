@@ -610,9 +610,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Armes alternatives ---
     const WEAPONS = [
         { id: 'standard', name: 'Standard', fireRate: 1, damage: 1, color: null, desc: 'Tir équilibré' },
-        { id: 'laser', name: 'Laser', fireRate: 0.4, damage: 0.5, color: '#ff4466', desc: 'Cadence folle, dégâts faibles' },
-        { id: 'shotgun', name: 'Shotgun', fireRate: 2.5, damage: 1.5, color: '#ffaa30', desc: '5 projectiles, lent' },
-        { id: 'missile', name: 'Missile', fireRate: 3, damage: 3, color: '#50fa7b', desc: 'Autoguidé, très lent' }
+        { id: 'laser', name: 'Laser', fireRate: 0.55, damage: 0.45, color: '#ff4466', desc: 'Très rapide, faible par tir' },
+        { id: 'shotgun', name: 'Shotgun', fireRate: 2.2, damage: 0.35, color: '#ffaa30', desc: 'Fort de près, faible de loin' },
+        { id: 'missile', name: 'Missile', fireRate: 2.8, damage: 2.2, color: '#50fa7b', desc: 'Autoguidé, cadence lente' }
     ];
     let currentWeapon = 0;
     
@@ -3505,8 +3505,22 @@ document.addEventListener('DOMContentLoaded', function() {
                         return;
                     }
                     
+                    // Shotgun: les astéroïdes "de base" demandent ~2 impacts
+                    if (!asteroid.hp && bullet.weaponId === 'shotgun') {
+                        asteroid.shotgunGuard = (asteroid.shotgunGuard || 0) + 1;
+                        if (asteroid.shotgunGuard < 2) {
+                            impactFlashes.push({ x: asteroid.x, y: asteroid.y, life: 1, maxLife: 1, radius: 10 });
+                            playSound('hit');
+                            screenShake.intensity = 2;
+                            if (!(activePowerUps.prism && Date.now() < activePowerUps.prismEndTime)) {
+                                bullets.splice(bulletIndex, 1);
+                            }
+                            return;
+                        }
+                    }
+
                     // Astéroïde blindé : décrémenter HP au lieu de détruire
-                    const bulletDmg = Math.max(1, Math.round(bullet.damage || 1));
+                    const bulletDmg = Math.max(0.2, bullet.damage || 1);
                     if (asteroid.hp && asteroid.hp > bulletDmg) {
                         asteroid.hp -= bulletDmg;
                         impactFlashes.push({ x: asteroid.x, y: asteroid.y, life: 1, maxLife: 1, radius: 12 });
@@ -3757,7 +3771,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Missile homing
         bullets.forEach(b => {
             if (!b.isMissile) return;
-            let closest = null, closestDist = 300;
+            let closest = null, closestDist = 260;
             asteroids.forEach(a => {
                 const d = Math.hypot(a.x - b.x, a.y - b.y);
                 if (d < closestDist) { closest = a; closestDist = d; }
@@ -3766,10 +3780,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 const angle = Math.atan2(closest.y - b.y, closest.x - b.x);
                 if (!b.vx) b.vx = 0;
                 if (!b.vy) b.vy = -b.speed;
-                b.vx += Math.cos(angle) * 0.3 * gameState.deltaTime;
-                b.vy += Math.sin(angle) * 0.3 * gameState.deltaTime;
+                b.vx += Math.cos(angle) * 0.22 * gameState.deltaTime;
+                b.vy += Math.sin(angle) * 0.22 * gameState.deltaTime;
                 const mag = Math.sqrt(b.vx * b.vx + b.vy * b.vy);
-                const targetSpeed = b.speed * 0.7;
+                const targetSpeed = b.speed * 0.65;
                 b.vx = (b.vx / mag) * targetSpeed;
                 b.vy = (b.vy / mag) * targetSpeed;
             }
@@ -4753,6 +4767,39 @@ document.addEventListener('DOMContentLoaded', function() {
         return Math.max(0.025, 0.038 - (level - 81) * 0.00012);
     }
     
+    function getScorePerLevel(mode, level) {
+        // Progression plus douce au début, puis nettement plus exigeante après 100
+        if (mode === 'bossrush') {
+            if (level <= 100) return 300;
+            const over = level - 100;
+            return Math.floor(300 + over * 22 + over * over * 1.8);
+        }
+        // normal + infinite
+        if (level <= 100) return 500;
+        const over = level - 100;
+        return Math.floor(500 + over * 35 + over * over * 2.2);
+    }
+
+    function getScoreForLevel(mode, targetLevel) {
+        if (targetLevel <= 1) return 0;
+        let total = 0;
+        for (let lvl = 1; lvl < targetLevel; lvl++) {
+            total += getScorePerLevel(mode, lvl);
+        }
+        return total;
+    }
+
+    function getLevelFromScore(mode, score) {
+        let level = 1;
+        let remaining = Math.max(0, score);
+        while (remaining >= getScorePerLevel(mode, level)) {
+            remaining -= getScorePerLevel(mode, level);
+            level++;
+            if (level > 9999) break; // garde-fou
+        }
+        return level;
+    }
+
     function checkLevel() {
         if (gameState.bossActive && boss) return;
         
@@ -4778,10 +4825,10 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // --- Mode Boss Rush ---
         if (gameState.gameMode === 'bossrush') {
-            const newLevel = Math.floor(gameState.score / 300) + 1;
+            const newLevel = getLevelFromScore('bossrush', gameState.score);
             if (newLevel > gameState.level) {
                 const previousLevel = gameState.level;
-                gameState.level = newLevel;
+                gameState.level = previousLevel + 1;
                 const prevTheme = Math.floor((previousLevel - 1) / 5);
                 const newTheme = Math.floor((gameState.level - 1) / 5);
                 if (newTheme > prevTheme) {
@@ -4803,10 +4850,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (gameState.gameMode === 'infinite') {
-        const newLevel = Math.floor(gameState.score / 500) + 1;
+        const newLevel = getLevelFromScore('infinite', gameState.score);
         if (newLevel > gameState.level) {
             const previousLevel = gameState.level;
-            gameState.level = newLevel;
+            gameState.level = previousLevel + 1;
             const prevTheme = Math.floor((previousLevel - 1) / 10);
             const newTheme = Math.floor((gameState.level - 1) / 10);
             if (newTheme > prevTheme) {
@@ -4822,10 +4869,10 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Mode normal : boss tous les 10 niveaux
-        const newLevel = Math.floor(gameState.score / 500) + 1;
+        const newLevel = getLevelFromScore('normal', gameState.score);
         if (newLevel > gameState.level) {
             const previousLevel = gameState.level;
-            gameState.level = newLevel;
+            gameState.level = previousLevel + 1;
             const prevTheme = Math.floor((previousLevel - 1) / 10);
             const newTheme = Math.floor((gameState.level - 1) / 10);
             if (newTheme > prevTheme) {
@@ -5302,13 +5349,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 
                 if (distance < boss.size + 5) {
-                    const dmg = Math.max(1, Math.round(bullet.damage || 1));
+                    const dmg = Math.max(0.2, bullet.damage || 1);
                     boss.health -= dmg;
                     playSound('bossHit');
                     bullets.splice(bulletIndex, 1);
                     gameStats.bulletsHit++;
                     // Particules de score pour les dégâts au boss
-                    createScoreParticle(bullet.x, bullet.y, '+1');
+                    createScoreParticle(bullet.x, bullet.y, `+${dmg.toFixed(1)}`);
                     updateHealthBars();
                     
                     // Le boss rétrécit quand il prend des dégâts
@@ -5320,9 +5367,10 @@ document.addEventListener('DOMContentLoaded', function() {
                         const defeatedBossNumber = boss.bossNumber;
                         
                         // Calculer le score nécessaire pour passer au niveau suivant
-                        // Exemple : niveau 10 → niveau 11, il faut 11 * 500 = 5500 points
+                        // avec la même courbe de progression que checkLevel()
                         const targetLevel = gameState.level + 1;
-                        const targetScore = targetLevel * 500;
+                        const modeForProgress = gameState.gameMode === 'bossrush' ? 'bossrush' : 'normal';
+                        const targetScore = getScoreForLevel(modeForProgress, targetLevel);
                         
                         // Donner juste assez de points pour passer au niveau suivant
                         let bossPoints = 0;
@@ -5891,24 +5939,24 @@ document.addEventListener('DOMContentLoaded', function() {
         if (weaponId === 'shotgun') {
             const spread = [-1.6, -0.8, 0, 0.8, 1.6];
             spread.forEach(vx => {
-                bullets.push({ x: ship.x + vx * 4, y: ship.y - ship.height / 2, speed: bulletSpeed, vx, vy: -bulletSpeed, size: bulletSize * 0.8, weaponColor: wColor, damage: weapon.damage });
+                bullets.push({ x: ship.x + vx * 4, y: ship.y - ship.height / 2, speed: bulletSpeed, vx, vy: -bulletSpeed, size: bulletSize * 0.78, weaponColor: wColor, damage: weapon.damage, weaponId });
             });
         } else if (weaponId === 'missile') {
-            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed * 0.7, size: bulletSize * 1.5, weaponColor: wColor, damage: weapon.damage, isMissile: true });
+            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed * 0.62, size: bulletSize * 1.35, weaponColor: wColor, damage: weapon.damage, isMissile: true, weaponId });
         } else if (isChicken) {
             if (activePowerUps.tripleShot) {
-                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: -0.8, vy: -bulletSpeed, size, isChicken: true, damage: weapon.damage });
-                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0, vy: -bulletSpeed, size, isChicken: true, damage: weapon.damage });
-                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0.8, vy: -bulletSpeed, size, isChicken: true, damage: weapon.damage });
+                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: -0.8, vy: -bulletSpeed, size, isChicken: true, damage: weapon.damage, weaponId });
+                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0, vy: -bulletSpeed, size, isChicken: true, damage: weapon.damage, weaponId });
+                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0.8, vy: -bulletSpeed, size, isChicken: true, damage: weapon.damage, weaponId });
             } else {
-                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, size, isChicken: true, damage: weapon.damage });
+                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, size, isChicken: true, damage: weapon.damage, weaponId });
             }
         } else if (activePowerUps.tripleShot) {
-            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: -0.8, vy: -bulletSpeed, size: bulletSize, weaponColor: wColor, damage: weapon.damage });
-            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0, vy: -bulletSpeed, size: bulletSize, weaponColor: wColor, damage: weapon.damage });
-            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0.8, vy: -bulletSpeed, size: bulletSize, weaponColor: wColor, damage: weapon.damage });
+            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: -0.8, vy: -bulletSpeed, size: bulletSize, weaponColor: wColor, damage: weapon.damage, weaponId });
+            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0, vy: -bulletSpeed, size: bulletSize, weaponColor: wColor, damage: weapon.damage, weaponId });
+            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0.8, vy: -bulletSpeed, size: bulletSize, weaponColor: wColor, damage: weapon.damage, weaponId });
         } else {
-            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, size: bulletSize, weaponColor: wColor, damage: weapon.damage });
+            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, size: bulletSize, weaponColor: wColor, damage: weapon.damage, weaponId });
         }
         
         const muzzleY = ship.y - ship.height / 2;
