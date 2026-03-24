@@ -607,6 +607,51 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Survie timer ---
     let survivalTimer = 0;
     
+    // --- Armes alternatives ---
+    const WEAPONS = [
+        { id: 'standard', name: 'Standard', fireRate: 1, damage: 1, color: null, desc: 'Tir équilibré' },
+        { id: 'laser', name: 'Laser', fireRate: 0.4, damage: 0.5, color: '#ff4466', desc: 'Cadence folle, dégâts faibles' },
+        { id: 'shotgun', name: 'Shotgun', fireRate: 2.5, damage: 1.5, color: '#ffaa30', desc: '5 projectiles, lent' },
+        { id: 'missile', name: 'Missile', fireRate: 3, damage: 3, color: '#50fa7b', desc: 'Autoguidé, très lent' }
+    ];
+    let currentWeapon = 0;
+    
+    // --- Skins ---
+    const SHIP_SKINS = [
+        { id: 'default', name: 'Classique', color: '#8fadff', unlockScore: 0 },
+        { id: 'flame', name: 'Flamme', color: '#ff6040', unlockScore: 5000 },
+        { id: 'emerald', name: 'Émeraude', color: '#50fa7b', unlockScore: 15000 },
+        { id: 'gold', name: 'Or', color: '#ffd866', unlockScore: 30000 },
+        { id: 'phantom', name: 'Fantôme', color: '#bd93f9', unlockScore: 60000 }
+    ];
+    let currentSkin = 0;
+    
+    // --- Boutique persistante ---
+    let shopUpgrades = {
+        extraLife: { level: 0, max: 3, cost: [2000, 5000, 12000], desc: '+1 vie max', icon: '❤️' },
+        dashCooldown: { level: 0, max: 3, cost: [1500, 4000, 8000], desc: 'Dash -20% cooldown', icon: '💨' },
+        comboWindow: { level: 0, max: 2, cost: [3000, 7000], desc: 'Combo +0.5s fenêtre', icon: '🔥' },
+        startSpeed: { level: 0, max: 2, cost: [2500, 6000], desc: 'Vaisseau +10% vitesse', icon: '🚀' },
+        bonusChance: { level: 0, max: 2, cost: [4000, 9000], desc: '+5% chance bonus', icon: '🎁' }
+    };
+    let shopCurrency = 0;
+    
+    // --- Revive ---
+    let reviveState = { available: true, active: false, timer: 0, presses: 0, required: 8 };
+    
+    // --- Météo spatiale ---
+    let spaceWeather = { type: null, timer: 0, duration: 0, particles: [], nextEvent: 15000 + Math.random() * 20000 };
+    const WEATHER_TYPES = ['meteor_shower', 'nebula_fog', 'aurora'];
+    
+    // --- Vagues scénarisées ---
+    let waveState = { active: false, asteroids: [], spawnTimer: 0, cooldown: 0 };
+    
+    // --- Astéroïdes à chaîne ---
+    let chainLinks = [];
+    
+    // --- Particules thématiques de fond ---
+    let themeParticles = [];
+    
     // Canvas de grain pour overlay rétro (créé une fois)
     let grainCanvas = null;
     
@@ -643,6 +688,32 @@ document.addEventListener('DOMContentLoaded', function() {
     let lastShotTime = 0;
     let baseFireRate = 175; // Tir plus rapide pour un gameplay réactif
     let currentFireRate = baseFireRate;
+    
+    // Charger boutique depuis localStorage
+    try {
+        const saved = localStorage.getItem('ssShop');
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            if (parsed.upgrades) Object.keys(parsed.upgrades).forEach(k => { if (shopUpgrades[k]) shopUpgrades[k].level = parsed.upgrades[k]; });
+            if (typeof parsed.currency === 'number') shopCurrency = parsed.currency;
+            if (typeof parsed.skin === 'number') currentSkin = parsed.skin;
+        }
+    } catch (e) {}
+    
+    function saveShop() {
+        try {
+            const data = { upgrades: {}, currency: shopCurrency, skin: currentSkin };
+            Object.keys(shopUpgrades).forEach(k => data.upgrades[k] = shopUpgrades[k].level);
+            localStorage.setItem('ssShop', JSON.stringify(data));
+        } catch (e) {}
+    }
+    
+    function getTotalScore() {
+        try { return parseInt(localStorage.getItem('ssTotalScore') || '0', 10); } catch (e) { return 0; }
+    }
+    function addTotalScore(pts) {
+        try { const t = getTotalScore() + pts; localStorage.setItem('ssTotalScore', String(t)); return t; } catch (e) { return 0; }
+    }
     
     // Vérifications de sécurité pour tous les éléments
     if (!canvas || !ctx) return;
@@ -1173,8 +1244,9 @@ document.addEventListener('DOMContentLoaded', function() {
         gameState.score = 0;
         gameState.level = 1;
         gameState._lastTimeScore = 0;
-        gameState.lives = (gameState.gameMode === 'survival') ? 1 : 3;
-        gameState.maxLives = (gameState.gameMode === 'survival') ? 1 : 3;
+        const bonusLives = shopUpgrades.extraLife.level;
+        gameState.lives = (gameState.gameMode === 'survival') ? 1 : (3 + bonusLives);
+        gameState.maxLives = (gameState.gameMode === 'survival') ? 1 : (3 + bonusLives);
         gameState.gameSpeed = 1.7; // Départ fluide, plus simple à kifer
         gameState.bossActive = false;
         currentFireRate = baseFireRate;
@@ -1215,6 +1287,15 @@ document.addEventListener('DOMContentLoaded', function() {
         freezeState = { active: false, timer: 0, duration: 0 };
         warpState = { active: false, timer: 0, duration: 1200, themeName: '' };
         survivalTimer = 0;
+        currentWeapon = 0;
+        reviveState = { available: true, active: false, timer: 0, presses: 0, required: 8 };
+        spaceWeather = { type: null, timer: 0, duration: 0, particles: [], nextEvent: 15000 + Math.random() * 20000 };
+        waveState = { active: false, asteroids: [], spawnTimer: 0, cooldown: 0 };
+        chainLinks = [];
+        themeParticles = [];
+        
+        // Appliquer upgrades boutique
+        ship.color = SHIP_SKINS[currentSkin] ? SHIP_SKINS[currentSkin].color : '#8fadff';
         if (currentLevelDisplay) {
             currentLevelDisplay.textContent = gameState.level;
         }
@@ -1889,6 +1970,149 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.font = 'bold 18px "Courier New", monospace';
             ctx.textAlign = 'right';
             ctx.fillText(`${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`, canvas.width - 14, 26);
+            ctx.restore();
+        }
+        
+        // --- Arme HUD ---
+        if (gameState.isPlaying) {
+            const wp = WEAPONS[currentWeapon];
+            ctx.save();
+            ctx.globalAlpha = 0.55;
+            ctx.fillStyle = wp.color || '#8fadff';
+            ctx.font = 'bold 11px monospace';
+            ctx.textAlign = 'left';
+            ctx.fillText(`[${currentWeapon + 1}] ${wp.name}`, 14, canvas.height - 46);
+            ctx.globalAlpha = 0.3;
+            ctx.font = '9px monospace';
+            ctx.fillText(wp.desc, 14, canvas.height - 36);
+            ctx.restore();
+        }
+        
+        // --- Particules thématiques de fond ---
+        if (themeParticles.length > 0) {
+            themeParticles.forEach(p => {
+                ctx.save();
+                ctx.globalAlpha = p.life * 0.5;
+                ctx.fillStyle = p.color;
+                ctx.beginPath();
+                if (p.type === 'snow') {
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                } else if (p.type === 'ember') {
+                    ctx.shadowBlur = 6;
+                    ctx.shadowColor = p.color;
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                } else {
+                    ctx.arc(p.x, p.y, p.size * 0.8, 0, Math.PI * 2);
+                }
+                ctx.fill();
+                ctx.restore();
+            });
+        }
+        
+        // --- Météo spatiale ---
+        if (spaceWeather.type) {
+            const weatherAlpha = Math.min(1, spaceWeather.timer / 1000, (spaceWeather.duration - (spaceWeather.duration - spaceWeather.timer)) / 1000);
+            ctx.save();
+            if (spaceWeather.type === 'meteor_shower') {
+                spaceWeather.particles.forEach(p => {
+                    ctx.globalAlpha = p.life * 0.7 * weatherAlpha;
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = p.size;
+                    ctx.beginPath();
+                    ctx.moveTo(p.x, p.y);
+                    ctx.lineTo(p.x - p.vx * 4, p.y - p.vy * 4);
+                    ctx.stroke();
+                });
+            } else if (spaceWeather.type === 'nebula_fog') {
+                ctx.globalAlpha = 0.08 * weatherAlpha;
+                ctx.fillStyle = '#6060aa';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else if (spaceWeather.type === 'aurora') {
+                spaceWeather.particles.forEach(p => {
+                    ctx.globalAlpha = 0.12 * weatherAlpha;
+                    const t = Date.now() * 0.001;
+                    const y = p.y + Math.sin(t + p.phase) * 20;
+                    const grad = ctx.createLinearGradient(p.x - p.width / 2, y, p.x + p.width / 2, y);
+                    grad.addColorStop(0, 'transparent');
+                    grad.addColorStop(0.3, `hsla(${p.hue}, 80%, 60%, 0.4)`);
+                    grad.addColorStop(0.7, `hsla(${p.hue + 40}, 70%, 55%, 0.3)`);
+                    grad.addColorStop(1, 'transparent');
+                    ctx.fillStyle = grad;
+                    ctx.fillRect(p.x - p.width / 2, y - 15, p.width, 30);
+                });
+            }
+            ctx.restore();
+        }
+        
+        // --- Chaînes visuelles entre astéroïdes liés ---
+        if (chainLinks.length > 0) {
+            ctx.save();
+            chainLinks.forEach(chain => {
+                const linked = asteroids.filter(a => a.chainId === chain.id);
+                if (linked.length < 2) return;
+                ctx.strokeStyle = '#ffaa40';
+                ctx.lineWidth = 1.5;
+                ctx.globalAlpha = 0.3 + Math.sin(Date.now() / 200) * 0.15;
+                ctx.shadowBlur = 6;
+                ctx.shadowColor = '#ffaa40';
+                for (let i = 0; i < linked.length - 1; i++) {
+                    ctx.beginPath();
+                    ctx.moveTo(linked[i].x, linked[i].y);
+                    ctx.lineTo(linked[i + 1].x, linked[i + 1].y);
+                    ctx.stroke();
+                }
+                ctx.beginPath();
+                ctx.moveTo(linked[linked.length - 1].x, linked[linked.length - 1].y);
+                ctx.lineTo(linked[0].x, linked[0].y);
+                ctx.stroke();
+            });
+            ctx.restore();
+        }
+        
+        // --- Screen warp sur dash ---
+        if (dashState.active) {
+            ctx.save();
+            const dp = 1 - (dashState.timer / DASH_DURATION);
+            const warpAmount = Math.sin(dp * Math.PI) * 0.03;
+            ctx.globalAlpha = 0.15;
+            ctx.fillStyle = '#6cf';
+            const cx = canvas.width / 2, cy = canvas.height / 2;
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, canvas.width * (0.5 + warpAmount), canvas.height * (0.5 - warpAmount), 0, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+        
+        // --- Revive overlay ---
+        if (reviveState.active) {
+            ctx.save();
+            ctx.fillStyle = 'rgba(0,0,0,0.6)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#ff4466';
+            ctx.font = 'bold 28px "Courier New", monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('MASH ESPACE !', canvas.width / 2, canvas.height / 2 - 30);
+            const pct = reviveState.presses / reviveState.required;
+            const barW = 200, barH = 16;
+            ctx.fillStyle = '#333';
+            ctx.fillRect(canvas.width / 2 - barW / 2, canvas.height / 2 + 10, barW, barH);
+            ctx.fillStyle = '#ff4466';
+            ctx.fillRect(canvas.width / 2 - barW / 2, canvas.height / 2 + 10, barW * pct, barH);
+            const timeLeft = (reviveState.timer / 1000).toFixed(1);
+            ctx.fillStyle = '#fff';
+            ctx.font = '14px monospace';
+            ctx.fillText(`${timeLeft}s`, canvas.width / 2, canvas.height / 2 + 44);
+            ctx.restore();
+        }
+        
+        // --- Boss enragé visuel ---
+        if (boss && boss.enraged) {
+            ctx.save();
+            const pulse = 0.08 + Math.sin(Date.now() / 100) * 0.05;
+            ctx.globalAlpha = pulse;
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.restore();
         }
         
@@ -3186,8 +3410,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     
                     // Astéroïde blindé : décrémenter HP au lieu de détruire
-                    if (asteroid.hp && asteroid.hp > 1) {
-                        asteroid.hp--;
+                    const bulletDmg = Math.max(1, Math.round(bullet.damage || 1));
+                    if (asteroid.hp && asteroid.hp > bulletDmg) {
+                        asteroid.hp -= bulletDmg;
                         impactFlashes.push({ x: asteroid.x, y: asteroid.y, life: 1, maxLife: 1, radius: 12 });
                         playSound('hit');
                         screenShake.intensity = 3;
@@ -3233,6 +3458,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     gameStats.asteroidsDestroyed++;
                     gameStats.bulletsHit++;
+                    
+                    // Chaîne d'astéroïdes
+                    if (asteroid.chainId) onChainAsteroidDestroyed(asteroid.chainId, asteroid.x, asteroid.y);
                     
                     // Freeze-frame sur les gros astéroïdes
                     if (asteroid.size >= 45) triggerFreezeFrame(35);
@@ -3376,11 +3604,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 // Supprimer l'astéroïde
                 asteroids.splice(index, 1);
                 
-                // Vérifier game over
                 if (gameState.lives <= 0) {
-                    endGame();
+                    if (reviveState.available && gameState.gameMode !== 'survival') {
+                        startRevive();
+                    } else {
+                        endGame();
+                    }
                 } else {
-                    // Invincibilité temporaire avec clignotement (2 secondes exactement)
                     ship.invincible = true;
                     setTimeout(() => {
                         ship.invincible = false;
@@ -3415,9 +3645,38 @@ document.addEventListener('DOMContentLoaded', function() {
                 ? 0.038 + ((lvl - 1) / 79) * 0.082
                 : 0.12 + (lvl - 80) * 0.0012;
         }
-        if (Math.random() < Math.min(0.25, spawnRate)) {
+        const bonusDropMod = 1 + shopUpgrades.bonusChance.level * 0.05;
+        if (Math.random() < Math.min(0.25, spawnRate * bonusDropMod)) {
             spawnAsteroid();
         }
+        
+        // Systèmes additionnels
+        updateScriptedWave();
+        trySpawnChain();
+        updateSpaceWeather();
+        updateThemeParticles();
+        if (reviveState.active) updateRevive();
+        
+        // Missile homing
+        bullets.forEach(b => {
+            if (!b.isMissile) return;
+            let closest = null, closestDist = 300;
+            asteroids.forEach(a => {
+                const d = Math.hypot(a.x - b.x, a.y - b.y);
+                if (d < closestDist) { closest = a; closestDist = d; }
+            });
+            if (closest) {
+                const angle = Math.atan2(closest.y - b.y, closest.x - b.x);
+                if (!b.vx) b.vx = 0;
+                if (!b.vy) b.vy = -b.speed;
+                b.vx += Math.cos(angle) * 0.3 * gameState.deltaTime;
+                b.vy += Math.sin(angle) * 0.3 * gameState.deltaTime;
+                const mag = Math.sqrt(b.vx * b.vx + b.vy * b.vy);
+                const targetSpeed = b.speed * 0.7;
+                b.vx = (b.vx / mag) * targetSpeed;
+                b.vy = (b.vy / mag) * targetSpeed;
+            }
+        });
     }
     
     function createExplosion(x, y, color) {
@@ -4006,7 +4265,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- COMBO SYSTEM ---
     function registerComboKill() {
         const now = Date.now();
-        if (now - comboState.lastKillTime < COMBO_TIMEOUT) {
+        const comboWindow = COMBO_TIMEOUT + shopUpgrades.comboWindow.level * 500;
+        if (now - comboState.lastKillTime < comboWindow) {
             comboState.count++;
         } else {
             comboState.count = 1;
@@ -4044,7 +4304,8 @@ document.addEventListener('DOMContentLoaded', function() {
         dashState.dy = (dy / len) * DASH_DISTANCE;
         dashState.active = true;
         dashState.timer = DASH_DURATION;
-        dashState.cooldown = DASH_COOLDOWN;
+        const cdReduction = 1 - shopUpgrades.dashCooldown.level * 0.2;
+        dashState.cooldown = DASH_COOLDOWN * cdReduction;
         dashState.ghostTrail = [];
         ship.invincible = true;
         gameStats.dashesUsed++;
@@ -4081,6 +4342,167 @@ document.addEventListener('DOMContentLoaded', function() {
         warpState.active = true;
         warpState.timer = warpState.duration;
         warpState.themeName = newThemeName;
+    }
+    
+    // --- VAGUES SCÉNARISÉES ---
+    function spawnScriptedWave() {
+        if (waveState.active) return;
+        const formations = ['v', 'circle', 'line', 'zigzag'];
+        const type = formations[Math.floor(Math.random() * formations.length)];
+        const count = 5 + Math.floor(Math.random() * 4);
+        const theme = getCurrentTheme();
+        waveState.active = true;
+        waveState.asteroids = [];
+        waveState.spawnTimer = 0;
+        for (let i = 0; i < count; i++) {
+            let x, y;
+            if (type === 'v') { x = canvas.width / 2 + (i - count / 2) * 40; y = -30 - Math.abs(i - count / 2) * 30; }
+            else if (type === 'circle') { const a = (i / count) * Math.PI; x = canvas.width / 2 + Math.cos(a) * 100; y = -30 - Math.sin(a) * 60; }
+            else if (type === 'line') { x = (canvas.width / (count + 1)) * (i + 1); y = -30 - i * 8; }
+            else { x = canvas.width / 2 + (i % 2 === 0 ? -1 : 1) * (i * 25); y = -30 - i * 20; }
+            waveState.asteroids.push({
+                x, y, size: 20 + Math.random() * 10, speed: gameState.gameSpeed * 1.0 + 0.5,
+                vx: 0, rotation: 0, rotationSpeed: (Math.random() - 0.5) * 0.1,
+                color: theme.asteroids[Math.floor(Math.random() * theme.asteroids.length)],
+                specialType: null, hp: 1, isWave: true, delay: i * 150
+            });
+        }
+    }
+    
+    function updateScriptedWave() {
+        if (!waveState.active) {
+            waveState.cooldown -= 16.67 * gameState.deltaTime;
+            if (waveState.cooldown <= 0 && gameState.level >= 3 && !gameState.bossActive && Math.random() < 0.003) {
+                spawnScriptedWave();
+                waveState.cooldown = 12000 + Math.random() * 8000;
+            }
+            return;
+        }
+        waveState.spawnTimer += 16.67 * gameState.deltaTime;
+        const toSpawn = waveState.asteroids.filter(a => !a.spawned && waveState.spawnTimer >= a.delay);
+        toSpawn.forEach(a => { a.spawned = true; asteroids.push(a); });
+        if (waveState.asteroids.every(a => a.spawned)) waveState.active = false;
+    }
+    
+    // --- ASTÉROÏDES À CHAÎNE ---
+    function trySpawnChain() {
+        if (gameState.level < 8 || Math.random() > 0.006 || gameState.bossActive) return;
+        const theme = getCurrentTheme();
+        const cx = Math.random() * (canvas.width - 100) + 50;
+        const cy = -40;
+        const count = 3 + Math.floor(Math.random() * 3);
+        const chainId = Date.now() + Math.random();
+        const chainColor = '#ffaa40';
+        for (let i = 0; i < count; i++) {
+            const angle = (i / count) * Math.PI * 2;
+            const dist = 25 + Math.random() * 15;
+            const a = {
+                x: cx + Math.cos(angle) * dist, y: cy + Math.sin(angle) * dist,
+                size: 15 + Math.random() * 8, speed: gameState.gameSpeed * 0.9,
+                vx: 0, rotation: 0, rotationSpeed: (Math.random() - 0.5) * 0.08,
+                color: chainColor, specialType: null, hp: 1, chainId: chainId
+            };
+            asteroids.push(a);
+        }
+        chainLinks.push({ id: chainId, count: count, destroyed: 0, baseX: cx, baseY: cy });
+    }
+    
+    function onChainAsteroidDestroyed(chainId, x, y) {
+        const link = chainLinks.find(c => c.id === chainId);
+        if (!link) return;
+        link.destroyed++;
+        if (link.destroyed >= link.count) {
+            const bonus = link.count * 50;
+            addScoreWithCombo(bonus, x, y);
+            createScoreParticle(x, y, `CHAÎNE +${bonus}`);
+            screenShake.intensity = 8;
+            triggerFreezeFrame(30);
+            chainLinks = chainLinks.filter(c => c.id !== chainId);
+        }
+    }
+    
+    // --- MÉTÉO SPATIALE ---
+    function updateSpaceWeather() {
+        if (spaceWeather.type) {
+            spaceWeather.timer -= 16.67 * gameState.deltaTime;
+            if (spaceWeather.timer <= 0) { spaceWeather.type = null; spaceWeather.particles = []; }
+            else updateWeatherParticles();
+            return;
+        }
+        spaceWeather.nextEvent -= 16.67 * gameState.deltaTime;
+        if (spaceWeather.nextEvent <= 0) {
+            spaceWeather.type = WEATHER_TYPES[Math.floor(Math.random() * WEATHER_TYPES.length)];
+            spaceWeather.duration = 8000 + Math.random() * 7000;
+            spaceWeather.timer = spaceWeather.duration;
+            spaceWeather.particles = [];
+            spaceWeather.nextEvent = 25000 + Math.random() * 35000;
+        }
+    }
+    function updateWeatherParticles() {
+        if (spaceWeather.type === 'meteor_shower') {
+            if (Math.random() < 0.15) {
+                spaceWeather.particles.push({ x: Math.random() * canvas.width, y: -5, vx: -1.5 + Math.random(), vy: 3 + Math.random() * 4, size: 1 + Math.random() * 2, life: 1 });
+            }
+        } else if (spaceWeather.type === 'aurora') {
+            if (spaceWeather.particles.length < 5) {
+                spaceWeather.particles.push({ x: Math.random() * canvas.width, y: canvas.height * 0.1 + Math.random() * canvas.height * 0.3, width: 80 + Math.random() * 120, phase: Math.random() * Math.PI * 2, hue: 100 + Math.random() * 80 });
+            }
+        }
+        spaceWeather.particles.forEach(p => {
+            if (p.vx !== undefined) { p.x += p.vx; p.y += p.vy; p.life -= 0.01; }
+        });
+        spaceWeather.particles = spaceWeather.particles.filter(p => p.life === undefined || p.life > 0);
+    }
+    
+    // --- REVIVE ---
+    function startRevive() {
+        if (!reviveState.available || gameState.gameMode === 'survival') return false;
+        reviveState.active = true;
+        reviveState.timer = 3000;
+        reviveState.presses = 0;
+        return true;
+    }
+    function updateRevive() {
+        if (!reviveState.active) return;
+        reviveState.timer -= 16.67;
+        if (reviveState.presses >= reviveState.required) {
+            reviveState.active = false;
+            reviveState.available = false;
+            gameState.lives = 1;
+            gameState.isPlaying = true;
+            ship.invincible = true;
+            setTimeout(() => { ship.invincible = false; }, 2000);
+            if (livesElement) livesElement.textContent = gameState.lives;
+            updateHealthBars();
+            showMessage('REVIVE !', 'powerup');
+            return;
+        }
+        if (reviveState.timer <= 0) {
+            reviveState.active = false;
+            endGame();
+        }
+    }
+    
+    // --- PARTICULES THÉMATIQUES DE FOND ---
+    function updateThemeParticles() {
+        if (gameState.isLowEndDevice) return;
+        const theme = getCurrentTheme();
+        const themeName = theme.name.toLowerCase();
+        if (themeParticles.length < 15 && Math.random() < 0.02) {
+            let p = { x: Math.random() * canvas.width, y: -5, life: 1, size: 1 + Math.random() * 2 };
+            if (themeName.includes('glac') || themeName.includes('ice') || themeName.includes('cryo')) {
+                p.type = 'snow'; p.vx = (Math.random() - 0.5) * 0.5; p.vy = 0.3 + Math.random() * 0.5; p.color = '#c8e8ff';
+            } else if (themeName.includes('volcan') || themeName.includes('feu') || themeName.includes('infern')) {
+                p.type = 'ember'; p.vx = (Math.random() - 0.5) * 0.8; p.vy = -0.5 - Math.random() * 0.8; p.y = canvas.height + 5; p.color = '#ff6030';
+            } else if (themeName.includes('nébul') || themeName.includes('nebul') || themeName.includes('cosmiq')) {
+                p.type = 'dust'; p.vx = (Math.random() - 0.5) * 0.2; p.vy = 0.1 + Math.random() * 0.3; p.color = theme.particles[0];
+            } else {
+                p.type = 'generic'; p.vx = (Math.random() - 0.5) * 0.3; p.vy = 0.2 + Math.random() * 0.3; p.color = theme.stars;
+            }
+            themeParticles.push(p);
+        }
+        themeParticles.forEach(p => { p.x += p.vx; p.y += p.vy; p.life -= 0.003; });
+        themeParticles = themeParticles.filter(p => p.life > 0 && p.y > -10 && p.y < canvas.height + 10);
     }
     
     function spawnAsteroid() {
@@ -4668,13 +5090,20 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Vérifier les phases des boss (changement de pattern à mi-vie)
-        if (boss && !boss.phaseChanged && boss.health <= boss.maxHealth / 2) {
+        // Phase 2 : enragé à 30% HP
+        if (boss && !boss.enraged && boss.health <= boss.maxHealth * 0.3) {
+            boss.enraged = true;
+            boss.phase = 2;
+            boss.shootInterval = Math.max(200, boss.shootInterval * 0.5);
+            boss.speed *= 1.6;
+            boss.color = '#ff2020';
+            triggerFreezeFrame(120);
+            screenShake.intensity = 15;
+            showMessage(`${boss.bossName} est ENRAGÉ !`, 'boss');
+            playSound('bossSpawn');
+        } else if (boss && !boss.phaseChanged && boss.health <= boss.maxHealth / 2) {
             boss.phaseChanged = true;
-            boss.phase = 2; // Phase 2 activée
-            // Augmenter la vitesse de tir et changer le pattern
             boss.shootInterval = Math.max(300, boss.shootInterval * 0.7);
-            console.log(`Boss ${boss.bossNumber} entre en phase 2 !`);
         }
         
         // Collision projectiles du joueur / boss
@@ -4688,7 +5117,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 const distance = Math.sqrt(dx * dx + dy * dy);
                 
                 if (distance < boss.size + 5) {
-                    boss.health--;
+                    const dmg = Math.max(1, Math.round(bullet.damage || 1));
+                    boss.health -= dmg;
                     playSound('bossHit');
                     bullets.splice(bulletIndex, 1);
                     gameStats.bulletsHit++;
@@ -4823,13 +5253,11 @@ document.addEventListener('DOMContentLoaded', function() {
                         updateHealthBars();
                         
                         if (gameState.lives <= 0) {
-                            endGame();
+                            if (reviveState.available && gameState.gameMode !== 'survival') startRevive();
+                            else endGame();
                         } else {
-                            // Invincibilité temporaire avec clignotement (1-2 secondes)
                             ship.invincible = true;
-                            setTimeout(() => {
-                                ship.invincible = false;
-                            }, 2000); // 2 secondes exactement
+                            setTimeout(() => { ship.invincible = false; }, 2000);
                         }
                     }
                 }
@@ -4859,14 +5287,11 @@ document.addEventListener('DOMContentLoaded', function() {
                     updateHealthBars();
                     
                     if (gameState.lives <= 0) {
-                        endGame();
+                        if (reviveState.available && gameState.gameMode !== 'survival') startRevive();
+                        else endGame();
                     } else {
-                        // Invincibilité temporaire avec clignotement (2 secondes)
-                        // Plus longue que pour les astéroïdes car le boss est plus dangereux
                         ship.invincible = true;
-                        setTimeout(() => {
-                            ship.invincible = false;
-                        }, 2000);
+                        setTimeout(() => { ship.invincible = false; }, 2000);
                     }
                 }
             }
@@ -5185,7 +5610,8 @@ document.addEventListener('DOMContentLoaded', function() {
         gameStats.bulletsFired++;
         if (!gameState.isPlaying || gameState.isPaused) return;
         
-        const effectiveFireRate = getEffectiveFireRate();
+        const weapon = WEAPONS[currentWeapon];
+        const effectiveFireRate = getEffectiveFireRate() * weapon.fireRate;
         if (Date.now() - lastShotTime < effectiveFireRate) return;
         lastShotTime = Date.now();
         
@@ -5193,24 +5619,32 @@ document.addEventListener('DOMContentLoaded', function() {
         const bulletSpeed = 12;
         const isChicken = activePowerUps.tastyCrousty && Date.now() < activePowerUps.tastyCroustyEndTime;
         const size = isChicken ? Math.max(bulletSize, 10) : bulletSize;
+        const weaponId = weapon.id;
+        const wColor = weapon.color;
         
-        if (isChicken) {
+        if (weaponId === 'shotgun') {
+            const spread = [-1.6, -0.8, 0, 0.8, 1.6];
+            spread.forEach(vx => {
+                bullets.push({ x: ship.x + vx * 4, y: ship.y - ship.height / 2, speed: bulletSpeed, vx, vy: -bulletSpeed, size: bulletSize * 0.8, weaponColor: wColor, damage: weapon.damage });
+            });
+        } else if (weaponId === 'missile') {
+            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed * 0.7, size: bulletSize * 1.5, weaponColor: wColor, damage: weapon.damage, isMissile: true });
+        } else if (isChicken) {
             if (activePowerUps.tripleShot) {
-                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: -0.8, vy: -bulletSpeed, size, isChicken: true });
-                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0, vy: -bulletSpeed, size, isChicken: true });
-                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0.8, vy: -bulletSpeed, size, isChicken: true });
+                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: -0.8, vy: -bulletSpeed, size, isChicken: true, damage: weapon.damage });
+                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0, vy: -bulletSpeed, size, isChicken: true, damage: weapon.damage });
+                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0.8, vy: -bulletSpeed, size, isChicken: true, damage: weapon.damage });
             } else {
-                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, size, isChicken: true });
+                bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, size, isChicken: true, damage: weapon.damage });
             }
         } else if (activePowerUps.tripleShot) {
-            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: -0.8, vy: -bulletSpeed, size: bulletSize });
-            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0, vy: -bulletSpeed, size: bulletSize });
-            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0.8, vy: -bulletSpeed, size: bulletSize });
+            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: -0.8, vy: -bulletSpeed, size: bulletSize, weaponColor: wColor, damage: weapon.damage });
+            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0, vy: -bulletSpeed, size: bulletSize, weaponColor: wColor, damage: weapon.damage });
+            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, vx: 0.8, vy: -bulletSpeed, size: bulletSize, weaponColor: wColor, damage: weapon.damage });
         } else {
-            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, size: bulletSize });
+            bullets.push({ x: ship.x, y: ship.y - ship.height / 2, speed: bulletSpeed, size: bulletSize, weaponColor: wColor, damage: weapon.damage });
         }
         
-        // Étincelles à la sortie du canon
         const muzzleY = ship.y - ship.height / 2;
         const sparkCount = gameState.isLowEndDevice ? 3 : 6;
         for (let i = 0; i < sparkCount; i++) {
@@ -5221,7 +5655,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 vy: -2 - Math.random() * 3,
                 life: 1,
                 size: 1.5 + Math.random() * 1,
-                color: (getCurrentTheme && getCurrentTheme().bullets) || '#00ffff'
+                color: wColor || (getCurrentTheme && getCurrentTheme().bullets) || '#00ffff'
             });
         }
         
@@ -5240,6 +5674,12 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             performDash();
         }
+        
+        // Weapon switch (1-4)
+        if (e.code === 'Digit1' && gameState.isPlaying) currentWeapon = 0;
+        if (e.code === 'Digit2' && gameState.isPlaying) currentWeapon = 1;
+        if (e.code === 'Digit3' && gameState.isPlaying) currentWeapon = 2;
+        if (e.code === 'Digit4' && gameState.isPlaying) currentWeapon = 3;
         
         if (!volumeManuallyModified) {
             if (e.code === 'ArrowUp' && (e.ctrlKey || e.metaKey)) {
@@ -5306,7 +5746,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         if (e.code === 'Space') {
-            // Vérifier si le formulaire d'enregistrement est ouvert
+            // Revive : mash space
+            if (reviveState.active) { reviveState.presses++; e.preventDefault(); return; }
+            
             const isRegisterFormOpen = scoreRegister && !scoreRegister.classList.contains('hidden');
             
             // Si le formulaire est ouvert ou qu'un enregistrement est en cours, ne pas démarrer le jeu
@@ -5415,8 +5857,8 @@ document.addEventListener('DOMContentLoaded', function() {
         const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
         const shipHeight = ship.height / 2;
         
-        // Mouvement horizontal (gauche/droite) — légèrement plus lent sur les côtés
-        const horizontalSpeed = ship.speed * 0.78;
+        const speedBonus = 1 + shopUpgrades.startSpeed.level * 0.1;
+        const horizontalSpeed = ship.speed * 0.78 * speedBonus;
         if (keys['ArrowLeft'] || keys['KeyA']) {
             ship.x = Math.max(shipSize, ship.x - horizontalSpeed * gameState.deltaTime);
         }
@@ -5424,8 +5866,7 @@ document.addEventListener('DOMContentLoaded', function() {
             ship.x = Math.min(canvas.width - shipSize, ship.x + horizontalSpeed * gameState.deltaTime);
         }
         
-        // Mouvement vertical (avancer/reculer) - vitesse légèrement réduite pour l'équilibre
-        const verticalSpeed = ship.speed * 0.8; // 80% de la vitesse horizontale pour l'équilibre
+        const verticalSpeed = ship.speed * 0.8 * speedBonus;
         if (keys['ArrowUp'] || keys['KeyW']) {
             // Avancer (vers le haut) - limite à 20% du haut de l'écran
             const minY = canvas.height * 0.2;
@@ -5594,12 +6035,99 @@ document.addEventListener('DOMContentLoaded', function() {
     initVolumeControl();
     
     // Mode selector (boutons)
-    document.querySelectorAll('.mode-btn').forEach(btn => {
+    document.querySelectorAll('.mode-btn[data-mode]').forEach(btn => {
         btn.addEventListener('click', () => {
-            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.mode-btn[data-mode]').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
         });
     });
+    
+    // --- BOUTIQUE UI ---
+    const shopModal = document.getElementById('shop-modal');
+    const skinsModal = document.getElementById('skins-modal');
+    const shopBtn = document.getElementById('shop-btn');
+    const skinsBtn = document.getElementById('skins-btn');
+    const closeShop = document.getElementById('close-shop');
+    const closeSkins = document.getElementById('close-skins');
+    
+    function renderShop() {
+        const container = document.getElementById('shop-items');
+        const currencyEl = document.getElementById('shop-currency');
+        if (!container) return;
+        if (currencyEl) currencyEl.textContent = shopCurrency + ' 🪙';
+        container.innerHTML = '';
+        Object.keys(shopUpgrades).forEach(key => {
+            const u = shopUpgrades[key];
+            const isMax = u.level >= u.max;
+            const cost = isMax ? '-' : u.cost[u.level];
+            const canBuy = !isMax && shopCurrency >= cost;
+            const el = document.createElement('div');
+            el.className = 'shop-item' + (isMax ? ' maxed' : '');
+            el.innerHTML = `<span class="shop-icon">${u.icon}</span><div class="shop-info"><div class="shop-name">${u.desc}</div><div class="shop-level">Niv. ${u.level}/${u.max}</div></div><button class="shop-buy-btn ${canBuy ? '' : 'disabled'}" data-key="${key}">${isMax ? 'MAX' : cost + ' 🪙'}</button>`;
+            container.appendChild(el);
+        });
+        container.querySelectorAll('.shop-buy-btn:not(.disabled)').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const k = btn.dataset.key;
+                const u = shopUpgrades[k];
+                if (u.level < u.max && shopCurrency >= u.cost[u.level]) {
+                    shopCurrency -= u.cost[u.level];
+                    u.level++;
+                    saveShop();
+                    renderShop();
+                }
+            });
+        });
+    }
+    
+    function renderSkins() {
+        const container = document.getElementById('skins-list');
+        if (!container) return;
+        const totalScore = getTotalScore();
+        container.innerHTML = '';
+        SHIP_SKINS.forEach((s, i) => {
+            const unlocked = totalScore >= s.unlockScore;
+            const selected = currentSkin === i;
+            const el = document.createElement('div');
+            el.className = 'shop-item' + (selected ? ' selected' : '') + (!unlocked ? ' locked' : '');
+            el.innerHTML = `<span class="skin-preview" style="background:${s.color};width:24px;height:24px;border-radius:50%;display:inline-block;border:2px solid ${selected ? '#fff' : 'transparent'}"></span><div class="shop-info"><div class="shop-name">${s.name}</div><div class="shop-level">${unlocked ? (selected ? '✓ Équipé' : 'Débloqué') : 'Score total : ' + s.unlockScore}</div></div>${unlocked && !selected ? '<button class="shop-buy-btn skin-select" data-idx="'+i+'">Équiper</button>' : ''}`;
+            container.appendChild(el);
+        });
+        container.querySelectorAll('.skin-select').forEach(btn => {
+            btn.addEventListener('click', () => {
+                currentSkin = parseInt(btn.dataset.idx, 10);
+                ship.color = SHIP_SKINS[currentSkin].color;
+                saveShop();
+                renderSkins();
+            });
+        });
+    }
+    
+    if (shopBtn) shopBtn.addEventListener('click', () => { shopModal.classList.remove('hidden'); renderShop(); });
+    if (closeShop) closeShop.addEventListener('click', () => shopModal.classList.add('hidden'));
+    if (skinsBtn) skinsBtn.addEventListener('click', () => { skinsModal.classList.remove('hidden'); renderSkins(); });
+    if (closeSkins) closeSkins.addEventListener('click', () => skinsModal.classList.add('hidden'));
+    
+    // --- PARTAGE DE SCORE ---
+    const shareBtn = document.getElementById('share-score-btn');
+    if (shareBtn) {
+        shareBtn.addEventListener('click', () => {
+            const grade = document.getElementById('final-grade')?.textContent || '-';
+            const text = `🚀 SPACE SHOOTER 🚀\n` +
+                `Score: ${gameState.score} | Niveau: ${gameState.level} | Grade: ${grade}\n` +
+                `🔥 Max Combo: ${gameStats.maxCombo || 0} (x${gameStats.maxMultiplier || 1})\n` +
+                `🎯 Précision: ${gameStats.bulletsFired > 0 ? ((gameStats.bulletsHit / gameStats.bulletsFired) * 100).toFixed(1) : 0}%\n` +
+                `Mode: ${gameState.gameMode}\n` +
+                `Peux-tu faire mieux ?`;
+            navigator.clipboard.writeText(text).then(() => {
+                shareBtn.textContent = '✓ Copié !';
+                setTimeout(() => { shareBtn.textContent = '📋 Partager'; }, 2000);
+            }).catch(() => {
+                shareBtn.textContent = '❌ Erreur';
+                setTimeout(() => { shareBtn.textContent = '📋 Partager'; }, 2000);
+            });
+        });
+    }
     
     function pauseGame() {
         gameState.isPaused = !gameState.isPaused;
@@ -5625,10 +6153,15 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function endGame() {
         gameState.isPlaying = false;
+        reviveState.active = false;
         if (gameLoopId != null) {
             cancelAnimationFrame(gameLoopId);
             gameLoopId = null;
         }
+        // Ajouter à la monnaie de la boutique
+        shopCurrency += Math.floor(gameState.score * 0.1);
+        addTotalScore(gameState.score);
+        saveShop();
         clearKeysAndShooting();
         if (brolyAudio) {
             brolyAudio.pause();

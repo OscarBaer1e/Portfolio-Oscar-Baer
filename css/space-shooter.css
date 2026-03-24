@@ -708,6 +708,79 @@
     opacity: 1;
 }
 
+/* Boutique / Skins modal */
+.shop-modal {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(6,6,14,0.95);
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+}
+.shop-modal.hidden { display: none; }
+.shop-content {
+    background: var(--ss-surface);
+    border: 1px solid var(--ss-border-bright);
+    border-radius: 20px;
+    padding: 28px 24px;
+    min-width: 300px;
+    max-width: 420px;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+.shop-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+}
+.shop-header h3 {
+    margin: 0;
+    font-family: var(--ss-font);
+    background: linear-gradient(135deg, var(--ss-accent-bright), var(--ss-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.shop-currency {
+    font-family: var(--ss-font);
+    font-size: 1rem;
+    color: var(--ss-gold);
+}
+.shop-items { display: flex; flex-direction: column; gap: 10px; }
+.shop-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+.shop-item.maxed { opacity: 0.5; }
+.shop-item.selected { border-color: var(--ss-accent); background: rgba(108,138,255,0.08); }
+.shop-item.locked { opacity: 0.4; }
+.shop-icon { font-size: 1.5rem; }
+.shop-info { flex: 1; }
+.shop-name { font-size: 0.85rem; color: #fff; font-weight: 600; }
+.shop-level { font-size: 0.7rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
+.shop-buy-btn {
+    padding: 6px 14px;
+    border: 1px solid var(--ss-border);
+    background: transparent;
+    color: var(--ss-gold);
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-family: var(--ss-font);
+    cursor: pointer;
+    transition: all .2s;
+}
+.shop-buy-btn:hover:not(.disabled) { background: rgba(255,216,102,0.15); border-color: var(--ss-gold); }
+.shop-buy-btn.disabled { opacity: 0.3; cursor: default; }
+.start-extra-btns { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+
 .game-message.level {
     background: linear-gradient(135deg, var(--ss-green), #2ed573);
     color: #000;

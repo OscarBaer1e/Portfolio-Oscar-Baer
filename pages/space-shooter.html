@@ -116,6 +116,7 @@
                             </div>
                             <div class="game-over-buttons">
                                 <button id="restart-btn" class="btn primary-btn">Rejouer</button>
+                                <button id="share-score-btn" class="btn secondary-btn">📋 Partager</button>
                                 <button id="register-score-btn" class="btn secondary-btn hidden">💾 Enregistrer mon Score</button>
                             </div>
                         </div>
@@ -127,7 +128,23 @@
                                 <button class="mode-btn" data-mode="survival">Survie</button>
                                 <button class="mode-btn" data-mode="bossrush">Boss Rush</button>
                             </div>
-                            <p class="start-hint">ESPACE pour commencer</p>
+                            <div class="start-extra-btns">
+                                <button id="shop-btn" class="mode-btn">🛒 Boutique</button>
+                                <button id="skins-btn" class="mode-btn">🎨 Skins</button>
+                            </div>
+                            <p class="start-hint">ESPACE pour commencer · 1-4 changer d'arme · Shift dash</p>
+                        </div>
+                        <div id="shop-modal" class="shop-modal hidden">
+                            <div class="shop-content">
+                                <div class="shop-header"><h3>🛒 Boutique</h3><span id="shop-currency" class="shop-currency">0 🪙</span><button id="close-shop" class="close-btn">&times;</button></div>
+                                <div id="shop-items" class="shop-items"></div>
+                            </div>
+                        </div>
+                        <div id="skins-modal" class="shop-modal hidden">
+                            <div class="shop-content">
+                                <div class="shop-header"><h3>🎨 Skins</h3><button id="close-skins" class="close-btn">&times;</button></div>
+                                <div id="skins-list" class="shop-items"></div>
+                            </div>
                         </div>
                         
                         <!-- Contrôles tactiles pour mobile -->
@@ -189,9 +206,10 @@
                                 <p><kbd>↑</kbd> <kbd>↓</kbd> ou <kbd>W</kbd> <kbd>S</kbd> — Avancer / Reculer</p>
                                 <p><kbd>ESPACE</kbd> — Tirer (maintenir = auto)</p>
                                 <p><kbd>Shift</kbd> — Dash (esquive rapide)</p>
+                                <p><kbd>1</kbd> <kbd>2</kbd> <kbd>3</kbd> <kbd>4</kbd> — Changer d'arme</p>
                             </div>
                         </div>
-                        <p class="tip">Détruisez les astéroïdes, collectez les bonus, battez les boss tous les 10 niveaux et grimpez dans le leaderboard. Astéroïdes spéciaux à partir du niv. 5 : 💥 Explosif, 🛡️ Blindé, 🧲 Magnétique.</p>
+                        <p class="tip">4 modes de jeu · 4 armes · Boutique d'upgrades · Astéroïdes spéciaux dès le niv. 5 · Boss enragés sous 30% HP · Vagues scénarisées · Météo spatiale.</p>
                     </div>
                     
                     <div id="game-message" class="game-message"></div>
