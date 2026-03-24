@@ -63,15 +63,41 @@
         @media (max-width: 900px) {
             .about-highlights { grid-template-columns: 1fr; }
         }
-        @media (max-width: 640px) {
+        @media (max-width: 992px) {
             #about .container .about-layout-grid {
                 display: flex !important;
                 flex-direction: column;
                 flex-wrap: nowrap !important;
                 gap: 2rem;
             }
+            .about-cv-lead {
+                font-size: 0.98rem;
+                margin-bottom: 1.4rem;
+            }
+            .about-cv-intro {
+                margin-bottom: 1.6rem;
+            }
+            .about-content .hero-actions {
+                display: flex;
+                flex-direction: column;
+                gap: 0.7rem;
+                align-items: stretch;
+            }
+            .about-content .hero-actions .btn {
+                width: 100%;
+                margin-top: 0;
+            }
+        }
+        @media (max-width: 640px) {
+            .about-cv-section h3 { font-size: 1.15rem; }
             .cv-timeline { padding-left: 1.75rem; }
             .cv-timeline-item::before { left: -1.75rem; width: 12px; height: 12px; }
+            .cv-timeline-item .cv-content h4 { font-size: 1rem; }
+            .cv-timeline-item .cv-content p { font-size: 0.9rem; }
+            .about-langues-pills span {
+                width: 100%;
+                text-align: center;
+            }
         }
     </style>
 </head>
