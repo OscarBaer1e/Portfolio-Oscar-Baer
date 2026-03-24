@@ -652,6 +652,9 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Particules thématiques de fond ---
     let themeParticles = [];
     
+    // --- Périls ---
+    let perilState = { active: false, type: null, timer: 0, cooldown: 20000 + Math.random() * 25000, data: null };
+    
     // Canvas de grain pour overlay rétro (créé une fois)
     let grainCanvas = null;
     
@@ -1293,6 +1296,7 @@ document.addEventListener('DOMContentLoaded', function() {
         waveState = { active: false, asteroids: [], spawnTimer: 0, cooldown: 0 };
         chainLinks = [];
         themeParticles = [];
+        perilState = { active: false, type: null, timer: 0, cooldown: 20000 + Math.random() * 25000, data: null };
         
         // Appliquer upgrades boutique
         ship.color = SHIP_SKINS[currentSkin] ? SHIP_SKINS[currentSkin].color : '#8fadff';
@@ -2055,21 +2059,40 @@ document.addEventListener('DOMContentLoaded', function() {
             chainLinks.forEach(chain => {
                 const linked = asteroids.filter(a => a.chainId === chain.id);
                 if (linked.length < 2) return;
-                ctx.strokeStyle = '#ffaa40';
-                ctx.lineWidth = 1.5;
-                ctx.globalAlpha = 0.3 + Math.sin(Date.now() / 200) * 0.15;
-                ctx.shadowBlur = 6;
-                ctx.shadowColor = '#ffaa40';
+                const hasPulse = chain.pulseTime && (Date.now() - chain.pulseTime < 600);
+                const pulseProgress = hasPulse ? (Date.now() - chain.pulseTime) / 600 : 0;
+                const baseAlpha = 0.3 + Math.sin(Date.now() / 200) * 0.15;
+                const pulseAlpha = hasPulse ? 0.7 * (1 - pulseProgress) : 0;
+                ctx.lineWidth = hasPulse ? 2.5 + pulseProgress * 2 : 1.5;
+                ctx.shadowBlur = hasPulse ? 14 : 6;
+                ctx.shadowColor = hasPulse ? '#fff' : '#ffaa40';
+                ctx.strokeStyle = hasPulse ? `rgba(255,220,100,${baseAlpha + pulseAlpha})` : '#ffaa40';
+                ctx.globalAlpha = baseAlpha + pulseAlpha;
                 for (let i = 0; i < linked.length - 1; i++) {
                     ctx.beginPath();
                     ctx.moveTo(linked[i].x, linked[i].y);
                     ctx.lineTo(linked[i + 1].x, linked[i + 1].y);
                     ctx.stroke();
                 }
-                ctx.beginPath();
-                ctx.moveTo(linked[linked.length - 1].x, linked[linked.length - 1].y);
-                ctx.lineTo(linked[0].x, linked[0].y);
-                ctx.stroke();
+                if (linked.length > 2) {
+                    ctx.beginPath();
+                    ctx.moveTo(linked[linked.length - 1].x, linked[linked.length - 1].y);
+                    ctx.lineTo(linked[0].x, linked[0].y);
+                    ctx.stroke();
+                }
+                // Pulse glow autour des astéroïdes restants
+                if (hasPulse) {
+                    linked.forEach(a => {
+                        if (a._chainPulse && a._chainPulse > 0) {
+                            ctx.globalAlpha = a._chainPulse * 0.4;
+                            ctx.fillStyle = '#ffdd80';
+                            ctx.beginPath();
+                            ctx.arc(a.x, a.y, a.size * 1.4, 0, Math.PI * 2);
+                            ctx.fill();
+                            a._chainPulse -= 0.02;
+                        }
+                    });
+                }
             });
             ctx.restore();
         }
@@ -2124,6 +2147,68 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.globalAlpha = pulse;
             ctx.fillStyle = '#ff0000';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.restore();
+        }
+        
+        // --- Périls ---
+        if (perilState.active) {
+            ctx.save();
+            if (perilState.type === 'giant' && perilState.data) {
+                const g = perilState.data;
+                g.rotation += 0.003 * gameState.deltaTime;
+                ctx.translate(g.x, g.y);
+                ctx.rotate(g.rotation);
+                const grad = ctx.createRadialGradient(-g.size * 0.2, -g.size * 0.2, 0, 0, 0, g.size);
+                grad.addColorStop(0, '#886655');
+                grad.addColorStop(0.5, '#554433');
+                grad.addColorStop(1, '#332211');
+                ctx.fillStyle = grad;
+                ctx.beginPath();
+                for (let i = 0; i < 12; i++) {
+                    const a = (i / 12) * Math.PI * 2;
+                    const r = g.size * (0.85 + Math.sin(a * 3 + g.rotation * 2) * 0.15);
+                    i === 0 ? ctx.moveTo(Math.cos(a) * r, Math.sin(a) * r) : ctx.lineTo(Math.cos(a) * r, Math.sin(a) * r);
+                }
+                ctx.closePath();
+                ctx.fill();
+                ctx.strokeStyle = 'rgba(255,100,50,0.3)';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+                // Cratères
+                ctx.globalAlpha = 0.15;
+                ctx.fillStyle = '#000';
+                ctx.beginPath(); ctx.arc(-g.size * 0.25, -g.size * 0.15, g.size * 0.15, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(g.size * 0.2, g.size * 0.25, g.size * 0.12, 0, Math.PI * 2); ctx.fill();
+                ctx.beginPath(); ctx.arc(g.size * 0.1, -g.size * 0.35, g.size * 0.1, 0, Math.PI * 2); ctx.fill();
+            } else if (perilState.type === 'blackhole' && perilState.data) {
+                const bh = perilState.data;
+                const t = Date.now() * 0.002;
+                // Anneaux d'accrétion
+                for (let r = 3; r > 0; r--) {
+                    ctx.globalAlpha = 0.08 + r * 0.03;
+                    ctx.strokeStyle = `hsl(${260 + r * 15}, 70%, ${40 + r * 10}%)`;
+                    ctx.lineWidth = 2 + r;
+                    ctx.beginPath();
+                    ctx.arc(bh.x, bh.y, bh.radius * (0.3 + r * 0.2) + Math.sin(t + r) * 5, 0, Math.PI * 2);
+                    ctx.stroke();
+                }
+                // Centre noir
+                const bhGrad = ctx.createRadialGradient(bh.x, bh.y, 0, bh.x, bh.y, bh.radius * 0.35);
+                bhGrad.addColorStop(0, 'rgba(0,0,0,0.9)');
+                bhGrad.addColorStop(0.7, 'rgba(20,0,40,0.5)');
+                bhGrad.addColorStop(1, 'transparent');
+                ctx.globalAlpha = 0.8;
+                ctx.fillStyle = bhGrad;
+                ctx.beginPath();
+                ctx.arc(bh.x, bh.y, bh.radius * 0.35, 0, Math.PI * 2);
+                ctx.fill();
+                // Distortion visuelle
+                ctx.globalAlpha = 0.04 + Math.sin(t * 2) * 0.02;
+                ctx.fillStyle = '#4400aa';
+                ctx.beginPath();
+                ctx.arc(bh.x, bh.y, bh.radius, 0, Math.PI * 2);
+                ctx.fill();
+            }
             ctx.restore();
         }
         
@@ -3666,6 +3751,7 @@ document.addEventListener('DOMContentLoaded', function() {
         trySpawnChain();
         updateSpaceWeather();
         updateThemeParticles();
+        updatePerils();
         if (reviveState.active) updateRevive();
         
         // Missile homing
@@ -4422,6 +4508,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const link = chainLinks.find(c => c.id === chainId);
         if (!link) return;
         link.destroyed++;
+        // Pulse d'énergie vers les voisins encore vivants
+        link.pulseTime = Date.now();
+        const siblings = asteroids.filter(a => a.chainId === chainId);
+        siblings.forEach(s => { s._chainPulse = 1.0; });
         if (link.destroyed >= link.count) {
             const bonus = link.count * 50;
             addScoreWithCombo(bonus, x, y);
@@ -4514,6 +4604,92 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         themeParticles.forEach(p => { p.x += p.vx; p.y += p.vy; p.life -= 0.003; });
         themeParticles = themeParticles.filter(p => p.life > 0 && p.y > -10 && p.y < canvas.height + 10);
+    }
+    
+    // --- PÉRILS ---
+    function updatePerils() {
+        if (perilState.active) {
+            perilState.timer -= 16.67 * gameState.deltaTime;
+            if (perilState.type === 'giant') {
+                const g = perilState.data;
+                g.x += g.vx * gameState.deltaTime;
+                g.y += g.vy * gameState.deltaTime;
+                // Collision avec le vaisseau
+                if (!ship.invincible && !dashState.active) {
+                    const d = Math.hypot(ship.x - g.x, ship.y - g.y);
+                    if (d < g.size + ship.width / 2) {
+                        gameState.lives--;
+                        if (livesElement) livesElement.textContent = gameState.lives;
+                        updateHealthBars();
+                        createEnhancedExplosion(ship.x, ship.y, ship.color, 30);
+                        playSound('hit');
+                        ship.invincible = true;
+                        setTimeout(() => { ship.invincible = false; }, 2000);
+                        if (gameState.lives <= 0) {
+                            if (reviveState.available && gameState.gameMode !== 'survival') startRevive();
+                            else endGame();
+                        }
+                    }
+                }
+                if (g.x < -g.size * 2 || g.x > canvas.width + g.size * 2 || g.y > canvas.height + g.size * 2) {
+                    perilState.active = false;
+                    addScoreWithCombo(200, canvas.width / 2, canvas.height / 2);
+                    showMessage('PÉRIL SURVÉCU +200', 'powerup');
+                }
+            } else if (perilState.type === 'blackhole') {
+                const bh = perilState.data;
+                // Attirer les astéroïdes et le vaisseau
+                asteroids.forEach(a => {
+                    const d = Math.hypot(a.x - bh.x, a.y - bh.y);
+                    if (d < bh.radius && d > 0) {
+                        a.x += ((bh.x - a.x) / d) * 1.2 * gameState.deltaTime;
+                        a.y += ((bh.y - a.y) / d) * 1.2 * gameState.deltaTime;
+                    }
+                });
+                if (!ship.invincible && !dashState.active) {
+                    const d = Math.hypot(ship.x - bh.x, ship.y - bh.y);
+                    if (d < bh.radius && d > 0) {
+                        ship.x += ((bh.x - ship.x) / d) * 0.5 * gameState.deltaTime;
+                        ship.y += ((bh.y - ship.y) / d) * 0.5 * gameState.deltaTime;
+                    }
+                }
+                if (perilState.timer <= 0) {
+                    perilState.active = false;
+                    addScoreWithCombo(300, bh.x, bh.y);
+                    showMessage('TROU NOIR SURVÉCU +300', 'powerup');
+                }
+            }
+            return;
+        }
+        perilState.cooldown -= 16.67 * gameState.deltaTime;
+        if (perilState.cooldown <= 0 && gameState.level >= 10 && !gameState.bossActive) {
+            const types = ['giant', 'blackhole'];
+            perilState.type = types[Math.floor(Math.random() * types.length)];
+            perilState.active = true;
+            if (perilState.type === 'giant') {
+                const fromLeft = Math.random() < 0.5;
+                perilState.data = {
+                    x: fromLeft ? -120 : canvas.width + 120,
+                    y: canvas.height * (0.2 + Math.random() * 0.5),
+                    vx: fromLeft ? 0.8 : -0.8,
+                    vy: 0.3 + Math.random() * 0.3,
+                    size: 80 + Math.random() * 40,
+                    rotation: 0
+                };
+                perilState.timer = 15000;
+                showMessage('PÉRIL : Astéroïde géant !', 'boss');
+            } else {
+                perilState.data = {
+                    x: canvas.width * (0.2 + Math.random() * 0.6),
+                    y: canvas.height * (0.2 + Math.random() * 0.4),
+                    radius: 120 + Math.random() * 60
+                };
+                perilState.timer = 6000;
+                showMessage('PÉRIL : Trou noir !', 'boss');
+            }
+            screenShake.intensity = 10;
+            perilState.cooldown = 30000 + Math.random() * 30000;
+        }
     }
     
     function spawnAsteroid() {
@@ -5440,7 +5616,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         const bossNumber = boss.bossNumber;
         
-        // Patterns de tir différents pour chaque boss
+        // Phase 2 enragée : patterns uniques par boss
+        if (boss.enraged) {
+            bossShootEnraged(bossNumber);
+            return;
+        }
+        
         switch(bossNumber) {
             case 1:
                 // Tir simple vers le bas
@@ -5608,7 +5789,83 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     
-    // Cadence effective : tous les bonus de tir se cumulent (fusion)
+    // Patterns enragés uniques par boss
+    function bossShootEnraged(bossNumber) {
+        const dx = ship.x - boss.x;
+        const dy = ship.y - boss.y;
+        const dist = Math.max(1, Math.sqrt(dx * dx + dy * dy));
+        
+        switch(bossNumber) {
+            case 1: // Rafale triple ciblée
+                for (let i = -1; i <= 1; i++) {
+                    bossBullets.push({ x: boss.x, y: boss.y + boss.size, speed: 4, vx: (dx / dist) * 2.5 + i * 0.6, vy: (dy / dist) * 2.5, size: 7, color: '#ff4444' });
+                }
+                break;
+            case 2: // Kamehameha — laser large (5 balles alignées)
+                for (let i = -2; i <= 2; i++) {
+                    bossBullets.push({ x: boss.x + i * 8, y: boss.y + boss.size, speed: 0, vx: 0, vy: 5, size: 10, color: '#44ccff', isLaser: true });
+                }
+                break;
+            case 3: // Spirale double rapide
+                for (let s = 0; s < 2; s++) {
+                    for (let i = 0; i < 5; i++) {
+                        const a = boss.patternTime * 0.015 + (i / 5) * Math.PI * 2 + s * Math.PI;
+                        bossBullets.push({ x: boss.x, y: boss.y, speed: 0, vx: Math.cos(a) * 3, vy: Math.sin(a) * 3, size: 5, color: '#ff66ff' });
+                    }
+                }
+                break;
+            case 4: // Téléportation + tirs en croix
+                boss.x = 50 + Math.random() * (canvas.width - 100);
+                boss.y = 50 + Math.random() * 100;
+                for (let i = 0; i < 4; i++) {
+                    const a = (i / 4) * Math.PI * 2;
+                    bossBullets.push({ x: boss.x, y: boss.y, speed: 0, vx: Math.cos(a) * 4, vy: Math.sin(a) * 4, size: 8, color: '#ff9900' });
+                }
+                break;
+            case 5: // Double cercle (16 directions)
+                for (let i = 0; i < 16; i++) {
+                    const a = (i / 16) * Math.PI * 2;
+                    const spd = (i % 2 === 0) ? 2 : 3;
+                    bossBullets.push({ x: boss.x, y: boss.y, speed: 0, vx: Math.cos(a) * spd, vy: Math.sin(a) * spd, size: 5, color: '#ffcc00' });
+                }
+                break;
+            case 6: // Mur de balles ondulé
+                for (let i = -4; i <= 4; i++) {
+                    const offset = Math.sin(boss.patternTime * 0.008 + i * 0.5) * 15;
+                    bossBullets.push({ x: boss.x + i * 20 + offset, y: boss.y + boss.size, speed: 4, vx: 0, size: 6, color: '#ffff44' });
+                }
+                break;
+            case 7: // Shotgun enragé (9 tirs)
+                for (let i = -4; i <= 4; i++) {
+                    bossBullets.push({ x: boss.x, y: boss.y + boss.size, speed: 5, vx: i * 0.8, size: 5, color: '#ff00ff' });
+                }
+                break;
+            case 8: // Pluie + ciblé
+                for (let i = 0; i < 6; i++) {
+                    bossBullets.push({ x: boss.x + (Math.random() - 0.5) * 80, y: boss.y + boss.size, speed: 3 + Math.random() * 2, vx: (Math.random() - 0.5) * 1.5, size: 5, color: '#ff33ff' });
+                }
+                bossBullets.push({ x: boss.x, y: boss.y + boss.size, speed: 5, vx: (dx / dist) * 3, vy: (dy / dist) * 3, size: 9, color: '#ff0000' });
+                break;
+            case 9: // Chaos x2 (10 random)
+                for (let i = 0; i < 10; i++) {
+                    const a = Math.random() * Math.PI * 2;
+                    bossBullets.push({ x: boss.x, y: boss.y, speed: 0, vx: Math.cos(a) * (2 + Math.random() * 2), vy: Math.sin(a) * (2 + Math.random() * 2), size: 5, color: '#ff88ff' });
+                }
+                break;
+            case 10: // Étoile 16 + laser ciblé double
+                for (let i = 0; i < 16; i++) {
+                    const a = (i / 16) * Math.PI * 2 + boss.patternTime * 0.005;
+                    bossBullets.push({ x: boss.x, y: boss.y, speed: 0, vx: Math.cos(a) * 3.5, vy: Math.sin(a) * 3.5, size: 6, color: '#ffffff' });
+                }
+                for (let i = -1; i <= 1; i += 2) {
+                    bossBullets.push({ x: boss.x + i * 15, y: boss.y + boss.size, speed: 6, vx: (dx / dist) * 4 + i * 0.5, vy: (dy / dist) * 4, size: 9, color: '#ff2222' });
+                }
+                break;
+            default:
+                bossBullets.push({ x: boss.x, y: boss.y + boss.size, speed: 4, vx: (dx / dist) * 2, vy: (dy / dist) * 2, size: 7, color: '#ff4444' });
+        }
+    }
+    
     function getEffectiveFireRate() {
         const now = Date.now();
         let rate = currentFireRate;
@@ -6119,6 +6376,69 @@ document.addEventListener('DOMContentLoaded', function() {
     if (skinsBtn) skinsBtn.addEventListener('click', () => { skinsModal.classList.remove('hidden'); renderSkins(); });
     if (closeSkins) closeSkins.addEventListener('click', () => skinsModal.classList.add('hidden'));
     
+    // Game over : boutique / skins / stats
+    const goShopBtn = document.getElementById('go-shop-btn');
+    const goSkinsBtn = document.getElementById('go-skins-btn');
+    const goStatsBtn = document.getElementById('go-stats-btn');
+    if (goShopBtn) goShopBtn.addEventListener('click', () => { shopModal.classList.remove('hidden'); renderShop(); });
+    if (goSkinsBtn) goSkinsBtn.addEventListener('click', () => { skinsModal.classList.remove('hidden'); renderSkins(); });
+    if (goStatsBtn) goStatsBtn.addEventListener('click', () => { statsModal.classList.remove('hidden'); renderPersistentStats(); });
+    
+    // Start screen : stats
+    const statsBtn = document.getElementById('stats-btn');
+    const statsModal = document.getElementById('stats-modal');
+    const closeStats = document.getElementById('close-stats');
+    if (statsBtn) statsBtn.addEventListener('click', () => { statsModal.classList.remove('hidden'); renderPersistentStats(); });
+    if (closeStats) closeStats.addEventListener('click', () => statsModal.classList.add('hidden'));
+    
+    // --- STATS PERSISTANTES ---
+    function loadPersistentStats() {
+        try { return JSON.parse(localStorage.getItem('ssPersistentStats') || '{}'); } catch (e) { return {}; }
+    }
+    function savePersistentStats(s) {
+        try { localStorage.setItem('ssPersistentStats', JSON.stringify(s)); } catch (e) {}
+    }
+    function updatePersistentStats() {
+        const s = loadPersistentStats();
+        s.totalGames = (s.totalGames || 0) + 1;
+        s.totalScore = (s.totalScore || 0) + (gameState.score || 0);
+        s.totalAsteroids = (s.totalAsteroids || 0) + (gameStats.asteroidsDestroyed || 0);
+        s.totalBosses = (s.totalBosses || 0) + (gameStats.bossesDefeated || 0);
+        s.totalTime = (s.totalTime || 0) + (gameStats.timePlayed || 0);
+        s.totalBullets = (s.totalBullets || 0) + (gameStats.bulletsFired || 0);
+        s.totalHits = (s.totalHits || 0) + (gameStats.bulletsHit || 0);
+        s.totalDashes = (s.totalDashes || 0) + (gameStats.dashesUsed || 0);
+        s.totalPowerUps = (s.totalPowerUps || 0) + (gameStats.powerUpsCollected || 0);
+        if ((gameStats.maxCombo || 0) > (s.bestCombo || 0)) s.bestCombo = gameStats.maxCombo;
+        if ((gameStats.maxMultiplier || 1) > (s.bestMultiplier || 1)) s.bestMultiplier = gameStats.maxMultiplier;
+        if ((gameState.score || 0) > (s.bestScore || 0)) s.bestScore = gameState.score;
+        if ((gameState.level || 1) > (s.bestLevel || 1)) s.bestLevel = gameState.level;
+        savePersistentStats(s);
+    }
+    function renderPersistentStats() {
+        const container = document.getElementById('persistent-stats');
+        if (!container) return;
+        const s = loadPersistentStats();
+        const totalMin = Math.floor((s.totalTime || 0) / 60000);
+        const accuracy = (s.totalBullets || 0) > 0 ? ((s.totalHits || 0) / s.totalBullets * 100).toFixed(1) : '0';
+        const rows = [
+            { icon: '🎮', label: 'Parties jouées', value: s.totalGames || 0 },
+            { icon: '🏆', label: 'Meilleur score', value: s.bestScore || 0 },
+            { icon: '🌟', label: 'Meilleur niveau', value: s.bestLevel || 1 },
+            { icon: '🔥', label: 'Meilleur combo', value: `${s.bestCombo || 0} (x${s.bestMultiplier || 1})` },
+            { icon: '🎯', label: 'Astéroïdes total', value: s.totalAsteroids || 0 },
+            { icon: '👹', label: 'Boss vaincus total', value: s.totalBosses || 0 },
+            { icon: '✅', label: 'Précision globale', value: accuracy + '%' },
+            { icon: '💨', label: 'Dashs total', value: s.totalDashes || 0 },
+            { icon: '🎁', label: 'Bonus collectés', value: s.totalPowerUps || 0 },
+            { icon: '⏱️', label: 'Temps total', value: totalMin + ' min' },
+            { icon: '📊', label: 'Score cumulé', value: s.totalScore || 0 }
+        ];
+        container.innerHTML = rows.map(r =>
+            `<div class="shop-item"><span class="shop-icon">${r.icon}</span><div class="shop-info"><div class="shop-name">${r.label}</div></div><span style="color:#fff;font-weight:700;font-family:var(--ss-font)">${r.value}</span></div>`
+        ).join('');
+    }
+    
     // --- PARTAGE DE SCORE ---
     const shareBtn = document.getElementById('share-score-btn');
     if (shareBtn) {
@@ -6173,6 +6493,7 @@ document.addEventListener('DOMContentLoaded', function() {
         shopCurrency += Math.floor(gameState.score * 0.1);
         addTotalScore(gameState.score);
         saveShop();
+        updatePersistentStats();
         clearKeysAndShooting();
         if (brolyAudio) {
             brolyAudio.pause();

@@ -117,7 +117,12 @@
                             <div class="game-over-buttons">
                                 <button id="restart-btn" class="btn primary-btn">Rejouer</button>
                                 <button id="share-score-btn" class="btn secondary-btn">📋 Partager</button>
-                                <button id="register-score-btn" class="btn secondary-btn hidden">💾 Enregistrer mon Score</button>
+                                <button id="register-score-btn" class="btn secondary-btn hidden">💾 Enregistrer</button>
+                            </div>
+                            <div class="go-extra-btns">
+                                <button id="go-shop-btn" class="mode-btn">🛒 Boutique</button>
+                                <button id="go-skins-btn" class="mode-btn">🎨 Skins</button>
+                                <button id="go-stats-btn" class="mode-btn">📊 Stats</button>
                             </div>
                         </div>
                         <div id="start-screen" class="start-screen">
@@ -131,6 +136,7 @@
                             <div class="start-extra-btns">
                                 <button id="shop-btn" class="mode-btn">🛒 Boutique</button>
                                 <button id="skins-btn" class="mode-btn">🎨 Skins</button>
+                                <button id="stats-btn" class="mode-btn">📊 Stats</button>
                             </div>
                             <p class="start-hint">ESPACE pour commencer · 1-4 changer d'arme · Shift dash</p>
                         </div>
@@ -146,6 +152,13 @@
                                 <div class="shop-header"><h3>🎨 Skins</h3></div>
                                 <div id="skins-list" class="shop-items"></div>
                                 <button id="close-skins" class="btn primary-btn shop-back-btn">← Retour</button>
+                            </div>
+                        </div>
+                        <div id="stats-modal" class="shop-modal hidden">
+                            <div class="shop-content">
+                                <div class="shop-header"><h3>📊 Statistiques</h3></div>
+                                <div id="persistent-stats" class="shop-items"></div>
+                                <button id="close-stats" class="btn primary-btn shop-back-btn">← Retour</button>
                             </div>
                         </div>
                         

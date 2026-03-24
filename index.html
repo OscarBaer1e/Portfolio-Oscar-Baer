@@ -8,11 +8,17 @@
 
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>Oscar BAER - Portfolio de Développeur Web</title>
+    <title>Oscar Baer – Portfolio Développement Web, Design & Audiovisuel</title>
+    <meta name="description" content="Portfolio d'Oscar Baer, étudiant en 3e année de BUT MMI. Développement web, design UX/UI et audiovisuel. En recherche d'alternance pour un Master à partir de septembre 2026.">
+    <meta property="og:title" content="Oscar Baer – Portfolio">
+    <meta property="og:description" content="Développement web, design UX/UI et audiovisuel. Découvrez mes projets et mon parcours.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="./ressources/images/oscar-portrait.png">
+    <meta name="theme-color" content="#473bf0">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
 
     <link rel="stylesheet" href="css/style.css">
     <link href="https://fonts.googleapis.com/css2?family=Anta&family=Lato:wght@300;400;600;700&family=Lora:wght@400;600;700&display=swap" rel="stylesheet">
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 
 </head>
@@ -26,7 +32,7 @@
 
         <div class="container">
 
-            <h1 class="logo"><a href="index.html">Oscar BAER</a></h1>
+            <h1 class="logo"><a href="index.html">Oscar Baer</a></h1>
 
             <nav>
 
@@ -67,23 +73,23 @@
                 <div class="hero-right reveal" data-animation-delay="200">
                     <div class="hero-intro">
                         <span class="intro-badge pulse-text">Bienvenue</span>
-                        <h2 class="hero-name neon-blink" id="easter-egg-trigger">Oscar BAER</h2>
+                        <h2 class="hero-name neon-blink" id="easter-egg-trigger">Oscar Baer</h2>
                         <h3 id="typing-text" class="hero-subtitle">Développeur Full-Stack · Candidat Master CMW</h3>
                         <p class="hero-description">
                             Développement web, design et audiovisuel. Je crée des expériences numériques réfléchies et accessibles.
                         </p>
                         <div class="hero-stats">
                             <div class="stat-item">
-                                <span class="stat-number" data-count="50">0</span>
-                                <span class="stat-label">Projets</span>
+                                <span class="stat-number" data-count="8">0</span>
+                                <span class="stat-label">Projets présentés</span>
                             </div>
                             <div class="stat-item">
                                 <span class="stat-number" data-count="3">0</span>
-                                <span class="stat-label">Années d'expérience</span>
+                                <span class="stat-label">Années de formation</span>
                             </div>
                             <div class="stat-item">
-                                <span class="stat-number" data-count="100">0</span>
-                                <span class="stat-label">% Passion</span>
+                                <span class="stat-number" data-count="4">0</span>
+                                <span class="stat-label">Langues parlées</span>
                             </div>
                         </div>
                         <div class="hero-actions">
@@ -95,11 +101,8 @@
                             </a>
                         </div>
                         <div class="hero-social">
-                            <a href="https://www.linkedin.com/in/oscar-baer-a5bbb029b/" target="_blank" class="social-icon" aria-label="LinkedIn">
+                            <a href="https://www.linkedin.com/in/oscar-baer-a5bbb029b/" target="_blank" rel="noopener noreferrer" class="social-icon" aria-label="LinkedIn">
                                 <i class="fab fa-linkedin"></i>
-                            </a>
-                            <a href="https://github.com/OscarBaer" target="_blank" class="social-icon" aria-label="GitHub">
-                                <i class="fab fa-github"></i>
                             </a>
                             <a href="./pages/contact.html" class="social-icon" aria-label="Me contacter (formulaire)">
                                 <i class="fas fa-envelope"></i>
@@ -146,16 +149,74 @@
                 </div>
             </div>
         </section>
+
+        <section id="featured-projects" class="section-padding">
+            <div class="container">
+                <h2 class="section-title reveal">Projets phares</h2>
+                <div class="portfolio-grid">
+                    <article class="portfolio-item reveal" data-animation-delay="0">
+                        <a href="./pages/txlforma.html" class="portfolio-item-link">
+                            <div class="portfolio-image-wrapper">
+                                <img src="./ressources/images/txlforma-dashboard.png" alt="Dashboard de TXLFORMA, plateforme e-learning." loading="lazy">
+                                <span class="portfolio-overlay-label"><i class="fas fa-eye"></i> Voir le projet</span>
+                            </div>
+                            <div class="portfolio-item-content">
+                                <h3>TXLFORMA – Plateforme e-learning</h3>
+                                <p class="category">React · Spring Boot · Stripe · Blender 3D</p>
+                            </div>
+                        </a>
+                    </article>
+                    <article class="portfolio-item reveal" data-animation-delay="100">
+                        <a href="./pages/biosphere.html" class="portfolio-item-link">
+                            <div class="portfolio-image-wrapper">
+                                <img src="./ressources/images/biosphere-1.png" alt="Biosphère, application de datavisualisation." loading="lazy">
+                                <span class="portfolio-overlay-label"><i class="fas fa-eye"></i> Voir le projet</span>
+                            </div>
+                            <div class="portfolio-item-content">
+                                <h3>Biosphère – Dataviz biocontrôle</h3>
+                                <p class="category">Datavisualisation · API · Décision</p>
+                            </div>
+                        </a>
+                    </article>
+                    <article class="portfolio-item reveal" data-animation-delay="200">
+                        <a href="./pages/graphisme.html" class="portfolio-item-link">
+                            <div class="portfolio-image-wrapper">
+                                <img src="./ressources/images/i1_files/unnamed.png" alt="Créations graphiques sélectionnées." loading="lazy">
+                                <span class="portfolio-overlay-label"><i class="fas fa-palette"></i> Voir les créations</span>
+                            </div>
+                            <div class="portfolio-item-content">
+                                <h3>Graphisme & Créations</h3>
+                                <p class="category">Design · Illustrations · Identité</p>
+                            </div>
+                        </a>
+                    </article>
+                </div>
+                <div class="text-center mt-5">
+                    <a href="./pages/portfolio.html" class="btn secondary-btn animated-btn">
+                        <i class="fas fa-th"></i> Voir tous les projets
+                    </a>
+                </div>
+            </div>
+        </section>
+
+        <section id="cta" class="section-padding">
+            <div class="container text-center">
+                <h2 class="section-title reveal">Un projet en tête ?</h2>
+                <p style="color: var(--dim-text-color); max-width: 40rem; margin: 0 auto 2rem; font-size: 1.05rem;">
+                    Actuellement en recherche d'alternance pour septembre 2026, je suis ouvert aux opportunités en communication visuelle, web et création de contenu.
+                </p>
+                <a href="./pages/contact.html" class="btn primary-btn animated-btn">
+                    <i class="fas fa-paper-plane"></i> Me contacter
+                </a>
+            </div>
+        </section>
     </main>
-
-
 
     <footer>
         <div class="container">
             <p>&copy; <span id="current-year"></span> Oscar Baer. Tous droits réservés.</p>
             <div class="social-links">
-                <a href="https://www.linkedin.com/in/oscar-baer-a5bbb029b/" target="_blank" aria-label="LinkedIn" class="social-link-animated"><i class="fab fa-linkedin"></i></a>
-                <a href="https://github.com/OscarBaer" target="_blank" aria-label="GitHub" class="social-link-animated"><i class="fab fa-github"></i></a>
+                <a href="https://www.linkedin.com/in/oscar-baer-a5bbb029b/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn" class="social-link-animated"><i class="fab fa-linkedin"></i></a>
                 <a href="./pages/contact.html" aria-label="Me contacter (formulaire)" class="social-link-animated"><i class="fas fa-envelope"></i></a>
             </div>
         </div>

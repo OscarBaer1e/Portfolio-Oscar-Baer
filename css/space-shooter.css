@@ -779,7 +779,7 @@
 }
 .shop-buy-btn:hover:not(.disabled) { background: rgba(255,216,102,0.15); border-color: var(--ss-gold); }
 .shop-buy-btn.disabled { opacity: 0.3; cursor: default; }
-.start-extra-btns { display: flex; gap: 8px; justify-content: center; margin-top: 10px; }
+.start-extra-btns, .go-extra-btns { display: flex; gap: 8px; justify-content: center; margin-top: 10px; flex-wrap: wrap; }
 .shop-back-btn {
     margin-top: 18px;
     width: 100%;
