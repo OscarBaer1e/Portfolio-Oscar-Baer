@@ -17,18 +17,25 @@
         .about-highlight-card { background: var(--dark-bg-color-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem 1.1rem; }
         .about-highlight-card h4 { margin: 0 0 0.35rem 0; color: var(--light-text-color); font-size: 1rem; }
         .about-highlight-card p { margin: 0; color: var(--dim-text-color); font-size: 0.92rem; line-height: 1.5; }
-        /* Grille dédiée About (isolée des autres styles globaux) */
+        /* Layout dédié About (très robuste : 2 colonnes fixes sur desktop) */
         #about .container .about-layout-grid {
-            display: grid;
-            grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr);
+            display: flex !important;
+            flex-wrap: nowrap !important;
             gap: 2.5rem;
             align-items: start;
         }
         #about .container .about-layout-grid > .about-layout-col {
             min-width: 0;
+            flex: 1 1 0;
             display: flex;
             flex-direction: column;
             gap: 2rem;
+        }
+        #about .container .about-layout-grid > .about-layout-col:first-child {
+            flex: 1.15 1 0;
+        }
+        #about .container .about-layout-grid > .about-layout-col:last-child {
+            flex: 1 1 0;
         }
 
         /* Timeline : expériences & formation */
@@ -58,7 +65,9 @@
         }
         @media (max-width: 640px) {
             #about .container .about-layout-grid {
-                grid-template-columns: 1fr;
+                display: flex !important;
+                flex-direction: column;
+                flex-wrap: nowrap !important;
                 gap: 2rem;
             }
         }
