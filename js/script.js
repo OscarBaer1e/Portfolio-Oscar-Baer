@@ -179,7 +179,7 @@ document.addEventListener('DOMContentLoaded', function() {
         gsap.registerPlugin(ScrollTrigger);
 
         gsap.utils.toArray('.reveal').forEach(function(el) {
-            gsap.fromTo(el, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 85%', toggleActions: 'play none none none' } });
+            gsap.fromTo(el, { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.1, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' } });
         });
 
         /* ----- 2. Text Reveal – titres principaux (dévoilement vertical) ----- */
@@ -204,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 wrap.appendChild(s);
             }
             el.appendChild(wrap);
-            gsap.from(wrap.children, { y: '100%', duration: 0.6, ease: 'power4.out', stagger: 0.02, delay: selector === '.hero-name' ? 0.25 : 0 });
+            gsap.from(wrap.children, { y: '100%', duration: 0.8, ease: 'expo.out', stagger: 0.03, delay: selector === '.hero-name' ? 0.3 : 0 });
         }
         var heroName = document.querySelector('.hero-name');
         if (heroName) applyTextReveal('.hero-name');
@@ -215,7 +215,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (document.querySelector('.project-detail')) {
             var articleReveal = gsap.utils.toArray('.project-detail .project-description h2, .project-detail .project-description h1, .project-detail .gallery, .project-detail .project-figure');
             articleReveal.forEach(function(el) {
-                gsap.fromTo(el, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.6, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 88%', toggleActions: 'play none none none' } });
+                gsap.fromTo(el, { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 1, ease: 'expo.out', scrollTrigger: { trigger: el, start: 'top 90%', toggleActions: 'play none none none' } });
             });
         }
 
@@ -813,13 +813,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const heroElements = document.querySelectorAll('.hero-left, .hero-right, .hero-intro > *');
         heroElements.forEach((el, index) => {
             el.style.opacity = '0';
-            el.style.transform = 'translateY(30px)';
-            el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            el.style.transform = 'translateY(24px)';
+            el.style.transition = 'opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1)';
             
             setTimeout(() => {
                 el.style.opacity = '1';
                 el.style.transform = 'translateY(0)';
-            }, 500 + (index * 100));
+            }, 400 + (index * 120));
         });
     }
     let clickCount = 0;

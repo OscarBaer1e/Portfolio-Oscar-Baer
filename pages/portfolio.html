@@ -37,14 +37,41 @@
             color: var(--light-text-color);
             font-size: 0.9rem;
             text-decoration: none;
-            transition: transform 0.15s ease, border-color 0.2s ease, background 0.2s ease;
+            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
         }
         .portfolio-chip:hover,
         .portfolio-chip:focus-visible {
-            transform: translateY(-1px);
+            transform: translateY(-2px);
             border-color: var(--primary-color);
-            background: rgba(102, 101, 221, 0.2);
+            background: rgba(102, 101, 221, 0.22);
+            box-shadow: 0 4px 12px rgba(71, 59, 240, 0.2);
             outline: none;
+        }
+        .portfolio-page .portfolio-grid {
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 2rem;
+        }
+        .portfolio-page .portfolio-item {
+            border-radius: 16px;
+        }
+        .portfolio-page .portfolio-item-content .tech-pills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.4rem;
+            margin-top: 0.15rem;
+        }
+        .portfolio-page .portfolio-item-content .tech-pill {
+            display: inline-block;
+            padding: 0.2rem 0.55rem;
+            border-radius: 999px;
+            background: rgba(102, 101, 221, 0.15);
+            border: 1px solid rgba(102, 101, 221, 0.25);
+            color: var(--secondary-color);
+            font-size: 0.72rem;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            text-transform: uppercase;
+            font-family: 'Lato', sans-serif;
         }
         @media (max-width: 768px) {
             .portfolio-page-intro {
@@ -60,17 +87,9 @@
                 font-size: 0.84rem;
                 padding: 0.42rem 0.72rem;
             }
-            .portfolio-item-content h3 {
-                font-size: 1.04rem;
-                line-height: 1.35;
-            }
-            .portfolio-item-content .category {
-                font-size: 0.86rem;
-                line-height: 1.45;
-            }
-            .portfolio-item-cta {
-                width: 100%;
-                text-align: center;
+            .portfolio-page .portfolio-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
             }
         }
         @media (max-width: 480px) {
@@ -124,126 +143,142 @@
                 </header>
 
                 <div class="portfolio-grid">
-                    <!-- 1. TXLFORMA -->
-                    <article class="portfolio-item reveal" data-animation-delay="0" data-skills="dev,design,multimedia,3d">
+                    <article class="portfolio-item reveal" data-animation-delay="0">
                         <a href="./txlforma.html" class="portfolio-item-link">
                             <div class="portfolio-image-wrapper">
-                                <img src="../ressources/images/txlforma-dashboard.png" alt="Le tableau de bord de la plateforme de formation TXLFORMA.">
+                                <img src="../ressources/images/txlforma-dashboard.png" alt="Le tableau de bord de la plateforme de formation TXLFORMA." loading="lazy">
                                 <span class="portfolio-overlay-label"><i class="fas fa-eye"></i> Voir le projet</span>
                             </div>
                             <div class="portfolio-item-content">
                                 <h3>TXLFORMA – Plateforme de formations</h3>
-                                <p class="category">React · 3D Blender · Stripe · Spring Boot</p>
+                                <div class="tech-pills">
+                                    <span class="tech-pill">React</span>
+                                    <span class="tech-pill">Spring Boot</span>
+                                    <span class="tech-pill">Stripe</span>
+                                    <span class="tech-pill">Blender 3D</span>
+                                </div>
                             </div>
                         </a>
-                        <a href="./txlforma.html" class="btn primary-btn btn-small portfolio-item-cta">Découvrir</a>
                     </article>
 
-                    <!-- 2. Webdocumentaire -->
-                    <article class="portfolio-item reveal" data-animation-delay="100" data-skills="design,multimedia">
+                    <article class="portfolio-item reveal" data-animation-delay="80">
                         <a href="./webdocumentaire.html" class="portfolio-item-link">
                             <div class="portfolio-image-wrapper">
-                                <img src="../ressources/images/webdocu.png" alt="Vignette de présentation du projet Webdocumentaire.">
+                                <img src="../ressources/images/webdocu.png" alt="Vignette du projet Webdocumentaire." loading="lazy">
                                 <span class="portfolio-overlay-label"><i class="fas fa-eye"></i> Voir le projet</span>
                             </div>
                             <div class="portfolio-item-content">
-                                <h3>Webdocumentaire</h3>
-                                <p class="category">Web · Rédaction · Audiovisuel</p>
+                                <h3>Webdocumentaire interactif</h3>
+                                <div class="tech-pills">
+                                    <span class="tech-pill">Web</span>
+                                    <span class="tech-pill">Rédaction</span>
+                                    <span class="tech-pill">Audiovisuel</span>
+                                </div>
                             </div>
                         </a>
-                        <a href="./webdocumentaire.html" class="btn primary-btn btn-small portfolio-item-cta">Voir le projet</a>
                     </article>
 
-                    <!-- 3. Biosphère -->
-                    <article class="portfolio-item reveal" data-animation-delay="200" data-skills="dev,design,marketing">
+                    <article class="portfolio-item reveal" data-animation-delay="160">
                         <a href="./biosphere.html" class="portfolio-item-link">
                             <div class="portfolio-image-wrapper">
-                                <img src="../ressources/images/biosphere-1.png" alt="Page d’accueil de Biosphère, application de datavisualisation des projets de biocontrôle.">
+                                <img src="../ressources/images/biosphere-1.png" alt="Biosphère, application de datavisualisation." loading="lazy">
                                 <span class="portfolio-overlay-label"><i class="fas fa-chart-bar"></i> Voir le projet</span>
                             </div>
                             <div class="portfolio-item-content">
                                 <h3>Biosphère – Dataviz biocontrôle</h3>
-                                <p class="category">Datavisualisation · API · Décision</p>
+                                <div class="tech-pills">
+                                    <span class="tech-pill">Datavisualisation</span>
+                                    <span class="tech-pill">API</span>
+                                    <span class="tech-pill">Décision</span>
+                                </div>
                             </div>
                         </a>
-                        <a href="./biosphere.html" class="btn primary-btn btn-small portfolio-item-cta">Découvrir</a>
                     </article>
 
-                    <!-- 4. Graphisme & Créations -->
-                    <article class="portfolio-item reveal" data-animation-delay="260" data-skills="design">
+                    <article class="portfolio-item reveal" data-animation-delay="240">
                         <a href="./graphisme.html" class="portfolio-item-link">
                             <div class="portfolio-image-wrapper">
-                                <img src="../ressources/images/i1_files/unnamed.png" alt="Sélection de créations graphiques réalisées pour différents projets.">
+                                <img src="../ressources/images/i1_files/unnamed.png" alt="Sélection de créations graphiques." loading="lazy">
                                 <span class="portfolio-overlay-label"><i class="fas fa-palette"></i> Voir les créations</span>
                             </div>
                             <div class="portfolio-item-content">
                                 <h3>Graphisme & Créations</h3>
-                                <p class="category">Design · Illustrations · Identité</p>
+                                <div class="tech-pills">
+                                    <span class="tech-pill">Photoshop</span>
+                                    <span class="tech-pill">Illustrator</span>
+                                    <span class="tech-pill">Identité</span>
+                                </div>
                             </div>
                         </a>
-                        <a href="./graphisme.html" class="btn primary-btn btn-small portfolio-item-cta">Découvrir</a>
                     </article>
 
-                    <!-- 5. Rédactions & PDF -->
-                    <article class="portfolio-item reveal" data-animation-delay="380" data-skills="design,marketing">
+                    <article class="portfolio-item reveal" data-animation-delay="320">
                         <a href="./documents.html" class="portfolio-item-link">
                             <div class="portfolio-image-wrapper">
-                                <img src="../ressources/images/dossier.jpg" alt="Vignette des documents et rédactions au format PDF.">
+                                <img src="../ressources/images/dossier.jpg" alt="Documents et rédactions." loading="lazy">
                                 <span class="portfolio-overlay-label"><i class="fas fa-file-pdf"></i> Voir les documents</span>
                             </div>
                             <div class="portfolio-item-content">
-                                <h3>Rédactions & PDF</h3>
-                                <p class="category">Articles · Notes · Dossiers</p>
+                                <h3>Rédactions & Documents</h3>
+                                <div class="tech-pills">
+                                    <span class="tech-pill">Articles</span>
+                                    <span class="tech-pill">Dossiers</span>
+                                    <span class="tech-pill">InDesign</span>
+                                </div>
                             </div>
                         </a>
-                        <a href="./documents.html" class="btn primary-btn btn-small portfolio-item-cta">Découvrir</a>
                     </article>
 
-                    <!-- 6. Révision Bac Français -->
-                    <article class="portfolio-item reveal" data-animation-delay="440" data-skills="dev,design">
+                    <article class="portfolio-item reveal" data-animation-delay="400">
                         <a href="./bacfr.html" class="portfolio-item-link">
                             <div class="portfolio-image-wrapper">
-                                <img src="../ressources/images/bacfr-1.png" alt="Interface de la plateforme de révision du Bac Français avec liste des textes et filtres.">
+                                <img src="../ressources/images/bacfr-1.png" alt="Interface de la plateforme de révision du Bac Français." loading="lazy">
                                 <span class="portfolio-overlay-label"><i class="fas fa-graduation-cap"></i> Voir le projet</span>
                             </div>
                             <div class="portfolio-item-content">
                                 <h3>Révision Bac Français</h3>
-                                <p class="category">React · Éducation · Mini‑jeux</p>
+                                <div class="tech-pills">
+                                    <span class="tech-pill">React</span>
+                                    <span class="tech-pill">Éducation</span>
+                                    <span class="tech-pill">Mini-jeux</span>
+                                </div>
                             </div>
                         </a>
-                        <a href="./bacfr.html" class="btn primary-btn btn-small portfolio-item-cta">Découvrir</a>
                     </article>
 
-                    <!-- 7. Projet 3D Blender -->
-                    <article class="portfolio-item reveal" data-animation-delay="460" data-skills="dev,design">
+                    <article class="portfolio-item reveal" data-animation-delay="480">
                         <a href="./projet-3d-blender.html" class="portfolio-item-link">
                             <div class="portfolio-image-wrapper">
-                                <img src="../ressources/images/projet-3d-blender-1.png" alt="Vue de la scène 3D Blender : environnement alien, robot et OVNI avec rayon tracteur.">
+                                <img src="../ressources/images/projet-3d-blender-1.png" alt="Scène 3D Blender : environnement alien, robot et OVNI." loading="lazy">
                                 <span class="portfolio-overlay-label"><i class="fas fa-cube"></i> Voir le projet</span>
                             </div>
                             <div class="portfolio-item-content">
-                                <h3>Projet 3D Blender – Environnement & robot</h3>
-                                <p class="category">Blender · 3D · Textures · Éclairage</p>
+                                <h3>Projet 3D – Environnement & robot</h3>
+                                <div class="tech-pills">
+                                    <span class="tech-pill">Blender</span>
+                                    <span class="tech-pill">Textures</span>
+                                    <span class="tech-pill">Éclairage</span>
+                                </div>
                             </div>
                         </a>
-                        <a href="./projet-3d-blender.html" class="btn primary-btn btn-small portfolio-item-cta">Découvrir</a>
                     </article>
 
-                    <!-- 8. Projets audiovisuels -->
-                    <article class="portfolio-item reveal" data-animation-delay="480" data-skills="design,multimedia">
+                    <article class="portfolio-item reveal" data-animation-delay="560">
                         <a href="./audiovisuel.html" class="portfolio-item-link">
                             <div class="portfolio-image-wrapper">
-                                <img src="https://img.youtube.com/vi/cDGgJR-BYRA/hqdefault.jpg" alt="Vignette des projets audiovisuels : interview, webdoc, format court et pub fictive.">
+                                <img src="https://img.youtube.com/vi/cDGgJR-BYRA/hqdefault.jpg" alt="Projets audiovisuels : interview, webdoc, pub fictive." loading="lazy">
                                 <span class="portfolio-overlay-label"><i class="fas fa-video"></i> Voir les vidéos</span>
                             </div>
                             <div class="portfolio-item-content">
                                 <h3>Projets audiovisuels</h3>
-                                <p class="category">Vidéo · Reportage · Pub · Webdoc</p>
+                                <div class="tech-pills">
+                                    <span class="tech-pill">Premiere Pro</span>
+                                    <span class="tech-pill">Reportage</span>
+                                    <span class="tech-pill">Pub</span>
+                                </div>
                             </div>
                         </a>
-                        <a href="./audiovisuel.html" class="btn primary-btn btn-small portfolio-item-cta">Découvrir</a>
                     </article>
-
                 </div>
 
                 <div class="portfolio-page-footer">

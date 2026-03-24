@@ -2181,17 +2181,17 @@ nav .nav-list a.active::after {
 
 .portfolio-item {
     background-color: var(--background-color-light);
-    border-radius: var(--radius-default);
+    border-radius: 14px;
     overflow: hidden;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-    border: 2px solid var(--border-color);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+    border: 1px solid var(--border-color);
     position: relative;
-    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.4s ease;
 }
 .portfolio-item:hover {
-    transform: translateY(-6px);
+    transform: translateY(-8px);
     border-color: var(--secondary-color);
-    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4);
+    box-shadow: 0 20px 48px rgba(71, 59, 240, 0.18), 0 8px 24px rgba(0, 0, 0, 0.3);
 }
 
 .portfolio-item-content {
@@ -2242,14 +2242,13 @@ nav .nav-list a.active::after {
     outline: 2px solid var(--primary-color);
     outline-offset: 2px;
 }
-/* Même logique : au survol on enlève le filtre, pas de calque coloré par-dessus */
 .portfolio-page .portfolio-item-link:hover .portfolio-image-wrapper img,
 .portfolio-page .portfolio-item-link:focus .portfolio-image-wrapper img {
-    filter: none;
-    transform: scale(1.03);
+    filter: brightness(1) saturate(1.1);
+    transform: scale(1.05);
 }
 .portfolio-page .portfolio-image-wrapper img {
-    transition: transform 0.4s ease, filter 0.4s ease;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
 }
 .portfolio-page .portfolio-image-wrapper {
     position: relative;
@@ -2257,14 +2256,22 @@ nav .nav-list a.active::after {
 .portfolio-page .portfolio-item-content {
     position: static;
     background: var(--dark-bg-color-alt);
-    padding: 1.25rem var(--spacing-unit);
+    padding: 1.25rem var(--spacing-unit) 1.5rem;
     flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
 }
 .portfolio-page .portfolio-item-content h3 {
-    margin-bottom: 0.35rem;
+    margin-bottom: 0;
+    font-size: 1.15rem;
+    line-height: 1.35;
 }
 .portfolio-page .portfolio-item-content .category {
     margin-bottom: 0;
+    font-size: 0.82rem;
+    letter-spacing: 0.5px;
+    opacity: 0.85;
 }
 .portfolio-page .portfolio-item-cta {
     margin: 0 var(--spacing-unit) var(--spacing-unit);
@@ -2944,14 +2951,14 @@ footer .container {
     height: 100%;
     object-fit: cover;
     filter: grayscale(0) blur(0px);
-    transition: all 0.5s ease;
+    transition: border-radius 0.7s cubic-bezier(0.16, 1, 0.3, 1), transform 0.7s cubic-bezier(0.16, 1, 0.3, 1);
     display: block;
     margin: 0 auto;
 }
 
 .morph:hover img {
     border-radius: 50%;
-    transform: rotate(360deg) scale(1.05);
+    transform: scale(1.06);
 }
 
 /* ------------------------------------------------ */
@@ -2961,10 +2968,8 @@ footer .container {
 /* État initial : caché */
 .reveal {
     opacity: 0;
-    transform: translateY(20px);
-    /* Définit une transition CSS pour l'animation */
-    transition: opacity 0.8s ease-out, transform 0.8s ease-out; 
-    /* La propriété 'transition-delay' est définie directement en JavaScript */
+    transform: translateY(28px);
+    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* État révélé : visible (ajouté par Intersection Observer) */
@@ -3535,8 +3540,8 @@ footer .container {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.4s ease, filter 0.4s ease;
-    filter: grayscale(100%) brightness(0.6);
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1), filter 0.6s ease;
+    filter: brightness(0.85) saturate(0.9);
 }
 
 .portfolio-overlay {
@@ -3569,7 +3574,12 @@ footer .container {
     font-size: 0.95rem;
     gap: 0.5rem;
     opacity: 0;
-    transition: opacity 0.35s ease;
+    transform: translateY(6px);
+    transition: opacity 0.45s ease, transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.portfolio-item-link:hover .portfolio-overlay-label,
+.portfolio-item-link:focus .portfolio-overlay-label {
+    transform: translateY(0);
 }
 .portfolio-item-link:hover .portfolio-overlay-label,
 .portfolio-item-link:focus .portfolio-overlay-label {
@@ -3580,10 +3590,9 @@ footer .container {
     opacity: 1;
 }
 
-/* Survol : on enlève uniquement le filtre (couleur + luminosité), pas de second effet */
 .portfolio-item:hover .portfolio-image-wrapper img {
-    transform: scale(1.03);
-    filter: none;
+    transform: scale(1.05);
+    filter: brightness(1) saturate(1.1);
 }
 
 .overlay-buttons {
@@ -3932,16 +3941,15 @@ footer .container {
     }
 }
 
-/* Amélioration des animations reveal */
 .reveal {
     opacity: 0;
-    transform: translateY(50px) scale(0.9);
-    transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform: translateY(28px);
+    transition: opacity 1s cubic-bezier(0.16, 1, 0.3, 1), transform 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .revealed {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
 }
 
 /* Animation de shake pour les erreurs */
@@ -3971,11 +3979,10 @@ footer .container {
     animation: zoomIn 0.6s ease-out;
 }
 
-/* Animation de fade avec blur */
 @keyframes fadeBlur {
     from {
         opacity: 0;
-        filter: blur(10px);
+        filter: blur(6px);
     }
     to {
         opacity: 1;
@@ -3984,7 +3991,7 @@ footer .container {
 }
 
 .fade-blur {
-    animation: fadeBlur 0.8s ease-out;
+    animation: fadeBlur 1s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 /* Amélioration des transitions pour les liens */
