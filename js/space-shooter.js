@@ -192,7 +192,7 @@ document.addEventListener('DOMContentLoaded', function() {
         lives: 3,
         maxLives: 3,
         gameSpeed: 1.7, // Plus simple et fluide, kif sans prise de tête
-        gameMode: 'normal', // 'normal' ou 'infinite'
+        gameMode: 'normal', // 'normal', 'infinite', 'survival', 'bossrush'
         bossActive: false,
         deltaTime: 1.0, // Multiplicateur de vitesse normalisé (1.0 = 60fps)
         isSavingScore: false, // Flag pour empêcher le démarrage pendant l'enregistrement
@@ -587,6 +587,25 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Étincelles à la sortie du canon
     let muzzleSparks = [];
+    
+    // --- Combo / multiplicateur ---
+    let comboState = { count: 0, multiplier: 1, lastKillTime: 0, displayAlpha: 0 };
+    const COMBO_TIMEOUT = 2200;
+    
+    // --- Dash ---
+    let dashState = { active: false, cooldown: 0, dx: 0, dy: 0, timer: 0, ghostTrail: [] };
+    const DASH_COOLDOWN = 2500;
+    const DASH_DURATION = 120;
+    const DASH_DISTANCE = 140;
+    
+    // --- Freeze-frame ---
+    let freezeState = { active: false, timer: 0, duration: 0 };
+    
+    // --- Warp transition ---
+    let warpState = { active: false, timer: 0, duration: 1200, themeName: '' };
+    
+    // --- Survie timer ---
+    let survivalTimer = 0;
     
     // Canvas de grain pour overlay rétro (créé une fois)
     let grainCanvas = null;
@@ -1143,14 +1162,19 @@ document.addEventListener('DOMContentLoaded', function() {
             bulletsHit: 0,
             powerUpsCollected: 0,
             timePlayed: 0,
-            startTime: Date.now()
+            startTime: Date.now(),
+            maxCombo: 0,
+            maxMultiplier: 1,
+            dashesUsed: 0,
+            bossesDefeated: 0
         };
         boss = null;
         bossBullets = [];
         gameState.score = 0;
         gameState.level = 1;
-        gameState.lives = 3;
-        gameState.maxLives = 3;
+        gameState._lastTimeScore = 0;
+        gameState.lives = (gameState.gameMode === 'survival') ? 1 : 3;
+        gameState.maxLives = (gameState.gameMode === 'survival') ? 1 : 3;
         gameState.gameSpeed = 1.7; // Départ fluide, plus simple à kifer
         gameState.bossActive = false;
         currentFireRate = baseFireRate;
@@ -1186,6 +1210,11 @@ document.addEventListener('DOMContentLoaded', function() {
         reflectedAsteroids = [];
         timeSlowMultiplier = 1.0;
         lastShotTime = 0;
+        comboState = { count: 0, multiplier: 1, lastKillTime: 0, displayAlpha: 0 };
+        dashState = { active: false, cooldown: 0, dx: 0, dy: 0, timer: 0, ghostTrail: [] };
+        freezeState = { active: false, timer: 0, duration: 0 };
+        warpState = { active: false, timer: 0, duration: 1200, themeName: '' };
+        survivalTimer = 0;
         if (currentLevelDisplay) {
             currentLevelDisplay.textContent = gameState.level;
         }
@@ -1723,6 +1752,146 @@ document.addEventListener('DOMContentLoaded', function() {
         // Dessiner les particules de score
         drawScoreParticles();
         
+        // --- Dash ghost trail ---
+        if (dashState.ghostTrail.length > 0) {
+            dashState.ghostTrail.forEach((g, i) => {
+                g.alpha -= 0.04;
+                ctx.save();
+                ctx.globalAlpha = Math.max(0, g.alpha) * 0.4;
+                ctx.translate(g.x, g.y);
+                ctx.fillStyle = '#6cf';
+                ctx.beginPath();
+                ctx.arc(0, 0, ship.width * 0.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            });
+            dashState.ghostTrail = dashState.ghostTrail.filter(g => g.alpha > 0);
+        }
+        
+        // --- Combo HUD ---
+        if (comboState.count >= 2 && Date.now() - comboState.lastKillTime < COMBO_TIMEOUT) {
+            comboState.displayAlpha = Math.max(0, 1 - (Date.now() - comboState.lastKillTime) / COMBO_TIMEOUT);
+            ctx.save();
+            ctx.globalAlpha = comboState.displayAlpha;
+            const comboText = `x${comboState.multiplier}`;
+            const comboSub = `${comboState.count} COMBO`;
+            const cx = canvas.width / 2;
+            const cy = 70;
+            ctx.fillStyle = comboState.multiplier >= 4 ? '#ffaa30' : (comboState.multiplier >= 2 ? '#ffd866' : '#fff');
+            ctx.font = `bold ${28 + comboState.multiplier * 3}px "Courier New", monospace`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = ctx.fillStyle;
+            ctx.shadowBlur = 12;
+            ctx.fillText(comboText, cx, cy);
+            ctx.font = '13px "Courier New", monospace';
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#aab';
+            ctx.fillText(comboSub, cx, cy + 22);
+            ctx.restore();
+        } else if (Date.now() - comboState.lastKillTime >= COMBO_TIMEOUT && comboState.count > 0) {
+            comboState.count = 0;
+            comboState.multiplier = 1;
+        }
+        
+        // --- Dash cooldown HUD ---
+        if (dashState.cooldown > 0) {
+            const pct = dashState.cooldown / DASH_COOLDOWN;
+            ctx.save();
+            ctx.globalAlpha = 0.6;
+            const bx = 14, by = canvas.height - 34, bw = 60, bh = 6;
+            ctx.fillStyle = '#223';
+            ctx.fillRect(bx, by, bw, bh);
+            ctx.fillStyle = '#4488ff';
+            ctx.fillRect(bx, by, bw * (1 - pct), bh);
+            ctx.globalAlpha = 0.5;
+            ctx.fillStyle = '#99bbff';
+            ctx.font = '10px monospace';
+            ctx.fillText('DASH', bx, by - 3);
+            ctx.restore();
+        } else if (gameState.isPlaying) {
+            ctx.save();
+            ctx.globalAlpha = 0.35;
+            ctx.fillStyle = '#6cf';
+            ctx.font = '10px monospace';
+            ctx.fillText('DASH ▸ Shift', 14, canvas.height - 28);
+            ctx.restore();
+        }
+        
+        // --- Danger progressif (bords rouges) ---
+        if (gameState.isPlaying && gameState.lives <= 1 && gameState.lives > 0) {
+            const dangerPulse = 0.12 + Math.sin(Date.now() / 200) * 0.08;
+            ctx.save();
+            const dg = ctx.createLinearGradient(0, 0, 30, 0);
+            dg.addColorStop(0, `rgba(255,20,20,${dangerPulse})`);
+            dg.addColorStop(1, 'transparent');
+            ctx.fillStyle = dg;
+            ctx.fillRect(0, 0, 30, canvas.height);
+            const dg2 = ctx.createLinearGradient(canvas.width, 0, canvas.width - 30, 0);
+            dg2.addColorStop(0, `rgba(255,20,20,${dangerPulse})`);
+            dg2.addColorStop(1, 'transparent');
+            ctx.fillStyle = dg2;
+            ctx.fillRect(canvas.width - 30, 0, 30, canvas.height);
+            const dg3 = ctx.createLinearGradient(0, 0, 0, 20);
+            dg3.addColorStop(0, `rgba(255,20,20,${dangerPulse * 0.6})`);
+            dg3.addColorStop(1, 'transparent');
+            ctx.fillStyle = dg3;
+            ctx.fillRect(0, 0, canvas.width, 20);
+            ctx.restore();
+        }
+        
+        // --- Warp transition ---
+        if (warpState.active) {
+            warpState.timer -= 16.67;
+            const progress = 1 - warpState.timer / warpState.duration;
+            ctx.save();
+            if (progress < 0.5) {
+                const p = progress * 2;
+                const centerY = canvas.height / 2;
+                for (let i = 0; i < 30; i++) {
+                    ctx.globalAlpha = p * 0.4;
+                    ctx.strokeStyle = '#fff';
+                    ctx.lineWidth = 1 + p * 2;
+                    const sx = Math.random() * canvas.width;
+                    ctx.beginPath();
+                    ctx.moveTo(sx, centerY - p * canvas.height * 0.5);
+                    ctx.lineTo(sx, centerY + p * canvas.height * 0.5);
+                    ctx.stroke();
+                }
+                ctx.globalAlpha = Math.pow(p, 2) * 0.85;
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+            } else {
+                const p = (progress - 0.5) * 2;
+                ctx.globalAlpha = (1 - p) * 0.7;
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                if (warpState.themeName) {
+                    ctx.globalAlpha = Math.max(0, 1 - p * 1.5);
+                    ctx.fillStyle = '#fff';
+                    ctx.font = 'bold 22px "Courier New", monospace';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(warpState.themeName.toUpperCase(), canvas.width / 2, canvas.height / 2);
+                }
+            }
+            ctx.restore();
+            if (warpState.timer <= 0) warpState.active = false;
+        }
+        
+        // --- Survival timer HUD ---
+        if (gameState.gameMode === 'survival' && gameState.isPlaying) {
+            const elapsed = Date.now() - gameStats.startTime;
+            const minutes = Math.floor(elapsed / 60000);
+            const seconds = Math.floor((elapsed % 60000) / 1000);
+            ctx.save();
+            ctx.fillStyle = '#ffd866';
+            ctx.font = 'bold 18px "Courier New", monospace';
+            ctx.textAlign = 'right';
+            ctx.fillText(`${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`, canvas.width - 14, 26);
+            ctx.restore();
+        }
+        
         // Vignette (bords sombres)
         if (!gameState.isLowEndDevice) {
             const vig = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, canvas.width * 0.25, canvas.width / 2, canvas.height / 2, canvas.width * 0.75);
@@ -2225,6 +2394,52 @@ document.addEventListener('DOMContentLoaded', function() {
             ctx.globalAlpha = 1;
         }
         
+        // Indicateurs visuels pour types spéciaux
+        if (asteroid.specialType === 'explosive') {
+            ctx.globalAlpha = 0.35 + Math.sin(Date.now() / 150) * 0.2;
+            ctx.fillStyle = '#ff4020';
+            ctx.shadowColor = '#ff4020';
+            ctx.shadowBlur = 18;
+            ctx.beginPath();
+            ctx.arc(0, 0, s * 1.15, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.shadowBlur = 0;
+            ctx.globalAlpha = 1;
+            ctx.fillStyle = '#fff';
+            ctx.font = `bold ${Math.max(12, s * 0.55)}px monospace`;
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('💥', 0, 0);
+        } else if (asteroid.specialType === 'armored') {
+            ctx.strokeStyle = '#dde';
+            ctx.lineWidth = 2.5;
+            buildPath(1.06);
+            ctx.stroke();
+            ctx.strokeStyle = 'rgba(160,180,220,0.5)';
+            ctx.lineWidth = 1;
+            buildPath(1.12);
+            ctx.stroke();
+            if (asteroid.hp > 1) {
+                ctx.fillStyle = '#fff';
+                ctx.font = `bold ${Math.max(10, s * 0.4)}px monospace`;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(asteroid.hp.toString(), 0, 0);
+            }
+        } else if (asteroid.specialType === 'magnetic') {
+            const t = Date.now() / 400;
+            ctx.globalAlpha = 0.2 + Math.sin(t) * 0.1;
+            ctx.strokeStyle = '#c060ff';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, s * 1.3 + Math.sin(t * 2) * 4, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(0, 0, s * 1.5 + Math.cos(t * 1.5) * 5, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.globalAlpha = 1;
+        }
+        
         ctx.restore();
     }
     
@@ -2595,6 +2810,15 @@ document.addEventListener('DOMContentLoaded', function() {
         // Mise à jour des statistiques
         if (gameState.isPlaying && !gameState.isPaused) {
             gameStats.timePlayed = Date.now() - gameStats.startTime;
+            // Score passif en mode survie (2 pts/sec)
+            if (gameState.gameMode === 'survival') {
+                const timePoints = Math.floor(gameStats.timePlayed / 500);
+                if (timePoints > (gameState._lastTimeScore || 0)) {
+                    gameState.score += (timePoints - (gameState._lastTimeScore || 0));
+                    gameState._lastTimeScore = timePoints;
+                    if (scoreElement) scoreElement.textContent = gameState.score;
+                }
+            }
         }
         
         // Mise à jour des projectiles (normalisé par delta time) — Chercheur (homing) si actif
@@ -2727,8 +2951,16 @@ document.addEventListener('DOMContentLoaded', function() {
             asteroid.y += asteroid.speed * mul * gameState.deltaTime;
             if (asteroid.vx !== undefined) {
                 asteroid.x += asteroid.vx * mul * gameState.deltaTime;
-                // Rebond plus amorti : moins de zigzag, trajectoires plus prévisibles
                 if (asteroid.x < -asteroid.size * 2 || asteroid.x > canvas.width + asteroid.size * 2) asteroid.vx *= -0.45;
+            }
+            // Magnétique : attirer vers le joueur
+            if (asteroid.specialType === 'magnetic') {
+                const mdx = ship.x - asteroid.x;
+                const mdy = ship.y - asteroid.y;
+                const mdist = Math.sqrt(mdx * mdx + mdy * mdy);
+                if (mdist > 0 && mdist < 300) {
+                    asteroid.x += (mdx / mdist) * 0.6 * mul * gameState.deltaTime;
+                }
             }
             asteroid.rotation += asteroid.rotationSpeed * mul * gameState.deltaTime;
             
@@ -2953,7 +3185,18 @@ document.addEventListener('DOMContentLoaded', function() {
                         return;
                     }
                     
-                    // Flash d'impact (petit cercle blanc/jaune avant l'explosion)
+                    // Astéroïde blindé : décrémenter HP au lieu de détruire
+                    if (asteroid.hp && asteroid.hp > 1) {
+                        asteroid.hp--;
+                        impactFlashes.push({ x: asteroid.x, y: asteroid.y, life: 1, maxLife: 1, radius: 12 });
+                        playSound('hit');
+                        screenShake.intensity = 3;
+                        if (!(activePowerUps.prism && Date.now() < activePowerUps.prismEndTime)) {
+                            bullets.splice(bulletIndex, 1);
+                        }
+                        return;
+                    }
+
                     impactFlashes.push({
                         x: asteroid.x,
                         y: asteroid.y,
@@ -2961,23 +3204,38 @@ document.addEventListener('DOMContentLoaded', function() {
                         maxLife: 1,
                         radius: Math.min(asteroid.size * 0.6, 25)
                     });
-                    // Explosion améliorée
                     createEnhancedExplosion(asteroid.x, asteroid.y, asteroid.color, asteroid.size);
                     playSound('explosion');
                     
-                    // Score
-                    // Ne pas ajouter de score si un boss est actif
+                    // Astéroïde explosif : détruit les voisins dans un rayon
+                    if (asteroid.specialType === 'explosive') {
+                        const EXP_RADIUS = 100;
+                        screenShake.intensity = 12;
+                        triggerFreezeFrame(40);
+                        for (let ei = asteroids.length - 1; ei >= 0; ei--) {
+                            if (ei === asteroidIndex) continue;
+                            const ea = asteroids[ei];
+                            const d = Math.hypot(ea.x - asteroid.x, ea.y - asteroid.y);
+                            if (d < EXP_RADIUS) {
+                                createEnhancedExplosion(ea.x, ea.y, ea.color, ea.size);
+                                if (!gameState.bossActive) addScoreWithCombo(Math.floor(ea.size / 5) * 10, ea.x, ea.y);
+                                gameStats.asteroidsDestroyed++;
+                                asteroids.splice(ei, 1);
+                                if (ei < asteroidIndex) asteroidIndex--;
+                            }
+                        }
+                    }
+                    
                     if (!gameState.bossActive) {
-                        const points = Math.floor(asteroid.size / 5) * 10;
-                        gameState.score += points;
-                        if (scoreElement) scoreElement.textContent = gameState.score;
-                        // Vérifier et mettre à jour le high score en temps réel
-                        checkAndUpdateHighScore();
-                        // Particules de score
-                        createScoreParticle(asteroid.x, asteroid.y, `+${points}`);
+                        const basePoints = Math.floor(asteroid.size / 5) * 10;
+                        const bonus = asteroid.specialType === 'armored' ? 2 : (asteroid.specialType === 'magnetic' ? 1.5 : 1);
+                        addScoreWithCombo(Math.floor(basePoints * bonus), asteroid.x, asteroid.y);
                     }
                     gameStats.asteroidsDestroyed++;
                     gameStats.bulletsHit++;
+                    
+                    // Freeze-frame sur les gros astéroïdes
+                    if (asteroid.size >= 45) triggerFreezeFrame(35);
                     
                     // Perceur (prism) : projectile perçant, ne pas le supprimer
                     if (!(activePowerUps.prism && Date.now() < activePowerUps.prismEndTime)) {
@@ -3081,7 +3339,12 @@ document.addEventListener('DOMContentLoaded', function() {
             const shipSize = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? ship.width / 2 * 0.6 : ship.width / 2;
             const shieldRadius = ship.width / 2 + 10;
             if (distance < asteroid.size + shipSize) {
-                // Bouclier miroir : renvoyer l'astéroïde dans l'autre sens (il devient un "projectile" à l'apparence d'astéroïde)
+                // Dash invincibilité
+                if (dashState.active || ship.invincible) {
+                    createEnhancedExplosion(asteroid.x, asteroid.y, asteroid.color, asteroid.size);
+                    asteroids.splice(index, 1);
+                    return;
+                }
                 if (activePowerUps.mirrorShield && Date.now() < activePowerUps.mirrorShieldEndTime && distance < asteroid.size + shieldRadius) {
                     playSound('hit');
                     reflectedAsteroids.push({
@@ -3139,12 +3402,20 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Spawn : départ un peu plus fourni (fluide), montée plus progressive
+        // Spawn d'astéroïdes
         const lvl = gameState.level;
-        const spawnRate = lvl <= 80
-            ? 0.038 + ((lvl - 1) / 79) * 0.082
-            : 0.12 + (lvl - 80) * 0.0012;
-        if (Math.random() < Math.min(0.20, spawnRate)) {
+        let spawnRate;
+        if (gameState.gameMode === 'survival') {
+            const elapsed = (Date.now() - gameStats.startTime) / 1000;
+            spawnRate = 0.06 + elapsed * 0.0008;
+        } else if (gameState.gameMode === 'bossrush') {
+            spawnRate = lvl <= 80 ? 0.03 + ((lvl - 1) / 79) * 0.06 : 0.10;
+        } else {
+            spawnRate = lvl <= 80
+                ? 0.038 + ((lvl - 1) / 79) * 0.082
+                : 0.12 + (lvl - 80) * 0.0012;
+        }
+        if (Math.random() < Math.min(0.25, spawnRate)) {
             spawnAsteroid();
         }
     }
@@ -3732,14 +4003,92 @@ document.addEventListener('DOMContentLoaded', function() {
         return baseSpeed * ASTEROID_SIZE_REF / Math.max(size, 12);
     }
     
+    // --- COMBO SYSTEM ---
+    function registerComboKill() {
+        const now = Date.now();
+        if (now - comboState.lastKillTime < COMBO_TIMEOUT) {
+            comboState.count++;
+        } else {
+            comboState.count = 1;
+        }
+        comboState.lastKillTime = now;
+        comboState.multiplier = comboState.count <= 1 ? 1 : Math.min(8, 1 + Math.floor(comboState.count / 3));
+        comboState.displayAlpha = 1;
+        if (comboState.count > gameStats.maxCombo) gameStats.maxCombo = comboState.count;
+        if (comboState.multiplier > gameStats.maxMultiplier) gameStats.maxMultiplier = comboState.multiplier;
+        return comboState.multiplier;
+    }
+
+    function addScoreWithCombo(basePoints, x, y) {
+        const mult = registerComboKill();
+        const points = basePoints * mult;
+        gameState.score += points;
+        if (scoreElement) scoreElement.textContent = gameState.score;
+        checkAndUpdateHighScore();
+        const label = mult > 1 ? `+${points} x${mult}` : `+${points}`;
+        createScoreParticle(x, y, label);
+    }
+    
+    // --- DASH ---
+    function performDash() {
+        if (dashState.cooldown > 0 || dashState.active) return;
+        if (!gameState.isPlaying || gameState.isPaused) return;
+        let dx = 0, dy = 0;
+        if (keys['ArrowLeft'] || keys['KeyA']) dx = -1;
+        if (keys['ArrowRight'] || keys['KeyD']) dx = 1;
+        if (keys['ArrowUp'] || keys['KeyW']) dy = -1;
+        if (keys['ArrowDown'] || keys['KeyS']) dy = 1;
+        if (dx === 0 && dy === 0) dy = -1; // Dash vers le haut par défaut
+        const len = Math.sqrt(dx * dx + dy * dy);
+        dashState.dx = (dx / len) * DASH_DISTANCE;
+        dashState.dy = (dy / len) * DASH_DISTANCE;
+        dashState.active = true;
+        dashState.timer = DASH_DURATION;
+        dashState.cooldown = DASH_COOLDOWN;
+        dashState.ghostTrail = [];
+        ship.invincible = true;
+        gameStats.dashesUsed++;
+        playSound('powerup');
+    }
+
+    function updateDash() {
+        if (dashState.cooldown > 0) dashState.cooldown -= 16.67 * gameState.deltaTime;
+        if (!dashState.active) return;
+        dashState.timer -= 16.67 * gameState.deltaTime;
+        const progress = 1 - (dashState.timer / DASH_DURATION);
+        const ease = 1 - Math.pow(1 - progress, 3);
+        const moveX = dashState.dx * ease * gameState.deltaTime * 0.06;
+        const moveY = dashState.dy * ease * gameState.deltaTime * 0.06;
+        ship.x = Math.max(ship.width / 2, Math.min(canvas.width - ship.width / 2, ship.x + moveX));
+        ship.y = Math.max(canvas.height * 0.1, Math.min(canvas.height - 40, ship.y + moveY));
+        dashState.ghostTrail.push({ x: ship.x, y: ship.y, alpha: 0.5 });
+        if (dashState.ghostTrail.length > 8) dashState.ghostTrail.shift();
+        if (dashState.timer <= 0) {
+            dashState.active = false;
+            setTimeout(() => { if (!dashState.active) ship.invincible = false; }, 100);
+        }
+    }
+    
+    // --- FREEZE-FRAME ---
+    function triggerFreezeFrame(durationMs) {
+        freezeState.active = true;
+        freezeState.timer = durationMs;
+        freezeState.duration = durationMs;
+    }
+    
+    // --- WARP TRANSITION ---
+    function triggerWarpTransition(newThemeName) {
+        warpState.active = true;
+        warpState.timer = warpState.duration;
+        warpState.themeName = newThemeName;
+    }
+    
     function spawnAsteroid() {
         const currentTheme = getCurrentTheme();
         const asteroidColors = currentTheme.asteroids;
         const randomColor = asteroidColors[Math.floor(Math.random() * asteroidColors.length)];
-        // Vitesse verticale plus régulière (moins de hasard) pour des trajectoires prévisibles
         const baseSpeed = Math.random() * 1.0 + gameState.gameSpeed * 1.2;
         
-        // Gros astéroïdes : peu en début (1-10), montée jusqu'à 30, stable 30-80, plus après 80
         const l = gameState.level;
         let bigChance = 0.15;
         if (l <= 10) bigChance = 0.05;
@@ -3747,14 +4096,24 @@ document.addEventListener('DOMContentLoaded', function() {
         else if (l > 80) bigChance = 0.18;
         const isBigType = Math.random() < bigChance;
         const size = isBigType
-            ? Math.random() * 22 + 50   // 50–72 : gros
-            : Math.random() * 30 + 15;  // 15–45 : normal
+            ? Math.random() * 22 + 50
+            : Math.random() * 30 + 15;
         
         const speed = getAsteroidSpeedForSize(baseSpeed, size);
-        // Dérive horizontale réduite : trajectoires surtout verticales, plus lisibles
         const vx = (Math.random() - 0.5) * 0.55;
         
-        asteroids.push({
+        // Types spéciaux (à partir du niveau 5)
+        let specialType = null;
+        if (l >= 5) {
+            const roll = Math.random();
+            const specialChance = Math.min(0.25, 0.05 + l * 0.002);
+            if (roll < specialChance) {
+                const types = ['explosive', 'armored', 'magnetic'];
+                specialType = types[Math.floor(Math.random() * types.length)];
+            }
+        }
+        
+        const asteroid = {
             x: Math.random() * (canvas.width - size * 2) + size,
             y: -size,
             size: size,
@@ -3762,8 +4121,16 @@ document.addEventListener('DOMContentLoaded', function() {
             vx: vx,
             rotation: 0,
             rotationSpeed: (Math.random() - 0.5) * 0.1,
-            color: randomColor
-        });
+            color: randomColor,
+            specialType: specialType,
+            hp: specialType === 'armored' ? 3 : 1
+        };
+
+        if (specialType === 'explosive') asteroid.color = '#ff6040';
+        if (specialType === 'armored') { asteroid.color = '#a0a8c0'; asteroid.speed *= 0.75; }
+        if (specialType === 'magnetic') asteroid.color = '#c060ff';
+        
+        asteroids.push(asteroid);
     }
     
     // Marque les astéroïdes comme "gros" (pour la séparation)
@@ -3780,28 +4147,70 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function checkLevel() {
-        // Ne pas augmenter le niveau si un boss est actif
-        if (gameState.bossActive && boss) {
+        if (gameState.bossActive && boss) return;
+        
+        // --- Mode Survie ---
+        if (gameState.gameMode === 'survival') {
+            const elapsed = (Date.now() - gameStats.startTime) / 1000;
+            const newLevel = Math.floor(elapsed / 20) + 1;
+            if (newLevel > gameState.level) {
+                const previousLevel = gameState.level;
+                gameState.level = newLevel;
+                const prevTheme = Math.floor((previousLevel - 1) / 10);
+                const newTheme = Math.floor((gameState.level - 1) / 10);
+                if (newTheme > prevTheme) {
+                    playThemeTransitionJingle(newTheme);
+                    triggerWarpTransition(themes[newTheme % themes.length].name);
+                }
+                gameState.gameSpeed += 0.15 + gameState.level * 0.02;
+                if (levelElement) levelElement.textContent = gameState.level;
+                if (currentLevelDisplay) currentLevelDisplay.textContent = gameState.level;
+            }
+            return;
+        }
+        
+        // --- Mode Boss Rush ---
+        if (gameState.gameMode === 'bossrush') {
+            const newLevel = Math.floor(gameState.score / 300) + 1;
+            if (newLevel > gameState.level) {
+                const previousLevel = gameState.level;
+                gameState.level = newLevel;
+                const prevTheme = Math.floor((previousLevel - 1) / 5);
+                const newTheme = Math.floor((gameState.level - 1) / 5);
+                if (newTheme > prevTheme) {
+                    playThemeTransitionJingle(newTheme);
+                    triggerWarpTransition(themes[newTheme % themes.length].name);
+                }
+                gameState.gameSpeed += getSpeedIncrease(gameState.level) * 0.4;
+                if (levelElement) levelElement.textContent = gameState.level;
+                if (currentLevelDisplay) currentLevelDisplay.textContent = gameState.level;
+                // Boss tous les 5 niveaux en boss rush
+                const shouldSpawnBoss = (gameState.level % 5 === 0) && 
+                                        (previousLevel % 5 !== 0 || previousLevel === 0) &&
+                                        !gameState.bossActive && !boss && gameState.level <= 100;
+                if (shouldSpawnBoss) {
+                    try { spawnBoss(); } catch (e) { gameState.bossActive = false; boss = null; }
+                }
+            }
             return;
         }
         
         if (gameState.gameMode === 'infinite') {
-            // Mode infini : le niveau augmente continuellement
         const newLevel = Math.floor(gameState.score / 500) + 1;
         if (newLevel > gameState.level) {
             const previousLevel = gameState.level;
             gameState.level = newLevel;
             const prevTheme = Math.floor((previousLevel - 1) / 10);
             const newTheme = Math.floor((gameState.level - 1) / 10);
-            if (newTheme > prevTheme) playThemeTransitionJingle(newTheme);
-            // Augmentation progressive de la vitesse
-            const speedIncrease = getSpeedIncrease(gameState.level) * 0.6; // Un peu moins en mode infini
+            if (newTheme > prevTheme) {
+                playThemeTransitionJingle(newTheme);
+                triggerWarpTransition(themes[newTheme % themes.length].name);
+            }
+            const speedIncrease = getSpeedIncrease(gameState.level) * 0.6;
             gameState.gameSpeed += speedIncrease;
             if (levelElement) levelElement.textContent = gameState.level;
             if (currentLevelDisplay) currentLevelDisplay.textContent = gameState.level;
-                // Animation de niveau supprimée
             }
-            // Pas de boss en mode infini
             return;
         }
         
@@ -3812,8 +4221,10 @@ document.addEventListener('DOMContentLoaded', function() {
             gameState.level = newLevel;
             const prevTheme = Math.floor((previousLevel - 1) / 10);
             const newTheme = Math.floor((gameState.level - 1) / 10);
-            if (newTheme > prevTheme) playThemeTransitionJingle(newTheme);
-            // Augmentation progressive de la vitesse
+            if (newTheme > prevTheme) {
+                playThemeTransitionJingle(newTheme);
+                triggerWarpTransition(themes[newTheme % themes.length].name);
+            }
             const speedIncrease = getSpeedIncrease(gameState.level);
             gameState.gameSpeed += speedIncrease;
             if (levelElement) levelElement.textContent = gameState.level;
@@ -4316,6 +4727,8 @@ document.addEventListener('DOMContentLoaded', function() {
                         createScoreParticle(boss.x, boss.y, `+${bossPoints}`);
                         
                         // Nettoyer le boss IMMÉDIATEMENT pour éviter les accès après
+                        gameStats.bossesDefeated++;
+                        triggerFreezeFrame(80);
                         boss = null;
                         gameState.bossActive = false;
                         bossBullets = [];
@@ -4822,7 +5235,12 @@ document.addEventListener('DOMContentLoaded', function() {
     document.addEventListener('keydown', (e) => {
         keys[e.code] = true;
         
-        // Raccourcis clavier pour le volume (désactivés si modifié manuellement)
+        // Dash (Shift)
+        if ((e.code === 'ShiftLeft' || e.code === 'ShiftRight') && gameState.isPlaying && !gameState.isPaused) {
+            e.preventDefault();
+            performDash();
+        }
+        
         if (!volumeManuallyModified) {
             if (e.code === 'ArrowUp' && (e.ctrlKey || e.metaKey)) {
                 e.preventDefault();
@@ -4983,6 +5401,11 @@ document.addEventListener('DOMContentLoaded', function() {
         addMobileButton(mobileLeft, 'ArrowLeft');
         addMobileButton(mobileRight, 'ArrowRight');
         addMobileButton(mobileShoot, 'Space');
+        
+        const mobileDash = document.getElementById('mobile-dash');
+        if (mobileDash) {
+            mobileDash.addEventListener('pointerdown', (e) => { e.preventDefault(); performDash(); });
+        }
     })();
     
     // Mouvement du vaisseau (normalisé par delta time)
@@ -5065,6 +5488,16 @@ document.addEventListener('DOMContentLoaded', function() {
         // Stocker le delta normalisé globalement pour l'utiliser dans update()
         gameState.deltaTime = normalizedDelta;
         
+        // Freeze-frame : geler le jeu brièvement
+        if (freezeState.active) {
+            freezeState.timer -= 16.67;
+            if (freezeState.timer <= 0) { freezeState.active = false; }
+            draw();
+            gameLoopId = requestAnimationFrame(gameLoop);
+            return;
+        }
+        
+        updateDash();
         handleMovement();
         update();
         draw();
@@ -5138,8 +5571,11 @@ document.addEventListener('DOMContentLoaded', function() {
             gameLoopId = null;
         }
         
-        // Récupérer le mode de jeu sélectionné
-        if (gameModeSelect) {
+        // Récupérer le mode de jeu sélectionné (boutons ou select)
+        const activeMode = document.querySelector('.mode-btn.active');
+        if (activeMode) {
+            gameState.gameMode = activeMode.dataset.mode;
+        } else if (gameModeSelect) {
             gameState.gameMode = gameModeSelect.value;
         }
         
@@ -5156,6 +5592,14 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Initialiser le contrôleur de volume au chargement
     initVolumeControl();
+    
+    // Mode selector (boutons)
+    document.querySelectorAll('.mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        });
+    });
     
     function pauseGame() {
         gameState.isPaused = !gameState.isPaused;
@@ -5227,25 +5671,39 @@ document.addEventListener('DOMContentLoaded', function() {
             finalGradeEl.className = 'final-grade-letter grade-' + grade;
         }
         
-        // Afficher les statistiques post-partie
+        // Titre dynamique
+        const goTitle = document.getElementById('gameover-title');
+        if (goTitle) {
+            if (gameState.gameMode === 'survival') goTitle.textContent = `Survie terminée — ${timeFormatted}`;
+            else if (gameState.gameMode === 'bossrush') goTitle.textContent = 'Boss Rush terminé !';
+            else goTitle.textContent = 'Mission Échouée!';
+        }
+        
+        // Grille de stats enrichie
+        const statsGrid = document.getElementById('go-stats-grid');
+        if (statsGrid) {
+            const stats = [
+                { icon: '🎯', label: 'Astéroïdes', value: gameStats.asteroidsDestroyed },
+                { icon: '✅', label: 'Précision', value: `${accuracy}%` },
+                { icon: '🔥', label: 'Max Combo', value: gameStats.maxCombo || 0 },
+                { icon: '⚡', label: 'Multiplicateur', value: `x${gameStats.maxMultiplier || 1}` },
+                { icon: '💨', label: 'Dashs', value: gameStats.dashesUsed || 0 },
+                { icon: '⏱️', label: 'Temps', value: timeFormatted },
+                { icon: '🎁', label: 'Bonus', value: gameStats.powerUpsCollected },
+                { icon: '💥', label: 'Tirs', value: gameStats.bulletsFired }
+            ];
+            statsGrid.innerHTML = stats.map(s => 
+                `<div class="go-stat-cell"><span class="go-stat-icon">${s.icon}</span><span class="go-stat-val">${s.value}</span><span class="go-stat-label">${s.label}</span></div>`
+            ).join('');
+        }
+        
         if (scoreMessage) {
-            let statsText = '';
-            if (gameState.score < 500) {
-                statsText = '😅 Tu es nul ! Moins de 500 points, vraiment ?<br><br>';
-            }
-            statsText += `<strong>📊 Statistiques de partie:</strong><br>`;
-            statsText += `🎯 Astéroïdes détruits: ${gameStats.asteroidsDestroyed}<br>`;
-            statsText += `💥 Projectiles tirés: ${gameStats.bulletsFired}<br>`;
-            statsText += `✅ Précision: ${accuracy}%<br>`;
-            statsText += `🎁 Bonus collectés: ${gameStats.powerUpsCollected}<br>`;
-            statsText += `⏱️ Temps de jeu: ${timeFormatted}`;
-            scoreMessage.innerHTML = statsText;
-            scoreMessage.style.color = '#00ffff';
-            scoreMessage.style.fontWeight = 'normal';
-            scoreMessage.style.fontSize = '0.9em';
-            scoreMessage.style.marginTop = '15px';
-            scoreMessage.style.textAlign = 'left';
-            scoreMessage.style.lineHeight = '1.6';
+            let msg = '';
+            if (gameState.score < 500) msg = '😅 Moins de 500 points... Tu peux mieux faire !';
+            else if (gameStats.maxCombo >= 15) msg = '🔥 Combo insane !';
+            else if (accuracyNum >= 80) msg = '🎯 Précision chirurgicale !';
+            else if (gameState.level >= 50) msg = '🌌 Tu as exploré l\'espace profond !';
+            scoreMessage.textContent = msg;
         }
         
         if (gameOver) gameOver.classList.remove('hidden');

@@ -587,11 +587,99 @@
     font-weight: 600;
 }
 
-.start-screen p {
-    font-size: 0.95rem;
-    margin-top: 20px;
+.start-screen .start-hint {
+    font-size: 0.85rem;
+    margin-top: 18px;
     animation: pulse 2s ease-in-out infinite;
-    color: rgba(255, 255, 255, 0.5);
+    color: rgba(255, 255, 255, 0.4);
+}
+
+/* Mode selector */
+.mode-select {
+    display: flex;
+    gap: 6px;
+    justify-content: center;
+    margin: 18px 0 4px;
+    flex-wrap: wrap;
+}
+
+.mode-btn {
+    padding: 7px 16px;
+    border: 1px solid var(--ss-border);
+    background: transparent;
+    color: rgba(255,255,255,0.55);
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-family: var(--ss-font);
+    cursor: pointer;
+    transition: all .2s;
+    letter-spacing: .02em;
+}
+.mode-btn:hover { border-color: var(--ss-accent); color: #fff; }
+.mode-btn.active {
+    background: linear-gradient(135deg, var(--ss-accent), var(--ss-purple));
+    border-color: transparent;
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 0 14px rgba(108, 138, 255, 0.3);
+}
+
+/* Game-over enrichi */
+.go-main-stats {
+    display: flex;
+    gap: 28px;
+    justify-content: center;
+    margin-bottom: 10px;
+}
+.go-stat-big {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+.go-stat-big .go-label {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: rgba(255,255,255,0.45);
+}
+.go-stat-big .go-value {
+    font-size: 2rem;
+    font-weight: 700;
+    font-family: var(--ss-font);
+    background: linear-gradient(135deg, var(--ss-accent-bright), var(--ss-gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.go-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin: 16px 0;
+}
+.go-stat-cell {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 4px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 10px;
+    border: 1px solid rgba(255,255,255,0.06);
+}
+.go-stat-icon { font-size: 1.1rem; }
+.go-stat-val {
+    font-size: 0.95rem;
+    font-weight: 700;
+    font-family: var(--ss-font);
+    color: #fff;
+}
+.go-stat-label {
+    font-size: 0.6rem;
+    text-transform: uppercase;
+    letter-spacing: .04em;
+    color: rgba(255,255,255,0.4);
 }
 
 /* ---- Messages in-game ---- */
@@ -1467,6 +1555,9 @@
     .volume-value { font-size: 0.65rem; min-width: 26px; }
     .score-register-buttons { flex-direction: column; gap: 8px; }
     .score-register-buttons .btn { max-width: 100%; }
+    .mode-btn { padding: 5px 10px; font-size: 0.68rem; }
+    .go-stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .go-stat-big .go-value { font-size: 1.5rem; }
 }
 
 /* ---- Mobile controls ---- */
@@ -1533,6 +1624,17 @@
         transform: scale(0.9);
         box-shadow: 0 0 20px rgba(100, 140, 255, 0.4);
     }
+
+    .mobile-btn-dash {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: rgba(100, 180, 255, 0.12);
+        border-color: rgba(100, 180, 255, 0.35);
+        margin-bottom: 10px;
+    }
+    .mobile-btn-dash:active { background: rgba(100, 180, 255, 0.35); box-shadow: 0 0 18px rgba(100,180,255,0.5); }
+    .mobile-btn-dash i { color: #6cb4ff; }
 
     .mobile-btn-shoot {
         width: 74px;

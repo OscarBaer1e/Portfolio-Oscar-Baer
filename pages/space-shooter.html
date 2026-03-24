@@ -101,14 +101,17 @@
                             <div id="current-level-display" class="level-value">1</div>
                         </div>
                         <div id="game-over" class="game-over hidden">
-                            <h3>Mission Échouée!</h3>
+                            <h3 id="gameover-title">Mission Échouée!</h3>
                             <div class="final-grade-block" aria-label="Note de partie">
                                 <span id="final-grade" class="final-grade-letter">-</span>
                             </div>
                             <div class="game-over-details">
-                                <p>Score Final: <span id="final-score">0</span></p>
-                                <p>Meilleur Score: <span id="final-high-score">0</span></p>
-                                <p>Niveau Atteint: <span id="final-level">1</span></p>
+                                <div class="go-main-stats">
+                                    <div class="go-stat-big"><span class="go-label">Score</span><span id="final-score" class="go-value">0</span></div>
+                                    <div class="go-stat-big"><span class="go-label">Niveau</span><span id="final-level" class="go-value">1</span></div>
+                                </div>
+                                <p style="font-size:.85em;opacity:.6">Meilleur : <span id="final-high-score">0</span></p>
+                                <div id="go-stats-grid" class="go-stats-grid"></div>
                                 <p id="score-message" class="score-message"></p>
                             </div>
                             <div class="game-over-buttons">
@@ -118,7 +121,13 @@
                         </div>
                         <div id="start-screen" class="start-screen">
                             <h3>SPACE SHOOTER</h3>
-                            <p>Appuyez sur ESPACE pour commencer</p>
+                            <div class="mode-select">
+                                <button class="mode-btn active" data-mode="normal">Normal</button>
+                                <button class="mode-btn" data-mode="infinite">Infini</button>
+                                <button class="mode-btn" data-mode="survival">Survie</button>
+                                <button class="mode-btn" data-mode="bossrush">Boss Rush</button>
+                            </div>
+                            <p class="start-hint">ESPACE pour commencer</p>
                         </div>
                         
                         <!-- Contrôles tactiles pour mobile -->
@@ -142,6 +151,9 @@
                                 </div>
                             </div>
                             <div class="mobile-controls-right">
+                                <button class="mobile-btn mobile-btn-dash" id="mobile-dash" aria-label="Dash">
+                                    <i class="fas fa-bolt"></i>
+                                </button>
                                 <button class="mobile-btn mobile-btn-shoot" id="mobile-shoot" aria-label="Tirer">
                                     <i class="fas fa-circle"></i>
                                     <span class="shoot-label">TIRER</span>
@@ -176,9 +188,10 @@
                                 <p><kbd>←</kbd> <kbd>→</kbd> ou <kbd>A</kbd> <kbd>D</kbd> — Déplacer</p>
                                 <p><kbd>↑</kbd> <kbd>↓</kbd> ou <kbd>W</kbd> <kbd>S</kbd> — Avancer / Reculer</p>
                                 <p><kbd>ESPACE</kbd> — Tirer (maintenir = auto)</p>
+                                <p><kbd>Shift</kbd> — Dash (esquive rapide)</p>
                             </div>
                         </div>
-                        <p class="tip">Détruisez les astéroïdes, collectez les bonus, battez les boss tous les 10 niveaux et grimpez dans le leaderboard.</p>
+                        <p class="tip">Détruisez les astéroïdes, collectez les bonus, battez les boss tous les 10 niveaux et grimpez dans le leaderboard. Astéroïdes spéciaux à partir du niv. 5 : 💥 Explosif, 🛡️ Blindé, 🧲 Magnétique.</p>
                     </div>
                     
                     <div id="game-message" class="game-message"></div>
