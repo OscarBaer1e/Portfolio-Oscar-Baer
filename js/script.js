@@ -396,6 +396,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!el || el.tagName !== 'IMG') return false;
             if (el.closest('.lightbox-overlay, .zoom-modal, .skill-overlay, .pdf-viewer-overlay')) return false;
             if (el.dataset.noLightbox === 'true') return false;
+            // Ne pas intercepter les images utilisées comme déclencheurs de mini-jeux/easter eggs
+            if (el.id === 'easter-egg-trigger-img') return false;
+            if (el.closest('#basketball-easter-egg, #easter-egg-trigger, #pacman-easter-egg-trigger')) return false;
+            if (el.closest('a[href*="bowling-game"], a[href*="space-shooter"], a[href*="pacman-game"]')) return false;
             return true;
         }
 
