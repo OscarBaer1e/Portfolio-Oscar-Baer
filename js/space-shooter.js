@@ -53,92 +53,112 @@ document.addEventListener('DOMContentLoaded', function() {
         // Thème 1 : Espace profond (niveaux 1-10)
         {
             name: 'Espace profond',
-            background: { top: '#0a0a1a', bottom: '#000000' },
-            stars: '#ffffff',
-            bullets: '#00ffff',
-            asteroids: ['#888888', '#666666', '#999999'],
-            particles: ['#00ffff', '#0088ff', '#00aaff']
+            background: { top: '#060610', bottom: '#000004' },
+            nebula: 'rgba(60,80,180,0.04)',
+            stars: '#c8d0ff',
+            bullets: '#6c8aff',
+            bulletGlow: 'rgba(108,138,255,0.5)',
+            asteroids: ['#5a6078', '#484e64', '#6a7090'],
+            particles: ['#6c8aff', '#4466cc', '#5588ee']
         },
-        // Thème 2 : Nébuleuse bleue (niveaux 11-20)
+        // Thème 2 : Nébuleuse indigo (niveaux 11-20)
         {
-            name: 'Nébuleuse bleue',
-            background: { top: '#1a0a2a', bottom: '#0a0a1a' },
-            stars: '#aaccff',
-            bullets: '#66ccff',
-            asteroids: ['#4466aa', '#335599', '#5577bb'],
-            particles: ['#66ccff', '#4488ff', '#66aaff']
+            name: 'Nébuleuse indigo',
+            background: { top: '#0a0818', bottom: '#040410' },
+            nebula: 'rgba(90,60,200,0.05)',
+            stars: '#b0b8ff',
+            bullets: '#8080ff',
+            bulletGlow: 'rgba(128,128,255,0.5)',
+            asteroids: ['#4a4880', '#3c3a70', '#5a5890'],
+            particles: ['#8080ff', '#6060dd', '#9090ff']
         },
         // Thème 3 : Nébuleuse violette (niveaux 21-30)
         {
             name: 'Nébuleuse violette',
-            background: { top: '#2a0a3a', bottom: '#1a0a2a' },
-            stars: '#cc99ff',
-            bullets: '#aa66ff',
-            asteroids: ['#6644aa', '#553399', '#7755bb'],
-            particles: ['#aa66ff', '#8844ff', '#aa88ff']
+            background: { top: '#120820', bottom: '#080410' },
+            nebula: 'rgba(160,60,220,0.05)',
+            stars: '#d8a8ff',
+            bullets: '#bd93f9',
+            bulletGlow: 'rgba(189,147,249,0.5)',
+            asteroids: ['#5a3880', '#483070', '#6a4890'],
+            particles: ['#bd93f9', '#9060dd', '#c8a0ff']
         },
         // Thème 4 : Nébuleuse rose (niveaux 31-40)
         {
             name: 'Nébuleuse rose',
-            background: { top: '#3a0a2a', bottom: '#2a0a1a' },
-            stars: '#ff99cc',
-            bullets: '#ff66aa',
-            asteroids: ['#aa4466', '#993355', '#bb5577'],
-            particles: ['#ff66aa', '#ff4488', '#ff88aa']
+            background: { top: '#180810', bottom: '#0c0408' },
+            nebula: 'rgba(200,60,120,0.05)',
+            stars: '#ffa8c8',
+            bullets: '#ff6b9d',
+            bulletGlow: 'rgba(255,107,157,0.5)',
+            asteroids: ['#804050', '#703848', '#905060'],
+            particles: ['#ff6b9d', '#dd4880', '#ff90b0']
         },
         // Thème 5 : Nébuleuse orange (niveaux 41-50)
         {
             name: 'Nébuleuse orange',
-            background: { top: '#3a1a0a', bottom: '#2a0a0a' },
-            stars: '#ffcc99',
+            background: { top: '#181008', bottom: '#0c0804' },
+            nebula: 'rgba(200,100,40,0.05)',
+            stars: '#ffd0a0',
             bullets: '#ffaa66',
-            asteroids: ['#aa6644', '#995533', '#bb7755'],
-            particles: ['#ffaa66', '#ff8844', '#ffcc88']
+            bulletGlow: 'rgba(255,170,102,0.5)',
+            asteroids: ['#806040', '#705030', '#907050'],
+            particles: ['#ffaa66', '#ee8844', '#ffcc88']
         },
-        // Thème 6 : Nébuleuse verte (niveaux 51-60)
+        // Thème 6 : Nébuleuse émeraude (niveaux 51-60)
         {
-            name: 'Nébuleuse verte',
-            background: { top: '#0a2a1a', bottom: '#0a1a0a' },
-            stars: '#99ffcc',
-            bullets: '#66ffaa',
-            asteroids: ['#44aa66', '#339955', '#55bb77'],
-            particles: ['#66ffaa', '#44ff88', '#88ffcc']
+            name: 'Nébuleuse émeraude',
+            background: { top: '#041810', bottom: '#020c08' },
+            nebula: 'rgba(40,200,100,0.04)',
+            stars: '#a0ffc8',
+            bullets: '#50fa7b',
+            bulletGlow: 'rgba(80,250,123,0.5)',
+            asteroids: ['#388060', '#306850', '#489070'],
+            particles: ['#50fa7b', '#30dd60', '#70ffa0']
         },
         // Thème 7 : Nébuleuse cyan (niveaux 61-70)
         {
             name: 'Nébuleuse cyan',
-            background: { top: '#0a2a2a', bottom: '#0a1a1a' },
-            stars: '#99ffff',
-            bullets: '#66ffff',
-            asteroids: ['#44aaaa', '#339999', '#55bbbb'],
-            particles: ['#66ffff', '#44ffff', '#88ffff']
+            background: { top: '#041418', bottom: '#020a0c' },
+            nebula: 'rgba(40,180,200,0.04)',
+            stars: '#a0f0ff',
+            bullets: '#00e5ff',
+            bulletGlow: 'rgba(0,229,255,0.5)',
+            asteroids: ['#387080', '#306068', '#488090'],
+            particles: ['#00e5ff', '#00c8dd', '#40f0ff']
         },
         // Thème 8 : Nébuleuse rouge (niveaux 71-80)
         {
             name: 'Nébuleuse rouge',
-            background: { top: '#2a0a0a', bottom: '#1a0000' },
-            stars: '#ff9999',
-            bullets: '#ff6666',
-            asteroids: ['#aa4444', '#993333', '#bb5555'],
-            particles: ['#ff6666', '#ff4444', '#ff8888']
+            background: { top: '#180808', bottom: '#0c0404' },
+            nebula: 'rgba(200,40,40,0.05)',
+            stars: '#ffb0b0',
+            bullets: '#ff4f6e',
+            bulletGlow: 'rgba(255,79,110,0.5)',
+            asteroids: ['#804040', '#703030', '#905050'],
+            particles: ['#ff4f6e', '#dd3050', '#ff7090']
         },
-        // Thème 9 : Nébuleuse jaune (niveaux 81-90)
+        // Thème 9 : Nébuleuse or (niveaux 81-90)
         {
-            name: 'Nébuleuse jaune',
-            background: { top: '#2a2a0a', bottom: '#1a1a00' },
-            stars: '#ffff99',
-            bullets: '#ffff66',
-            asteroids: ['#aaaa44', '#999933', '#bbbb55'],
-            particles: ['#ffff66', '#ffff44', '#ffff88']
+            name: 'Nébuleuse or',
+            background: { top: '#181408', bottom: '#0c0a04' },
+            nebula: 'rgba(200,180,40,0.05)',
+            stars: '#fff0a0',
+            bullets: '#ffd866',
+            bulletGlow: 'rgba(255,216,102,0.5)',
+            asteroids: ['#807040', '#706030', '#908050'],
+            particles: ['#ffd866', '#eec044', '#ffee88']
         },
         // Thème 10 : Espace final (niveaux 91+)
         {
             name: 'Espace final',
-            background: { top: '#1a1a2a', bottom: '#0a0a1a' },
-            stars: '#ffffff',
+            background: { top: '#0c0c18', bottom: '#04040a' },
+            nebula: 'rgba(140,140,200,0.04)',
+            stars: '#e8e8ff',
             bullets: '#ffffff',
-            asteroids: ['#ffffff', '#cccccc', '#dddddd'],
-            particles: ['#ffffff', '#ffccff', '#ccffff']
+            bulletGlow: 'rgba(255,255,255,0.5)',
+            asteroids: ['#a0a0b0', '#8888a0', '#b0b0c0'],
+            particles: ['#ffffff', '#e0d0ff', '#d0e0ff']
         }
     ];
     
@@ -493,7 +513,7 @@ document.addEventListener('DOMContentLoaded', function() {
         width: 40,
         height: 40,
         speed: 7,
-        color: '#00ffff'
+        color: '#8fadff'
     };
     
     // Projectiles
@@ -1305,65 +1325,81 @@ document.addEventListener('DOMContentLoaded', function() {
     function draw() {
         if (!canvas || !ctx) return;
         
-        // Appliquer le shake de l'écran
         ctx.save();
         ctx.translate(screenShake.x, screenShake.y);
         
-        // Fond avec gradient selon le thème
         const currentTheme = getCurrentTheme();
+
+        // Fond avec dégradé riche
         const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
         gradient.addColorStop(0, currentTheme.background.top);
         gradient.addColorStop(1, currentTheme.background.bottom);
         ctx.fillStyle = gradient;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
-        // Nébuleuse pulsée (ambiance) — pulse plus marquée avec score et musique
+        // Nébuleuse douce (couleur du thème, très subtile)
         if (!gameState.isLowEndDevice) {
-            const pulseBase = 0.02 + 0.025 * Math.sin(Date.now() / 400);
-            const pulseScore = 1 + 0.15 * Math.sin((gameState.score || 0) / 80);
-            const musicPlaying = (brolyAudio && !brolyAudio.paused) || (beerusAudio && !beerusAudio.paused);
-            const pulseMusic = musicPlaying ? 1.25 : 1;
-            const pulse = Math.min(0.12, pulseBase * pulseScore * pulseMusic);
-            const nebula = ctx.createRadialGradient(canvas.width / 2, canvas.height * 0.3, 0, canvas.width / 2, canvas.height * 0.3, canvas.width * 0.8);
+            const nebulaAlpha = 0.025 + 0.02 * Math.sin(Date.now() / 500);
+            const nebula = ctx.createRadialGradient(canvas.width * 0.4, canvas.height * 0.25, 0, canvas.width * 0.5, canvas.height * 0.4, canvas.width * 0.7);
             nebula.addColorStop(0, 'transparent');
-            nebula.addColorStop(0.5, 'rgba(80,120,200,' + pulse + ')');
+            nebula.addColorStop(0.4, currentTheme.nebula || 'rgba(80,100,200,' + nebulaAlpha + ')');
             nebula.addColorStop(1, 'transparent');
             ctx.fillStyle = nebula;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Second point nébuleux (côté opposé)
+            const nebula2 = ctx.createRadialGradient(canvas.width * 0.75, canvas.height * 0.7, 0, canvas.width * 0.7, canvas.height * 0.65, canvas.width * 0.5);
+            nebula2.addColorStop(0, 'transparent');
+            nebula2.addColorStop(0.5, currentTheme.nebula || 'rgba(80,100,200,' + (nebulaAlpha * 0.6) + ')');
+            nebula2.addColorStop(1, 'transparent');
+            ctx.fillStyle = nebula2;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
         
-        // Effet de ralentissement temporel (distorsion visuelle)
+        // Effet time slow
         if (activePowerUps.timeSlow && Date.now() < activePowerUps.timeSlowEndTime) {
             ctx.save();
-            ctx.globalAlpha = 0.1;
-            ctx.fillStyle = '#9b59b6';
+            ctx.globalAlpha = 0.06;
+            ctx.fillStyle = '#bd93f9';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             ctx.restore();
         }
         
-        // Étoiles selon le thème (optimisé pour mobile)
+        // Étoiles avec scintillement subtil
+        const twinkleTime = Date.now() / 600;
         if (gameState.isLowEndDevice) {
-            // Sur appareils bas de gamme, dessiner seulement une étoile sur deux
             for (let i = 0; i < stars.length; i += 2) {
                 const star = stars[i];
                 ctx.fillStyle = currentTheme.stars;
+                ctx.globalAlpha = 0.4 + Math.sin(twinkleTime + i * 0.7) * 0.25;
                 ctx.beginPath();
                 ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
                 ctx.fill();
             }
+            ctx.globalAlpha = 1;
         } else {
-            stars.forEach(star => {
+            stars.forEach((star, i) => {
+                const alpha = 0.35 + Math.sin(twinkleTime + i * 0.5) * 0.3;
+                ctx.globalAlpha = alpha;
                 ctx.fillStyle = currentTheme.stars;
                 ctx.beginPath();
                 ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
                 ctx.fill();
+                // Lueur des étoiles les plus grosses
+                if (star.size > 1.4) {
+                    ctx.globalAlpha = alpha * 0.15;
+                    ctx.beginPath();
+                    ctx.arc(star.x, star.y, star.size * 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
             });
+            ctx.globalAlpha = 1;
         }
         
         if (!gameState.isLowEndDevice && ambientMeteors.length > 0) {
             ambientMeteors.forEach(m => {
                 ctx.save();
-                ctx.globalAlpha = m.alpha;
+                ctx.globalAlpha = m.alpha * 0.7;
                 ctx.fillStyle = currentTheme.stars;
                 ctx.beginPath();
                 ctx.arc(m.x, m.y, m.size, 0, Math.PI * 2);
@@ -1372,29 +1408,28 @@ document.addEventListener('DOMContentLoaded', function() {
             });
         }
         
-        // Traînées de particules du vaisseau (réduites sur mobile) — arc-en-ciel si bonus actif
-        if (!gameState.isLowEndDevice) {
+        // Traînée du vaisseau
+        if (!gameState.isLowEndDevice && shipTrail.length > 1) {
             const trailStep = gameState.isMobile ? 2 : 1;
             const trailPrism = activePowerUps.prism && Date.now() < activePowerUps.prismEndTime;
-            shipTrail.forEach((trail, index) => {
-                if (index % trailStep === 0) {
-                    ctx.save();
-                    ctx.globalAlpha = trail.alpha;
-                    if (trailPrism) {
-                        const hue = (Date.now() / 40 + index * 35) % 360;
-                        ctx.fillStyle = `hsl(${hue}, 100%, 65%)`;
-                        ctx.shadowBlur = gameState.isMobile ? 8 : 12;
-                    } else {
-                        ctx.fillStyle = ship.color;
-                        ctx.shadowBlur = gameState.isMobile ? 5 : 10;
-                    }
-                    ctx.shadowColor = ctx.fillStyle;
-                    ctx.beginPath();
-                    ctx.arc(trail.x, trail.y, 3 - (index / shipTrail.length) * 2, 0, Math.PI * 2);
-                    ctx.fill();
-                    ctx.restore();
+            for (let i = 0; i < shipTrail.length; i += trailStep) {
+                const trail = shipTrail[i];
+                const ratio = i / shipTrail.length;
+                const radius = 2.5 * (1 - ratio);
+                if (radius < 0.3) continue;
+                ctx.save();
+                ctx.globalAlpha = trail.alpha * 0.5;
+                if (trailPrism) {
+                    const hue = (Date.now() / 40 + i * 35) % 360;
+                    ctx.fillStyle = `hsl(${hue}, 85%, 65%)`;
+                } else {
+                    ctx.fillStyle = currentTheme.bullets;
                 }
-            });
+                ctx.beginPath();
+                ctx.arc(trail.x, trail.y, radius, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.restore();
+            }
         }
         
         // Aura style Super Saiyan (Broly = vert, Beerus/Goku = doré)
@@ -1514,9 +1549,9 @@ document.addEventListener('DOMContentLoaded', function() {
                     const s = bulletSize * 2.2;
                     ctx.drawImage(tastyCroustyImg, -s/2, -s/2, s, s);
                 } else {
-                    ctx.fillStyle = '#ffcc00';
+                    ctx.fillStyle = '#ffd866';
                     ctx.shadowBlur = 10;
-                    ctx.shadowColor = '#ffcc00';
+                    ctx.shadowColor = '#ffd866';
                     ctx.beginPath();
                     ctx.arc(0, 0, bulletSize, 0, Math.PI * 2);
                     ctx.fill();
@@ -1529,9 +1564,22 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!anyVisual) {
                 ctx.save();
                 ctx.translate(bullet.x, bullet.y);
+                // Traînée allongée
+                const trailGrad = ctx.createLinearGradient(0, -bulletSize * 3, 0, bulletSize);
+                trailGrad.addColorStop(0, 'rgba(108,138,255,0)');
+                trailGrad.addColorStop(0.5, currentTheme.bulletGlow || 'rgba(108,138,255,0.3)');
+                trailGrad.addColorStop(1, currentTheme.bullets);
+                ctx.fillStyle = trailGrad;
+                ctx.fillRect(-bulletSize * 0.6, -bulletSize * 3, bulletSize * 1.2, bulletSize * 4);
+                // Cœur lumineux
+                if (!gameState.isLowEndDevice) { ctx.shadowBlur = 8; ctx.shadowColor = currentTheme.bullets; }
+                ctx.fillStyle = '#fff';
+                ctx.globalAlpha = 0.9;
+                ctx.beginPath();
+                ctx.arc(0, 0, bulletSize * 0.6, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.globalAlpha = 1;
                 ctx.fillStyle = currentTheme.bullets;
-                ctx.shadowBlur = gameState.isMobile ? 5 : 10;
-                ctx.shadowColor = currentTheme.bullets;
                 ctx.beginPath();
                 ctx.arc(0, 0, bulletSize, 0, Math.PI * 2);
                 ctx.fill();
@@ -1541,9 +1589,9 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             const colors = [];
             if (prismActive) colors.push(hslToRgb((Date.now() / 25 + bulletIndex * 50) % 360, 1, 0.6));
-            if (brolyAuraActive) colors.push([0, 255, 136]);
-            if (beerusAuraActive) colors.push([255, 68, 102]);
-            if (overdriveActive) colors.push([255, 102, 0]);
+            if (brolyAuraActive) colors.push([80, 250, 123]);
+            if (beerusAuraActive) colors.push([255, 107, 157]);
+            if (overdriveActive) colors.push([255, 170, 102]);
             let r = 0, g = 0, b = 0;
             colors.forEach(([rr, gg, bb]) => { r += rr; g += gg; b += bb; });
             r = Math.min(255, Math.round(r / colors.length));
@@ -1551,13 +1599,11 @@ document.addEventListener('DOMContentLoaded', function() {
             b = Math.min(255, Math.round(b / colors.length));
             const blend = `rgb(${r},${g},${b})`;
             const shape = prismActive ? 'bar' : 'circle';
-            const shadowBlur = gameState.isMobile ? 10 : 14;
             ctx.save();
             ctx.translate(bullet.x, bullet.y);
             if (shape === 'bar') ctx.rotate((Date.now() * 0.008 + bulletIndex) * 0.02);
             ctx.fillStyle = blend;
-            ctx.shadowBlur = shadowBlur;
-            ctx.shadowColor = blend;
+            if (!gameState.isLowEndDevice) { ctx.shadowBlur = 12; ctx.shadowColor = blend; }
             if (shape === 'bar') {
                 const barW = bulletSize * 1.2, barH = bulletSize * 8;
                 ctx.fillRect(-barW/2, -barH/2, barW, barH);
@@ -1677,24 +1723,25 @@ document.addEventListener('DOMContentLoaded', function() {
         // Dessiner les particules de score
         drawScoreParticles();
         
+        // Vignette (bords sombres)
         if (!gameState.isLowEndDevice) {
-            const vig = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, canvas.width * 0.2, canvas.width / 2, canvas.height / 2, canvas.width * 0.8);
+            const vig = ctx.createRadialGradient(canvas.width / 2, canvas.height / 2, canvas.width * 0.25, canvas.width / 2, canvas.height / 2, canvas.width * 0.75);
             vig.addColorStop(0, 'transparent');
-            vig.addColorStop(0.6, 'rgba(0,0,0,0)');
-            vig.addColorStop(1, 'rgba(0,0,0,0.12)');
+            vig.addColorStop(0.7, 'rgba(0,0,0,0)');
+            vig.addColorStop(1, 'rgba(0,0,0,0.25)');
             ctx.fillStyle = vig;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
         }
         
-        // Scanlines (overlay rétro discret)
+        // Scanlines très discrètes
         if (!gameState.isLowEndDevice) {
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.04)';
-            for (let y = 0; y < canvas.height; y += 2) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.02)';
+            for (let y = 0; y < canvas.height; y += 3) {
                 ctx.fillRect(0, y, canvas.width, 1);
             }
         }
         
-        // Grain (léger bruit de film)
+        // Grain subtil
         if (!gameState.isLowEndDevice) {
             if (!grainCanvas || grainCanvas.width !== canvas.width || grainCanvas.height !== canvas.height) {
                 grainCanvas = document.createElement('canvas');
@@ -1704,13 +1751,13 @@ document.addEventListener('DOMContentLoaded', function() {
                 const imgData = gctx.createImageData(grainCanvas.width, grainCanvas.height);
                 const data = imgData.data;
                 for (let i = 0; i < data.length; i += 4) {
-                    const n = Math.floor(Math.random() * 32);
+                    const n = Math.floor(Math.random() * 24);
                     data[i] = data[i + 1] = data[i + 2] = n;
-                    data[i + 3] = 12 + Math.floor(Math.random() * 8);
+                    data[i + 3] = 8 + Math.floor(Math.random() * 6);
                 }
                 gctx.putImageData(imgData, 0, 0);
             }
-            ctx.globalAlpha = 0.08;
+            ctx.globalAlpha = 0.05;
             ctx.drawImage(grainCanvas, 0, 0);
             ctx.globalAlpha = 1;
         }
@@ -1725,28 +1772,28 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.globalAlpha = event.alpha;
         
         if (event.type === 'rocket') {
-            // Fusée
-            ctx.fillStyle = '#ff8800';
-            ctx.shadowBlur = 15;
-            ctx.shadowColor = '#ff8800';
+            ctx.fillStyle = '#8fadff';
             ctx.beginPath();
             ctx.moveTo(event.x, event.y);
-            ctx.lineTo(event.x - 10, event.y + 20);
-            ctx.lineTo(event.x + 10, event.y + 20);
+            ctx.lineTo(event.x - 6, event.y + 14);
+            ctx.lineTo(event.x + 6, event.y + 14);
             ctx.closePath();
             ctx.fill();
-            
             // Flamme
-            ctx.fillStyle = '#ffff00';
+            const flameGrad = ctx.createLinearGradient(event.x, event.y + 14, event.x, event.y + 28);
+            flameGrad.addColorStop(0, 'rgba(255,200,100,0.8)');
+            flameGrad.addColorStop(1, 'rgba(255,100,50,0)');
+            ctx.fillStyle = flameGrad;
             ctx.beginPath();
-            ctx.arc(event.x, event.y + 20, 5, 0, Math.PI * 2);
+            ctx.moveTo(event.x - 4, event.y + 14);
+            ctx.quadraticCurveTo(event.x, event.y + 28, event.x + 4, event.y + 14);
             ctx.fill();
         } else if (event.type === 'shootingStar') {
-            // Étoile filante
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 2;
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = '#ffffff';
+            const grad = ctx.createLinearGradient(event.x, event.y, event.x - event.length, event.y + event.length);
+            grad.addColorStop(0, 'rgba(255,255,255,0.9)');
+            grad.addColorStop(1, 'rgba(255,255,255,0)');
+            ctx.strokeStyle = grad;
+            ctx.lineWidth = 1.5;
             ctx.beginPath();
             ctx.moveTo(event.x, event.y);
             ctx.lineTo(event.x - event.length, event.y + event.length);
@@ -2006,54 +2053,96 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function drawShip(x, y) {
-        // Clignotement si invincible (1-2 secondes)
         if (ship.invincible) {
-            const blinkSpeed = 150; // ms par clignotement
-            const blinkTime = Date.now() % (blinkSpeed * 2);
-            if (blinkTime < blinkSpeed) {
-                // Ne pas dessiner pendant la moitié du temps (clignotement)
-                return;
-            }
+            const blinkTime = Date.now() % 300;
+            if (blinkTime < 150) return;
         }
         
         ctx.save();
         ctx.translate(x, y);
         
-        // Rétrécissement si bonus actif
         const shrinkScale = activePowerUps.shrink && Date.now() < activePowerUps.shrinkEndTime ? 0.6 : 1.0;
         ctx.scale(shrinkScale, shrinkScale);
         
-        let shipColor = ship.color;
-        let detailColor = '#00ffff';
+        let shipColor = '#8fadff';
+        let detailColor = '#c8d8ff';
+        let engineColor = '#6c8aff';
         if (brolyAudio && !brolyAudio.paused) {
-            shipColor = '#00ff88';
-            detailColor = '#00ffcc';
+            shipColor = '#50fa7b'; detailColor = '#a0ffc0'; engineColor = '#30dd60';
         } else if (beerusAudio && !beerusAudio.paused) {
-            shipColor = '#ff4466';
-            detailColor = '#ffaacc';
+            shipColor = '#ff6b9d'; detailColor = '#ffc0d8'; engineColor = '#ff4080';
         } else if (activePowerUps.overdrive && Date.now() < activePowerUps.overdriveEndTime) {
-            shipColor = '#ff6600';
-            detailColor = '#ff9933';
+            shipColor = '#ffaa66'; detailColor = '#ffd0a0'; engineColor = '#ff8030';
         }
         
-        // Corps du vaisseau
-        ctx.fillStyle = shipColor;
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = shipColor;
+        const w = ship.width;
+        const h = ship.height;
         
-        // Forme du vaisseau (triangle)
+        // Flamme moteur (pulsante)
+        const flamePulse = 0.8 + Math.sin(Date.now() / 40) * 0.3;
+        const flameLen = (h * 0.45) * flamePulse;
+        const flameGrad = ctx.createLinearGradient(0, h / 2, 0, h / 2 + flameLen);
+        flameGrad.addColorStop(0, engineColor);
+        flameGrad.addColorStop(0.4, 'rgba(255,200,100,0.6)');
+        flameGrad.addColorStop(1, 'rgba(255,100,50,0)');
+        ctx.fillStyle = flameGrad;
         ctx.beginPath();
-        ctx.moveTo(0, -ship.height / 2);
-        ctx.lineTo(-ship.width / 2, ship.height / 2);
-        ctx.lineTo(0, ship.height / 2 - 10);
-        ctx.lineTo(ship.width / 2, ship.height / 2);
+        ctx.moveTo(-w * 0.18, h / 2 - 2);
+        ctx.quadraticCurveTo(0, h / 2 + flameLen, w * 0.18, h / 2 - 2);
+        ctx.fill();
+
+        // Lueur moteur
+        if (!gameState.isLowEndDevice) {
+            ctx.shadowBlur = 18;
+            ctx.shadowColor = engineColor;
+            ctx.fillStyle = engineColor;
+            ctx.globalAlpha = 0.3;
+            ctx.beginPath();
+            ctx.arc(0, h / 2, w * 0.15, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+            ctx.shadowBlur = 0;
+        }
+
+        // Corps principal
+        const bodyGrad = ctx.createLinearGradient(0, -h / 2, 0, h / 2);
+        bodyGrad.addColorStop(0, detailColor);
+        bodyGrad.addColorStop(0.5, shipColor);
+        bodyGrad.addColorStop(1, 'rgba(40,50,80,0.8)');
+        ctx.fillStyle = bodyGrad;
+        if (!gameState.isLowEndDevice) { ctx.shadowBlur = 12; ctx.shadowColor = shipColor; }
+
+        ctx.beginPath();
+        ctx.moveTo(0, -h / 2);
+        ctx.lineTo(-w * 0.22, h * 0.1);
+        ctx.lineTo(-w * 0.48, h / 2);
+        ctx.lineTo(-w * 0.12, h * 0.3);
+        ctx.lineTo(0, h * 0.38);
+        ctx.lineTo(w * 0.12, h * 0.3);
+        ctx.lineTo(w * 0.48, h / 2);
+        ctx.lineTo(w * 0.22, h * 0.1);
         ctx.closePath();
         ctx.fill();
-        
-        // Détails
-        ctx.fillStyle = detailColor;
+        ctx.shadowBlur = 0;
+
+        // Ligne centrale (cockpit)
+        ctx.strokeStyle = detailColor;
+        ctx.lineWidth = 1.5;
+        ctx.globalAlpha = 0.4;
         ctx.beginPath();
-        ctx.arc(0, 5, 5, 0, Math.PI * 2);
+        ctx.moveTo(0, -h * 0.35);
+        ctx.lineTo(0, h * 0.2);
+        ctx.stroke();
+        ctx.globalAlpha = 1;
+        
+        // Cockpit
+        const cockpitGrad = ctx.createRadialGradient(0, -h * 0.05, 0, 0, -h * 0.05, 6);
+        cockpitGrad.addColorStop(0, '#ffffff');
+        cockpitGrad.addColorStop(0.5, detailColor);
+        cockpitGrad.addColorStop(1, 'rgba(100,140,255,0.2)');
+        ctx.fillStyle = cockpitGrad;
+        ctx.beginPath();
+        ctx.ellipse(0, -h * 0.05, 4, 5, 0, 0, Math.PI * 2);
         ctx.fill();
         
         ctx.restore();
@@ -2064,26 +2153,77 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.translate(asteroid.x, asteroid.y);
         ctx.rotate(asteroid.rotation);
         
-        ctx.fillStyle = asteroid.color;
-        ctx.shadowBlur = asteroid.size >= 48 ? 12 : 5;
-        ctx.shadowColor = asteroid.color;
+        const s = asteroid.size;
+        const sides = s >= 48 ? 10 : 7;
+        const irregularity = s >= 48 ? 8 : 5;
         
-        const sides = asteroid.size >= 48 ? 12 : 8;
-        const irregularity = asteroid.size >= 48 ? 8 : 5;
-        ctx.beginPath();
-        for (let i = 0; i < sides; i++) {
-            const angle = (i / sides) * Math.PI * 2;
-            const radius = asteroid.size + Math.sin(angle * 3) * irregularity;
-            const x = Math.cos(angle) * radius;
-            const y = Math.sin(angle) * radius;
-            if (i === 0) {
-                ctx.moveTo(x, y);
-            } else {
-                ctx.lineTo(x, y);
+        // Générer un seed stable pour la forme irrégulière
+        if (!asteroid._shape) {
+            asteroid._shape = [];
+            for (let i = 0; i < sides; i++) {
+                asteroid._shape.push(0.85 + Math.random() * 0.3);
             }
         }
-        ctx.closePath();
+
+        // Chemin de l'astéroïde
+        function buildPath(scale) {
+            ctx.beginPath();
+            for (let i = 0; i < sides; i++) {
+                const angle = (i / sides) * Math.PI * 2;
+                const r = (s + Math.sin(angle * 3) * irregularity) * asteroid._shape[i] * scale;
+                const px = Math.cos(angle) * r;
+                const py = Math.sin(angle) * r;
+                i === 0 ? ctx.moveTo(px, py) : ctx.lineTo(px, py);
+            }
+            ctx.closePath();
+        }
+
+        // Ombre portée subtile
+        if (!gameState.isLowEndDevice) {
+            ctx.globalAlpha = 0.2;
+            ctx.fillStyle = '#000';
+            buildPath(1.08);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+        }
+        
+        // Corps avec dégradé
+        const grad = ctx.createRadialGradient(-s * 0.25, -s * 0.25, 0, 0, 0, s * 1.1);
+        grad.addColorStop(0, lightenColor(asteroid.color, 0.35));
+        grad.addColorStop(0.6, asteroid.color);
+        grad.addColorStop(1, darkenColor(asteroid.color, 0.4));
+        ctx.fillStyle = grad;
+        buildPath(1);
         ctx.fill();
+
+        // Bordure subtile
+        ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+        ctx.lineWidth = 1;
+        buildPath(1);
+        ctx.stroke();
+
+        // Cratères (seulement pour les gros + desktop)
+        if (!gameState.isLowEndDevice && s > 22) {
+            if (!asteroid._craters) {
+                asteroid._craters = [];
+                const count = s >= 48 ? 3 : 2;
+                for (let i = 0; i < count; i++) {
+                    asteroid._craters.push({
+                        x: (Math.random() - 0.5) * s * 0.8,
+                        y: (Math.random() - 0.5) * s * 0.8,
+                        r: s * (0.1 + Math.random() * 0.12)
+                    });
+                }
+            }
+            ctx.globalAlpha = 0.15;
+            ctx.fillStyle = '#000';
+            asteroid._craters.forEach(c => {
+                ctx.beginPath();
+                ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+                ctx.fill();
+            });
+            ctx.globalAlpha = 1;
+        }
         
         ctx.restore();
     }
@@ -2092,12 +2232,20 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.save();
         ctx.translate(powerUp.x, powerUp.y);
         
-        // Animation de pulsation
-        const pulse = Math.sin(Date.now() / 200) * 0.2 + 1;
+        const pulse = Math.sin(Date.now() / 200) * 0.15 + 1;
         ctx.scale(pulse, pulse);
+
+        // Halo derrière le power-up
+        if (!gameState.isLowEndDevice) {
+            ctx.globalAlpha = 0.15 + Math.sin(Date.now() / 300) * 0.08;
+            ctx.fillStyle = powerUp.color;
+            ctx.beginPath();
+            ctx.arc(0, 0, 18, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+        }
         
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = powerUp.color;
+        if (!gameState.isLowEndDevice) { ctx.shadowBlur = 10; ctx.shadowColor = powerUp.color; }
         
         // Dessine le boost selon son type
         if (powerUp.type === 'rapidFire') {
@@ -2316,19 +2464,22 @@ document.addEventListener('DOMContentLoaded', function() {
     function drawShield() {
         ctx.save();
         ctx.translate(ship.x, ship.y);
-        
-        // Bouclier pulsant
-        const pulse = Math.sin(Date.now() / 100) * 0.1 + 1;
-        ctx.globalAlpha = 0.5;
-        ctx.strokeStyle = '#00ffff';
-        ctx.lineWidth = 3;
-        ctx.shadowBlur = 20;
-        ctx.shadowColor = '#00ffff';
-        
+        const pulse = Math.sin(Date.now() / 100) * 0.08 + 1;
+        const r = (ship.width / 2 + 10) * pulse;
+        // Halo
+        ctx.globalAlpha = 0.1;
+        ctx.fillStyle = '#6c8aff';
         ctx.beginPath();
-        ctx.arc(0, 0, (ship.width / 2 + 10) * pulse, 0, Math.PI * 2);
+        ctx.arc(0, 0, r + 4, 0, Math.PI * 2);
+        ctx.fill();
+        // Arc
+        ctx.globalAlpha = 0.45;
+        ctx.strokeStyle = '#8fadff';
+        ctx.lineWidth = 2.5;
+        if (!gameState.isLowEndDevice) { ctx.shadowBlur = 14; ctx.shadowColor = '#6c8aff'; }
+        ctx.beginPath();
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
         ctx.stroke();
-        
         ctx.restore();
     }
     
@@ -2336,14 +2487,14 @@ document.addEventListener('DOMContentLoaded', function() {
         ctx.save();
         ctx.translate(ship.x, ship.y);
         const pulse = Math.sin(Date.now() / 120) * 0.08 + 1;
-        ctx.globalAlpha = 0.6;
-        ctx.strokeStyle = '#00ccff';
+        const r = (ship.width / 2 + 10) * pulse;
+        ctx.globalAlpha = 0.5;
+        ctx.strokeStyle = '#00e5ff';
         ctx.lineWidth = 2;
-        ctx.setLineDash([6, 4]);
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = '#00aacc';
+        ctx.setLineDash([5, 4]);
+        if (!gameState.isLowEndDevice) { ctx.shadowBlur = 12; ctx.shadowColor = '#00b8d4'; }
         ctx.beginPath();
-        ctx.arc(0, 0, (ship.width / 2 + 10) * pulse, 0, Math.PI * 2);
+        ctx.arc(0, 0, r, 0, Math.PI * 2);
         ctx.stroke();
         ctx.setLineDash([]);
         ctx.restore();
@@ -3310,11 +3461,10 @@ document.addEventListener('DOMContentLoaded', function() {
         scoreParticles.forEach(particle => {
             ctx.save();
             ctx.globalAlpha = particle.alpha;
-            ctx.fillStyle = '#ffff00';
-            ctx.font = 'bold 20px Anta';
+            ctx.fillStyle = '#ffd866';
+            ctx.font = 'bold 16px Anta, system-ui';
             ctx.textAlign = 'center';
-            ctx.shadowBlur = 10;
-            ctx.shadowColor = '#ffff00';
+            if (!gameState.isLowEndDevice) { ctx.shadowBlur = 6; ctx.shadowColor = 'rgba(255,216,102,0.5)'; }
             ctx.fillText(particle.text, particle.x, particle.y);
             ctx.restore();
         });
@@ -3420,15 +3570,17 @@ document.addEventListener('DOMContentLoaded', function() {
     // Explosion améliorée avec plus de particules et effets
     function createEnhancedExplosion(x, y, color, size) {
         try {
-            // Limiter le nombre de particules pour éviter les crashes (réduit sur mobile)
-            const maxParticles = gameState.isMobile ? (gameState.isLowEndDevice ? 15 : 25) : 50;
-            const maxParticleCount = Math.min(Math.floor(size / 2) + 20, maxParticles);
-            const particleCount = Math.min(maxParticleCount, maxParticles);
+            const maxParticles = gameState.isMobile ? (gameState.isLowEndDevice ? 12 : 22) : 40;
+            const particleCount = Math.min(Math.floor(size / 2) + 16, maxParticles);
+            
+            const theme = getCurrentTheme();
+            const particleColors = [color, lightenColor(color, 0.25), '#fff'];
             
             for (let i = 0; i < particleCount; i++) {
-                const angle = (Math.PI * 2 / particleCount) * i;
-                const speed = Math.random() * 6 + 2;
-                const particleSize = Math.random() * (size / 5) + 2;
+                const angle = (Math.PI * 2 / particleCount) * i + (Math.random() - 0.5) * 0.4;
+                const speed = Math.random() * 5 + 2.5;
+                const particleSize = Math.random() * (size / 5) + 1.5;
+                const pColor = particleColors[Math.floor(Math.random() * particleColors.length)];
                 
                 particles.push({
                     x: x,
@@ -3436,25 +3588,25 @@ document.addEventListener('DOMContentLoaded', function() {
                     vx: Math.cos(angle) * speed,
                     vy: Math.sin(angle) * speed,
                     size: particleSize,
-                    color: color,
+                    color: pColor,
                     alpha: 1,
-                    life: 1
+                    life: 1,
+                    type: Math.random() < 0.3 ? 'sparkle' : (Math.random() < 0.4 ? 'star' : undefined)
                 });
             }
             
-            // Ajoute des particules plus petites pour l'effet de fumée (limitées)
-            // Réduire les particules de fumée sur mobile
-            const maxSmoke = gameState.isMobile ? (gameState.isLowEndDevice ? 5 : 10) : 25;
-            const smokeCount = Math.min(Math.floor(particleCount / 2), maxSmoke);
+            // Particules de fumée
+            const maxSmoke = gameState.isMobile ? (gameState.isLowEndDevice ? 4 : 8) : 16;
+            const smokeCount = Math.min(Math.floor(particleCount / 3), maxSmoke);
             for (let i = 0; i < smokeCount; i++) {
                 particles.push({
                     x: x + (Math.random() - 0.5) * size,
                     y: y + (Math.random() - 0.5) * size,
-                    vx: (Math.random() - 0.5) * 2,
-                    vy: (Math.random() - 0.5) * 2,
-                    size: Math.random() * 3 + 1,
-                    color: `rgba(${Math.random() * 100 + 50}, ${Math.random() * 100 + 50}, ${Math.random() * 100 + 50}, 0.8)`,
-                    alpha: 0.8,
+                    vx: (Math.random() - 0.5) * 1.5,
+                    vy: (Math.random() - 0.5) * 1.5,
+                    size: Math.random() * 2.5 + 1,
+                    color: darkenColor(color, 0.3),
+                    alpha: 0.6,
                     life: 1
                 });
             }
