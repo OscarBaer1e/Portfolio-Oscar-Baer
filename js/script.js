@@ -23,6 +23,16 @@ if (isMobile) {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
+    /* Désactive les liens GitHub tant que le profil n'est pas prêt */
+    var githubLinks = document.querySelectorAll('a[href*="github.com/OscarBaer"], a[aria-label="GitHub"]');
+    githubLinks.forEach(function(link) {
+        link.removeAttribute('href');
+        link.removeAttribute('target');
+        link.setAttribute('aria-disabled', 'true');
+        link.setAttribute('title', 'GitHub bientôt disponible');
+        link.classList.add('disabled-social-link');
+    });
+
     /* ----- Accessibilité : lien d'évitement ----- */
     var mainEl = document.querySelector('main');
     if (mainEl && !mainEl.id) mainEl.id = 'main-content';

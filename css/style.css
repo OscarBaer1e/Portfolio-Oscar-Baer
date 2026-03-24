@@ -2635,6 +2635,11 @@ nav .nav-list a.active::after {
 .lightbox-close:hover {
     background: rgba(255, 255, 255, 0.3);
 }
+.disabled-social-link {
+    pointer-events: none;
+    opacity: 0.55;
+    cursor: not-allowed;
+}
 @media (max-width: 980px) {
     .lightbox-overlay.has-side-description {
         flex-direction: column;
