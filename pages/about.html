@@ -13,6 +13,7 @@
         .about-cv-section { margin-bottom: 2.5rem; }
         .about-cv-section h3 { font-size: 1.35rem; margin-bottom: 1.25rem; padding-bottom: 0.5rem; border-bottom: 2px solid var(--primary-color); color: var(--light-text-color); }
         .about-cv-lead { color: var(--dim-text-color); max-width: 60rem; margin: 0 auto 2rem; text-align: center; font-size: 1.02rem; }
+        .about-skills-intro { color: var(--dim-text-color); max-width: 46rem; margin: 0 auto 1.5rem; text-align: center; font-size: 1rem; }
         .about-highlights { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; margin-bottom: 2.25rem; }
         .about-highlight-card { background: var(--dark-bg-color-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem 1.1rem; }
         .about-highlight-card h4 { margin: 0 0 0.35rem 0; color: var(--light-text-color); font-size: 1rem; }
@@ -59,7 +60,6 @@
         .about-skills-cards .skill-category:hover { border-color: var(--primary-color); box-shadow: 0 8px 24px rgba(102, 101, 221, 0.15); }
         .about-skills-cards .skill-category h4 { margin-bottom: 0.75rem; }
 
-        /* Règles détaillées 2 colonnes dans style.css (#about .container .about-cv-two-cols) */
         @media (max-width: 900px) {
             .about-highlights { grid-template-columns: 1fr; }
         }
@@ -70,8 +70,6 @@
                 flex-wrap: nowrap !important;
                 gap: 2rem;
             }
-        }
-        @media (max-width: 640px) {
             .cv-timeline { padding-left: 1.75rem; }
             .cv-timeline-item::before { left: -1.75rem; width: 12px; height: 12px; }
         }
@@ -147,11 +145,10 @@
                     </article>
                 </div>
 
-                <!-- Deux colonnes : gauche Expériences + Formation | droite Compétences + Langues -->
                 <div class="about-layout-grid">
-                <div class="about-layout-col">
+                <section class="about-layout-col" aria-labelledby="about-exp-title">
                 <div class="about-cv-section">
-                    <h3><i class="fas fa-briefcase" aria-hidden="true"></i> Expériences professionnelles</h3>
+                    <h3 id="about-exp-title"><i class="fas fa-briefcase" aria-hidden="true"></i> Expériences professionnelles</h3>
                     <div class="cv-timeline">
                         <div class="cv-timeline-item">
                         <span class="cv-dates">Sept. 2025 – Août 2026</span>
@@ -215,11 +212,11 @@
                         </div>
                     </div>
                 </div>
-                </div>
-                <div class="about-layout-col">
+                </section>
+                <section class="about-layout-col" aria-labelledby="about-skills-title">
                 <div class="skills-section about-cv-section about-skills-cards">
-                    <h3 class="section-title" style="margin-bottom: 0.5rem;"><i class="fas fa-tools" aria-hidden="true"></i> Compétences</h3>
-                    <p class="text-center" style="color: var(--dim-text-color); max-width: 46rem; margin: 0 auto 1.5rem; font-size: 1rem;">
+                    <h3 id="about-skills-title"><i class="fas fa-tools" aria-hidden="true"></i> Compétences</h3>
+                    <p class="about-skills-intro">
                         Développement, design, audiovisuel et communication.
                     </p>
                     <div class="skills-grid">
@@ -267,9 +264,8 @@
                         <span>Italien (notions)</span>
                     </div>
                 </div>
+                </section>
                 </div>
-                </div>
-                <!-- Fin deux colonnes -->
             </div>
         </section>
     </main>
