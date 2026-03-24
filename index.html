@@ -153,45 +153,48 @@
         <section id="featured-projects" class="section-padding">
             <div class="container">
                 <h2 class="section-title reveal">Projets phares</h2>
-                <div class="portfolio-grid">
-                    <article class="portfolio-item reveal" data-animation-delay="0">
+                <p class="reveal" style="color: var(--dim-text-color); max-width: 44rem; margin: -2.5rem auto 3rem; text-align: center; font-size: 1rem; line-height: 1.7;">
+                    Une sélection de mes réalisations les plus abouties, entre développement web, visualisation de données et création graphique.
+                </p>
+                <div class="portfolio-grid" style="grid-template-columns: repeat(3, 1fr); max-width: 1100px; margin: 0 auto; gap: 2rem;">
+                    <article class="portfolio-item reveal" data-animation-delay="0" style="border-radius: 16px;">
                         <a href="./pages/txlforma.html" class="portfolio-item-link">
                             <div class="portfolio-image-wrapper">
                                 <img src="./ressources/images/txlforma-dashboard.png" alt="Dashboard de TXLFORMA, plateforme e-learning." loading="lazy">
                                 <span class="portfolio-overlay-label"><i class="fas fa-eye"></i> Voir le projet</span>
                             </div>
                             <div class="portfolio-item-content">
-                                <h3>TXLFORMA – Plateforme e-learning</h3>
-                                <p class="category">React · Spring Boot · Stripe · Blender 3D</p>
+                                <h3>TXLFORMA</h3>
+                                <p class="category">React · Spring Boot · Stripe</p>
                             </div>
                         </a>
                     </article>
-                    <article class="portfolio-item reveal" data-animation-delay="100">
+                    <article class="portfolio-item reveal" data-animation-delay="120" style="border-radius: 16px;">
                         <a href="./pages/biosphere.html" class="portfolio-item-link">
                             <div class="portfolio-image-wrapper">
                                 <img src="./ressources/images/biosphere-1.png" alt="Biosphère, application de datavisualisation." loading="lazy">
                                 <span class="portfolio-overlay-label"><i class="fas fa-eye"></i> Voir le projet</span>
                             </div>
                             <div class="portfolio-item-content">
-                                <h3>Biosphère – Dataviz biocontrôle</h3>
-                                <p class="category">Datavisualisation · API · Décision</p>
+                                <h3>Biosphère</h3>
+                                <p class="category">Dataviz · API · Décision</p>
                             </div>
                         </a>
                     </article>
-                    <article class="portfolio-item reveal" data-animation-delay="200">
+                    <article class="portfolio-item reveal" data-animation-delay="240" style="border-radius: 16px;">
                         <a href="./pages/graphisme.html" class="portfolio-item-link">
                             <div class="portfolio-image-wrapper">
                                 <img src="./ressources/images/i1_files/unnamed.png" alt="Créations graphiques sélectionnées." loading="lazy">
                                 <span class="portfolio-overlay-label"><i class="fas fa-palette"></i> Voir les créations</span>
                             </div>
                             <div class="portfolio-item-content">
-                                <h3>Graphisme & Créations</h3>
-                                <p class="category">Design · Illustrations · Identité</p>
+                                <h3>Graphisme</h3>
+                                <p class="category">Illustrations · Identité</p>
                             </div>
                         </a>
                     </article>
                 </div>
-                <div class="text-center mt-5">
+                <div class="text-center reveal" style="margin-top: 3rem;">
                     <a href="./pages/portfolio.html" class="btn secondary-btn animated-btn">
                         <i class="fas fa-th"></i> Voir tous les projets
                     </a>
@@ -199,15 +202,17 @@
             </div>
         </section>
 
-        <section id="cta" class="section-padding">
-            <div class="container text-center">
-                <h2 class="section-title reveal">Un projet en tête ?</h2>
-                <p style="color: var(--dim-text-color); max-width: 40rem; margin: 0 auto 2rem; font-size: 1.05rem;">
-                    Actuellement en recherche d'alternance pour septembre 2026, je suis ouvert aux opportunités en communication visuelle, web et création de contenu.
-                </p>
-                <a href="./pages/contact.html" class="btn primary-btn animated-btn">
-                    <i class="fas fa-paper-plane"></i> Me contacter
-                </a>
+        <section id="cta" class="section-padding" style="padding-top: 4rem; padding-bottom: 6rem;">
+            <div class="container">
+                <div class="reveal" style="max-width: 680px; margin: 0 auto; text-align: center; background: rgba(71, 59, 240, 0.06); border: 1px solid var(--border-color); border-radius: 20px; padding: 3.5rem 2.5rem;">
+                    <h2 style="font-size: 2rem; margin-bottom: 1rem; color: var(--light-text-color); font-weight: 700;">Un projet en tête ?</h2>
+                    <p style="color: var(--dim-text-color); max-width: 36rem; margin: 0 auto 2rem; font-size: 1.02rem; line-height: 1.7;">
+                        En recherche d'alternance à partir de septembre 2026, je suis disponible pour des opportunités en communication visuelle, développement web et création de contenu.
+                    </p>
+                    <a href="./pages/contact.html" class="btn primary-btn animated-btn">
+                        <i class="fas fa-paper-plane"></i> Me contacter
+                    </a>
+                </div>
             </div>
         </section>
     </main>
