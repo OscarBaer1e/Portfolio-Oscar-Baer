@@ -24,6 +24,34 @@
         .about-highlight-card { background: var(--dark-bg-color-alt); border: 1px solid var(--border-color); border-radius: 12px; padding: 1rem 1.1rem; }
         .about-highlight-card h4 { margin: 0 0 0.35rem 0; color: var(--light-text-color); font-size: 1rem; }
         .about-highlight-card p { margin: 0; color: var(--dim-text-color); font-size: 0.92rem; line-height: 1.5; }
+        .about-highlight-card--reactbits {
+            position: relative;
+            overflow: hidden;
+            padding: 1.1rem;
+            border-radius: 14px;
+            transition: transform 0.25s ease, border-color 0.25s ease;
+            isolation: isolate;
+        }
+        .about-highlight-card--reactbits:hover,
+        .about-highlight-card--reactbits:focus-visible {
+            transform: translateY(-4px);
+            border-color: var(--primary-color);
+        }
+        .about-highlight-card--reactbits:focus-visible {
+            outline: 2px solid var(--primary-color);
+            outline-offset: 2px;
+        }
+        .about-highlight-content {
+            position: relative;
+            z-index: 1;
+        }
+        .about-spotlight-layer {
+            pointer-events: none;
+            position: absolute;
+            inset: 0;
+            transition: opacity 260ms ease;
+            z-index: 0;
+        }
         /* Layout dédié About (très robuste : 2 colonnes fixes sur desktop) */
         #about .container .about-layout-grid {
             display: flex !important;
@@ -162,7 +190,7 @@
                     </div>
                 </div>
 
-                <div class="about-highlights">
+                <div class="about-highlights" id="about-highlights-static">
                     <article class="about-highlight-card">
                         <h4><i class="fas fa-calendar-check" aria-hidden="true"></i> Disponibilité</h4>
                         <p>Recherche d'alternance à partir de septembre 2026.</p>
@@ -176,6 +204,7 @@
                         <p>Travail en équipe, gestion de projet Agile et documentation claire.</p>
                     </article>
                 </div>
+                <div id="reactbits-highlights-root" hidden aria-label="Points forts interactifs React Bits"></div>
 
                 <div class="about-layout-grid">
                 <section class="about-layout-col" aria-labelledby="about-exp-title">
@@ -315,5 +344,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
     <script src="../js/script.js"></script>
+    <script type="module" src="../js/about-reactbits.js"></script>
 </body>
 </html>
